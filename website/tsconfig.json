@@ -4,10 +4,18 @@
 		"strict": true,
 		"resolveJsonModule": true,
 		"jsx": "react",
-		"moduleResolution": "node"
+		// The preset declares @site/* relative to its own package directory;
+		// redeclare it against the site root so editor and tsc resolve it.
+		"baseUrl": ".",
+		"paths": {
+			"@site/*": ["./*"]
+		}
 	},
 	"include": [
 		"./**/*.ts",
 		"./**/*.tsx",
+		// The Markdown export plugin is JavaScript with JSDoc types; its
+		// `// @ts-check` only means anything while it is part of the program.
+		"./plugins/docs-markdown/**/*.js",
 	]
 }

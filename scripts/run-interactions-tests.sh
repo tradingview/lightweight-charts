@@ -2,7 +2,8 @@
 set -e
 echo "Preparing"
 
-npm run build
+pnpm build
+pnpm --filter @tradingview/lwc-toolkit --filter "@tradingview/lwc-plugin-*" build
 
 echo "Interactions tests"
-npm run e2e:interactions
+pnpm e2e:interactions

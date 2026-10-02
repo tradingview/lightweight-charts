@@ -18,18 +18,14 @@ sidebar_position: 8
 You can find the source code of the Lightweight Charts™ Android wrapper in [this repository](https://github.com/tradingview/lightweight-charts-android).
 :::
 
-:::info
-
-This wrapper is currently still using `v3.8.0`. This will be updated to `v4.0.0` in the near future.
-
-:::
-
 You can use Lightweight Charts™ inside an Android application. To use Lightweight Charts™ in that context, you can use our Android wrapper, which will allow you to interact with Lightweight Charts™ library, which will be rendered in a web view.
 
 ## Installation
 
 :::info
-Requires minSdkVersion 21, and installed WebView with support of ES6
+
+Requires minSdkVersion 23, and an installed Android System WebView or Chrome WebView provider with ES2020 support. Lightweight Charts™ 5.x is ESM/ES2020-only.
+
 :::
 
 In `/build.gradle`
@@ -48,7 +44,7 @@ In `/gradle_module/build.gradle`
 ```groovy
 dependencies {
     //...
-    implementation 'com.tradingview:lightweightcharts:3.8.0'
+    implementation 'com.tradingview:lightweightcharts:5.2.0'
 }
 ```
 
@@ -78,7 +74,7 @@ Configure the chart layout.
 ```kotlin
 charts_view.api.applyOptions {
     layout = layoutOptions {
-        background = SolidColor(Color.LTGRAY)
+        background = SolidColor(Color.LTGRAY.toIntColor())
         textColor = Color.BLACK.toIntColor()
     }
     localization = localizationOptions {

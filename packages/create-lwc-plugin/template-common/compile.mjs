@@ -1,33 +1,8 @@
 import { dirname, resolve } from 'node:path';
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { build, defineConfig } from 'vite';
 import { fileURLToPath } from 'url';
 import { generateDtsBundle } from 'dts-bundle-generator';
-
-function buildPackageJson(packageName) {
-	/*
-	 Define the contents of the package's package.json here.
-	 */
-	return {
-		name: packageName,
-		version: '1.0.0',
-		keywords: ['lwc-plugin', 'lightweight-charts'],
-		type: 'module',
-		main: `./${packageName}.umd.cjs`,
-		module: `./${packageName}.js`,
-		types: `./${packageName}.d.ts`,
-		exports: {
-			import: {
-				types: `./${packageName}.d.ts`,
-				default: `./${packageName}.js`,
-			},
-			require: {
-				types: `./${packageName}.d.cts`,
-				default: `./${packageName}.umd.cjs`,
-			},
-		},
-	};
-}
 
 const __filename = fileURLToPath(import.meta.url);
 const currentDir = dirname(__filename);
@@ -38,8 +13,7 @@ const pluginFile = resolve(currentDir, 'src', `${pluginFileName}.ts`);
 const pluginsToBuild = [
 	{
 		filepath: pluginFile,
-		exportName: '_PACKAGENAME_',
-		name: '_CLASSNAME_',
+		exportName: 'template-entry',
 	},
 ];
 
@@ -48,31 +22,40 @@ if (!existsSync(compiledFolder)) {
 	mkdirSync(compiledFolder);
 }
 
-const buildConfig = ({
-	filepath,
-	name,
-	exportName,
-	formats = ['es', 'umd'],
-}) => {
+/*
+ The plugin is published as ESM only. Two bundles are produced:
+
+ - `<name>.js`         the package entry point. Every dependency stays external,
+                       so a bundler in the consuming project can deduplicate them.
+ - `<name>.standalone.js`  for use straight from a CDN. Everything except
+                       `lightweight-charts` itself is inlined and the result is
+                       minified, so the file can be imported on its own with no
+                       install step. The entry point is left unminified: whatever
+                       bundles it will minify it in turn.
+
+ The bundler's own minifier is used, which mangles names and drops comments and
+ dead code but keeps line breaks. That is deliberate: a dedicated minifier saves
+ only a couple of hundred more bytes over the wire on a bundle this size, and is
+ not worth an extra dependency in every plugin project.
+ */
+const buildConfig = ({ filepath, exportName, standalone = false }) => {
 	return defineConfig({
 		publicDir: false,
 		build: {
-			outDir: `dist`,
-			emptyOutDir: true,
+			outDir: 'dist',
+			// Both passes write into the same folder, so only the first may clear it.
+			emptyOutDir: false,
+			minify: standalone,
 			copyPublicDir: false,
 			lib: {
 				entry: filepath,
-				name,
-				formats,
-				fileName: exportName,
+				formats: ['es'],
+				fileName: standalone ? `${exportName}.standalone` : exportName,
 			},
 			rollupOptions: {
-				external: ['lightweight-charts', 'fancy-canvas'],
-				output: {
-					globals: {
-						'lightweight-charts': 'LightweightCharts',
-					},
-				},
+				external: standalone
+					? ['lightweight-charts']
+					: ['lightweight-charts', 'fancy-canvas'],
 			},
 		},
 	});
@@ -80,37 +63,48 @@ const buildConfig = ({
 
 const startTime = Date.now().valueOf();
 console.log('⚡️ Starting');
+
 console.log('Bundling the plugin...');
-const promises = pluginsToBuild.map(file => {
-	return build(buildConfig(file));
-});
-await Promise.all(promises);
-console.log('Generating the package.json file...');
-pluginsToBuild.forEach(file => {
-	const packagePath = resolve(compiledFolder, 'package.json');
-	const content = JSON.stringify(
-		buildPackageJson(file.exportName),
-		undefined,
-		4
-	);
-	writeFileSync(packagePath, content, { encoding: 'utf-8' });
-});
+for (const file of pluginsToBuild) {
+	// Sequential: the two passes share an output folder.
+	await build(buildConfig({ ...file, standalone: false }));
+	await build(buildConfig({ ...file, standalone: true }));
+}
+
 console.log('Generating the typings files...');
-pluginsToBuild.forEach(file => {
-	try {
-		const esModuleTyping = generateDtsBundle([
-			{
-				filePath: `./typings/${pluginFileName}.d.ts`,
+for (const file of pluginsToBuild) {
+	const esModuleTyping = generateDtsBundle([
+		{
+			filePath: `./typings/${pluginFileName}.d.ts`,
+			libraries: {
+				importedLibraries: ['lightweight-charts', 'fancy-canvas'],
+				/*
+				 The toolkit is a devDependency that the bundler inlines into the
+				 plugin's own output, so its types have to be inlined into the
+				 declarations to match. Listing it is not optional: with
+				 `followSymlinks: false` below it counts as an external library, and
+				 an external library in neither list is emitted as neither a
+				 declaration nor an import — leaving a .d.ts that references types it
+				 never declares. `skipLibCheck` hides that from consumers.
+				 */
+				inlinedLibraries: ['@tradingview/lwc-toolkit'],
 			},
-		]);
-		const typingFilePath = resolve(compiledFolder, `${file.exportName}.d.ts`);
-		writeFileSync(typingFilePath, esModuleTyping.join('\n'), {
-			encoding: 'utf-8',
-		});
-		copyFileSync(typingFilePath, resolve(compiledFolder, `${file.exportName}.d.cts`));
-	} catch (e) {
-		console.error('Error generating typings for: ', file.exportName);
-	}
-});
+		},
+	], {
+		/*
+		 dts-bundle-generator treats a dependency as an external library only when
+		 its resolved path sits in node_modules, and it inlines anything else. A
+		 linked dependency resolves outside node_modules, so without this the
+		 library's entire public typings would be inlined into the bundle instead
+		 of imported from it.
+		 */
+		followSymlinks: false,
+	});
+	const typingFilePath = resolve(compiledFolder, `${file.exportName}.d.ts`);
+	writeFileSync(typingFilePath, esModuleTyping.join('\n'), {
+		encoding: 'utf-8',
+	});
+}
+
 const endTime = Date.now().valueOf();
 console.log(`🎉 Done (${endTime - startTime}ms)`);

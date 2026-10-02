@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { expect } from 'chai';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { after, before, describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -10,11 +10,11 @@ import puppeteer, {
 	launch as launchPuppeteer,
 } from 'puppeteer';
 
-import { TestCase } from '../helpers/get-test-cases';
 import { Interaction, runInteractionsOnPage } from '../helpers/perform-interactions';
 import { retryTest } from '../helpers/retry-tests';
 
-import { getTestCases } from './helpers/get-interaction-test-cases';
+import { generatePluginPageContent } from '../graphics/generate-plugin-test-cases';
+import { getTestCases, InteractionTestCase } from './helpers/get-interaction-test-cases';
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirectory = dirname(currentFilePath);
@@ -41,6 +41,7 @@ interface InternalWindow {
 	initialInteractionsToPerform: () => Interaction[];
 	finalInteractionsToPerform: () => Interaction[];
 	finishedSetup: Promise<() => void>;
+	testCaseReady: Promise<void>;
 	afterInitialInteractions?: () => void;
 	afterFinalInteractions: () => void;
 }
@@ -67,14 +68,21 @@ void describe('Interactions tests', () => {
 
 	let testCaseCount = 0;
 
-	const runTestCase = (testCase: TestCase) => {
+	const runTestCase = (testCase: InteractionTestCase, groupName: string) => {
 		testCaseCount += 1;
 		void it(testCase.name, { timeout: 15000 }, async () => {
 			await retryTest(3, async () => {
-				const pageContent = generatePageContent(
-					testStandalonePath,
-					testCase.caseContent
-				);
+				const esmPath = process.env.TEST_STANDALONE_ESM_PATH || '';
+				const pageContent = testCase.plugin === undefined
+					? generatePageContent(testStandalonePath, testCase.caseContent)
+					: generatePluginPageContent(
+						esmPath,
+						testCase.plugin.packageName,
+						`${esmPath.slice(0, esmPath.lastIndexOf('/') + 1)}${testCase.plugin.folder}.js`,
+						testCase.caseContent,
+						'development',
+						'beforeInteractions'
+					);
 
 				const page = await browser.newPage();
 				await page.setViewport({ width: 600, height: 600 });
@@ -92,24 +100,29 @@ void describe('Interactions tests', () => {
 					}
 				});
 
-				await page.setContent(pageContent, { waitUntil: 'load' });
-
-				await page.evaluate(() => {
-					return (window as unknown as InternalWindow).finishedSetup;
-				});
-
-				await runInteractionsOnPage(page);
-
-				await page.close();
-
-				if (errors.length !== 0) {
-					throw new Error(`Page has errors:\n${errors.join('\n')}`);
+				try {
+					await page.setContent(pageContent, { waitUntil: 'load' });
+					// Module-based plugin pages finish setup after their imports load.
+					const setupKey = testCase.plugin === undefined ? 'finishedSetup' : 'testCaseReady';
+					await page.waitForFunction((key: string) => Object.prototype.hasOwnProperty.call(window, key), {}, setupKey);
+					await page.evaluate(
+						(plugin: boolean) => {
+							const state = window as unknown as InternalWindow;
+							return plugin ? state.testCaseReady : state.finishedSetup;
+						},
+						testCase.plugin !== undefined
+					);
+					await runInteractionsOnPage(page);
+					expect(errors, 'There should not be any errors thrown within the test page.').to.deep.equal([]);
+				} catch (error) {
+					// Preserve the visible state when an interaction assertion fails.
+					const outDir = join(process.env.CMP_OUT_DIR || join(currentDirectory, '.gendata'), groupName || 'library');
+					mkdirSync(outDir, { recursive: true });
+					await page.screenshot({ path: join(outDir, `${testCase.name}.png`) });
+					throw error;
+				} finally {
+					await page.close();
 				}
-
-				expect(errors.length).to.be.equal(
-					0,
-					'There should not be any errors thrown within the test page.'
-				);
 			});
 		});
 	};
@@ -119,12 +132,12 @@ void describe('Interactions tests', () => {
 	for (const groupName of Object.keys(testCaseGroups)) {
 		if (groupName.length === 0) {
 			for (const testCase of testCaseGroups[groupName]) {
-				runTestCase(testCase);
+				runTestCase(testCase, groupName);
 			}
 		} else {
 			void describe(groupName, () => {
 				for (const testCase of testCaseGroups[groupName]) {
-					runTestCase(testCase);
+					runTestCase(testCase, groupName);
 				}
 			});
 		}

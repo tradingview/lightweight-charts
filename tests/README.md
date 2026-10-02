@@ -18,9 +18,20 @@ When contributing to the library, please note:
 
 The unit tests can be run using the following command:
 
-- `npm run test`
+- `pnpm test`
 
-The unit tests form part of the `npm run verify` command which should be run before committing to the repo.
+The unit tests form part of the `pnpm verify` command which should be run before committing to the repo.
+Package unit tests under `packages/*/tests/unit/**/*.spec.ts` are included in the same command.
+
+## Type Tests
+
+Run `pnpm type-tests` for both the library type checks and the plugin consumer type checks.
+The command builds the library and plugin packages before checking each plugin's
+`tests/type-checks/api.ts` against its published declarations. These cases import
+the package name and `/standalone` entry point with strict NodeNext resolution,
+without source aliases or skipped declaration checks. They cover inferred types,
+custom horizontal scales, callbacks, partial options, and invalid inputs marked
+with `@ts-expect-error`. The files are compiled only, never executed.
 
 ## End-to-end (e2e) Tests
 
@@ -47,7 +58,7 @@ You can run the coverage test with the following command:
 Alternatively, you can run the test on a specific file like this:
 
 ```bash
-npx esno ./tests/e2e/coverage/runner.ts ./dist/lightweight-charts.standalone.development.js
+pnpm exec esno ./tests/e2e/coverage/runner.ts ./dist/lightweight-charts.standalone.development.js
 ```
 
 #### Analysing the Coverage test
@@ -75,7 +86,7 @@ You can run the graphics tests with the following command:
 Alternatively, you can run the test on specific files like this:
 
 ```bash
-npx esno ./tests/e2e/graphics/runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
+pnpm exec esno ./tests/e2e/graphics/runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
 ```
 
 The following enviromental variables can be used to adjust the test:
@@ -85,7 +96,7 @@ The following enviromental variables can be used to adjust the test:
 - `CMP_OUT_DIR`: Directory to output the test artifacts. (Defaults to `.gendata`)
 
 ```bash
-PRODUCTION_BUILD=false DEVICE_PIXEL_RATIO=1.5 npx esno ./tests/e2e/graphics/runner.ts ./golden/lightweight-charts.standalone.development.js ./dist/lightweight-charts.standalone.development.js
+PRODUCTION_BUILD=false DEVICE_PIXEL_RATIO=1.5 pnpm exec esno ./tests/e2e/graphics/runner.ts ./golden/lightweight-charts.standalone.development.js ./dist/lightweight-charts.standalone.development.js
 ```
 
 ### Memory Leaks
@@ -103,7 +114,7 @@ You can run the memory leak test with the following command:
 Alternatively, you can run the test on a specific file like this:
 
 ```bash
-npx esno ./tests/e2e/memleaks/runner.ts ./dist/lightweight-charts.standalone.development.js
+pnpm exec esno ./tests/e2e/memleaks/runner.ts ./dist/lightweight-charts.standalone.development.js
 ```
 
 ### Interactions
@@ -121,5 +132,17 @@ You can run the interactions tests with the following command:
 Alternatively, you can run the tests on a specific file like this:
 
 ```bash
-npx esno ./tests/e2e/interactions/runner.ts ./dist/lightweight-charts.standalone.development.js
+pnpm exec esno ./tests/e2e/interactions/runner.ts ./dist/lightweight-charts.standalone.development.js
 ```
+
+Plugin interaction cases live in `packages/lwc-plugin-<name>/tests/interactions/*.js`
+and run alongside the library cases in `pnpm e2e:interactions`. They use the same
+`beforeInteractions(container)` and interaction callbacks as the library cases,
+with `LightweightCharts` and `LwcPlugin` globals supplied by the module test page.
+`scripts/run-interactions-tests.sh` builds the library, toolkit, and plugins first.
+When invoking the runner directly, build those outputs beforehand.
+
+Set `GREP` to select cases by `<group>/<case>` (for example,
+`GREP='lwc-plugin-vertical-line/' pnpm e2e:interactions`). Failed interactions save
+screenshots under `tests/e2e/interactions/.gendata/<group>/`, or `CMP_OUT_DIR` when
+set. The existing interaction CI job retains this directory as an artifact.

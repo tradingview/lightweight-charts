@@ -1,8 +1,8 @@
 ---
 sidebar_position: 0
-sidebar_label: Full Bar Width
+sidebar_label: Full bar width
 pagination_title: Full Bar Width
-title: Full Bar Width Calculations
+title: Full bar width calculations
 description: Describes the calculation for full bar widths
 keywords:
   - plugins

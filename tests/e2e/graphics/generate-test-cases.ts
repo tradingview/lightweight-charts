@@ -9,7 +9,7 @@ const dummyContent = fs.readFileSync(
 	path.join(currentDirectory, 'helpers', 'test-page-dummy.html'),
 	{ encoding: 'utf-8' }
 );
-const resizeObserverPolyfill =
+export const resizeObserverPolyfill =
 	fs
 		.readFileSync(
 			path.join(

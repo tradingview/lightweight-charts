@@ -23,6 +23,7 @@ function main() {
 	delete packageJson.engines;
 	delete packageJson.devDependencies;
 	delete packageJson.scripts;
+	delete packageJson.packageManager;
 
 	fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', { encoding: 'utf-8' });
 }

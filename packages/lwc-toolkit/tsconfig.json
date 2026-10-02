@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"target": "es2020",
+		"useDefineForClassFields": true,
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"lib": ["ES2020", "DOM"],
+		"strict": true,
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"skipLibCheck": true,
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"rootDir": "src",
+		"outDir": "dist",
+		// Only the types the sources reference, so that emitting declarations never picks
+		// up unrelated ambient @types packages hoisted further up the workspace.
+		"types": []
+	},
+	"include": ["src"]
+}

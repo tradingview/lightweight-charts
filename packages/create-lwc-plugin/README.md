@@ -1,34 +1,24 @@
 # create-lwc-plugin
 
-**create-lwc-plugin** is an npm package designed to simplify the process of
-creating a new plugin for Lightweight Charts™. With this generator, you can
-quickly scaffold a project from a template for either
+**create-lwc-plugin** scaffolds a new plugin project for Lightweight Charts™.
+The wizard asks a few questions and generates a ready-to-run project from a
+template for one of the three plugin types:
 
-- a Drawing primitive plugin, or
-- a Custom series plugin.
+- a series primitive
+- a pane primitive
+- a custom series
 
-By using this wizard-like tool, you can customize the initial setup of their
-plugin project by answering a few questions. This allows for a seamless and
-efficient starting point, saving valuable time and effort.
-
-Whether you are developing a new Drawing primitive plugin or a Custom series
-plugin for Lightweight Charts, this generator provides a structured and
-organized foundation. It ensures that your plugin adheres to the best practices
-and conventions of Lightweight Charts, making it easier to develop, maintain,
-and contribute to the community.
-
-Getting started with your Lightweight Charts plugin development has never been
-easier. Let the Lightweight Charts™ Plugin Scaffold Generator
-(`create-lwc-plugin`) handle the initial setup, so you can focus on creating
-outstanding plugins for Lightweight Charts™.
+The scaffolded project is ready to publish: its `package.json` follows the
+conventions used by the Lightweight Charts™ plugin catalog, so the plugin can
+be listed there once it is published to npm.
 
 ✨ Need some examples for inspiration? Check out the
 [plugin-examples](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples)
-folder in the Lightweight Charts repo.
+folder in the Lightweight Charts™ repo.
 
-## Scaffolding Your First Lightweight Charts™ Plugin
+## Scaffold your first Lightweight Charts™ plugin
 
-With NPM:
+With npm:
 
 ```bash
 npm create lwc-plugin@latest
@@ -40,15 +30,41 @@ With Yarn:
 yarn create lwc-plugin
 ```
 
-With PNPM:
+With pnpm:
 
 ```bash
 pnpm create lwc-plugin
 ```
 
-## Using the generated project
+The wizard asks for the plugin's name, description, author, license, the minimum
+version of Lightweight Charts™ it supports, and the tags to list it under. Those
+answers populate the generated `package.json`, including the `lwcPlugin` block
+read by the plugin catalog.
 
-### Running Locally (during development)
+Before any of that, the wizard offers to install the
+[plugin-authoring Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md)
+for AI coding assistants such as Claude Code, Codex, and Cursor. The skill helps
+choose the plugin type, build on `@tradingview/lwc-toolkit`, and pick the right
+official plugin as the reference for your idea. It also points to the docs and
+warns about the autoscale, whitespace, and hit-test mistakes a first plugin
+tends to make.
+
+Say yes, and you have two ways to continue. Carry on with the wizard: the skill
+is installed into the new project when the wizard finishes. Or quit right
+there: the skill is installed into the current directory, and you hand the rest
+over to your assistant. The assistant knows how to run this wizard with you.
+
+The skill is installed with the [`skills` CLI](https://github.com/vercel-labs/skills).
+The CLI asks which assistants to set it up for. You can also run it yourself at
+any time:
+
+```bash
+npx skills add tradingview/lightweight-charts --skill lightweight-charts-plugin-authoring
+```
+
+## The generated project
+
+### Run locally
 
 ```shell
 npm install
@@ -57,26 +73,41 @@ npm run dev
 
 Visit `localhost:5173` in the browser.
 
-### Compiling the Plugin
+### Build the plugin
 
 ```shell
-npm run compile
+npm run build
 ```
 
-Check the output in the `dist` folder.
+This writes three files into the `dist` folder: the package entry point
+(`<name>.js`), a standalone build for use over a CDN
+(`<name>.standalone.js`) which inlines every dependency except
+Lightweight Charts™ itself, and the bundled type declarations (`<name>.d.ts`).
+Plugins are published as ES modules only.
 
-### Publishing To NPM
+### Publish to npm
 
-You can configure the contents of the package's `package.json` within the
-`compile.mjs` script.
-
-Once you have compiled the plugin (see above section) then you can publish the
-package to NPM with these commands:
+The `package.json` in the project root is the published manifest. Check its
+`description`, `version`, `license` and `lwcPlugin` fields, then publish from
+the project root:
 
 ```shell
-cd dist
 npm publish
 ```
 
 Hint: append `--dry-run` to the end of the publish command to see the results of
-the publish command without actually uploading the package to NPM.
+the publish command without actually uploading the package to npm.
+
+## Scaffold an official in-repo plugin
+
+Maintainers working inside the Lightweight Charts™ repository can scaffold a
+workspace package instead of a standalone project:
+
+```shell
+pnpm create lwc-plugin --workspace
+```
+
+Workspace mode targets `packages/`, scopes the package name to `@tradingview/`,
+depends on the library and the shared plugin utilities through `workspace:*`,
+seeds a `CHANGELOG.md`, `LICENSE` and `NOTICE`, and marks the plugin as an
+official catalog entry.

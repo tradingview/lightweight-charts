@@ -1,0 +1,14 @@
+.frameBare {
+	width: 100%;
+	border: 0;
+	display: block;
+	/* The framed page paints its own light background; this only covers the
+	   moment before it loads, so it must not be the theme's surface colour. */
+	background: #ffffff;
+}
+
+.frame {
+	composes: frameBare;
+	border: 1px solid var(--ifm-color-emphasis-200);
+	border-radius: 12px;
+}

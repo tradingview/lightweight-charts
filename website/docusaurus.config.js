@@ -9,6 +9,7 @@ import pluginDocusaurus from 'docusaurus-plugin-typedoc';
 import logger from '@docusaurus/logger';
 
 import versions from './versions.json';
+import { docsMarkdownPlugin } from './plugins/docs-markdown/index.js';
 
 /* Configuration Constants */
 const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
@@ -267,7 +268,11 @@ const getConfig = async () => {
 			],
 		],
 
-		customFields: {},
+		customFields: {
+			// Frozen at build time so the server-rendered markup and the
+			// hydrated client derive the same "New" badge (no Date.now() in render).
+			catalogueBuildTime: Date.now(),
+		},
 
 		themeConfig: {
 			navbar: {
@@ -293,6 +298,11 @@ const getConfig = async () => {
 						docId: 'api/index',
 						position: 'left',
 						label: 'API Reference',
+					},
+					{
+						to: '/plugins',
+						position: 'left',
+						label: 'Plugins',
 					},
 					{
 						type: 'docsVersionDropdown',
@@ -422,6 +432,8 @@ const getConfig = async () => {
 			...versions.map(typedocPluginForVersion),
 			'./plugins/enhanced-codeblock',
 			'./plugins/suppress-resize-observer-error',
+			'./plugins/plugin-catalogue',
+			docsMarkdownPlugin,
 		],
 	};
 

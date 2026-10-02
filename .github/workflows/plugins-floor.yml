@@ -1,0 +1,56 @@
+name: Plugin packages, declared floor
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'packages/**'
+      - 'scripts/plugins/**'
+      - '.github/workflows/plugins-floor.yml'
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: Only this plugin package (name, folder or short name); empty for all
+        type: string
+        default: ''
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+  # Passed to the script as `--filter`; empty means every package.
+  PLUGIN_FILTER: ${{ inputs.filter }}
+
+jobs:
+  floor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      # pnpm is provided by corepack (see the note in deploy.yml). It has to
+      # be enabled before setup-node, because `cache: 'pnpm'` needs the pnpm
+      # binary to resolve the store path.
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck every plugin against its declared minimum library version
+        run: |
+          args=()
+          if [ -n "$PLUGIN_FILTER" ]; then args+=(--filter "$PLUGIN_FILTER"); fi
+          pnpm plugins:check-compat --floor "${args[@]}"

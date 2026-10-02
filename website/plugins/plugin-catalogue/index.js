@@ -1,0 +1,77 @@
+const path = require('path');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+
+const execFileAsync = promisify(execFile);
+
+/**
+ * Exposes the plugin catalogue data to the site, see ./types.d.ts for the shape
+ * and README.md for where each field comes from.
+ *
+ * The data is produced by the repository script so that the docs build, the CI
+ * gates and a maintainer's terminal all use one implementation. A failing
+ * script (invalid metadata, unreachable registry) fails the docs build.
+ */
+module.exports = function pluginCatalogue(context) {
+	const repoRoot = path.resolve(context.siteDir, '..');
+	const script = path.join(repoRoot, 'scripts/plugins/catalogue.mjs');
+
+	return {
+		name: 'lwc-plugin-catalogue',
+
+		// The dev server re-runs loadContent when these change.
+		getPathsToWatch: () => [
+			path.join(repoRoot, 'packages/lwc-plugin-*/package.json'),
+			path.join(repoRoot, 'packages/lwc-plugin-*/README.md'),
+			// Excludes each plugin's node_modules: pnpm links lightweight-charts back
+			// to the repo root and chokidar follows it forever. This entry must be
+			// relative: Docusaurus only relativises absolute paths, and chokidar joins
+			// a relative "!" path onto siteDir. It must also repeat the globs' own
+			// prefix; a generic `!**/node_modules/**` matches nothing under `..`.
+			`!${path.relative(context.siteDir, path.join(repoRoot, 'packages/lwc-plugin-*/node_modules/**'))}`,
+		],
+
+		async loadContent() {
+			let result;
+			try {
+				result = await execFileAsync(process.execPath, [script], {
+					cwd: context.siteDir,
+					encoding: 'utf-8',
+					maxBuffer: 64 * 1024 * 1024,
+				});
+			} catch (err) {
+				if (err.stderr) {
+					process.stderr.write(err.stderr);
+				}
+				// err.message would repeat the stderr the line above already printed.
+				throw new Error('The plugin catalogue could not be built, see the errors above.');
+			}
+			// The script's warnings and summary belong in the build log.
+			if (result.stderr) {
+				process.stderr.write(result.stderr);
+			}
+			return JSON.parse(result.stdout);
+		},
+
+		async contentLoaded({ content, actions }) {
+			// Global data is loaded on every page, so it carries everything but the
+			// READMEs. Each full entry is written as its own JSON module and handed
+			// to its own route as the `entry` prop (addRoute does not prepend the
+			// site baseUrl itself).
+			await Promise.all(content.plugins.map(async entry => {
+				const entryPath = await actions.createData(`${entry.slug}.json`, JSON.stringify(entry));
+				actions.addRoute({
+					path: `${context.baseUrl}plugins/${entry.slug}`,
+					component: '@site/src/components/PluginDetails/index.tsx',
+					exact: true,
+					modules: { entry: entryPath },
+				});
+			}));
+			actions.setGlobalData({
+				registry: content.registry,
+				unpublished: content.unpublished,
+				plugins: content.plugins.map(({ readme, ...summary }) => summary),
+			});
+		},
+	};
+};

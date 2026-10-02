@@ -11,7 +11,7 @@ import {
 	SeriesType,
 	Time,
 } from 'lightweight-charts';
-import { PluginBase } from '../plugin-base';
+import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
 
 interface SessionHighlightingRendererData {
 	x: Coordinate | number;

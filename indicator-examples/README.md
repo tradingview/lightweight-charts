@@ -11,19 +11,18 @@ This directory contains implementations of indicator calculations and examples o
 To run these examples locally follow these steps:
 
 1. Clone the repo to your local machine
-2. First build the library
+2. First install the dependencies (the repository is a pnpm workspace, so a single install in the root directory covers all the projects) and build the library
 
    ```shell
-   npm install
-   npm run build:prod
+   pnpm install
+   pnpm build:prod
    ```
 
-3. Switch to the Indicator Examples Folder, install dependencies, and start the development server
+3. Switch to the Indicator Examples Folder and start the development server
 
    ```shell
    cd indicator-examples
-   npm install
-   npm run dev
+   pnpm dev
    ```
 
 4. Visit `localhost:5173` in the browser.
@@ -31,7 +30,7 @@ To run these examples locally follow these steps:
 ## Compiling the Examples
 
 ```shell
-npm run compile
+pnpm compile
 ```
 
 Check the output in the `compiled` folder.

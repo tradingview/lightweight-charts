@@ -105,10 +105,10 @@ async function main() {
 	runForSuccess('git', ['checkout', revToCheck]);
 
 	console.log(`Installing dependencies...`);
-	runShellForSuccess('npm install');
+	runShellForSuccess('pnpm install --frozen-lockfile');
 
 	console.log(`Building the library...`);
-	runShellForSuccess('npm run build:prod');
+	runShellForSuccess('pnpm build:prod');
 
 	const oldSizes = await getSizes();
 
@@ -116,10 +116,10 @@ async function main() {
 	runForSuccess('git', ['checkout', headRev]);
 
 	console.log(`Installing dependencies...`);
-	runShellForSuccess('npm install');
+	runShellForSuccess('pnpm install --frozen-lockfile');
 
 	console.log(`Building the library...`);
-	runShellForSuccess('npm run build:prod');
+	runShellForSuccess('pnpm build:prod');
 
 	const newSizes = await getSizes();
 

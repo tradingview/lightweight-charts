@@ -1,6 +1,10 @@
-# nodejs & npm
+# nodejs & package managers
 node_modules/
 npm-debug.log*
+pnpm-debug.log*
+
+# puppeteer browser cache (see .puppeteerrc.cjs)
+/.cache/
 
 /debug/**/*
 !/debug/README.md
@@ -29,6 +33,9 @@ npm-debug.log*
 /website/docs/api/
 /website/versioned_docs/**/api/
 /website/build
+# Plugin demo and preview pages, built by `pnpm plugins:build-demos`.
+/website/static/plugin-demos/
+/website/static/plugin-previews/
 /website/.docusaurus
 /website/.cache-loader
 /website/.previous-typings-cache/*.d.ts
@@ -36,9 +43,14 @@ npm-debug.log*
 
 !/src/typings/**/*.d.ts
 
-# graphics tests out data
+# end-to-end test output
 /tests/e2e/graphics/.gendata/
+/tests/e2e/interactions/.gendata/
 tests/e2e/coverage/.gendata
 
 # memleak log output
 tests/e2e/memleaks/.logs/
+
+# fixture build output
+tests/fixtures/**/dist/
+*.tsbuildinfo

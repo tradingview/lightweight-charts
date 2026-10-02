@@ -12,6 +12,10 @@ dist
 typings
 *.local
 
+# Tarballs left behind by `npm pack`, which publint and
+# arethetypeswrong both run to inspect the package.
+*.tgz
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

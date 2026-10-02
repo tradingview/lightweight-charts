@@ -1,0 +1,60 @@
+/*
+ * Layout of a catalogue preview page: one compact control row above a chart
+ * that fills whatever is left. The frame the catalogue gives the page can be
+ * short, so nothing here has an intrinsic height and nothing is restyled after
+ * load — the chart is created at its final size and never resizes underneath.
+ *
+ * Light only, and explicitly so: the page is framed inside a site that has a
+ * dark theme, and `color-scheme` keeps form controls and scrollbars light with
+ * the rest of the page.
+ */
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	color-scheme: light;
+	background-color: rgba(248, 249, 253, 1);
+	color: rgba(19, 23, 34, 1);
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu,
+		sans-serif;
+	font-size: 13px;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+#controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 12px;
+	align-items: center;
+	padding: 8px 12px;
+}
+
+/* No controls declared: the row adds no padding of its own. */
+#controls:empty {
+	display: none;
+}
+
+#controls label {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	white-space: nowrap;
+}
+
+#controls select,
+#controls button {
+	font: inherit;
+}
+
+/* `min-height: 0` so the chart shrinks with the frame instead of overflowing. */
+#chart {
+	flex: 1 1 auto;
+	min-height: 0;
+}

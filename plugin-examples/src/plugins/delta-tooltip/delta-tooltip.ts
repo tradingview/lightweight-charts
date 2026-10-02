@@ -11,8 +11,8 @@ import {
 	IPrimitivePaneView,
 	Time,
 } from 'lightweight-charts';
-import { Delegate, ISubscription } from '../../helpers/delegate';
-import { convertTime, formattedDateAndTime } from '../../helpers/time';
+import { Delegate, ISubscription } from '@tradingview/lwc-toolkit/delegate';
+import { convertTime, formattedDateAndTime } from '@tradingview/lwc-toolkit/time';
 import {
 	MultiTouchCrosshairPaneView,
 	TooltipCrosshairLineData,

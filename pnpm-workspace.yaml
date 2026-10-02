@@ -1,0 +1,26 @@
+packages:
+  - 'website'
+  - 'plugin-examples'
+  - 'indicator-examples'
+  - 'packages/*'
+
+savePrefix: '~'
+preferOffline: true
+
+# Keep the versions that the pre-migration npm lockfile had:
+# - @types/express-serve-static-core: newer versions change the typing of
+#   express route params, which breaks tests/e2e. Remove this override when
+#   the test code is updated for the newer typings.
+# - terser (a floating ^5.x dependency of @rollup/plugin-terser): a different
+#   minifier version changes the produced dist/*.production.* bundles. Bump
+#   it deliberately, not as a side effect of an install.
+overrides:
+  '@types/express-serve-static-core': 5.0.6
+  terser: 5.39.0
+
+# pnpm does not run lifecycle scripts of dependencies unless they are
+# explicitly allowed here, see https://pnpm.io/settings#onlybuiltdependencies
+onlyBuiltDependencies:
+  # downloads the browser used by e2e tests; also covers the nested puppeteer
+  # bundled by memlab, which downloads its own Chromium for the memleaks tests
+  - puppeteer

@@ -2,7 +2,7 @@
 sidebar_position: 0
 sidebar_label: Candlesticks
 pagination_title: Candlestick Widths
-title: Candlestick Width Calculations
+title: Candlestick width calculations
 description: Describes the calculation for candlestick body widths
 keywords:
   - plugins

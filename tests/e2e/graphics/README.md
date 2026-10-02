@@ -28,11 +28,28 @@ This tests runs against 2 versions of the library - "golden" and "test". Golden 
 To run this tests you need use [runner.ts](./runner.ts):
 
 ```bash
-npx esno ./runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
+pnpm exec esno ./runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js
 ```
 
 Each path to the standalone module might be either to a local file (relative/absolute path to a file) or remote file (via http/https).
 If file is local then local server will be runner to serve that file (see [serve-local-files.ts](../serve-local-files.ts) module).
+
+## Plugin package test cases
+
+The official plugin packages under `packages/lwc-plugin-*` have their own suite, run with [plugins-runner.ts](./plugins-runner.ts) and, on CI, as the `graphics-tests-part4-plugins` jobs. It reuses this harness; only discovery and the page differ.
+
+- Cases live in `packages/lwc-plugin-<name>/tests/graphics/<case>.js` and follow the same contract as the library cases (`runTestCase(container)`, a classic script with no imports, `window.chart` set unless `ignoreMouseMove` is). The group name is the package folder, so `--grep "lwc-plugin-"` selects the whole suite and `--grep "lwc-plugin-vertical-line/"` one package.
+- Two globals are provided: `LightweightCharts` (the library) and `LwcPlugin`, the namespace import of the package under test (`new LwcPlugin.VertLine(...)`). The page loads both through an import map from their ES module builds: the library's `lightweight-charts.standalone.*.mjs` and the package's `dist/<name>.standalone.js` — the file a CDN user imports, so the suite also covers the packaging.
+- A file whose name starts with a dot is not discovered, like in the library suite. That is how a case for a known bug is parked until the fix lands: keep it dotted, say why in a comment at the top, and un-dot it in the fix PR.
+- Golden is the merge-base build of the package _and_ of the library; test is HEAD of both. A package with no golden build (a new package, or a merge-base that predates it) fails its cases, with the test screenshot kept in the job's artifacts: like an intentional rendering change, a new case is something the reviewer looks at rather than something that passes silently.
+
+Locally, with the library (`pnpm build`) and the packages (`pnpm --filter "@tradingview/lwc-plugin-*" build`) built:
+
+```bash
+pnpm e2e:graphics:plugins --grep "lwc-plugin-vertical-line/"
+```
+
+This uses the working tree as both golden and test, so it checks that every case renders without errors. To compare against another revision, run `GRAPHICS_TEST_SUITE=plugins scripts/run-graphics-tests.sh`, or point `plugins-runner.ts` at a folder of golden builds with `--golden-plugins-dir` (one `<package folder>/<name>.standalone.js` per package, or the packages themselves). `GRAPHICS_SERVER_PORT` moves the local file server off its default port when two suites run side by side.
 
 ## Branch-Specific Test Cases
 
@@ -60,10 +77,10 @@ BRANCH_SPECIFIC_TEST="true" ./scripts/run-graphics-tests.sh
     But if you test with local files, you cannot open that HTML pages in your browser to debug because there is scripts which are loaded from webserver (which a runner up to runs tests).
     In that can you can use the following hack.
 
-    Let's say you run your tests in that way - `npx esno ./runner.ts ./golden/standalone/module.js ./test/standalone/module.js`.
+    Let's say you run your tests in that way - `pnpm exec esno ./runner.ts ./golden/standalone/module.js ./test/standalone/module.js`.
     After that in `.gendata/test-case-name/1.golden.html` you can find a HTML page.
 
-    To open this page properly you can run `npx esno ./tests/e2e/serve-static-files.ts golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.
+    To open this page properly you can run `pnpm exec esno ./tests/e2e/serve-static-files.ts golden.js:./golden/standalone/module.js test.js:./test/standalone/module.js` and then open that page in the browser to debug.
 
 1. The following environmental variables can be used to adjust the test:
 
@@ -73,5 +90,5 @@ BRANCH_SPECIFIC_TEST="true" ./scripts/run-graphics-tests.sh
 1. You can set additional options from the command line arguments:
 
 ```bash
-npx esno ./tests/e2e/graphics/runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js --bail --grep "add-series"
+pnpm exec esno ./tests/e2e/graphics/runner.ts ./path/to/golden/standalone/module.js ./path/to/test/standalone/module.js --bail --grep "add-series"
 ```

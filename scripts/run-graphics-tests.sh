@@ -1,61 +1,102 @@
 #!/bin/bash
 set -e
 
-if [ "$CMP_OUT_DIR" = "" ]; then
-	echo "Env variable CMP_OUT_DIR must be set"
-	exit 1
-fi
+# This script switches the working tree between a base revision and HEAD.
+# Everything is defined in functions that are parsed before the first
+# `git checkout`, so the running script never depends on reading more of
+# this file after the tree has changed underneath it.
 
-echo "Checkout to merge-base and build..."
+main() {
+	if [ "$CMP_OUT_DIR" = "" ]; then
+		echo "Env variable CMP_OUT_DIR must be set"
+		exit 1
+	fi
 
-BUILD_SCRIPT="build"
-TEST_FILE_MODE="development"
+	echo "Checkout to merge-base and build..."
 
-if [ "$PRODUCTION_BUILD" = "true" ]; then
-	BUILD_SCRIPT="build:prod"
-	TEST_FILE_MODE="production"
-fi
+	BUILD_SCRIPT="build"
+	TEST_FILE_MODE="development"
 
-HEAD_SHA1=$(git rev-parse HEAD)
+	if [ "$PRODUCTION_BUILD" = "true" ]; then
+		BUILD_SCRIPT="build:prod"
+		TEST_FILE_MODE="production"
+	fi
 
-if [ -z "$COMPARE_BRANCH" ]; then
-    # If COMPARE_BRANCH is not set, use the old behaviour
-    echo "checking out merge-base with master"
-    git checkout $(git merge-base origin/master HEAD)
-else
-    # If COMPARE_BRANCH is set, use the specified branch
-    echo "Using latest commit on target branch: $COMPARE_BRANCH"
-    git checkout origin/$COMPARE_BRANCH
-fi
+	HEAD_SHA1=$(git rev-parse HEAD)
 
-npm install
-npm run $BUILD_SCRIPT
-# Remove existing merge-base-dist if it exists
-rm -rf ./merge-base-dist
-mv ./dist ./merge-base-dist
+	if [ -z "$COMPARE_BRANCH" ]; then
+	    # If COMPARE_BRANCH is not set, use the old behaviour
+	    echo "checking out merge-base with master"
+	    git checkout $(git merge-base origin/master HEAD)
+	else
+	    # If COMPARE_BRANCH is set, use the specified branch
+	    echo "Using latest commit on target branch: $COMPARE_BRANCH"
+	    git checkout origin/$COMPARE_BRANCH
+	fi
 
-if [ "$BRANCH_SPECIFIC_TEST" = "true" ]; then
-	echo "Using BRANCH_SPECIFIC_TEST"
-	echo "Running generate-golden-content"
-	npx esno ./tests/e2e/graphics/generate-golden-content.ts ./golden_test_files
-	export GOLDEN_TEST_CONTENT_PATH="./golden_test_files"
-fi
+	pnpm install --frozen-lockfile
+	pnpm $BUILD_SCRIPT
+	if [ "$GRAPHICS_TEST_SUITE" = "plugins" ]; then
+		build_plugins_golden
+	fi
+	# Plugin workspace imports need dist/typings.d.ts until their build finishes.
+	rm -rf ./merge-base-dist
+	mv ./dist ./merge-base-dist
 
-echo "Checkout to HEAD back and build..."
+	if [ "$BRANCH_SPECIFIC_TEST" = "true" ]; then
+		echo "Using BRANCH_SPECIFIC_TEST"
+		echo "Running generate-golden-content"
+		pnpm exec esno ./tests/e2e/graphics/generate-golden-content.ts ./golden_test_files
+		export GOLDEN_TEST_CONTENT_PATH="./golden_test_files"
+	fi
 
-git checkout $HEAD_SHA1
-npm install
-npm run $BUILD_SCRIPT
+	echo "Checkout to HEAD back and build..."
 
-echo "Graphics tests"
-set +e
-npx esno ./tests/e2e/graphics/runner.ts ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.js ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.js
-EXIT_CODE=$?
-set -e
+	git checkout $HEAD_SHA1
+	pnpm install --frozen-lockfile
+	pnpm $BUILD_SCRIPT
 
-if [ $EXIT_CODE != 0 ]; then
-	echo "Generate archive with screenshots"
-	tar -czvf ./screenshots.tar.gz $CMP_OUT_DIR
-	mv ./screenshots.tar.gz $CMP_OUT_DIR/screenshots.tar.gz
-	exit $EXIT_CODE
-fi
+	if [ "$GRAPHICS_TEST_SUITE" = "plugins" ]; then
+		build_plugins
+	fi
+	set +e
+	if [ "$GRAPHICS_TEST_SUITE" = "plugins" ]; then
+		echo "Plugin graphics tests"
+		pnpm exec esno ./tests/e2e/graphics/plugins-runner.ts ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.mjs ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.mjs --golden-plugins-dir ./merge-base-plugins-dist --test-plugins-dir ./packages
+	else
+		echo "Graphics tests"
+		pnpm exec esno ./tests/e2e/graphics/runner.ts ./merge-base-dist/lightweight-charts.standalone.$TEST_FILE_MODE.js ./dist/lightweight-charts.standalone.$TEST_FILE_MODE.js
+	fi
+	EXIT_CODE=$?
+	set -e
+
+	if [ $EXIT_CODE != 0 ]; then
+		echo "Generate archive with screenshots"
+		tar -czvf ./screenshots.tar.gz $CMP_OUT_DIR
+		mv ./screenshots.tar.gz $CMP_OUT_DIR/screenshots.tar.gz
+		exit $EXIT_CODE
+	fi
+}
+
+# Builds the toolkit and every plugin package of the checked-out revision.
+build_plugins() {
+	pnpm --filter @tradingview/lwc-toolkit --filter "@tradingview/lwc-plugin-*" build
+}
+
+# Golden plugin builds: the merge-base revision's packages, kept next to the
+# merge-base library build. A package that does not exist there (a new one)
+# simply has no golden build, and its cases fail with their screenshots kept.
+build_plugins_golden() {
+	rm -rf ./merge-base-plugins-dist ./packages/lwc-plugin-*/dist
+	mkdir -p ./merge-base-plugins-dist
+	build_plugins
+	for pkg in ./packages/lwc-plugin-*/; do
+		if [ -d "$pkg/dist" ]; then
+			cp -R "$pkg/dist" "./merge-base-plugins-dist/$(basename "$pkg")"
+		fi
+	done
+	# Stale outputs must not survive into the HEAD build.
+	rm -rf ./packages/lwc-plugin-*/dist ./packages/lwc-plugin-*/typings
+}
+
+main "$@"

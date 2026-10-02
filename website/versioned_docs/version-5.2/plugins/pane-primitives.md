@@ -1,49 +1,75 @@
 ---
-sidebar_label: Pane Primitives
+sidebar_label: Pane primitives
+title: Pane primitives
 sidebar_position: 2
 ---
 
-# Pane Primitives
+**Pane primitives** are primitives attached to a chart pane rather than to a specific series.
+Use pane primitives for chart-wide elements that are not tied to any series' data, such as watermarks.
+The library's built-in text and image watermarks are implemented this way.
+For series-bound primitives, see [Series primitives](./series-primitives.mdx).
 
-In addition to Series Primitives, the library now supports Pane Primitives. These are essentially the same as Series Primitives but are designed to draw on the pane of a chart rather than being associated with a specific series. Pane Primitives can be used for features like watermarks or other chart-wide annotations.
+## Attaching a primitive
 
-## Key Differences from Series Primitives
-
-1. Pane Primitives are attached to the chart pane rather than a specific series.
-2. They cannot draw on the price and time scales.
-3. They are ideal for chart-wide features that are not tied to a particular series.
-
-## Adding a Pane Primitive
-
-Pane Primitives can be added to a chart using the `attachPrimitive` method on the [`IPaneApi`](../api/interfaces/IPaneApi.md) interface. Here's an example:
+A pane primitive is a class implementing the
+[`IPanePrimitive`](../api/type-aliases/IPanePrimitive.md) interface.
+Create an instance of your primitive and attach it to a pane with the
+[`attachPrimitive`](../api/interfaces/IPaneApi.md#attachprimitive) method:
 
 ```javascript
-const chart = createChart(document.getElementById('container'));
-const pane = chart.panes()[0]; // Get the first (main) pane
+class MyCustomPanePrimitive {
+    /* Class implementing the IPanePrimitive interface */
+}
 
-const myPanePrimitive = new MyCustomPanePrimitive();
-pane.attachPrimitive(myPanePrimitive);
+// Create an instantiated pane primitive
+const myCustomPanePrimitive = new MyCustomPanePrimitive();
+
+const chart = createChart(document.getElementById('container'));
+// Get the main pane
+const mainPane = chart.panes()[0];
+
+// Attach the primitive to the pane
+mainPane.attachPrimitive(myCustomPanePrimitive);
 ```
 
-## Implementing a Pane Primitive
+To remove the primitive from the pane, use the
+[`detachPrimitive`](../api/interfaces/IPaneApi.md#detachprimitive) method:
 
-To create a Pane Primitive, you should implement the [`IPanePrimitive`](../api/type-aliases/IPanePrimitive.md) interface. This interface is similar to [`ISeriesPrimitive`](../api/type-aliases/ISeriesPrimitive.md), but with some key differences:
+```javascript
+mainPane.detachPrimitive(myCustomPanePrimitive);
+```
 
-- It doesn't include methods for drawing on price and time scales.
-- The `paneViews` method is used to define what will be drawn on the chart pane.
+## Key differences from series primitives
 
-Here's a basic example of a Pane Primitive implementation:
+Pane primitives follow the same model as
+[series primitives](./series-primitives.mdx) — views that return renderers,
+the `attached` / `detached` lifecycle, `updateAllViews`, and hit testing —
+with three differences:
+
+- A pane primitive is attached to a pane, so
+  [`paneViews`](../api/interfaces/IPanePrimitiveBase.md#paneviews) is its only
+  view getter: it cannot draw on the price or time scales, or define axis
+  labels.
+- The `attached` method receives
+  [`{ chart, requestUpdate }`](../api/interfaces/PaneAttachedParameter.md)
+  without a series reference.
+- There is no `autoscaleInfo`: a pane primitive is not tied to a price scale.
+
+## Implementing a pane primitive
+
+The `paneViews` method returns the views that draw on the pane. Each view must
+provide a `renderer()` method returning the renderer that draws on the canvas:
 
 ```javascript
 class MyCustomPanePrimitive {
     paneViews() {
         return [
             {
-                renderer: {
+                renderer: () => ({
                     draw: target => {
                         // Custom drawing logic here
                     },
-                },
+                }),
             },
         ];
     }
@@ -51,5 +77,3 @@ class MyCustomPanePrimitive {
     // Other methods as needed...
 }
 ```
-
-For more details on implementing Pane Primitives, refer to the [`IPanePrimitive`](../api/type-aliases/IPanePrimitive.md) interface documentation.

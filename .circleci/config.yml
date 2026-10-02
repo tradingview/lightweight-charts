@@ -9,26 +9,39 @@ parameters:
 
 aliases:
   - &restore-node-modules-cache
-      name: Restore node_modules cache
+      name: Restore dependencies cache
       keys:
-        - &cache-key v1-dependencies-{{ checksum "package-lock.json" }}
+        - &cache-key v2-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
 
   - &save-node-modules-cache
-      name: Save node_modules cache
+      name: Save dependencies cache
+      # The whole workspace is installed with a single `pnpm install` at the
+      # root, so one cache covers every project. All jobs run in the same
+      # working directory, and pnpm's virtual store (node_modules/.pnpm) only
+      # uses relative symlinks, so caching the materialized node_modules
+      # trees is safe. Extend the paths when new packages/* projects appear.
       paths:
         - node_modules
-      key: *cache-key
-
-  - &restore-node-modules-cache-website
-      name: Restore node_modules cache for /website
-      keys:
-        - &cache-key-website v1-dependencies-website-{{ checksum "website/package.json" }}
-
-  - &save-node-modules-cache-website
-      name: Save node_modules cache for /website
-      paths:
         - website/node_modules
-      key: *cache-key-website
+        - plugin-examples/node_modules
+        - indicator-examples/node_modules
+        - packages/create-lwc-plugin/node_modules
+        - packages/lwc-toolkit/node_modules
+        - packages/lwc-plugin-accessibility/node_modules
+        - packages/lwc-plugin-brushable-area-series/node_modules
+        - packages/lwc-plugin-dual-range-histogram-series/node_modules
+        - packages/lwc-plugin-hlc-area-series/node_modules
+        - packages/lwc-plugin-image-watermark/node_modules
+        - packages/lwc-plugin-pretty-histogram-series/node_modules
+        - packages/lwc-plugin-rounded-candles-series/node_modules
+        - packages/lwc-plugin-stacked-area-series/node_modules
+        - packages/lwc-plugin-stacked-bars-series/node_modules
+        - packages/lwc-plugin-vertical-line/node_modules
+        # puppeteer browser cache (see .puppeteerrc.cjs)
+        - .cache
+        # corepack-downloaded pnpm, so restore-only jobs don't re-download it
+        - ~/.cache/node/corepack
+      key: *cache-key
 
   - &default-filters
       tags:
@@ -47,18 +60,24 @@ executors:
   node-executor:
     docker:
       - image: cimg/node:22.14.0
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
 
   node-browsers-executor:
     docker:
       - image: cimg/node:22.14.0-browsers
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
 
 commands:
   checkout-with-deps:
-    description: "Checkout the code with restore npm dependencies"
+    description: "Checkout the code, enable pnpm via corepack and restore the dependencies cache"
     steps:
       - checkout
+      - run:
+          name: Enable corepack (pnpm)
+          command: sudo corepack enable
       - restore_cache: *restore-node-modules-cache
-      - restore_cache: *restore-node-modules-cache-website
 
   run-graphics-tests:
     description: "Run graphics tests with specific devicePixelRatio"
@@ -73,12 +92,16 @@ commands:
       branchSpecificTest:
         type: boolean
         default: false
+      suite:
+        type: string
+        default: library
     steps:
       - checkout-with-deps
       - run:
           name: "Setup Environment Variables"
           command: |
             echo 'export NO_SANDBOX="true"' >> $BASH_ENV
+            echo 'export GRAPHICS_TEST_SUITE=<< parameters.suite >>' >> $BASH_ENV
             echo 'export CMP_OUT_DIR="./graphics-cmp-data"' >> $BASH_ENV
             echo 'export TESTS_REPORT_FILE="test-results/graphics/results.xml"' >> $BASH_ENV
             echo 'export DEVICE_PIXEL_RATIO=<< parameters.devicePixelRatio >>' >> $BASH_ENV
@@ -102,25 +125,18 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm ci
-      - run: npx puppeteer browsers install chrome
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec puppeteer browsers install chrome
       - save_cache: *save-node-modules-cache
-
-  install-deps-website:
-    executor: node-executor
-    steps:
-      - checkout-with-deps
-      - run: cd website && npm install
-      - save_cache: *save-node-modules-cache-website
 
   build:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm run build:prod
+      - run: pnpm build:prod
       # make sure that the project is compiled successfully with composite projects
       # so we don't have cyclic deps between projects and wrong imports
-      - run: npm run tsc-verify
+      - run: pnpm tsc-verify
       - persist_to_workspace:
           root: ./
           paths:
@@ -145,7 +161,7 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: npm run lint:eslint
+      - run: pnpm lint:eslint
 
   lint-dts:
     executor: node-executor
@@ -153,14 +169,88 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: npm run bundle-dts
-      - run: npm run check-dts-docs
+      - run: pnpm bundle-dts
+      - run: pnpm check-dts-docs
 
   lint-markdown:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm run lint:md
+      - run: pnpm lint:md
+
+  lwc-toolkit:
+    executor: node-executor
+    steps:
+      - checkout-with-deps
+      # The package compiles against `lightweight-charts`, which resolves to the
+      # repository root, whose `types` points into `dist/`. That does not exist
+      # until the library is built, so this job needs the build's output.
+      - attach_workspace:
+          at: ./
+      - run: pnpm --filter @tradingview/lwc-toolkit typecheck
+      - run: pnpm --filter @tradingview/lwc-toolkit build
+      # Neither tsc nor Vite minds an extensionless relative specifier, so
+      # nothing else in the repo would notice the package emitting ESM that real
+      # Node cannot resolve. Import every sub-path by specifier, from a
+      # workspace that depends on the package, so the exports map is exercised
+      # the way a consumer without a bundler would.
+      - run:
+          name: "Check every sub-path could be imported in NodeJS"
+          command: |
+            cd plugin-examples
+            node --input-type=module -e "
+              const { createRequire } = await import('node:module');
+              const require = createRequire('$PWD/package.json');
+              const pkg = require('@tradingview/lwc-toolkit/package.json');
+              const subs = Object.keys(pkg.exports).filter((k) => k !== './package.json');
+              for (const sub of subs) {
+                await import('@tradingview/lwc-toolkit/' + sub.slice(2));
+              }
+              console.log('resolved ' + subs.length + ' sub-paths');
+            "
+      - run:
+          name: "Lint the publishable package"
+          command: |
+            cd packages/lwc-toolkit
+            pnpm dlx publint@0.3.14 --strict
+            # node10 ignores `exports` altogether and a `require` of an ESM-only
+            # package is meant to fail, so both are by design here rather than
+            # findings. `node16 (from ESM)` and `bundler` are the modes that
+            # have to stay green.
+            pnpm dlx @arethetypeswrong/cli@0.18.5 --pack . \
+              --ignore-rules no-resolution cjs-resolves-to-esm
+
+  plugins:
+    executor: node-executor
+    steps:
+      - checkout-with-deps
+      # The official plugin packages under packages/lwc-plugin-*: package
+      # contract and catalogue metadata, typecheck + build against the
+      # workspace library and toolkit, and the changelog entry for a bumped
+      # version. The scripts build the library and the toolkit themselves;
+      # running after `build` only means a broken library fails there, once.
+      # Nothing here publishes: the release script refuses to publish when CI
+      # is set, and the job has no npm credentials. Until the first plugin
+      # package graduates, every step reports that there is nothing to check.
+      #
+      # The dependencies cache lists node_modules directories explicitly and a
+      # plugin package's own devDependencies (vite, dts-bundle-generator, ...)
+      # are not among them, so the job completes the install itself. With the
+      # cache restored this only fetches what the cache does not hold.
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      # Every check reports, whatever the previous one found.
+      - run:
+          name: "Validate the package contract and catalogue metadata"
+          command: pnpm plugins:validate
+      - run:
+          name: "Typecheck and build every plugin against the workspace library"
+          command: pnpm plugins:check-compat
+          no_output_timeout: 5m
+          when: always
+      - run:
+          name: "Check version and changelog consistency against the registry"
+          command: pnpm plugins:release --check-only
+          when: always
 
   usable-in-nodejs:
     executor: node-executor
@@ -168,7 +258,7 @@ jobs:
       - checkout-with-deps
       - attach_workspace:
           at: ./
-      - run: npm run prepare-package-json-for-release
+      - run: pnpm prepare-package-json-for-release
       - run:
           name: "Installing lightweight-charts package into node_modules"
           # this is hacky way to do something like `npm link lightweight-charts`
@@ -186,7 +276,12 @@ jobs:
       TESTS_REPORT_FILE: "test-results/unittests/results.xml"
     steps:
       - checkout-with-deps
-      - run: npm run test
+      # The package tests import the library at run time through the
+      # workspace link, which resolves to the built dist/.
+      - attach_workspace:
+          at: ./
+      - run: pnpm --filter @tradingview/lwc-toolkit build
+      - run: pnpm test
       - store_test_results:
           path: test-results/
 
@@ -194,7 +289,7 @@ jobs:
     executor: node-executor
     steps:
       - checkout-with-deps
-      - run: npm run type-tests
+      - run: pnpm type-tests
 
   dts-changes:
     executor: node-executor
@@ -217,11 +312,15 @@ jobs:
       branchSpecificTest:
         type: boolean
         default: false
+      suite:
+        type: string
+        default: library
     executor: node-browsers-executor
     steps:
       - run-graphics-tests:
           devicePixelRatio: << parameters.dpr >>
           grep: << parameters.grep >>
+          suite: << parameters.suite >>
           productionBuild: << parameters.productionBuild >>
           branchSpecificTest: << parameters.branchSpecificTest >>
 
@@ -270,6 +369,8 @@ jobs:
       - run: scripts/run-interactions-tests.sh
       - store_test_results:
           path: test-results/
+      - store_artifacts:
+          path: tests/e2e/interactions/.gendata
 
   size-limit:
     executor: node-executor
@@ -282,24 +383,41 @@ jobs:
       - run:
           name: "Comparing sizes with merge-base"
           command: node scripts/compare-size-with-merge-base.js
-      - run: npm run size-limit
+      - run: pnpm size-limit
+
+  build-plugin-examples:
+    executor: node-executor
+    steps:
+      - checkout-with-deps
+      - attach_workspace:
+          at: ./
+      # The plugin packages' own devDependencies are only in the cache once it
+      # was saved with them listed; installing here keeps the job independent
+      # of the cache contents (with the cache restored this fetches nothing).
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      # builds @tradingview/lwc-toolkit and the graduated plugin packages first
+      # (via the build:deps pre-step), typechecks all plugin sources against
+      # them and compiles every plugin, including the bundled typings that must
+      # inline the toolkit
+      - run:
+          command: pnpm --filter lightweight-charts-plugin-examples compile
+          no_output_timeout: 5m
 
   build-docusaurus-website:
     executor: node-executor
     resource_class: medium+
     steps:
       - checkout-with-deps
-      - run: npm run build:prod
+      - run: pnpm build:prod
       - run:
-          name: "Install dependencies and build website"
+          name: "Build website"
           command: |
             cd website
-            npm install
-            npm run build
+            pnpm build
       - run:
           # we need to run this check here because only here we have generated md files of the website
           name: "Check website markdown links"
-          command: npm run check-markdown-links -- --check-website-links
+          command: pnpm check-markdown-links --check-website-links
       - persist_to_workspace:
           root: ./
           paths:
@@ -335,13 +453,10 @@ workflows:
     jobs:
       - install-deps:
           filters: *default-filters
-      - install-deps-website:
-          filters: *default-filters
       - build:
           filters: *default-filters
           requires:
             - install-deps
-            - install-deps-website
 
       - graphics-tests:
           name: branch_specific_graphics-tests-part1-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
@@ -361,14 +476,20 @@ workflows:
           branchSpecificTest: true
           matrix: *graphics-test-matrix
           <<: *graphics-test-config
+      # The plugin packages, rendered through their standalone builds against
+      # the merge-base builds of both the package and the library.
+      - graphics-tests:
+          name: branch_specific_graphics-tests-part4-plugins-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "lwc-plugin-"
+          suite: plugins
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
 
   build-lint-test:
     when:
       not: << pipeline.parameters.run_branch_specific_graphics_tests >>
     jobs:
       - install-deps:
-          filters: *default-filters
-      - install-deps-website:
           filters: *default-filters
       - no-crlf:
           filters: *default-filters
@@ -379,11 +500,18 @@ workflows:
           filters: *default-filters
           requires:
             - install-deps
-            - install-deps-website
       - lint-markdown:
           filters: *default-filters
           requires:
             - install-deps
+      - lwc-toolkit:
+          filters: *default-filters
+          requires:
+            - build
+      - plugins:
+          filters: *default-filters
+          requires:
+            - build
 
       - size-limit:
           filters: *default-filters
@@ -420,6 +548,12 @@ workflows:
           grep: "(series/|time-scale/|degenerative-horizontal-series-with-integer-min-tick/)"
           matrix: *graphics-test-matrix
           <<: *graphics-test-config
+      - graphics-tests:
+          name: graphics-tests-part4-plugins-dpr<< matrix.dpr >><<# matrix.productionBuild >>-PROD<</ matrix.productionBuild >>
+          grep: "lwc-plugin-"
+          suite: plugins
+          matrix: *graphics-test-matrix
+          <<: *graphics-test-config
       - memleaks-tests:
           filters: *default-filters
           requires:
@@ -440,8 +574,11 @@ workflows:
           filters: *default-filters
           requires:
             - build
+      - build-plugin-examples:
+          filters: *default-filters
+          requires:
+            - build
       - build-docusaurus-website:
           filters: *default-filters
           requires:
             - install-deps
-            - install-deps-website

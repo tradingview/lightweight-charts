@@ -1,17 +1,54 @@
 ---
-sidebar_label: Custom Series Types
+sidebar_label: Custom series
+title: Custom series
 sidebar_position: 3
 ---
 
-# Custom Series Types
+**Custom series** let you define new types of series with your own data
+structures and rendering logic. A custom series mirrors the API of the
+built-in series: you add it to the chart once, then manage it with the same
+methods you already use, such as
+[`setData`](../api/interfaces/ISeriesApi.md#setdata) and
+[`applyOptions`](../api/interfaces/ISeriesApi.md#applyoptions). For primitives
+that decorate an existing series rather than define a new one, see
+[Series primitives](./series-primitives.mdx).
 
-Custom series allow developers to create new types of series with their own data
-structures, and rendering logic (implemented using
-[CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
-methods). These custom series extend the current capabilities of our built-in
-series, providing a consistent API which mirrors the built-in chart types.
+## Adding a custom series
 
-:::note
+A custom series is defined by a class implementing the
+[`ICustomSeriesPaneView`](../api/interfaces/ICustomSeriesPaneView.md)
+interface. Pass an instance of it to the
+[`addCustomSeries`](../api/interfaces/IChartApi.md#addcustomseries) method,
+then work with the returned series as with any other:
+
+```javascript title='javascript'
+class MyCustomSeries {
+    /* Class implementing the ICustomSeriesPaneView interface */
+}
+
+// Create an instantiated custom series
+const customSeriesInstance = new MyCustomSeries();
+
+const chart = createChart(document.getElementById('container'));
+const myCustomSeries = chart.addCustomSeries(customSeriesInstance, {
+    // Options for MyCustomSeries
+    customOption: 10,
+});
+
+const data = [
+    { time: 1642425322, value: 123, customValue: 456 },
+    /* ... more data */
+];
+
+myCustomSeries.setData(data);
+```
+
+To remove a custom series, use the standard
+[`removeSeries`](../api/interfaces/IChartApi.md#removeseries) method:
+
+```javascript title='javascript'
+chart.removeSeries(myCustomSeries);
+```
 
 These series are expected to have a uniform width for each data point, which
 ensures that the chart maintains a consistent look and feel across all series
@@ -19,71 +56,54 @@ types. The only restriction on the data structure is that it should extend the
 [`CustomData`](../api/interfaces/CustomData.md) interface (have a valid time
 property for each data point).
 
-:::
+## Defining a custom series
 
-## Defining a Custom Series
-
-A custom series should implement the
-[`ICustomSeriesPaneView`](../api/interfaces/ICustomSeriesPaneView.md) interface.
-The interface defines the basic functionality and structure required for
-creating a custom series view.
-
+The [`ICustomSeriesPaneView`](../api/interfaces/ICustomSeriesPaneView.md)
+interface defines the functionality and structure required of a custom series.
 It includes the following methods and properties:
 
 ### Renderer
 
-- ICustomSeriesPaneView property:
-  [`renderer`](../api/interfaces/ICustomSeriesPaneView.md#renderer)
-
-This method should return a renderer which implements the
+The [`renderer`](../api/interfaces/ICustomSeriesPaneView.md#renderer) method
+returns the renderer that draws the series data on the main chart pane. The
+renderer must implement the
 [`ICustomSeriesPaneRenderer`](../api/interfaces/ICustomSeriesPaneRenderer.md)
-interface and is used to draw the series data on the main chart pane.
+interface.
 
-The [`draw`](../api/interfaces/ICustomSeriesPaneRenderer.md#draw) method of the
-renderer is evoked whenever the chart needs to draw the series.
+The library calls the renderer's
+[`draw`](../api/interfaces/ICustomSeriesPaneRenderer.md#draw) method whenever
+the chart needs to draw the series.
 
 The [`PriceToCoordinateConverter`](../api/type-aliases/PriceToCoordinateConverter.md)
 provided as the 2nd argument to the draw method is a convenience function for
 changing prices into vertical coordinate values. It is provided since the
 series' original data will most likely be defined in price values, and the
 renderer needs to draw with coordinates. The values returned by the converter
-will be defined in mediaSize (unscaled by `devicePixelRatio`).
-
-:::tip
-
-`CanvasRenderingTarget2D` provided within the `draw` function is explained in
-more detail on the [Canvas Rendering Target](./canvas-rendering-target) page.
-
-:::
+are in media coordinates (unscaled by `devicePixelRatio`).
+See the [Canvas rendering target](./canvas-rendering-target.md) page for more
+details on the `CanvasRenderingTarget2D` provided to the `draw` method.
 
 ### Update
 
-- ICustomSeriesPaneView property:
-  [`update`](../api/interfaces/ICustomSeriesPaneView.md#update)
-
-This method will be called with the latest data for the renderer to use during
-the next paint.
-
-The update method is evoked with two parameters: `data` (discussed below), and
-`seriesOptions`. seriesOptions is a reference to the currently applied options
-for the series
+The [`update`](../api/interfaces/ICustomSeriesPaneView.md#update) method is
+called with the latest data for the renderer to use during the next paint. It
+receives two parameters: `data` (described below) and `seriesOptions`, a
+reference to the currently applied options for the series.
 
 The [`PaneRendererCustomData`](../api/interfaces/PaneRendererCustomData.md)
 interface provides the data that can be used within the renderer for drawing the
 series data. It includes the following properties:
 
-- `bars`: List of all the series' items and their x coordinates. See
+- `bars`: list of all the series' items and their x coordinates. See
   [`CustomBarItemData`](../api/interfaces/CustomBarItemData.md) for more details
-- `barSpacing`: Spacing between consecutive bars.
-- `visibleRange`: The current visible range of items on the chart.
+- `barSpacing`: spacing between consecutive bars.
+- `visibleRange`: the current visible range of items on the chart.
 
-### Hit Testing
+### Hit testing
 
-- ICustomSeriesPaneRenderer property:
-  [`hitTest`](../api/interfaces/ICustomSeriesPaneRenderer.md#hittest)
-
-This optional method allows a custom series to participate directly in hover and
-click resolution.
+The renderer can implement the optional
+[`hitTest`](../api/interfaces/ICustomSeriesPaneRenderer.md#hittest) method to
+participate directly in hover and click resolution.
 
 Return `null` when the cursor misses the custom geometry. Return a
 [`CustomSeriesHitTestResult`](../api/interfaces/CustomSeriesHitTestResult.md)
@@ -102,14 +122,12 @@ The `type` field is used for hover arbitration only. Public mouse events still
 report `hoveredInfo.type` as `custom` for custom-series hits. Use `objectId`
 and `hoveredInfo.objectKind` to distinguish custom sub-objects.
 
-### Price Value Builder
+### Price value builder
 
-- ICustomSeriesPaneView property:
-  [`priceValueBuilder`](../api/interfaces/ICustomSeriesPaneView.md#pricevaluebuilder)
-
-A function for interpreting the custom series data and returning an array of
-numbers representing the prices values for the item, specifically the equivalent
-highest, lowest, and current price values for the data item.
+The
+[`priceValueBuilder`](../api/interfaces/ICustomSeriesPaneView.md#pricevaluebuilder)
+method interprets a data item and returns an array of numbers: the equivalent
+highest, lowest, and current price values for that item.
 
 These price values are used by the chart to determine the auto-scaling (to
 ensure the items are in view) and the crosshair and price line positions. The
@@ -119,36 +137,25 @@ price line position.
 
 ### Whitespace
 
-- ICustomSeriesPaneView property:
-  [`isWhitespace`](../api/interfaces/ICustomSeriesPaneView.md#iswhitespace)
+The
+[`isWhitespace`](../api/interfaces/ICustomSeriesPaneView.md#iswhitespace)
+method tells the library which data points should be treated as whitespace:
+return `true` for a whitespace item. Whitespace data points are not passed to
+the renderer or to the `priceValueBuilder`.
 
-A function used by the library to determine which data points provided by the
-user should be considered Whitespace. The method should return `true` when the
-data point is Whitespace. Data points which are whitespace data won't be provided to
-the renderer, or the `priceValueBuilder`.
+### Default options
 
-### Default Options
-
-- ICustomSeriesPaneView property:
-  [`defaultOptions`](../api/interfaces/ICustomSeriesPaneView.md#defaultoptions)
-
-The default options to be used for the series. The user can override these
-values using the options argument in
-[`addCustomSeries`](../api/interfaces/IChartApi.md#addcustomseries), or via the
-[`applyOptions`](../api/interfaces/ISeriesApi.md#applyoptions) method on the
-`ISeriesAPI`.
+The
+[`defaultOptions`](../api/interfaces/ICustomSeriesPaneView.md#defaultoptions)
+property provides the default options for the series. The user can override
+them with the options argument of
+[`addCustomSeries`](../api/interfaces/IChartApi.md#addcustomseries), or later
+via the [`applyOptions`](../api/interfaces/ISeriesApi.md#applyoptions) method
+on the series.
 
 ### Destroy
 
-- ICustomSeriesPaneView property:
-  [`destroy`](../api/interfaces/ICustomSeriesPaneView.md#destroy)
-
-This method will be evoked when the series has been removed from the chart. This
-method should be used to clean up any objects, references, and other items that
-could potentially cause memory leaks.
-
-This method should contain all the necessary code to clean up the object before
-it is removed from memory. This includes removing any event listeners or timers
-that are attached to the object, removing any references to other objects, and
-resetting any values or properties that were modified during the lifetime of the
-object.
+The [`destroy`](../api/interfaces/ICustomSeriesPaneView.md#destroy) method is
+called when the series is removed from the chart. Use it to clean up
+everything that could outlive the series and cause memory leaks: event
+listeners, timers, and references to other objects.

@@ -15,6 +15,8 @@ export interface IPriceScaleApi {
 	/**
 	 * Returns currently applied options of the price scale
 	 *
+	 * For an overlay price scale that has no series yet, returns the `overlayPriceScales` defaults.
+	 *
 	 * @returns Full set of currently applied options, including defaults
 	 */
 	options(): Readonly<PriceScaleOptions>;

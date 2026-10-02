@@ -1,5 +1,5 @@
 import { Coordinate, IChartApi, Logical } from 'lightweight-charts';
-import { Delegate, ISubscription } from '../../helpers/delegate';
+import { Delegate, ISubscription } from '@tradingview/lwc-toolkit/delegate';
 
 export interface TouchPoint {
 	x: number;

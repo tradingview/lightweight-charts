@@ -1,0 +1,552 @@
+/* Plugin catalog v2 — Docusaurus-native page styled with Infima variables,
+   so it inherits the docs theme (including dark mode) automatically. */
+
+.catalog {
+	display: grid;
+	grid-template-columns: 220px 1fr;
+	gap: 40px;
+	/* width: 100% keeps the container at max-width even when the results grid
+	   is empty — as a flex item inside the Docusaurus layout, auto margins
+	   would otherwise shrink it to fit content and the page width would jump. */
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 32px 24px 64px;
+}
+
+.intro {
+	grid-column: 1 / -1;
+	max-width: 760px;
+}
+/* accent-28px-bold */
+.intro h1 { font-size: 28px; line-height: 36px; margin-bottom: 8px; }
+/* regular-16px: 16/24, max line length 540px */
+.intro p {
+	color: var(--ifm-color-emphasis-700);
+	margin: 0;
+	font-size: 16px;
+	line-height: 24px;
+	max-width: 540px;
+}
+
+/* Sidebar filters */
+
+.sidebarGroup { margin-bottom: 26px; }
+
+/* caps-12px: 12/16, letter-spacing 0.4px */
+.groupTitle {
+	font-size: 12px;
+	line-height: 16px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.4px;
+	color: var(--ifm-color-emphasis-600);
+	margin-bottom: 10px;
+}
+
+.filterList { list-style: none; margin: 0; padding: 0; }
+
+.filterBtn {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	padding: 7px 10px;
+	margin-bottom: 2px;
+	border: none;
+	border-radius: 8px;
+	background: none;
+	font: inherit;
+	font-size: 14px;
+	color: var(--ifm-color-emphasis-700);
+	cursor: pointer;
+	text-align: left;
+}
+.filterBtn:hover { background: var(--ifm-color-emphasis-100); color: var(--ifm-font-color-base); }
+/* Active filter: black pill with white text (Mark's review, Aug 2026). */
+.filterBtnActive {
+	composes: filterBtn;
+	background: var(--ifm-font-color-base);
+	color: var(--ifm-background-surface-color);
+	font-weight: 600;
+}
+.filterBtnActive:hover {
+	background: var(--ifm-font-color-base);
+	color: var(--ifm-background-surface-color);
+}
+.count { font-size: 12px; color: var(--ifm-color-emphasis-600); font-weight: 400; }
+.filterBtnActive .count { color: inherit; opacity: 0.7; }
+
+/* Search + grid */
+
+.searchRow {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+/* TV DS "Search input": magnifier on the left, clear button when filled. */
+.searchBox {
+	position: relative;
+	flex: 1;
+	max-width: 420px;
+	display: flex;
+	align-items: center;
+}
+.searchIcon {
+	position: absolute;
+	left: 12px;
+	color: var(--ifm-color-emphasis-600);
+	pointer-events: none;
+	display: flex;
+}
+.searchClear {
+	position: absolute;
+	right: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background: var(--ifm-color-emphasis-300);
+	color: var(--ifm-background-surface-color);
+	font-size: 11px;
+	line-height: 1;
+	cursor: pointer;
+}
+.searchClear:hover { background: var(--ifm-color-emphasis-500); }
+
+.searchInput {
+	width: 100%;
+	padding: 9px 32px 9px 36px;
+	font: inherit;
+	font-size: 14px;
+	color: var(--ifm-font-color-base);
+	background: var(--ifm-background-surface-color);
+	border: 1px solid var(--ifm-color-emphasis-300);
+	border-radius: 8px;
+}
+.searchInput:focus {
+	outline: 2px solid var(--ifm-color-primary);
+	outline-offset: -1px;
+}
+/* The DS clear button replaces the native WebKit one. */
+.searchInput::-webkit-search-cancel-button { display: none; }
+
+.resultCount { color: var(--ifm-color-emphasis-600); font-size: 13px; }
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+	gap: 20px;
+}
+
+.empty {
+	padding: 48px 0;
+	color: var(--ifm-color-emphasis-600);
+	text-align: center;
+}
+
+/* Cards */
+
+.card {
+	display: flex;
+	flex-direction: column;
+	background: var(--ifm-background-surface-color);
+	border: 1px solid var(--ifm-color-emphasis-200);
+	border-radius: 12px;
+	overflow: hidden;
+	color: inherit;
+	/* No drop shadow; hover changes the background, the card does not float
+	   (Mark's review, Aug 2026). */
+	transition: background-color 0.15s, border-color 0.15s;
+}
+.card:hover {
+	text-decoration: none;
+	color: inherit;
+	background: var(--ifm-color-emphasis-100);
+	border-color: var(--ifm-color-emphasis-300);
+}
+/* TV DS "hover on hover": grey-filled elements on a hovered surface step one
+   shade deeper (cold-gray-150 / cold-gray-750) so they stay visible. */
+.card:hover .tag,
+.card:hover .badgeStable,
+.card:hover .badgeVersion { background: #ebebeb; }
+:global(html[data-theme='dark']) .card:hover .tag,
+:global(html[data-theme='dark']) .card:hover .badgeStable,
+:global(html[data-theme='dark']) .card:hover .badgeVersion { background: #3d3d3d; }
+
+.cardPreview {
+	height: 120px;
+	background: var(--ifm-color-emphasis-100);
+	border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+.cardPreview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The SVG previews are drawn with light-theme colors; mirror the same
+   dark-mode treatment the live embeds get. */
+:global(html[data-theme='dark']) .cardPreview img {
+	filter: invert(0.92) hue-rotate(180deg);
+}
+
+.cardBody {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	gap: 8px;
+	padding: 14px 16px 16px;
+}
+
+.titleRow {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	justify-content: space-between;
+}
+/* accent-16px-semibold */
+.titleRow h3 { font-size: 16px; line-height: 24px; font-weight: 600; margin: 0; }
+
+
+.check { color: var(--ifm-color-primary); font-weight: 700; font-size: 12px; }
+
+/* regular-13px */
+.desc { margin: 0; font-size: 13px; line-height: 18px; color: var(--ifm-color-emphasis-700); flex: 1; }
+
+.metaRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+.version { font-size: 12px; color: var(--ifm-color-emphasis-600); }
+
+.cardDeprecated { composes: card; opacity: 0.62; }
+.cardDeprecated:hover { opacity: 1; }
+
+/* Tags & badges */
+
+/* TV DS Tag: borderless grey pill. The background transition matches the
+   card's so the hover-on-hover shade shifts in sync with the card fill. */
+.tag {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	background: var(--ifm-color-emphasis-100);
+	color: var(--ifm-color-emphasis-700);
+	white-space: nowrap;
+	transition: background-color 0.15s;
+}
+
+.badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	white-space: nowrap;
+	font-feature-settings: 'tnum' on, 'lnum' on;
+	transition: background-color 0.15s;
+}
+.badgeNew {
+	composes: badge;
+	/* TV DS positive = minty-green */
+	background: color-mix(in srgb, #089981 14%, transparent);
+	color: #089981;
+}
+[data-theme='dark'] .badgeNew { color: #22ab94; }
+.badgeDeprecated {
+	composes: badge;
+	background: color-mix(in srgb, var(--ifm-color-warning) 18%, transparent);
+	color: var(--ifm-color-warning-darkest);
+}
+[data-theme='dark'] .badgeDeprecated { color: var(--ifm-color-warning-light); }
+.badgeStable {
+	composes: badge;
+	background: var(--ifm-color-emphasis-100);
+	color: var(--ifm-color-emphasis-700);
+}
+.badgeVersion {
+	composes: badge;
+	background: var(--ifm-color-emphasis-100);
+	color: var(--ifm-color-emphasis-700);
+	font-weight: 500;
+}
+
+/* ---------- Detail page ---------- */
+
+.detail {
+	width: 100%;
+	/* Wide enough for the article plus the table of contents beside it; the
+	   article itself is still bounded by .readme. */
+	max-width: 1140px;
+	margin: 0 auto;
+	padding: 28px 24px 64px;
+}
+
+/* One column of the row that holds the article and the table of contents. */
+.detailBody {
+	min-width: 0;
+}
+
+/* The theme's own TOC, stuck beside the article. */
+.tocDesktop {
+	position: sticky;
+	top: calc(var(--ifm-navbar-height) + 16px);
+	max-height: calc(100vh - var(--ifm-navbar-height) - 32px);
+	overflow-y: auto;
+}
+
+.tocMobile {
+	margin-bottom: 24px;
+}
+
+/* Internal links are blue per the TV DS Links sheet. */
+.backLink {
+	display: inline-block;
+	margin-bottom: 20px;
+	font-size: 14px;
+	line-height: 18px;
+}
+
+/* accent-28px-bold */
+.detailHeader h1 { font-size: 28px; line-height: 36px; margin-bottom: 6px; }
+
+/* regular-14px */
+.byline {
+	margin: 0 0 12px;
+	font-size: 14px;
+	line-height: 18px;
+	color: var(--ifm-color-emphasis-700);
+}
+
+.badgesRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+/* regular-16px: 16/24, max line length 540px */
+.detailDesc {
+	color: var(--ifm-color-emphasis-700);
+	font-size: 16px;
+	line-height: 24px;
+	max-width: 540px;
+	margin: 0 0 12px;
+}
+
+.detailLinks { display: flex; gap: 20px; font-size: 14px; line-height: 18px; margin-bottom: 28px; }
+
+.externalIcon { margin-left: 4px; vertical-align: -1px; }
+
+/* TV DS Informer / Warning (light variant): cream fill, orange title. */
+.noticeDeprecated {
+	padding: 10px 14px;
+	margin: 0 0 24px;
+	border-radius: 8px;
+	background: #fff3e0; /* tan-orange-50 */
+	color: var(--ifm-font-color-base);
+	font-size: 14px;
+	line-height: 18px;
+}
+.noticeDeprecated strong { color: #ef6c00; } /* tan-orange-800 */
+[data-theme='dark'] .noticeDeprecated { background: rgba(245, 124, 0, 0.14); }
+[data-theme='dark'] .noticeDeprecated strong { color: #ffb74d; } /* tan-orange-300 */
+
+.noticeCommunity {
+	padding: 10px 14px;
+	margin: 0 0 24px;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--ifm-color-primary) 10%, transparent);
+	color: var(--ifm-color-emphasis-700);
+	font-size: 14px;
+}
+.noticeCommunity strong { color: var(--ifm-color-primary); }
+
+.previewBlock {
+	border: 1px solid var(--ifm-color-emphasis-200);
+	border-radius: 12px;
+	overflow: hidden;
+	margin-bottom: 36px;
+	background: var(--ifm-background-surface-color);
+}
+/* Height comes from the entry's `previewHeight`, applied inline. */
+.previewChart { position: relative; }
+.chartHost { height: 100%; }
+.previewFrame {
+	width: 100%;
+	height: 100%;
+	border: 0;
+	display: block;
+	background: #ffffff;
+}
+.previewOverlay {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	background: var(--ifm-background-surface-color);
+}
+:global(html[data-theme='dark']) .previewOverlay {
+	filter: invert(0.92) hue-rotate(180deg);
+	background: #ffffff;
+}
+.previewDemoLink {
+	white-space: nowrap;
+}
+.previewCaption {
+	padding: 8px 14px;
+	border-top: 1px solid var(--ifm-color-emphasis-200);
+	font-size: 12px;
+	line-height: 16px;
+	color: var(--ifm-color-emphasis-600);
+}
+
+.section { margin-bottom: 44px; }
+/* accent-20px-semibold */
+.section h2 { font-size: 20px; line-height: 24px; font-weight: 600; margin-bottom: 16px; }
+
+/* npm/CDN switch — exact port of the ui-lib SegmentedControls (medium),
+   values taken from the compiled component CSS in widgets-documentation
+   (segmentedControls / segmentedControlBase / checked). */
+.tabs {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	width: fit-content;
+	isolation: isolate;
+	background: #f2f2f2; /* container-fill-primary-neutral-extra-light = cold-gray-100 */
+	border-radius: 12px;
+	padding: 4px;
+	gap: 4px;
+	margin-bottom: 14px;
+}
+.tab {
+	height: 40px;
+	min-width: 120px;
+	padding: 0 28px;
+	border: none;
+	border-radius: 8px;
+	background: none;
+	font: inherit;
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 500;
+	color: #4a4a4a; /* content-primary-neutral-semi-bold = cold-gray-700 */
+	cursor: pointer;
+	transition: background-color 0.1s;
+}
+.tab:hover:not(:active) { background: #ebebeb; } /* cold-gray-150 */
+.tab:active { background: #dbdbdb; } /* cold-gray-200 */
+.tabActive {
+	composes: tab;
+	background: #ffffff; /* container-fill-senary-inverse */
+	color: #0f0f0f; /* content-secondary-neutral-bold = cold-gray-900 */
+	box-shadow: 0 0 6px 0 #ebebeb; /* Shadow S, tertiary-neutral-light */
+	z-index: 1;
+}
+.tabActive:hover:not(:active),
+.tabActive:active { background: #ffffff; }
+
+:global(html[data-theme='dark']) .tabs { background: #2e2e2e; } /* cold-gray-800 */
+:global(html[data-theme='dark']) .tab { color: #b8b8b8; } /* cold-gray-300 */
+:global(html[data-theme='dark']) .tab:hover:not(:active) { background: #3d3d3d; } /* cold-gray-750 */
+:global(html[data-theme='dark']) .tab:active { background: #4a4a4a; } /* cold-gray-700 */
+:global(html[data-theme='dark']) .tabActive,
+:global(html[data-theme='dark']) .tabActive:hover:not(:active),
+:global(html[data-theme='dark']) .tabActive:active {
+	background: #4a4a4a; /* senary-inverse (dark) = cold-gray-700 */
+	color: #ffffff;
+	box-shadow: 0 0 6px 0 #0f0f0f; /* tertiary-neutral-light (dark) = cold-gray-900 */
+}
+
+/* Step captions before code blocks: regular-14px, full text colour — these
+   are instructions, not fine print. */
+.hint { font-size: 14px; line-height: 18px; color: var(--ifm-font-color-base); margin: 12px 0 6px; }
+
+/* TV DS "preformatted" block: 1px border, radius 8, padding 16, no fill. */
+.optionsTable { font-size: 14px; line-height: 18px; width: 100%; border-collapse: collapse; }
+.optionsTable th, .optionsTable td {
+	text-align: left;
+	padding: 10px 24px 10px 16px;
+	/* TV DS divider: 1px, cold-gray-150 / cold-gray-750 */
+	border-bottom: 1px solid #ebebeb;
+	vertical-align: top;
+	background: none;
+	border-left: none;
+	border-right: none;
+	border-top: none;
+}
+:global(html[data-theme='dark']) .optionsTable th,
+:global(html[data-theme='dark']) .optionsTable td { border-bottom-color: #3d3d3d; }
+.optionsTable th { color: var(--ifm-color-emphasis-600); font-weight: 600; font-size: 13px; }
+
+.metaTable { border-collapse: collapse; font-size: 14px; line-height: 18px; width: 100%; }
+.metaTable td { padding: 9px 24px 9px 16px; vertical-align: top; border: none; }
+.metaTable td:first-child {
+	color: var(--ifm-color-emphasis-600);
+	white-space: nowrap;
+	width: 200px;
+}
+
+.notFound { text-align: center; padding: 80px 0; color: var(--ifm-color-emphasis-700); }
+.notFound ul { list-style: none; padding: 0; }
+
+/* TV DS focus-outline-color-blue: one blue :focus-visible ring everywhere. */
+.filterBtn:focus-visible,
+.tab:focus-visible,
+.searchClear:focus-visible,
+.card:focus-visible {
+	outline: 2px solid var(--ifm-color-primary);
+	outline-offset: 1px;
+}
+
+/* TV DS: monospaced digits wherever numbers line up. */
+.optionsTable,
+.metaTable,
+.resultCount,
+.count {
+	font-feature-settings: 'tnum' on, 'lnum' on;
+}
+
+@media (max-width: 760px) {
+	.catalog { grid-template-columns: 1fr; gap: 24px; padding: 20px; }
+	.detail { padding: 20px 20px 48px; }
+}
+
+/* Empty catalogue (no published packages yet) */
+.emptyCatalog { grid-column: 1 / -1; }
+
+/* README body on the detail page; typography comes from the theme's
+   global .markdown class, this only bounds and spaces it. */
+.readme { max-width: 720px; }
+.readme h2 { font-size: 20px; line-height: 24px; font-weight: 600; margin: 28px 0 12px; }
+.readme h3 { font-size: 16px; line-height: 24px; font-weight: 600; margin: 20px 0 8px; }
+/* Code fences are @theme/CodeBlock now, styled by the theme like every other
+   code block on the site, so the README body adds nothing of its own. */
+/* Reference tables wrap instead of hiding columns behind an (invisible on
+   macOS) horizontal scrollbar; smaller type keeps four columns readable. */
+.readme table { display: table; width: 100%; font-size: 14px; line-height: 20px; }
+.readme table code { white-space: normal; }
+.readme th, .readme td { padding: 8px 10px; }
+
+/* Fixture/offline data marker: shown only when the catalogue was built
+   without a registry (registry === null), never with real published data. */
+.noticePreview {
+	display: inline-block;
+	margin: 10px 0 0;
+	padding: 6px 12px;
+	border-radius: 8px;
+	font-size: 13px;
+	line-height: 18px;
+	background: var(--ifm-color-emphasis-100);
+	color: var(--ifm-color-emphasis-700);
+}

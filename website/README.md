@@ -11,7 +11,7 @@ Handwritten documentation should focus on explaining concepts, tutorials, intera
 ## Local Development
 
 ```console
-npm run start
+pnpm start
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
@@ -21,7 +21,7 @@ This command starts a local development server and opens a browser window. Most 
 ## Build
 
 ```console
-npm run build
+pnpm build
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
@@ -31,7 +31,7 @@ This command generates static content in the `build` directory.
 ## Serve Build Locally
 
 ```console
-npm run serve
+pnpm serve
 ```
 
 _Note_: Embedded `.html` examples won't display correctly when using this command but will work correctly when hosted online.
@@ -41,12 +41,25 @@ This command serves the built website locally.
 ## Deployment
 
 ```console
-GIT_USER=<Your GitHub username> GITHUB_ORGANIZATION_NAME=<Your Github username or organization name> USE_SSH=true npm deploy
+GIT_USER=<Your GitHub username> GITHUB_ORGANIZATION_NAME=<Your Github username or organization name> USE_SSH=true pnpm run deploy
 ```
 
 _Note_: API documentation will not be generated unless you have already built the library and its `typings.d.ts` file.
 
 This will build the website into static files and push the files to the `gh-pages` branch.
+
+## Markdown export for LLMs
+
+Every build also writes a Markdown copy of the documentation next to the pages it is generated from, for LLMs and other tools that read the docs as text rather than as a website (`plugins/docs-markdown`):
+
+- `<page URL>.md` — the page as Markdown, with the MDX stripped (imports and JSX removed, `<CodeBlock>` samples inlined as fenced code, partials expanded) and every link rewritten to an absolute URL.
+- `llms.txt` — the index of every exported page, following the sidebar (pages that sit at the root of a section are listed before its categories, so that every page falls under the heading it belongs to).
+- `docs_map.md` — the same index, with each page's headings listed under it.
+- `lightweight-charts.d.ts` — the TypeScript declarations of the released version, published in place of the generated API reference pages.
+
+Only the released version of the documentation and the tutorials are exported; the API reference is not, since the declarations above cover it in one file.
+
+The exported files are generated in `postBuild`, so they exist only in a full `npm run build` — not when running the development server.
 
 ## Adding a new version
 
@@ -55,13 +68,13 @@ Run the following command replacing $VERSION with the name of a version you woul
 See [the Docusaurus versioning docs](https://docusaurus.io/docs/versioning#tagging-a-new-version) for an explanation of the Docusaurus versioning behaviour.
 
 ```bash
-npm run docusaurus docs:version $VERSION
+pnpm docusaurus docs:version $VERSION
 ```
 
 For example:
 
 ```bash
-npm run docusaurus docs:version 3.7.0
+pnpm docusaurus docs:version 3.7.0
 ```
 
 ## CircleCI

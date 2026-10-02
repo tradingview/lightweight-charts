@@ -411,6 +411,11 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	private _sendUpdateToChart(update: DataUpdateResponse): void {
 		const model = this._chartWidget.model();
 
+		for (const series of update.series.keys()) {
+			// Updating the time scale can synchronously recalculate the crosshair.
+			// Invalidate cached pane items before their logical indexes change.
+			series.invalidatePaneViewData();
+		}
 		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points, update.timeScale.firstChangedPointIndex);
 		update.series.forEach((value: SeriesChanges, series: Series<SeriesType>) => series.setData(value.data, value.info));
 

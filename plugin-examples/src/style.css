@@ -60,3 +60,24 @@ h1 {
   padding-inline-start: 0px;
   list-style-type: none;
 }
+
+.note {
+  max-width: 640px;
+  color: rgba(19, 23, 34, 0.7);
+}
+
+.package-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: rgba(41, 98, 255, 0.1);
+  color: rgba(41, 98, 255, 1);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 20px;
+  vertical-align: 1px;
+}
+.package-badge:hover {
+  background: rgba(41, 98, 255, 0.18);
+}
