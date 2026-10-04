@@ -474,7 +474,9 @@ export class DataLayer<HorzScaleItem> {
 		}
 
 		if (firstChangedPointIndex === -1) {
-			// if no time scale changed, then do nothing
+			// Times and length are unchanged, but the point objects may be new
+			// (the single-series setData path rebuilds the map from scratch).
+			this._sortedTimePoints = newTimePoints;
 			return -1;
 		}
 
