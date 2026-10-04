@@ -20,6 +20,7 @@ export const lineStyleDefaults: LineStyleOptions = {
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 	pointMarkersVisible: false,
+	connectGaps: true,
 };
 
 const createPaneView = (series: ISeries<'Line'>, model: IChartModelBase): IUpdatablePaneView => new SeriesLinePaneView(series, model);
