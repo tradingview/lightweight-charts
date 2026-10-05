@@ -596,12 +596,12 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	 * Shifts the right offset to compensate for bars being appended or replace to the right
 	 * so that the visible range stays in place.
 	 */
-	public setCompensateRightOffset(compensat: number): void {
+	public shiftRightOffset(delta: number): void {
 		if (this._commonTransitionStartState !== null) {
-			this._commonTransitionStartState.rightOffset -= compensat;
+			this._commonTransitionStartState.rightOffset -= delta;
 		}
 
-		this.setRightOffset(this._rightOffset - compensat);
+		this.setRightOffset(this._rightOffset - delta);
 	}
 
 	public barSpacing(): number {
@@ -856,6 +856,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 				const finishAnimation = animationProgress >= 1;
 				return finishAnimation ? offset : source + (offset - source) * animationProgress;
 			},
+			shift: () => {},
 		});
 	}
 
