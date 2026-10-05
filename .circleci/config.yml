@@ -134,6 +134,7 @@ jobs:
     steps:
       - checkout-with-deps
       - run: pnpm build:prod
+      - run: pnpm check-bundle-host-names
       # make sure that the project is compiled successfully with composite projects
       # so we don't have cyclic deps between projects and wrong imports
       - run: pnpm tsc-verify
