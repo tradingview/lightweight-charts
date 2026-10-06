@@ -846,7 +846,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			throw new RangeError('animationDuration (optional) must be finite positive number');
 		}
 
-		const source = this._rightOffset;
+		let source = this._rightOffset;
 		const animationStart = performance.now();
 
 		this._model.setTimeScaleAnimation({
@@ -856,7 +856,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 				const finishAnimation = animationProgress >= 1;
 				return finishAnimation ? offset : source + (offset - source) * animationProgress;
 			},
-			shift: () => {},
+			shift: (delta: number) => { source -= delta; },
 		});
 	}
 
