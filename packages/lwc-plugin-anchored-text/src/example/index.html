@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Anchored text Plugin Example</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				overflow: hidden;
+				background-color: rgba(248, 249, 253, 1);
+				color: rgba(19, 23, 34, 1);
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+					sans-serif;
+				font-size: 16px;
+			}
+			body {
+				display: flex;
+				flex-direction: column;
+			}
+			#controls {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.5rem 0.75rem;
+				padding: 0.5rem 0.75rem;
+			}
+			#controls label {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			#chart {
+				flex: 1 1 auto;
+				min-height: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="controls">
+			<label>
+				Text
+				<input id="text" type="text" value="Anchored Text" size="18" />
+			</label>
+			<label>
+				Horizontal
+				<select id="horz-align">
+					<option value="left">left</option>
+					<option value="center" selected>center</option>
+					<option value="right">right</option>
+				</select>
+			</label>
+			<label>
+				Vertical
+				<select id="vert-align">
+					<option value="top">top</option>
+					<option value="center" selected>center</option>
+					<option value="bottom">bottom</option>
+				</select>
+			</label>
+			<label>
+				Horizontal margin
+				<input id="horz-margin" type="range" min="0" max="100" step="1" value="20" />
+			</label>
+			<label>
+				Vertical margin
+				<input id="vert-margin" type="range" min="0" max="100" step="1" value="10" />
+			</label>
+			<label>
+				Font
+				<select id="font">
+					<option value="bold 14px -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif">bold 14px sans-serif</option>
+					<option value="italic bold 42px Arial" selected>italic bold 42px Arial</option>
+					<option value="12px monospace">12px monospace</option>
+				</select>
+			</label>
+			<label>
+				Colour
+				<input id="color" type="color" value="#222" />
+			</label>
+			<label>
+				Layer
+				<select id="z-order">
+					<option value="top" selected>top</option>
+					<option value="normal">normal</option>
+					<option value="bottom">bottom</option>
+				</select>
+			</label>
+			<label>
+				<input id="visible" type="checkbox" checked />
+				Visible
+			</label>
+			<label>
+				<input id="left-scale" type="checkbox" />
+				Left price scale
+			</label>
+			<label>
+				<input id="second-pane" type="checkbox" />
+				Second pane
+			</label>
+			<button id="attach" type="button">Detach</button>
+		</div>
+		<div id="chart"></div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>
