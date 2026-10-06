@@ -11,7 +11,7 @@ aliases:
   - &restore-node-modules-cache
       name: Restore dependencies cache
       keys:
-        - &cache-key v2-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
+        - &cache-key v3-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
 
   - &save-node-modules-cache
       name: Save dependencies cache
