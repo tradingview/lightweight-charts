@@ -13,7 +13,13 @@ async function beforeInteractions(container) {
 		return Array.from(canvas.getContext('2d').getImageData(Math.round(x * ratio), Math.round(y * ratio), 1, 1).data);
 	};
 
-	const chart = LwcPlugin.createScatterChart(container, { layout: { attributionLogo: false } });
+	// The price axis is held at a fixed width: a rescale changes its labels, and
+	// with some fonts their width, which narrows the plot and rightly refits the
+	// X axis (a range set this test would count as a refit for nothing).
+	const chart = LwcPlugin.createScatterChart(container, {
+		layout: { attributionLogo: false },
+		rightPriceScale: { minimumWidth: 100 },
+	});
 	const series = LwcPlugin.createScatterSeries(chart, { pointSize: 30, opacity: 1 });
 	series.setData([{ id: 'a', x: 0, y: 0 }, { id: 'b', x: 50, y: 50 }, { id: 'c', x: 100, y: 100 }]);
 	await frames(3);
@@ -56,8 +62,12 @@ async function beforeInteractions(container) {
 
 	// A size change rescales the price axis: the margins hold the largest point.
 	const before = series.series().priceToCoordinate(100);
+	const plotWidth = chart.timeScale().width();
 	series.applyOptions({ pointSize: 50 });
 	await frames(3);
+	if (chart.timeScale().width() !== plotWidth) {
+		throw new Error(`The plot width changed (${plotWidth} → ${chart.timeScale().width()}): widen rightPriceScale.minimumWidth`);
+	}
 	expectCounts('a larger point size', { setData: 0, chartOptions: 0, range: 0 });
 	if (Math.abs(series.series().priceToCoordinate(100) - before) < 5) { throw new Error('A larger point size did not rescale the price axis'); }
 
