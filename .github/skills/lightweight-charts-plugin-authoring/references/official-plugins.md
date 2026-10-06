@@ -120,6 +120,16 @@ that accept a deprecated spelling (`'middle'`) on input and never return it,
 and `mergeOptions` where one option (`lineHeight`) treats an explicit
 `undefined` as a value.
 
+### `session-highlighting` — per-bar background from the series' own data
+
+`SessionHighlighting` shades a full-height column behind every bar with the
+colour a user function returns for its time. Read for: deriving per-bar state
+from `series.data()` in `dataUpdated` and touching only the last bar on an
+`'update'` scope, mapping the visible logical range back to data indices by
+binary search over `timeToIndex` (so other series starting earlier do not
+shift the slice), `fullBarWidth` from the time scale's `barSpacing` so columns
+abut at any pixel ratio, and `zOrder: 'bottom'` for a background.
+
 ## Pane primitives
 
 ### `accessibility` — DOM overlays and multi-pane lifecycle
@@ -139,7 +149,7 @@ interaction tests show how to assert on DOM state.
 
 Upstream `plugin-examples/src/plugins/` holds unpublished proof-of-concept
 plugins: tooltips and delta tooltips, a rectangle drawing tool, trend lines,
-session highlighting, a heatmap series, lollipop, grouped bars, box-whisker,
+a heatmap series, lollipop, grouped bars, box-whisker,
 background shading, price alerts, a volume profile, a partial price line,
 and crosshair highlighting. Good for seeing the shape of an
 idea; they predate the toolkit and skip the tests and README the packages

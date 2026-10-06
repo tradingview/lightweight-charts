@@ -60,6 +60,7 @@ export const CATALOGUE_CATEGORIES: ReadonlyMap<string, string> = new Map([
 	['image-watermark', 'Overlays'],
 	['pretty-histogram-series', 'Series types'],
 	['rounded-candles-series', 'Series types'],
+	['session-highlighting', 'Overlays'],
 	['stacked-area-series', 'Series types'],
 	['stacked-bars-series', 'Series types'],
 	['vertical-line', 'Drawing tools'],

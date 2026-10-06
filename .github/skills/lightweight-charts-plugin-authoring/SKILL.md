@@ -197,13 +197,14 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 | a series primitive with an axis label and dragging | `vertical-line` |
 | an image or decoration behind a series or pane | `image-watermark` (both a series and a pane primitive) |
 | a text label anchored to a pane edge or corner | `anchored-text` (the smallest series + pane pair over one core) |
+| a background derived from each bar of a series | `session-highlighting` (per-bar state from `dataUpdated`, visible-range slice) |
 | a DOM layer on a pane, multi-pane lifecycle | `accessibility` |
 
 `references/official-plugins.md` says what each one demonstrates in detail.
 `plugin-examples/src/plugins/` in the repository
 (`https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples`)
 holds a further set of proof-of-concept plugins — tooltips, drawing tools,
-session highlighting, heatmaps, … — good for breadth and ideas, but they are
+heatmaps, … — good for breadth and ideas, but they are
 unpublished starting points, not the standard to match. The graduated
 plugins' folders there are redirects to the packages.
 
