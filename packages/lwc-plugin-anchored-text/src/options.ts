@@ -1,6 +1,10 @@
 import { PrimitivePaneViewZOrder } from 'lightweight-charts';
 
-export type AnchoredTextAlign = 'left' | 'center' | 'right';
+/** Horizontal anchor of the text within the pane. */
+export type AnchoredTextHorzAlign = 'left' | 'center' | 'right';
+
+/** Vertical anchor of the text within the pane. */
+export type AnchoredTextVertAlign = 'top' | 'center' | 'bottom';
 
 /**
  * The alignment value used by the `plugin-examples` version of this plugin.
@@ -14,9 +18,9 @@ export interface AnchoredTextOptions {
 	/** The line of text. An empty string draws nothing. */
 	text: string;
 	/** Which side of the pane the text is anchored to, or centred. */
-	horzAlign: AnchoredTextAlign;
+	horzAlign: AnchoredTextHorzAlign;
 	/** Which edge of the pane the text is anchored to, or centred. */
-	vertAlign: AnchoredTextAlign;
+	vertAlign: AnchoredTextVertAlign;
 	/**
 	 * Distance from the left or right pane edge, in CSS pixels. Not used when
 	 * `horzAlign` is `'center'`.
@@ -49,8 +53,8 @@ export interface AnchoredTextOptions {
 export type AnchoredTextInputOptions = Partial<
 	Omit<AnchoredTextOptions, 'horzAlign' | 'vertAlign'>
 > & {
-	horzAlign?: AnchoredTextAlign | LegacyMiddleAlign;
-	vertAlign?: AnchoredTextAlign | LegacyMiddleAlign;
+	horzAlign?: AnchoredTextHorzAlign | LegacyMiddleAlign;
+	vertAlign?: AnchoredTextVertAlign | LegacyMiddleAlign;
 };
 
 /** Values used for any option which is not set. */
@@ -67,7 +71,7 @@ export const defaultOptions: AnchoredTextOptions = {
 	zOrder: 'top',
 };
 
-function normalizeAlign(value: AnchoredTextAlign | LegacyMiddleAlign): AnchoredTextAlign | 'center' {
+function normalizeAlign<T extends string>(value: T | LegacyMiddleAlign): T | 'center' {
 	return value === 'middle' ? 'center' : value;
 }
 

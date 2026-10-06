@@ -9,8 +9,8 @@ import { generateLineData } from './sample-data';
 import {
 	AnchoredText,
 	AnchoredTextHorzAlign,
-	AnchoredTextPane,
 	AnchoredTextVertAlign,
+	AnchoredTextPane,
 } from '../anchored-text';
 
 const container = document.querySelector<HTMLDivElement>('#chart');
