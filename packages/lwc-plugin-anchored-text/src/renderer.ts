@@ -34,8 +34,8 @@ class AnchoredTextPaneRenderer implements IPrimitivePaneRenderer {
 			const layout = layoutAnchoredText(
 				{
 					width: metrics.width,
-					ascent: metrics.actualBoundingBoxAscent,
-					descent: metrics.actualBoundingBoxDescent,
+					ascent: metrics.fontBoundingBoxAscent,
+					descent: metrics.fontBoundingBoxDescent,
 				},
 				scope.mediaSize,
 				options

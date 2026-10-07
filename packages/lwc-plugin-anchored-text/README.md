@@ -157,15 +157,16 @@ as `defaultOptions`.
 | `lineHeight` | `number` | — (measured) | Height of the text, in CSS pixels. Measured from the font when not set. |
 | `color` | `string` | `'#131722'` | Text colour. |
 | `visible` | `boolean` | `true` | Whether the text is drawn at all. |
-| `zOrder` | `'bottom' \| 'normal' \| 'top'` | `'top'` | Layer the text is drawn in. `'top'` puts it over the series. |
+| `zOrder` | `'bottom' \| 'normal' \| 'top'` | `'normal'` | Layer the text is drawn in. `'normal'` draws it with the series, under the crosshair; `'top'` puts it over everything in the pane, the crosshair included; `'bottom'` puts it behind the series. |
 
 ### Alignment and margins
 
 The text is placed against the anchored edge of its pane, `horzMargin` and
 `vertMargin` away from it. A centred axis ignores its margin. With a
 `lineHeight` the text's baseline sits at the bottom of that height, as it did
-in the `plugin-examples` version; without one the height is measured from the
-font, so the text fits its box exactly.
+in the `plugin-examples` version; without one the height is that of the font,
+so it does not change with the text, and the baseline sits at the font's
+ascent.
 
 ## Notes
 

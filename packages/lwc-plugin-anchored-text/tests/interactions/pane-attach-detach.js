@@ -1,17 +1,5 @@
 // A pane primitive follows its pane: it paints in the pane it is attached to,
 // survives that pane being removed, and can be attached to another pane.
-async function beforeInteractions(container) {
-	const chart = LightweightCharts.createChart(container, {
-		height: 380,
-		grid: { vertLines: { visible: false }, horzLines: { visible: false } },
-	});
-	const data = Array.from({ length: 50 }, (_unused, i) => ({ time: 1704067200 + i * 86400, value: 30 + Math.sin(i / 5) * 10 }));
-	const series = chart.addSeries(LightweightCharts.LineSeries, { color: '#F0F0F0' });
-	series.setData(data);
-	const secondSeries = chart.addSeries(LightweightCharts.LineSeries, { color: '#F0F0F0' }, 1);
-	secondSeries.setData(data);
-	chart.timeScale().fitContent();
-	const frames = async () => { for (let i = 0; i < 4; i++) { await new Promise(requestAnimationFrame); } };
 
 // Counts the dark pixels inside a CSS-pixel box of the pane, on every canvas
 // of the pane (the layer a primitive is drawn on depends on its zOrder).
@@ -36,6 +24,19 @@ function darkPixels(pane, box) {
 // The default anchor is top-left with 20px / 10px margins and a 14px font.
 const textBox = { x: 20, y: 8, width: 120, height: 24 };
 
+async function beforeInteractions(container) {
+	const chart = LightweightCharts.createChart(container, {
+		height: 380,
+		grid: { vertLines: { visible: false }, horzLines: { visible: false } },
+	});
+	const data = Array.from({ length: 50 }, (_unused, i) => ({ time: 1704067200 + i * 86400, value: 30 + Math.sin(i / 5) * 10 }));
+	const series = chart.addSeries(LightweightCharts.LineSeries, { color: '#F0F0F0' });
+	series.setData(data);
+	const secondSeries = chart.addSeries(LightweightCharts.LineSeries, { color: '#F0F0F0' }, 1);
+	secondSeries.setData(data);
+	chart.timeScale().fitContent();
+	const frames = async () => { for (let i = 0; i < 4; i++) { await new Promise(requestAnimationFrame); } };
+
 	const text = new LwcPlugin.AnchoredTextPane({ text: 'Pane label', color: '#000000' });
 
 	chart.panes()[1].attachPrimitive(text);
@@ -47,10 +48,13 @@ const textBox = { x: 20, y: 8, width: 120, height: 24 };
 		throw new Error('The text leaked into another pane');
 	}
 
-	chart.panes()[1].detachPrimitive(text);
+	// Removing the last series removes the pane, and the library detaches
+	// the primitive with it.
 	chart.removeSeries(secondSeries);
-	chart.removePane(1);
 	await frames();
+	if (chart.panes().length !== 1) {
+		throw new Error('The empty pane was not removed');
+	}
 
 	chart.panes()[0].attachPrimitive(text);
 	await frames();
@@ -59,5 +63,18 @@ const textBox = { x: 20, y: 8, width: 120, height: 24 };
 	}
 	if (text.options().text !== 'Pane label') {
 		throw new Error('The options were lost across panes');
+	}
+
+	// A redraw requested after the move must reach the new pane, not the
+	// removed one.
+	text.setText('');
+	await frames();
+	if (darkPixels(chart.panes()[0], textBox) !== 0) {
+		throw new Error('setText did not redraw the new pane');
+	}
+	text.setText('Pane label');
+	await frames();
+	if (darkPixels(chart.panes()[0], textBox) === 0) {
+		throw new Error('setText did not paint the text back in the new pane');
 	}
 }

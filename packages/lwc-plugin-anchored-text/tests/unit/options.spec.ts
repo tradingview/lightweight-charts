@@ -19,7 +19,7 @@ void describe('resolveOptions', () => {
 			lineHeight: undefined,
 			color: '#131722',
 			visible: true,
-			zOrder: 'top',
+			zOrder: 'normal',
 		});
 		expect(resolveOptions()).to.deep.equal(defaultOptions);
 	});

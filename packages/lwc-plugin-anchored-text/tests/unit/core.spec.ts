@@ -39,7 +39,7 @@ void describe('AnchoredTextCore', () => {
 	void it('has one pane view whose layer follows zOrder', () => {
 		const { core } = createCore({ text: 'Title' });
 		expect(core.paneViews()).to.have.length(1);
-		expect(core.paneViews()[0].zOrder?.()).to.equal('top');
+		expect(core.paneViews()[0].zOrder?.()).to.equal('normal');
 		core.applyOptions({ zOrder: 'bottom' });
 		expect(core.paneViews()[0].zOrder?.()).to.equal('bottom');
 	});

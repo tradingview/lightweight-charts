@@ -15,6 +15,7 @@ function runTestCase(container) {
 		layout: { attributionLogo: false },
 	}));
 	const series = chart.addSeries(LightweightCharts.LineSeries, { lineWidth: 4 });
+	series.priceScale().applyOptions({ scaleMargins: { top: 0.1, bottom: 0.1 } });
 	series.setData(generateData().map(point => ({ time: point.time, value: 50 })));
 	chart.timeScale().fitContent();
 

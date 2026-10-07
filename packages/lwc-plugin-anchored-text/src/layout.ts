@@ -3,9 +3,9 @@ import { AnchoredTextOptions } from './options.js';
 /** What the renderer measured about the text, in CSS pixels. */
 export interface TextMeasure {
 	width: number;
-	/** Distance from the baseline to the top of the glyphs. */
+	/** Distance from the baseline to the top of the font. */
 	ascent: number;
-	/** Distance from the baseline to the bottom of the glyphs. */
+	/** Distance from the baseline to the bottom of the font. */
 	descent: number;
 }
 
@@ -31,7 +31,7 @@ type LayoutOptions = Pick<
 
 /**
  * Places the text box within the pane. Nothing is clamped: text wider than
- * the pane overflows it, and the renderer's own clip trims it at the edge.
+ * the pane overflows it, and the pane canvas trims it at the edge.
  */
 export function layoutAnchoredText(text: TextMeasure, pane: Size, options: LayoutOptions): TextLayout {
 	const width = text.width;

@@ -24,7 +24,7 @@ const text = new AnchoredText({
 	horzAlign: 'center',
 	vertAlign: 'center',
 	font: 'italic bold 42px Arial',
-	color: '#222'
+	color: '#222222'
 });
 
 const data = generateLineData();

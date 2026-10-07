@@ -68,7 +68,7 @@ export const defaultOptions: AnchoredTextOptions = {
 	lineHeight: undefined,
 	color: '#131722',
 	visible: true,
-	zOrder: 'top',
+	zOrder: 'normal',
 };
 
 function normalizeAlign<T extends string>(value: T | LegacyMiddleAlign): T | 'center' {
