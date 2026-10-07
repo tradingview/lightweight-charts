@@ -5,6 +5,13 @@ an ever-expanding dataset, resembling a live feed that loads older data when the
 user scrolls back in time. The example depicts a chart that initially loads a
 limited amount of data, but later fetches additional data as required.
 
+The initial amount of data is estimated from the time scale width divided by
+`barSpacing`, so that the loaded bars fill the visible area. The example loads
+50 extra bars, so that the user can scroll back before additional data is
+requested. Refer to the
+[Number of visible bars](https://tradingview.github.io/lightweight-charts/docs/time-scale.md#number-of-visible-bars) section for
+more information.
+
 Key to this functionality is the
 [`subscribeVisibleLogicalRangeChange`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange)
 method. This function is triggered when the visible data range changes, in this
@@ -123,7 +130,10 @@ const series = chart.addSeries(CandlestickSeries, {
 
 const datafeed = new Datafeed();
 
-series.setData(datafeed.getBars(200));
+// Estimate how many bars fit in the visible area and load 20% extra bars to allow scrolling
+const timeScale = chart.timeScale();
+const visibleBars = Math.ceil(timeScale.width() / timeScale.options().barSpacing);
+series.setData(datafeed.getBars(visibleBars + (visibleBars * 0.2)));
 
 chart.timeScale().subscribeVisibleLogicalRangeChange(logicalRange => {
 	if (logicalRange.from < 10) {

@@ -1,21 +1,19 @@
 # Time scale
 
-## Overview
-
-Time scale (or time axis) is a horizontal scale that displays the time of data points at the bottom of the chart.
+The **time scale** (or time axis) is a horizontal scale that displays the time of data points at the bottom of the chart.
 
 ![Time scale](https://tradingview.github.io/lightweight-charts/img/time-scale.png "Time scale")
 
 The horizontal scale can also represent price or other custom values. Refer to the [Chart types](https://tradingview.github.io/lightweight-charts/docs/chart-types.md) article for more information.
 
-### Time scale appearance
+## Time scale appearance
 
 Use [`TimeScaleOptions`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/TimeScaleOptions) to adjust the time scale appearance. You can specify these options in two ways:
 
 - On chart initialization. To do this, provide the desired options as a [`timeScale`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ChartOptionsBase#timescale) parameter when calling [`createChart`](https://tradingview.github.io/lightweight-charts/docs/api/functions/createChart).
 - On the fly using either the [`ITimeScaleApi.applyOptions`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi#applyoptions) or [`IChartApi.applyOptions`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#applyoptions) method. Both methods produce the same result.
 
-### Time scale API
+## Time scale API
 
 Call the [`IChartApi.timeScale`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#timescale) method to get an instance of the [`ITimeScaleApi`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi) interface. This interface provides an extensive API for controlling the time scale. For example, you can adjust the visible range, convert a time point or [index](https://tradingview.github.io/lightweight-charts/docs/api/type-aliases/Logical) to a coordinate, and subscribe to events.
 
@@ -35,7 +33,7 @@ You can adjust the visible range using the following methods:
 - [`setVisibleLogicalRange`]
 - [`getVisibleLogicalRange`]
 
-### Data range
+## Data range
 
 The data range includes only values from the first to the last bar visible on the chart. If the visible area has empty space, this part of the scale is not included in the data range.
 
@@ -43,7 +41,7 @@ Note that you cannot extrapolate time with the [`setVisibleRange`] method. For e
 
 If you want to adjust the visible range more flexible, operate with the [logical range](#logical-range) instead.
 
-### Logical range
+## Logical range
 
 The logical range represents a continuous line of values. These values are logical [indices](https://tradingview.github.io/lightweight-charts/docs/api/type-aliases/Logical) on the scale that illustrated as red lines in the image below:
 
@@ -57,6 +55,35 @@ A half-index, such as `3.5`, represents the middle of the bar.
 In the library, the logical range is represented with the [`LogicalRange`](https://tradingview.github.io/lightweight-charts/docs/api/type-aliases/LogicalRange) object. This object has the `from` and `to` properties, which are logical indices on the time scale. For example, the visible logical range on the chart above is approximately from `-4.73` to `5.05`.
 
 The [`setVisibleLogicalRange`] method allows you to specify the visible range beyond the bounds of the available data. This can be useful for setting a [chart margin](#chart-margin) or aligning series visually.
+
+## Number of visible bars
+
+The number of bars that fit in the visible area depends on the time scale width and the [`barSpacing`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/TimeScaleOptions#barspacing) option. The time scale width is the chart width without the price scales. To get it, call the [`width`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi#width) method.
+
+Before the data is set, you can only estimate this number. After the data is set, you can measure it exactly.
+
+### Estimating before the data is set
+
+Divide the time scale width by `barSpacing` to estimate how much data to load, for example, to fill the whole viewport with data from a remote API:
+
+```javascript
+const timeScale = chart.timeScale();
+const visibleBars = Math.ceil(timeScale.width() / timeScale.options().barSpacing);
+```
+
+Note the following:
+
+- The result is an estimate. The exact width of the time scale depends on the price scale width, which is known only after the data is set.
+- `barSpacing` returned by [`options`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi#options) is the current bar spacing, which changes when the user zooms the chart. It can differ from the value you passed in the options.
+- The [`rightOffset`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/TimeScaleOptions#rightoffset) and [`rightOffsetPixels`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/TimeScaleOptions#rightoffsetpixels) options add a margin to the right of the last bar. This margin reduces the number of bars visible after the first render. For example, with `rightOffset` set to `5`, five fewer bars are visible than the estimate.
+- If both [`fixLeftEdge`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/TimeScaleOptions#fixleftedge) and [`fixRightEdge`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/TimeScaleOptions#fixrightedge) are enabled, the library increases `barSpacing` as needed so that all loaded bars always fill the visible area.
+
+### Measuring after the data is set
+
+Use the [`getVisibleLogicalRange`] method to get the size of the visible logical range as the difference between `to` and `from`. Note that this range can include empty space before the first bar or after the last one.
+
+To check how many bars of a series are outside the visible range, use [`barsInLogicalRange`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesApi#barsinlogicalrange).
+To load more data while the user scrolls, subscribe to range changes with [`subscribeVisibleLogicalRangeChange`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange) as shown in the [Infinite history](https://tradingview.github.io/lightweight-charts/tutorials/demos/infinite-history.md) tutorial.
 
 ## Chart margin
 

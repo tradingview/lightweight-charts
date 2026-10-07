@@ -3,7 +3,7 @@
 A map of all documentation pages with their headings, for navigation by LLMs and tools. Every page is available as Markdown at the linked URL.
 
 > Version: 5.2 (latest released)
-> Last updated: 2026-10-05 15:30:11 UTC
+> Last updated: 2026-10-07 09:29:20 UTC
 
 This map uses a hierarchical structure:
 
@@ -52,12 +52,14 @@ This map uses a hierarchical structure:
   - Modify price scale
   - Remove price scale
 - [Time scale](https://tradingview.github.io/lightweight-charts/docs/time-scale.md)
-  - Overview
-    - Time scale appearance
-    - Time scale API
+  - Time scale appearance
+  - Time scale API
   - Visible range
-    - Data range
-    - Logical range
+  - Data range
+  - Logical range
+  - Number of visible bars
+    - Estimating before the data is set
+    - Measuring after the data is set
   - Chart margin
 - [Panes](https://tradingview.github.io/lightweight-charts/docs/panes.md)
   - Customization Options
