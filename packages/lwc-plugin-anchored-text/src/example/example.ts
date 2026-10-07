@@ -74,8 +74,6 @@ colorInput.addEventListener('input', () => {
 	text.applyOptions({ color: colorInput.value });
 });
 
-// The series is drawn with a thick line so that `'bottom'` visibly puts the
-// text behind it.
 const zOrderSelect = control<HTMLSelectElement>('z-order');
 zOrderSelect.addEventListener('change', () => {
 	text.applyOptions({ zOrder: zOrderSelect.value as PrimitivePaneViewZOrder });
@@ -97,15 +95,13 @@ attachButton.addEventListener('click', () => {
 	attachButton.textContent = attached ? 'Detach' : 'Attach';
 });
 
-// The geometry comes from the pane, so a visible left price scale must not
-// move the text.
+// The geometry comes from the pane, so a visible left price scale must not move the text.
 const leftScaleInput = control<HTMLInputElement>('left-scale');
 leftScaleInput.addEventListener('change', () => {
 	chart.applyOptions({ leftPriceScale: { visible: leftScaleInput.checked } });
 });
 
-// The pane primitive needs no series of its own: it is anchored within the
-// pane it is attached to.
+// The pane primitive needs no series of its own: it is anchored within the pane it is attached to.
 const paneText = new AnchoredTextPane({
 	text: 'Pane 1',
 	horzAlign: 'center',
