@@ -61,6 +61,14 @@ interface StartScrollPosition extends Point {
 	localY: Coordinate;
 }
 
+/**
+ * Pointer position in bars for the animation scroll velocity samples.
+ * Unlike the right offset it is not shifted when bars arrive during the drag.
+ */
+export function getAnimationScrollPosition(localX: Coordinate, barSpacing: number): Coordinate {
+	return -localX / barSpacing as Coordinate;
+}
+
 export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private readonly _chart: IChartWidgetBase;
 	private _state: Pane | null;
@@ -846,7 +854,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 					KineticScrollConstants.DumpingCoeff,
 					KineticScrollConstants.ScrollMinMove / barSpacing
 				);
-				this._scrollXAnimation.addPosition(timeScale.rightOffset() as Coordinate, this._startScrollingPos.timestamp);
+				this._scrollXAnimation.addPosition(getAnimationScrollPosition(this._startScrollingPos.localX, barSpacing), this._startScrollingPos.timestamp);
 			} else {
 				this._scrollXAnimation = null;
 			}
@@ -867,7 +875,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 			model.scrollTimeTo(event.localX);
 			if (this._scrollXAnimation !== null) {
-				this._scrollXAnimation.addPosition(timeScale.rightOffset() as Coordinate, now);
+				this._scrollXAnimation.addPosition(getAnimationScrollPosition(event.localX, timeScale.barSpacing()), now);
 			}
 		}
 	}

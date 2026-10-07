@@ -856,7 +856,12 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 				const finishAnimation = animationProgress >= 1;
 				return finishAnimation ? offset : source + (offset - source) * animationProgress;
 			},
-			shift: (delta: number) => { source -= delta; },
+			shift: (delta: number) => {
+				const progress = (performance.now() - animationStart) / animationDuration;
+				if (progress < 1) {
+					source -= delta / (1 - progress);
+				}
+			},
 		});
 	}
 
