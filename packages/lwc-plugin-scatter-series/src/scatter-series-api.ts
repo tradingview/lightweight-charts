@@ -1,62 +1,48 @@
 import {
 	AutoscaleInfo,
-	AutoscaleInfoProvider,
 	ColorType,
 	Coordinate,
 	CustomSeriesOptions,
 	IChartApiBase,
-	IPaneApi,
 	ISeriesApi,
-	Logical,
-	LogicalRange,
-	MouseEventParams,
 	PriceScaleMode,
 	SeriesPartialOptions,
-	SeriesType,
 	WhitespaceData,
 } from 'lightweight-charts';
-import { Delegate } from '@tradingview/lwc-toolkit/delegate';
+import { isChartRemoved, isSeriesAttached } from '@tradingview/lwc-toolkit/chart/lifecycle';
+import { cloneOptions } from '@tradingview/lwc-toolkit/options/merge';
+import { CoalescedTask, createCoalescedTask } from '@tradingview/lwc-toolkit/scheduling/coalesced-task';
 
+import { scatterAutoscaleInfo } from './autoscale';
 import type { ScatterGroupInfo, ScatterPoint, ScatterPointInfo, ScatterSizeMapping, ScatterSlotData } from './data';
 import { ScatterGeometryCache, XMapping, YToCoordinate, coordinateToX, isInPane, xToCoordinate } from './geometry';
 import { hitTestScatter } from './hit-test';
+import { HoverController, HoverHost } from './hover-controller';
 import {
 	ScatterHorzScaleBehavior,
 	ScatterXAxisOwner,
 	claimScatterXAxis,
-	formatScatterX,
 	isScatterHorzScaleBehavior,
 	releaseScatterXAxis,
-	setScatterXAxis,
 } from './horz-scale-behavior';
-import { cloneOptions, isUnsafeKey, mergeOptions } from './merge';
-import { ScatterModel, ScatterSlotItem, buildScatterModel, sameGrid, sameSlots } from './model';
+import { ScatterModel, buildScatterModel } from './model';
 import {
-	ScatterGroup,
-	ScatterSeriesOptions,
-	ScatterSeriesPartialOptions,
-	scatterOptionDefaults,
-	scatterOptionKeys,
-	underlyingSeriesDefaults,
-} from './options';
+	ScatterOwnOptions,
+	applyOwnOptions,
+	applySeriesOptions,
+	fullOptions,
+	initialOwnOptions,
+	optionChange,
+	paintOptions,
+	splitOptions,
+} from './option-handling';
+import { ScatterSeriesOptions, ScatterSeriesPartialOptions, underlyingSeriesDefaults } from './options';
 import type { ScatterRenderOptions } from './renderer';
-import { cappedStrokeWidth, mapSizeValue } from './size';
-import { ResolvedScatterGroup, clampOpacity, describeGroup, strokeColorOf } from './style';
+import { cappedStrokeWidth, describeSizeMapping } from './size';
+import { ResolvedScatterGroup, describeGroup, strokeColorOf, withGroupVisibility } from './style';
 import { ScatterSeriesView } from './view';
-import {
-	MAX_X_MAGNITUDE,
-	SlotGrid,
-	TickLevel,
-	XAxisGeometry,
-	XAxisLabels,
-	XLabelSpacing,
-	chooseXLabels,
-	endLabelRoom,
-	sameLevels,
-	slotValue,
-	stepValue,
-	tickLevels,
-} from './x-axis';
+import { XAxisController, XAxisHost } from './x-axis-controller';
+import { MAX_X_MAGNITUDE, slotValue, stepValue } from './x-axis';
 
 /** The custom series a scatter series draws with. */
 export type ScatterUnderlyingSeries = ISeriesApi<
@@ -234,1151 +220,442 @@ export interface ScatterSeriesApi<TPoint extends ScatterPoint = ScatterPoint> {
 	remove(): void;
 }
 
-type ScatterOnlyOptions = typeof scatterOptionDefaults;
+/** The start of the console warnings. */
+const WARNING = 'lwc-plugin-scatter-series: ';
 
-/** Least room between two X labels, in multiples of the font size. */
-const LABEL_GAP_EM = 0.5;
-
-/**
- * Least distance between the centres of two X labels, in multiples of the
- * font size: 36 px at the default 12 px, which thins the labels of a 300 px
- * chart out the way the design does (0, 20, 40 … rather than every 10).
- */
-const LABEL_PITCH_EM = 3;
-
-/** Width of a character when the labels cannot be measured, in multiples of the font size. */
-const FALLBACK_CHARACTER_EM = 0.62;
+const SCALE_MODE_WARNING = 'percentage and indexed-to-100 price scales mean nothing here; use Normal or Logarithmic.';
 
 /**
- * Two visible ranges this close, in slots, are the same: the chart's own
- * arithmetic does not return a range exactly as it was set.
+ * Where a scatter series is in its life. `attached`: its underlying series is
+ * on the chart, and it acts on it. `detached`: the host took the underlying
+ * series off with `chart.removeSeries`; the series lets go of the chart after
+ * the current call, never from inside the chart's own dispatch of an event.
+ * `disposed`: the chart was removed (`chart.remove()`), and with it everything
+ * the series did to it. `removed`: `remove()` was called. The first two are
+ * read from the chart each time; the last two are final.
  */
-const RANGE_TOLERANCE = 1e-3;
-
-/** Scatter options which change how the series is painted, but not its points or its slots. */
-const PAINT_ONLY_KEYS: ReadonlySet<string> = new Set([
-	'hoveredOpacity',
-	'hoveredSizeIncrease',
-	'hoveredRingWidth',
-	'hoveredRingColor',
-	'hoveredRingGap',
-	'plotBorder',
-]);
+type Lifecycle = 'attached' | 'detached' | 'disposed' | 'removed';
 
 /**
- * Scatter options which change how the points look — the model is built
- * again — but neither the slots nor the X axis, which the chart keeps.
+ * A scatter series: the model of its points, and the chart's custom series it
+ * draws them with. The X axis ({@link XAxisController}) and the hovered point
+ * ({@link HoverController}) are handled apart.
+ *
+ * The public members are arrow functions on the instance, not prototype
+ * methods: a host may call them through a Proxy (a Vue `reactive()`, say),
+ * whose `this` could not read the `#private` fields.
  */
-const RESTYLE_KEYS: ReadonlySet<string> = new Set([
-	'opacity',
-	'pointSize',
-	'pointSizeLimits',
-	'shape',
-	'strokeColor',
-	'strokeWidth',
-	'hollow',
-	'palette',
-	'sizeRange',
-	'sizeDomain',
-	'sizeScale',
-]);
-
-let measureContext: CanvasRenderingContext2D | null | undefined;
-
-/** A context to measure text with, or `null` where there is none. */
-function textMeasureContext(): CanvasRenderingContext2D | null {
-	if (measureContext === undefined) {
-		measureContext = typeof document !== 'undefined' ? document.createElement('canvas').getContext('2d') : null;
-	}
-	return measureContext;
-}
-
-/**
- * The flags of `handleScroll` and `handleScale` which let the user move the X
- * axis: those of the library's `TimeScale._isAllScalingAndScrollingDisabled`
- * (`src/model/time-scale.ts`), which decides whether the chart treats both
- * edges as fixed. A unit test reads the library's list and fails when the two
- * differ.
- * @internal
- */
-export const X_AXIS_MOVE_FLAGS: { readonly handleScroll: readonly string[]; readonly handleScale: readonly string[] } = {
-	handleScroll: ['mouseWheel', 'pressedMouseMove', 'horzTouchDrag', 'vertTouchDrag'],
-	handleScale: ['mouseWheel', 'pinch', 'axisPressedMouseMove', 'axisDoubleClickReset'],
-};
-
-/**
- * Whether the user can move the X axis: scrolling or zooming switched on.
- * @internal
- */
-export function canMoveXAxis(options: Pick<ReturnType<IChartApiBase<number>['options']>, 'handleScroll' | 'handleScale'>): boolean {
-	const anyOn = (value: unknown, keys: readonly string[]): boolean => {
-		if (typeof value === 'boolean') {
-			return value;
-		}
-		const record = value as Record<string, unknown>;
-		return keys.some((key: string) => {
-			const flag = record[key];
-			return typeof flag === 'object' && flag !== null ? (flag as { time?: boolean }).time === true : flag === true;
-		});
-	};
-	return anyOn(options.handleScroll, X_AXIS_MOVE_FLAGS.handleScroll) || anyOn(options.handleScale, X_AXIS_MOVE_FLAGS.handleScale);
-}
-
-function sameRange(a: LogicalRange, b: LogicalRange): boolean {
-	return Math.abs(a.from - b.from) < RANGE_TOLERANCE && Math.abs(a.to - b.to) < RANGE_TOLERANCE;
-}
-
-function samePointInfo<TPoint extends ScatterPoint>(a: ScatterPointInfo<TPoint> | null, b: ScatterPointInfo<TPoint> | null): boolean {
-	if (a === null || b === null) {
-		return a === b;
-	}
-	return a.objectId === b.objectId &&
-		a.point === b.point &&
-		a.index === b.index &&
-		a.groupId === b.groupId &&
-		a.x === b.x &&
-		a.y === b.y &&
-		a.radius === b.radius &&
-		a.color === b.color &&
-		a.opacity === b.opacity &&
-		a.shape === b.shape &&
-		a.hollow === b.hollow &&
-		a.strokeColor === b.strokeColor &&
-		a.strokeWidth === b.strokeWidth;
-}
-
-/** The X domain fitted to the plot. */
-interface FitLayout {
-	/** Distance between neighbouring slots, CSS pixels. */
-	spacing: number;
-	/** Room between each end of the domain and the edge of the plot, CSS pixels. */
-	margins: { left: number; right: number };
-	/** The labels of the fitted axis; `null` before the chart knows its width. */
-	labels: XAxisLabels | null;
-}
-
-/** The point under the pointer, as the chart reported it. */
-interface PointerHover {
-	/** Its `objectId`. */
-	id: string;
-	/** Its data index: the point actually hit, should several share the id. */
-	index: number;
-}
-
 export class ScatterSeriesApiImpl<TPoint extends ScatterPoint> implements ScatterSeriesApi<TPoint>, ScatterXAxisOwner {
-	private readonly _chart: IChartApiBase<number>;
-	private readonly _behavior: ScatterHorzScaleBehavior;
-	private readonly _series: ScatterUnderlyingSeries;
-	private readonly _hoveredChanged: Delegate<ScatterPointInfo<TPoint> | null> = new Delegate();
-	private readonly _geometryCache: ScatterGeometryCache = new ScatterGeometryCache();
-	// The chart's own label distance, given back on removal: the host's latest.
-	private _hostLabelLength: number | undefined;
-	private _scatterOptions: ScatterOnlyOptions;
-	private _renderOptions: ScatterRenderOptions | null = null;
-	private _userAutoscaleInfoProvider: AutoscaleInfoProvider | undefined;
-	private _hitTestTolerance: number = underlyingSeriesDefaults.hitTestTolerance;
-	private _points: readonly TPoint[] = [];
-	private _model: ScatterModel<TPoint>;
+	readonly #chart: IChartApiBase<number>;
+	readonly #behavior: ScatterHorzScaleBehavior;
+	readonly #series: ScatterUnderlyingSeries;
+	readonly #geometryCache: ScatterGeometryCache = new ScatterGeometryCache();
+	#own: ScatterOwnOptions;
+	// The paint options of `#own`: made when first needed after it changes.
+	#paint: ScatterRenderOptions | null = null;
+	#points: readonly TPoint[] = [];
+	#model: ScatterModel<TPoint>;
+	#state: Lifecycle = 'attached';
+	readonly #warned: Set<string> = new Set();
+	#scaleModeCheckedAt: number = -1;
 
-	// What the chart was last given.
-	private _appliedGrid: SlotGrid | null = null;
-	private _appliedLevels: readonly TickLevel[] | null = null;
-	private _appliedEnds: boolean = false;
-	private _appliedSlots: readonly ScatterSlotItem[] | null = null;
-	private _appliedFormatter: ((x: number) => string) | null = null;
-	private _appliedLabelLength: number | null = null;
-	private _appliedMargins: { left: number; right: number } | null = null;
-	private _appliedEdgeState: string = '';
-	// The chart's own fixed edges, kept while `xMargins` needs them freed.
-	private _hostEdges: { fixLeftEdge: boolean; fixRightEdge: boolean } | null = null;
-
-	// Label measuring.
-	private _labelFont: string = '';
-	private readonly _labelWidths: Map<string, number> = new Map();
-	private _fitCache: { key: string; formatter: ((x: number) => string) | null; grid: SlotGrid; layout: FitLayout } | null = null;
-
-	// Fitting the X domain.
-	private _fittedRange: LogicalRange | null = null;
-	private _rangeFollowsFit: boolean = true;
-	private _width: number = 0;
-	// Laying the axis out: set while the series itself changes the chart's
-	// slots and range, whose events are not the user's.
-	private _layingOut: boolean = false;
-	private _layoutScheduled: boolean = false;
-	private _fitScheduled: boolean = false;
-
-	// Hover.
-	private _pointerHovered: PointerHover | null = null;
-	private _lastHit: { model: ScatterModel<TPoint>; index: number } | null = null;
-	private _apiHoveredId: string | null = null;
-	private _notified: ScatterPointInfo<TPoint> | null = null;
-	private _notificationScheduled: boolean = false;
-	private _drawnScheduled: boolean = false;
-
-	// Counts the layouts which went as far as changing the chart.
-	private _chartWrites: number = 0;
-	private _duplicatesWarned: boolean = false;
-	private _xRangeWarned: boolean = false;
-	private _scaleModeWarned: boolean = false;
-	private _removed: boolean = false;
-	private _chartRemoved: boolean = false;
+	// Every task queued by the series and its controllers: `remove()` cancels them all.
+	readonly #tasks: CoalescedTask[] = [];
+	readonly #task: typeof createCoalescedTask = (run: () => void, enqueue?: (callback: () => void) => void): CoalescedTask => {
+		const task = createCoalescedTask(run, enqueue);
+		this.#tasks.push(task);
+		return task;
+	};
+	// Once a paint is over: the hovered point may have moved with the scales.
+	readonly #drawnTask: CoalescedTask = this.#task(() => this.#afterDraw());
+	// Lets go of the chart the series was taken off, after the current call (see `#acts`).
+	readonly #releaseTask: CoalescedTask = this.#task(() => {
+		if (this.#lifecycle() === 'detached') {
+			this.remove();
+		}
+	});
+	readonly #xAxis: XAxisController;
+	readonly #hover: HoverController<TPoint>;
 
 	public constructor(chart: IChartApiBase<number>, options: ScatterSeriesPartialOptions, paneIndex: number) {
 		const behavior = chart.horzBehaviour();
 		if (!isScatterHorzScaleBehavior(behavior)) {
-			throw new Error(
-				'A scatter series needs a chart with a numeric X axis: create it with createScatterChart, ' +
-				'or with createChartEx and a ScatterHorzScaleBehavior from the same copy of this package ' +
-				'(the standalone build and the main entry point do not mix).'
-			);
+			throw new Error('A scatter series needs a chart with a ScatterHorzScaleBehavior of the same build: use createScatterChart.');
 		}
 		claimScatterXAxis(behavior, this);
-		this._chart = chart;
-		this._behavior = behavior;
-		this._hostLabelLength = chart.options().timeScale.tickMarkMaxCharacterLength;
+		this.#chart = chart;
+		this.#behavior = behavior;
+		const xAxisHost: XAxisHost = {
+			series: () => this.#series,
+			model: () => this.#model,
+			options: () => this.#own.scatter,
+			acts: () => this.#acts(),
+		};
+		this.#xAxis = new XAxisController(chart, behavior, xAxisHost, this.#task);
+		const hoverHost: HoverHost<TPoint> = {
+			model: () => this.#model,
+			series: () => this.#series,
+			hoveredPoint: () => this.hoveredPoint(),
+		};
+		this.#hover = new HoverController(hoverHost, this.#task);
 		try {
-			const split = this._splitOptions(options);
-			this._hitTestTolerance = split.tolerance ?? this._hitTestTolerance;
-			this._userAutoscaleInfoProvider = split.autoscale?.provider;
-			this._scatterOptions = mergeOptions(scatterOptionDefaults, split.scatter);
-			this._model = buildScatterModel<TPoint>([], this._fullOptions(underlyingSeriesDefaults.color));
-
+			const split = splitOptions(options);
+			this.#own = initialOwnOptions(split);
+			this.#model = buildScatterModel<TPoint>([], fullOptions(underlyingSeriesDefaults, underlyingSeriesDefaults.color, this.#own));
 			const view = new ScatterSeriesView({
-				model: () => this._model,
-				options: () => this._paintOptions(),
-				backgroundColor: () => this._backgroundColor(),
-				xMapping: () => this._xMapping(),
-				hoveredIndex: () => this._hoveredIndex(),
+				model: () => this.#model,
+				options: () => this.#paintOptions(),
+				backgroundColor: () => this.#backgroundColor(),
+				xMapping: () => this.#xAxis.xMapping(),
+				hoveredIndex: () => this.#hover.index(),
 				geometry: (model: ScatterModel, mapping: XMapping, yToCoordinate: YToCoordinate) =>
-					this._geometryCache.geometry(model, mapping, yToCoordinate),
-				hit: (model: ScatterModel, index: number | null) => {
-					this._lastHit = index === null ? null : { model: model as ScatterModel<TPoint>, index };
-				},
-				drawn: this._onDrawn,
+					this.#geometryCache.geometry(model, mapping, yToCoordinate),
+				hit: (model: ScatterModel, index: number | null) => this.#hover.recordHit(model, index),
+				drawn: () => this.#drawnTask.schedule(),
 			});
-			this._series = chart.addCustomSeries(
+			this.#series = chart.addCustomSeries(
 				view,
 				{
 					...split.base,
-					autoscaleInfoProvider: this._autoscaleInfoProvider,
+					autoscaleInfoProvider: this.#autoscaleInfoProvider,
 					// The chart falls back to hit testing the vertical extent of each slot
-					// when the renderer reports no point, which would report the series as
-					// hovered — with no objectId — in the empty space between points.
-					// A tolerance this negative turns the fallback off; the series' own
-					// `hitTestTolerance` is kept here and used by the renderer.
+					// when the renderer reports no point: hovered, with no objectId, between
+					// points. This tolerance turns that off; the renderer uses the series' own.
 					hitTestTolerance: Number.NEGATIVE_INFINITY,
 				},
 				paneIndex
 			);
-			chart.subscribeCrosshairMove(this._onCrosshairMove);
-			chart.timeScale().subscribeSizeChange(this._onSizeChange);
-			chart.timeScale().subscribeVisibleLogicalRangeChange(this._onVisibleRangeChange);
-			this._rebuild();
+			chart.subscribeCrosshairMove(this.#hover.onCrosshairMove);
+			this.#xAxis.subscribe();
+			this.#rebuildModel();
+			this.#xAxis.relayOut();
+			this.#repaintModel();
 		} catch (error) {
-			// Options the series cannot use, or an `xFormatter` that throws: undo
-			// what was done to the chart — the series, the subscriptions, the
-			// chart options, the claim on the axis — so that the host can try again.
+			// Undo what was done to the chart, so that the host can try again.
 			this.remove();
 			throw error;
 		}
 	}
 
-	public setData(points: readonly TPoint[]): void {
-		if (!this._isLive()) {
+	public readonly setData = (points: readonly TPoint[]): void => {
+		if (!this.#acts()) {
 			return;
 		}
 		const next = points.slice();
-		this._atomically(() => {
-			this._points = next;
-			this._rebuild();
+		this.#atomically(() => {
+			this.#points = next;
+			this.#rebuildModel();
+			this.#xAxis.relayOut();
+			this.#repaintModel();
 		});
-	}
+	};
 
-	public data(): readonly TPoint[] {
-		// A copy: the series indexes into its own.
-		return this._points.slice();
-	}
+	public readonly data = (): readonly TPoint[] => {
+		return this.#points.slice();
+	};
 
-	public applyOptions(options: ScatterSeriesPartialOptions): void {
-		if (!this._isLive()) {
+	public readonly applyOptions = (options: ScatterSeriesPartialOptions): void => {
+		if (!this.#acts()) {
 			return;
 		}
-		const { scatter, base, tolerance, autoscale } = this._splitOptions(options);
-		const scatterKeys = Object.keys(scatter);
-		let rebuilt = false;
-		// Options the series cannot use throw here, with nothing changed.
-		this._atomically(() => {
-			if (scatterKeys.length > 0) {
-				this._scatterOptions = mergeOptions(this._scatterOptions, scatter);
+		const split = splitOptions(options);
+		const change = optionChange(split);
+		// Options the series or the chart cannot use throw here, with nothing changed.
+		this.#atomically(() => {
+			this.#setOwn(applyOwnOptions(this.#own, split));
+			if (change !== 'paint') {
+				// The model takes the new colour, which the series takes below.
+				this.#rebuildModel(split.base.color);
+				if (change === 'axis') {
+					this.#xAxis.relayOut();
+				}
+				this.#repaintModel();
 			}
-			if (tolerance !== null) {
-				this._hitTestTolerance = tolerance;
-			}
-			if (autoscale !== null) {
-				this._userAutoscaleInfoProvider = autoscale.provider;
-			}
-			if (scatterKeys.length > 0 || tolerance !== null) {
-				this._renderOptions = null;
-			}
-			// The model is built with the new colour, which the series takes below.
-			const color = base.color ?? this._series.options().color;
-			if (scatterKeys.some((key: string) => !PAINT_ONLY_KEYS.has(key) && !RESTYLE_KEYS.has(key))) {
-				this._rebuild(true, color);
-				rebuilt = true;
-			} else if (base.color !== undefined || scatterKeys.some((key: string) => RESTYLE_KEYS.has(key))) {
-				this._rebuild(false, color);
-				rebuilt = true;
-			}
+			applySeriesOptions(this.#series, split.base);
 		});
-		if (Object.keys(base).length > 0) {
-			this._series.applyOptions(base);
-		} else if (!rebuilt && (scatterKeys.length > 0 || autoscale !== null)) {
-			this._requestRepaint();
+		if (change === 'paint' && Object.keys(split.base).length === 0 && (Object.keys(split.scatter).length > 0 || split.autoscale !== null)) {
+			this.#requestRepaint();
 		}
 		// `visible` and the styles change what the hovered point is, or how it looks.
-		this._scheduleHoveredNotification();
-	}
+		this.#hover.scheduleNotification();
+	};
 
-	public options(): Readonly<ScatterSeriesOptions> {
-		// A copy: changing it changes neither the series nor the defaults.
-		return cloneOptions(this._fullOptions(this._series.options().color));
-	}
+	public readonly options = (): Readonly<ScatterSeriesOptions> => {
+		const base = this.#series.options();
+		return cloneOptions(fullOptions(base, base.color, this.#own));
+	};
 
-	public series(): ScatterUnderlyingSeries {
-		return this._series;
-	}
+	public readonly series = (): ScatterUnderlyingSeries => {
+		return this.#series;
+	};
 
-	public groups(): readonly ScatterGroupInfo[] {
-		const model = this._model;
-		const background = this._backgroundColor();
+	public readonly groups = (): readonly ScatterGroupInfo[] => {
+		const model = this.#model;
+		const background = this.#backgroundColor();
 		return model.groups.map((group: ResolvedScatterGroup) => describeGroup(group, model.groupPointCounts[group.index], background));
-	}
+	};
 
-	public setGroupVisible(groupId: string, visible: boolean): void {
-		if (!this._isLive()) {
+	public readonly setGroupVisible = (groupId: string, visible: boolean): void => {
+		if (!this.#acts()) {
 			return;
 		}
-		const declared = this._scatterOptions.groups;
-		const position = declared.findIndex((group: ScatterGroup) => group.id === groupId);
-		let next: ScatterGroup[];
-		if (position !== -1) {
-			if ((declared[position].visible !== false) === visible) {
-				return;
-			}
-			next = declared.map((group: ScatterGroup, index: number) => (index === position ? { ...group, visible } : group));
-		} else {
-			const resolved = this._model.groups;
-			const target = resolved.findIndex((group: ResolvedScatterGroup) => group.id === groupId);
-			// An unknown group, or an undeclared one being shown: it is shown already.
-			if (target === -1 || visible) {
-				return;
-			}
-			// Declaring the group moves it among the declared ones. Declare the
-			// undeclared groups before it too, so the order and the palette
-			// colours stay as they are.
-			next = declared.slice();
-			for (const group of resolved.slice(0, target + 1)) {
-				if (!group.declared) {
-					next.push(group.id === groupId ? { id: groupId, visible: false } : { id: group.id });
-				}
-			}
+		const groups = withGroupVisibility(this.#own.scatter.groups, this.#model.groups, groupId, visible);
+		if (groups !== null) {
+			this.applyOptions({ groups });
 		}
-		this.applyOptions({ groups: next });
-	}
+	};
 
-	public xDomain(): ScatterXDomain {
-		const grid = this._model.grid;
+	public readonly xDomain = (): ScatterXDomain => {
+		const grid = this.#model.grid;
 		return {
 			min: slotValue(grid, 0),
 			max: slotValue(grid, grid.count - 1),
 			tickStep: stepValue(grid.tickStep),
 		};
-	}
+	};
 
-	public fitXDomain(): void {
-		if (!this._isLive()) {
-			return;
-		}
-		const grid = this._model.grid;
-		const timeScale = this._chart.timeScale();
-		const width = timeScale.width();
-		const first = timeScale.timeToIndex(slotValue(grid, 0), false);
-		if (width <= 1 || first === null) {
-			return;
-		}
-		const { spacing, margins } = this._fit(width);
-		// The chart puts logical index i at `width − (right − i + 0.5) × spacing − 1`
-		// for a visible range ending at `right`. The first slot lands on the left
-		// margin and the last one (n slots later) on `width − 1 − right margin`
-		// when the spacing is (width − 1 − both margins) / n and the range ends
-		// right margin / spacing − 0.5 slots after the last slot;
-		// setVisibleLogicalRange sets the spacing to width / (to − from + 1),
-		// hence `from`. With no margins, the ends of the domain are the plot edges.
-		const to = first + grid.count - 1 - 0.5 + margins.right / spacing;
-		const range = { from: to + 1 - width / spacing, to } as LogicalRange;
-		this._fittedRange = range;
-		this._rangeFollowsFit = true;
-		timeScale.setVisibleLogicalRange(range);
-	}
+	public readonly fitXDomain = (): void => {
+		this.#xAxis.fit();
+	};
 
-	public xToCoordinate(x: number): Coordinate | null {
-		const mapping = Number.isFinite(x) ? this._liveXMapping() : null;
+	public readonly xToCoordinate = (x: number): Coordinate | null => {
+		const mapping = Number.isFinite(x) ? this.#liveXMapping() : null;
 		return mapping === null ? null : (xToCoordinate(mapping, x) as Coordinate);
-	}
+	};
 
-	public coordinateToX(coordinate: number): number | null {
-		const mapping = Number.isFinite(coordinate) ? this._liveXMapping() : null;
+	public readonly coordinateToX = (coordinate: number): number | null => {
+		const mapping = Number.isFinite(coordinate) ? this.#liveXMapping() : null;
 		return mapping === null || mapping.pxPerUnit === 0 ? null : coordinateToX(mapping, coordinate);
-	}
+	};
 
-	public sizeMapping(): ScatterSizeMapping | null {
-		const scaling = this._model.sizeScaling;
-		if (scaling === null) {
+	public readonly sizeMapping = (): ScatterSizeMapping | null => {
+		const scaling = this.#model.sizeScaling;
+		return scaling === null ? null : describeSizeMapping(scaling);
+	};
+
+	public readonly pointById = (objectId: string): ScatterPointInfo<TPoint> | null => {
+		if (!this.#isSeriesVisible()) {
 			return null;
 		}
-		return {
-			domain: { ...scaling.domain },
-			range: { ...scaling.range },
-			scale: scaling.scale,
-			// The function the points are sized with.
-			sizeFor: (value: number): number => (Number.isFinite(value) ? mapSizeValue(value, scaling) : Number.NaN),
-		};
-	}
+		const index = this.#model.idToIndex.get(objectId);
+		return index === undefined ? null : this.#pointInfo(index);
+	};
 
-	public pointById(objectId: string): ScatterPointInfo<TPoint> | null {
-		if (!this._isSeriesVisible()) {
-			return null;
-		}
-		const index = this._model.idToIndex.get(objectId);
-		return index === undefined ? null : this._pointInfo(index);
-	}
-
-	public hitTest(x: number, y: number): ScatterPointInfo<TPoint> | null {
+	public readonly hitTest = (x: number, y: number): ScatterPointInfo<TPoint> | null => {
 		// Visibility first: it also tells a removed chart, which must not be asked for a mapping.
-		if (!this._isSeriesVisible()) {
+		if (!this.#isSeriesVisible()) {
 			return null;
 		}
-		const mapping = this._xMapping();
+		const mapping = this.#xAxis.xMapping();
 		if (mapping === null) {
 			return null;
 		}
-		const model = this._model;
-		const geometry = this._geometryCache.geometry(model, mapping, (price: number) => this._series.priceToCoordinate(price));
-		const hit = hitTestScatter(
-			geometry,
-			x,
-			y,
-			this._hoveredIndex(),
-			this._hitTestTolerance,
-			this._paintOptions().hoveredSizeIncrease
-		);
-		return hit === null ? null : this._pointInfo(hit.index);
-	}
+		const model = this.#model;
+		const paint = this.#paintOptions();
+		const geometry = this.#geometryCache.geometry(model, mapping, (price: number) => this.#series.priceToCoordinate(price));
+		const hit = hitTestScatter(geometry, x, y, this.#hover.index(), paint.hitTestTolerance, paint.hoveredSizeIncrease);
+		return hit === null ? null : this.#pointInfo(hit.index);
+	};
 
-	public hoveredPoint(): ScatterPointInfo<TPoint> | null {
-		const index = this._hoveredIndex();
-		return index === null || !this._isSeriesVisible() ? null : this._pointInfo(index);
-	}
+	public readonly hoveredPoint = (): ScatterPointInfo<TPoint> | null => {
+		const index = this.#hover.index();
+		return index === null || !this.#isSeriesVisible() ? null : this.#pointInfo(index);
+	};
 
-	public setHoveredPoint(objectId: string | null): void {
-		if (!this._isLive() || objectId === this._apiHoveredId) {
+	public readonly setHoveredPoint = (objectId: string | null): void => {
+		if (!this.#acts() || !this.#hover.setApiHovered(objectId)) {
 			return;
 		}
-		this._apiHoveredId = objectId;
-		this._requestRepaint();
-		this._scheduleHoveredNotification();
-	}
+		this.#requestRepaint();
+		this.#hover.scheduleNotification();
+	};
 
-	public subscribeHoveredPointChange(handler: ScatterHoveredPointHandler<TPoint>): void {
-		this._hoveredChanged.subscribe(handler);
-	}
+	public readonly subscribeHoveredPointChange = (handler: ScatterHoveredPointHandler<TPoint>): void => {
+		this.#hover.subscribe(handler);
+	};
 
-	public unsubscribeHoveredPointChange(handler: ScatterHoveredPointHandler<TPoint>): void {
-		this._hoveredChanged.unsubscribe(handler);
-	}
+	public readonly unsubscribeHoveredPointChange = (handler: ScatterHoveredPointHandler<TPoint>): void => {
+		this.#hover.unsubscribe(handler);
+	};
 
-	public remove(): void {
-		if (this._removed) {
+	public readonly remove = (): void => {
+		const state = this.#lifecycle();
+		if (state === 'removed') {
 			return;
 		}
-		const attachment = this._attachment();
-		this._removed = true;
-		const hovered = this._notified;
-		this._notified = null;
+		this.#state = 'removed';
+		for (const task of this.#tasks) {
+			task.cancel();
+		}
 		try {
-			// A host tooltip learns that the point is gone, as when the pointer leaves it.
-			if (hovered !== null) {
-				this._hoveredChanged.fire(null);
-			}
+			this.#hover.dispose();
 		} finally {
-			this._hoveredChanged.destroy();
-			releaseScatterXAxis(this._behavior, this);
-			this._detach(attachment);
+			releaseScatterXAxis(this.#behavior, this);
+			this.#detach(state);
 		}
+	};
+
+	/**
+	 * Whether the underlying series is on the chart (a host may take it off
+	 * with `chart.removeSeries(series.series())` rather than `remove()`).
+	 * @internal
+	 */
+	public readonly attached = (): boolean => {
+		return this.#lifecycle() === 'attached';
+	};
+
+	/** Reads the lifecycle from the chart, unless it is final. Changes nothing on the chart. */
+	#lifecycle(): Lifecycle {
+		if (this.#state === 'attached' || this.#state === 'detached') {
+			this.#state = isChartRemoved(this.#chart)
+				? 'disposed'
+				: isSeriesAttached(this.#chart, this.#series) ? 'attached' : 'detached';
+		}
+		return this.#state;
+	}
+
+	/**
+	 * Whether the series acts on its chart, for the entry points. One the host
+	 * took off the chart lets go of it, as `remove()` does, after the current
+	 * call — which may be the chart's own dispatch of an event.
+	 */
+	#acts(): boolean {
+		const state = this.#lifecycle();
+		if (state === 'detached') {
+			this.#releaseTask.schedule();
+		}
+		return state === 'attached';
 	}
 
 	/** Undoes on the chart what the series did to it, unless the chart is gone. */
-	private _detach(attachment: 'attached' | 'detached' | 'disposed'): void {
-		if (attachment === 'disposed') {
-			// The chart was removed first (a host tearing down the chart before
-			// the series): the series and the subscriptions went with it, and
-			// the chart must not be asked to paint again.
+	#detach(state: Exclude<Lifecycle, 'removed'>): void {
+		if (state === 'disposed') {
+			// The series and the subscriptions went with the chart, which must not be asked to paint again.
 			return;
 		}
 		try {
-			this._chart.unsubscribeCrosshairMove(this._onCrosshairMove);
-			this._chart.timeScale().unsubscribeSizeChange(this._onSizeChange);
-			this._chart.timeScale().unsubscribeVisibleLogicalRangeChange(this._onVisibleRangeChange);
-			if (attachment === 'attached') {
-				this._chart.removeSeries(this._series);
+			this.#chart.unsubscribeCrosshairMove(this.#hover.onCrosshairMove);
+			this.#xAxis.unsubscribe();
+			if (state === 'attached') {
+				this.#chart.removeSeries(this.#series);
 			}
-			// Unless the host has set a label distance of its own since.
-			if (this._appliedLabelLength !== null && this._chart.options().timeScale.tickMarkMaxCharacterLength === this._appliedLabelLength) {
-				// `undefined` would be skipped by the merge; `0` means the default too.
-				this._chart.applyOptions({ timeScale: { tickMarkMaxCharacterLength: this._hostLabelLength ?? 0 } });
-			}
-			if (this._hostEdges !== null) {
-				this._chart.applyOptions({ timeScale: this._hostEdges });
-				this._hostEdges = null;
-			}
+			this.#xAxis.restoreHostOptions();
 		} catch {
 			// Nothing left to undo on a chart in the middle of being torn down.
 		}
 	}
 
-	/**
-	 * Whether the underlying series is still on the chart: a host may take it
-	 * off with `chart.removeSeries(series.series())` rather than `remove()`.
-	 * @internal
-	 */
-	public attached(): boolean {
-		return !this._removed && this._attachment() === 'attached';
+	#setOwn(own: ScatterOwnOptions): void {
+		this.#own = own;
+		this.#paint = null;
 	}
 
-	/**
-	 * Where the underlying series is: on the chart, taken off it, or gone with
-	 * the chart.
-	 */
-	private _attachment(): 'attached' | 'detached' | 'disposed' {
-		if (this._isChartRemoved()) {
-			return 'disposed';
+	#paintOptions(): Readonly<ScatterRenderOptions> {
+		if (this.#paint === null) {
+			this.#paint = paintOptions(this.#own);
 		}
-		const series = this._series as unknown as ISeriesApi<SeriesType, number>;
-		return this._chart.panes().some((pane: IPaneApi<number>) => pane.getSeries().indexOf(series) !== -1)
-			? 'attached'
-			: 'detached';
-	}
-
-	/**
-	 * Whether the chart was removed (`chart.remove()`), with or without the
-	 * series: a removed chart has no panes (a live one always has one), and
-	 * throws when asked for coordinates. Once removed, always removed.
-	 */
-	private _isChartRemoved(): boolean {
-		if (!this._chartRemoved) {
-			try {
-				this._chartRemoved = this._chart.panes().length === 0;
-			} catch {
-				this._chartRemoved = true;
-			}
-		}
-		return this._chartRemoved;
-	}
-
-	/**
-	 * Whether the series still acts on its chart: neither was removed, and the
-	 * series is on the chart. A series the host took off with
-	 * `chart.removeSeries(series.series())` lets go of the chart the first time
-	 * it finds out — as `remove()` does — rather than give the chart its slots
-	 * again.
-	 */
-	private _isLive(): boolean {
-		if (this._removed || this._isChartRemoved()) {
-			return false;
-		}
-		if (this._attachment() === 'detached') {
-			this.release();
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Cleans up after a series taken off the chart without `remove()`: once it
-	 * finds out, or once another scatter series claims the chart.
-	 * @internal
-	 */
-	public release(): void {
-		this.remove();
-	}
-
-	private _fullOptions(color: string): ScatterSeriesOptions {
-		const base = this._series !== undefined ? this._series.options() : underlyingSeriesDefaults;
-		return {
-			...base,
-			color,
-			hitTestTolerance: this._hitTestTolerance,
-			autoscaleInfoProvider: this._userAutoscaleInfoProvider,
-			...this._scatterOptions,
-		};
-	}
-
-	private _paintOptions(): Readonly<ScatterRenderOptions> {
-		if (this._renderOptions === null) {
-			const options = this._scatterOptions;
-			const pixels = (value: number, fallback: number): number => (Number.isFinite(value) ? Math.max(0, value) : fallback);
-			this._renderOptions = {
-				hoveredOpacity: clampOpacity(options.hoveredOpacity, scatterOptionDefaults.hoveredOpacity),
-				hoveredSizeIncrease: pixels(options.hoveredSizeIncrease, 0),
-				hoveredRingWidth: pixels(options.hoveredRingWidth, 0),
-				hoveredRingColor: options.hoveredRingColor ?? null,
-				hoveredRingGap: pixels(options.hoveredRingGap, scatterOptionDefaults.hoveredRingGap),
-				plotBorder: options.plotBorder,
-				baselines: options.baselines,
-				hitTestTolerance: this._hitTestTolerance,
-			};
-		}
-		return this._renderOptions;
+		return this.#paint;
 	}
 
 	/** The chart's background (the top of a gradient): the automatic ring colour of filled points. */
-	private _backgroundColor(): string {
-		const background = this._chart.options().layout.background;
+	#backgroundColor(): string {
+		const background = this.#chart.options().layout.background;
 		return background.type === ColorType.VerticalGradient ? background.topColor : background.color;
 	}
 
 	/**
-	 * Splits options into the scatter ones, kept here, and the series ones,
-	 * passed on. `null` for a scatter option whose default is not `null` (an
-	 * object, an array, a number) is its default.
+	 * Runs a change of the points or options, all or nothing: should it throw,
+	 * the points, the options and the model are as they were, the chart is
+	 * given them again — with the user's zoom — and the error is thrown on.
 	 */
-	private _splitOptions(options: ScatterSeriesPartialOptions): {
-		scatter: Record<string, unknown>;
-		base: SeriesPartialOptions<CustomSeriesOptions>;
-		/** The new `hitTestTolerance`, or `null` when none is given. */
-		tolerance: number | null;
-		/** The new `autoscaleInfoProvider`, `undefined` included, or `null` when none is given. */
-		autoscale: { provider: AutoscaleInfoProvider | undefined } | null;
-	} {
-		const scatter: Record<string, unknown> = {};
-		const base: Record<string, unknown> = {};
-		const defaults = scatterOptionDefaults as Record<string, unknown>;
-		let tolerance: number | null = null;
-		let autoscale: { provider: AutoscaleInfoProvider | undefined } | null = null;
-		for (const [key, value] of Object.entries(options)) {
-			if (isUnsafeKey(key)) {
-				continue;
-			}
-			if (scatterOptionKeys.has(key)) {
-				scatter[key] = value === null && defaults[key] !== null ? defaults[key] : value;
-			} else if (key === 'hitTestTolerance') {
-				if (typeof value === 'number' && Number.isFinite(value)) {
-					tolerance = Math.max(0, value);
-				}
-			} else if (key === 'autoscaleInfoProvider') {
-				// Ours wraps the user's, which sees the scatter range as its base.
-				autoscale = { provider: value as AutoscaleInfoProvider | undefined };
-			} else {
-				base[key] = value;
-			}
-		}
-		return { scatter, base: base as SeriesPartialOptions<CustomSeriesOptions>, tolerance, autoscale };
-	}
-
-	/**
-	 * Runs a change of the points or options, all or nothing: should it throw
-	 * (options the series cannot use, an `xFormatter` that throws), the points,
-	 * the options and the model are as they were, the chart is given them again,
-	 * and the error is thrown on.
-	 */
-	private _atomically(change: () => void): void {
-		const points = this._points;
-		const scatterOptions = this._scatterOptions;
-		const model = this._model;
-		const tolerance = this._hitTestTolerance;
-		const provider = this._userAutoscaleInfoProvider;
-		const writes = this._chartWrites;
+	#atomically(change: () => void): void {
+		const points = this.#points;
+		const own = this.#own;
+		const model = this.#model;
+		const axis = this.#xAxis.snapshot();
 		try {
 			change();
 		} catch (error) {
-			this._points = points;
-			this._scatterOptions = scatterOptions;
-			this._model = model;
-			this._hitTestTolerance = tolerance;
-			this._userAutoscaleInfoProvider = provider;
-			this._renderOptions = null;
-			if (writes !== this._chartWrites && this._isLive()) {
-				// Whatever the change gave the chart before it threw goes.
-				this._appliedGrid = null;
-				this._appliedSlots = null;
-				try {
-					this._layOutXAxis();
-				} catch {
-					// As it was before the change: nothing more to restore.
-				}
-				this._requestRepaint();
+			this.#points = points;
+			this.#setOwn(own);
+			this.#model = model;
+			if (this.#xAxis.changedSince(axis) && this.#lifecycle() === 'attached') {
+				this.#xAxis.restore(axis);
+				this.#requestRepaint();
 			}
 			throw error;
 		}
 	}
 
 	/**
-	 * Builds the model again from the points and options.
+	 * Builds the model again from the points and options. The caller gives the
+	 * chart what changed: the axis, then a repaint.
 	 *
-	 * @param layOut - Whether the slots or the X axis may have changed, which
-	 * the chart is then given; `false` for options that only style the points.
-	 * @param color - The series colour the model is built with.
+	 * @param color - The series colour, when the series is about to take a new one.
 	 */
-	private _rebuild(layOut: boolean = true, color: string = this._series.options().color): void {
-		if (!this._isLive()) {
-			return;
+	#rebuildModel(color?: string): void {
+		const base = this.#series.options();
+		const model = buildScatterModel(this.#points, fullOptions(base, color ?? base.color, this.#own));
+		if (model.duplicateIds) {
+			this.#warnOnce('several points share an id, which pointById and hover cannot tell apart.');
 		}
-		const model = buildScatterModel(this._points, this._fullOptions(color));
-		if (model.duplicateIds && !this._duplicatesWarned) {
-			this._duplicatesWarned = true;
-			console.warn(
-				'lwc-plugin-scatter-series: several points share an id. Give every point a unique id: ' +
-				'pointById, setHoveredPoint and hoveredInfo.objectId cannot tell such points apart.'
-			);
+		if (model.xOutOfRange) {
+			this.#warnOnce(`points with X beyond ±${MAX_X_MAGNITUDE} are not drawn.`);
 		}
-		if (model.xOutOfRange && !this._xRangeWarned) {
-			this._xRangeWarned = true;
-			console.warn(
-				`lwc-plugin-scatter-series: X values beyond ±${MAX_X_MAGNITUDE} cannot be laid out on the X axis; ` +
-				'those points are not drawn.'
-			);
+		if (model.xWidened) {
+			this.#warnOnce('an X span below 1e-98 is widened.');
 		}
-		this._model = model;
-		if (layOut) {
-			this._layOutXAxis();
-		}
-		// The new model may differ in its scales but not in its slots (sizes,
-		// baselines): have the chart autoscale and paint again.
-		this._requestRepaint();
-		this._scheduleHoveredNotification();
+		this.#model = model;
 	}
 
-	/**
-	 * Gives the chart what it needs of the current model, and only what
-	 * changed: the slots (weighed again when the grid or the label chain
-	 * changed), the label distance, and the visible range — fitted again when
-	 * the domain or the width changed, unless the user has scrolled or zoomed
-	 * it. The range events the chart fires meanwhile are the series' own.
-	 *
-	 * @param widthChanged - Whether the plot was resized.
-	 */
-	private _layOutXAxis(widthChanged: boolean = false): void {
-		const layingOut = this._layingOut;
-		this._layingOut = true;
-		try {
-			this._layOutXAxisNow(widthChanged);
-		} finally {
-			this._layingOut = layingOut;
-		}
+	/** Has the chart autoscale and paint the new model (which may differ in its scales, not its slots). */
+	#repaintModel(): void {
+		this.#requestRepaint();
+		this.#hover.scheduleNotification();
 	}
 
-	private _layOutXAxisNow(widthChanged: boolean): void {
-		const model = this._model;
-		const grid = model.grid;
-		const formatter = this._scatterOptions.xFormatter;
-		const timeScale = this._chart.timeScale();
-		const gridChanged = !sameGrid(this._appliedGrid, grid);
-		const followsFit = this._followsFit();
-		// Labels for the plot as it is about to be shown: fitted, or as the user
-		// zoomed it (a new grid is always fitted).
-		const labels = this._chooseLabels(grid, followsFit || gridChanged || this._fittedRange === null);
-		const levels = labels !== null ? labels.levels : tickLevels(grid, grid.tickStep);
-		const ends = labels !== null && labels.ends;
-		const reweigh = gridChanged ||
-			this._appliedLevels === null ||
-			!sameLevels(this._appliedLevels, levels) ||
-			ends !== this._appliedEnds;
-		const width = timeScale.width();
-		const margins = width > 1 ? this._fit(width, grid).margins : null;
-		const applied = this._appliedMargins;
-		const marginChanged = margins !== null && (applied === null || applied.left !== margins.left || applied.right !== margins.right);
-		// From here on the chart is changed.
-		this._chartWrites++;
-		this._appliedMargins = margins;
-		this._appliedEdgeState = this._edgeStateKey();
-		this._applyEdges();
-		const refit = gridChanged || this._fittedRange === null || (followsFit && (reweigh || widthChanged || marginChanged));
-		const userRange = !refit && reweigh ? timeScale.getVisibleLogicalRange() : null;
-
-		// The behaviour weighs the time points as the slots are set, so it must
-		// know the grid and the chain first.
-		setScatterXAxis(this._behavior, { grid, levels, ends, formatter });
-		const slots = model.slots as (ScatterSlotData | WhitespaceData<number>)[];
-		if (reweigh) {
-			this._setSlotsWeighedAgain(slots, grid);
-		} else if (this._appliedSlots === null || !sameSlots(this._appliedSlots, model.slots)) {
-			this._series.setData(slots);
-		}
-		this._appliedGrid = grid;
-		this._appliedLevels = levels;
-		this._appliedEnds = ends;
-		this._appliedSlots = model.slots;
-		this._applyLabelDistance(labels, formatter !== this._appliedFormatter);
-		this._appliedFormatter = formatter;
-
-		if (refit) {
-			this.fitXDomain();
-		} else if (userRange !== null) {
-			// The chart keeps the range through the slots set again; should it not, the user's comes back.
-			const range = timeScale.getVisibleLogicalRange();
-			if (range === null || !sameRange(range, userRange)) {
-				timeScale.setVisibleLogicalRange(userRange);
-			}
-		}
+	/** Repaints without changing the data: the chart redraws a series whose options change. */
+	#requestRepaint(): void {
+		this.#series.applyOptions({});
 	}
 
-	/**
-	 * Sets the slots so that the chart weighs every time point again, with the
-	 * grid and the label chain just given to the behaviour.
-	 *
-	 * The chart weighs the time points from the first one that changed on, and
-	 * keeps the weights of the leading ones that stay. When the first slot
-	 * stays, it is moved off by one slot for a moment, so that every point is
-	 * weighed again. The data is never emptied: the time scale keeps its
-	 * points, and the host its visible range — no `null` range, and none of an
-	 * empty axis, reaches a host listening to range changes.
-	 */
-	private _setSlotsWeighedAgain(slots: (ScatterSlotData | WhitespaceData<number>)[], grid: SlotGrid): void {
-		const applied = this._appliedSlots;
-		if (applied !== null && applied.length > 0 && slots.length > 0 && applied[0].time === slots[0].time) {
-			this._series.setData([{ ...slots[0], time: slotValue(grid, -1) }, ...slots.slice(1)]);
+	#warnOnce(message: string): void {
+		if (!this.#warned.has(message)) {
+			this.#warned.add(message);
+			// eslint-disable-next-line no-console
+			console.warn(`${WARNING}${message}`);
 		}
-		this._series.setData(slots);
-	}
-
-	/**
-	 * The labels for the plot fitted to the domain, or as it is in view, or
-	 * `null` before the chart knows its width.
-	 *
-	 * @param fitted - Whether to label the plot fitted to the domain, rather than as the user zoomed it.
-	 */
-	private _chooseLabels(grid: SlotGrid, fitted: boolean): XAxisLabels | null {
-		const width = this._chart.timeScale().width();
-		if (width <= 1 || grid.count < 2) {
-			return null;
-		}
-		if (!fitted) {
-			const mapping = this._xMapping();
-			if (mapping !== null && mapping.pxPerUnit > 0) {
-				const edges = this._edgeState();
-				const { labelWidth, spacing } = this._labelMeasure(grid);
-				const geometry: XAxisGeometry = {
-					spacing: mapping.pxPerUnit * stepValue(grid.step),
-					origin: mapping.origin,
-					width,
-					zoomed: true,
-					movedInside: { left: !edges.freeLeft, right: !edges.freeRight },
-					movable: edges.movable,
-				};
-				return chooseXLabels(grid, geometry, labelWidth, spacing);
-			}
-		}
-		return this._fitLayout(width, grid).labels;
-	}
-
-	/** What labels are measured with: the width of the label of a slot, in the chart's font, and how far apart labels must be. */
-	private _labelMeasure(grid: SlotGrid): { labelWidth: (slot: number) => number; spacing: XLabelSpacing } {
-		const fontSize = this._chart.options().layout.fontSize;
-		const font = this._currentLabelFont();
-		if (font !== this._labelFont || this._labelWidths.size > 10000) {
-			this._labelFont = font;
-			this._labelWidths.clear();
-		}
-		const state = { grid, levels: [], ends: false, formatter: this._scatterOptions.xFormatter };
-		const context = textMeasureContext();
-		const labelWidth = (slot: number): number => {
-			const text = formatScatterX(state, slotValue(grid, slot));
-			let size = this._labelWidths.get(text);
-			if (size === undefined) {
-				if (context !== null) {
-					context.font = font;
-					size = context.measureText(text).width;
-				} else {
-					size = text.length * fontSize * FALLBACK_CHARACTER_EM;
-				}
-				this._labelWidths.set(text, size);
-			}
-			return size;
-		};
-		return { labelWidth, spacing: { gap: fontSize * LABEL_GAP_EM, minPitch: fontSize * LABEL_PITCH_EM } };
-	}
-
-	/**
-	 * How the chart treats the ends of the X axis: whether the user can move
-	 * it, and which edges are then free — not fixed by the host, or freed for
-	 * `xMargins`. At a free edge of a movable axis the chart centres an end
-	 * label on its slot instead of moving it inside the plot; while the user
-	 * can move neither, it treats both edges as fixed.
-	 */
-	private _edgeState(): { movable: boolean; freeLeft: boolean; freeRight: boolean } {
-		const options = this._chart.options();
-		const movable = canMoveXAxis(options);
-		const freed = this._marginsNeedFreeEdges();
-		return {
-			movable,
-			freeLeft: movable && (freed || !options.timeScale.fixLeftEdge),
-			freeRight: movable && (freed || !options.timeScale.fixRightEdge),
-		};
-	}
-
-	/**
-	 * The fit of the X domain to a plot `width` pixels wide — the distance
-	 * between slots and the room kept at each end of the domain — and its
-	 * labels. The room is `xMargins`; at a free edge of a movable axis, where
-	 * the chart centres the end label on the edge, at least as much as that
-	 * label needs to stay inside the plot (see {@link endLabelRoom}). Cached
-	 * for as long as nothing it depends on changes.
-	 */
-	private _fitLayout(width: number, grid: SlotGrid): FitLayout {
-		const edges = this._edgeState();
-		const options = this._chart.options();
-		const formatter = this._scatterOptions.xFormatter;
-		const key = [
-			width,
-			this._scatterOptions.xMargins,
-			this._currentLabelFont(),
-			options.layout.fontSize,
-			edges.movable,
-			edges.freeLeft,
-			edges.freeRight,
-		].join('|');
-		const cached = this._fitCache;
-		if (cached !== null && cached.key === key && cached.formatter === formatter && sameGrid(cached.grid, grid)) {
-			return cached.layout;
-		}
-		const margin = this._scatterOptions.xMargins;
-		const most = Math.max(0, (width - 1) / 4);
-		const base = Number.isFinite(margin) ? Math.min(Math.max(0, margin), most) : 0;
-		let margins = { left: base, right: base };
-		const spacingOf = (room: { left: number; right: number }): number => (width - 1 - room.left - room.right) / (grid.count - 1);
-		const measure = width > 1 && grid.count >= 2 ? this._labelMeasure(grid) : null;
-		const choose = (): XAxisLabels | null => measure === null
-			? null
-			: chooseXLabels(
-				grid,
-				{
-					spacing: spacingOf(margins),
-					origin: margins.left,
-					width,
-					movedInside: { left: !edges.freeLeft, right: !edges.freeRight },
-					movable: edges.movable,
-				},
-				measure.labelWidth,
-				measure.spacing
-			);
-		let labels = choose();
-		for (let pass = 0; pass < 3 && measure !== null && labels !== null && (edges.freeLeft || edges.freeRight); pass++) {
-			const room = endLabelRoom(grid, labels, spacingOf(margins), measure.labelWidth);
-			const next = {
-				left: edges.freeLeft ? Math.min(most, Math.max(margins.left, room.left)) : margins.left,
-				right: edges.freeRight ? Math.min(most, Math.max(margins.right, room.right)) : margins.right,
-			};
-			if (next.left === margins.left && next.right === margins.right) {
-				break;
-			}
-			margins = next;
-			labels = choose();
-		}
-		const layout = { spacing: spacingOf(margins), margins, labels };
-		this._fitCache = { key, formatter, grid, layout };
-		return layout;
-	}
-
-	/** The font the time scale draws its labels in. */
-	private _currentLabelFont(): string {
-		const options = this._chart.options();
-		const { fontSize, fontFamily } = options.layout;
-		return `${options.timeScale.allowBoldLabels ? 'bold ' : ''}${fontSize}px ${fontFamily}`;
-	}
-
-	/**
-	 * Tells the time scale how far apart to keep the X labels, as the
-	 * character count it takes. Applying the option also drops the chart's
-	 * cached label texts, which a new formatter needs.
-	 */
-	private _applyLabelDistance(labels: XAxisLabels | null, force: boolean): void {
-		const options = this._chart.options();
-		// The chart's own conversion from characters to pixels.
-		const pixelsPerCharacter = ((options.layout.fontSize + 4) * 5) / 8;
-		const length = labels !== null ? labels.minDistance / pixelsPerCharacter : this._appliedLabelLength;
-		const current = options.timeScale.tickMarkMaxCharacterLength;
-		if (this._appliedLabelLength === null || current !== this._appliedLabelLength) {
-			// The host set a label distance of its own since: the one to give back.
-			this._hostLabelLength = current;
-		}
-		if (length === null || (length === this._appliedLabelLength && length === current && !force)) {
-			return;
-		}
-		this._appliedLabelLength = length;
-		this._chart.applyOptions({ timeScale: { tickMarkMaxCharacterLength: length } });
-	}
-
-	/**
-	 * `xMargins` needs room before the first slot and after the last one, which
-	 * the chart refuses at a fixed edge (`fixLeftEdge` / `fixRightEdge`, on in a
-	 * scatter chart by default). While margins are asked for, the series frees
-	 * both edges — again whenever the host fixes one, keeping that as its
-	 * setting; without margins, it gives the chart back the host's setting.
-	 *
-	 * @returns Whether it changed the chart's edges.
-	 */
-	private _applyEdges(): boolean {
-		if (this._marginsNeedFreeEdges()) {
-			const { fixLeftEdge, fixRightEdge } = this._chart.options().timeScale;
-			if (!fixLeftEdge && !fixRightEdge) {
-				return false;
-			}
-			const kept = this._hostEdges;
-			this._hostEdges = {
-				fixLeftEdge: fixLeftEdge || (kept !== null && kept.fixLeftEdge),
-				fixRightEdge: fixRightEdge || (kept !== null && kept.fixRightEdge),
-			};
-			this._chart.applyOptions({ timeScale: { fixLeftEdge: false, fixRightEdge: false } });
-			return true;
-		}
-		if (this._hostEdges !== null) {
-			const edges = this._hostEdges;
-			this._hostEdges = null;
-			this._chart.applyOptions({ timeScale: edges });
-			return true;
-		}
-		return false;
-	}
-
-	/** {@link _edgeState} as a string, to tell when it changes. */
-	private _edgeStateKey(): string {
-		const { movable, freeLeft, freeRight } = this._edgeState();
-		return `${movable}|${freeLeft}|${freeRight}`;
-	}
-
-	/** Whether `xMargins` asks for room past the ends of the domain. */
-	private _marginsNeedFreeEdges(): boolean {
-		const margin = this._scatterOptions.xMargins;
-		return Number.isFinite(margin) && margin > 0;
-	}
-
-	/** Whether the host fixed an edge of the chart again while margins need them free. */
-	private _edgesFixedAgain(): boolean {
-		if (!this._marginsNeedFreeEdges()) {
-			return false;
-		}
-		const { fixLeftEdge, fixRightEdge } = this._chart.options().timeScale;
-		return fixLeftEdge || fixRightEdge;
-	}
-
-	/**
-	 * The fit of the X domain to a plot `width` pixels wide: the distance
-	 * between slots, and the room kept at each end of the domain.
-	 */
-	private _fit(width: number, grid: SlotGrid = this._model.grid): { spacing: number; margins: { left: number; right: number } } {
-		const { spacing, margins } = this._fitLayout(width, grid);
-		return { spacing, margins };
-	}
-
-	/** Whether the visible range is still the fitted one: the user did not scroll or zoom it. */
-	private _followsFit(): boolean {
-		return this._fittedRange === null || this._rangeFollowsFit || !canMoveXAxis(this._chart.options());
-	}
-
-	/**
-	 * Whether a visible range shows the whole X domain as far zoomed out as
-	 * the fit, or further: the length of the range is that of the fit — or,
-	 * should the chart not zoom out that far (at fixed edges with more slots
-	 * than pixels, or above `minBarSpacing`), the most it lets the user zoom
-	 * out. Where the domain sits in the plot does not matter: a pan at the
-	 * zoom of the fit is still the fit, which the series sets again.
-	 */
-	private _isZoomedOut(range: LogicalRange): boolean {
-		const width = this._chart.timeScale().width();
-		const grid = this._model.grid;
-		if (width <= 1) {
-			return true;
-		}
-		const options = this._chart.options().timeScale;
-		// setVisibleLogicalRange sets the spacing to width / (to − from + 1).
-		let longest = width / this._fit(width).spacing - 1;
-		// The chart's least spacing: one slot per `width / count` pixels at two
-		// fixed edges, else `minBarSpacing`.
-		if (options.fixLeftEdge && options.fixRightEdge) {
-			longest = Math.min(longest, grid.count - 1);
-		} else if (options.minBarSpacing > 0) {
-			longest = Math.min(longest, width / options.minBarSpacing - 1);
-		}
-		return range.to - range.from >= longest - RANGE_TOLERANCE;
-	}
-
-	/**
-	 * Whether the chart has just reset its time scale (a double-click on the
-	 * X axis with `handleScale.axisDoubleClickReset`): the spacing is the
-	 * `barSpacing` option and the scroll position the `rightOffset` option.
-	 * The chart knows nothing of the X domain: the series fits it instead.
-	 */
-	private _isTimeScaleReset(): boolean {
-		const options = this._chart.options().timeScale;
-		const timeScale = this._chart.timeScale();
-		const spacing = timeScale.options().barSpacing;
-		if (!(spacing > 0) || Math.abs(spacing - options.barSpacing) > 1e-9 * spacing) {
-			return false;
-		}
-		const offset = options.rightOffsetPixels !== undefined ? options.rightOffsetPixels / spacing : options.rightOffset;
-		return Math.abs(timeScale.scrollPosition() - offset) < RANGE_TOLERANCE;
-	}
-
-	/**
-	 * The X mapping of the chart's scale as it is now, found from the second
-	 * slot: while the slots are weighed again the first one is moved off for a
-	 * moment (see `_setSlotsWeighedAgain`), and the crosshair events the chart
-	 * fires then must still find the points.
-	 */
-	private _xMapping(): XMapping | null {
-		const grid = this._model.grid;
-		const timeScale = this._chart.timeScale();
-		const second = timeScale.timeToIndex(slotValue(grid, 1), false);
-		if (second === null) {
-			return null;
-		}
-		const origin = timeScale.logicalToCoordinate((second - 1) as unknown as Logical);
-		const next = timeScale.logicalToCoordinate(second as unknown as Logical);
-		if (origin === null || next === null) {
-			return null;
-		}
-		return { start: slotValue(grid, 0), origin, pxPerUnit: (next - origin) / stepValue(grid.step) };
 	}
 
 	/** The X mapping, or `null` once the series or its chart is removed: a removed chart must not be asked. */
-	private _liveXMapping(): XMapping | null {
-		return this._isLive() ? this._xMapping() : null;
+	#liveXMapping(): XMapping | null {
+		return this.#acts() ? this.#xAxis.xMapping() : null;
 	}
 
 	/** Whether points can be drawn and hovered: the series on a live chart, and visible. */
-	private _isSeriesVisible(): boolean {
-		return this.attached() && this._series.options().visible;
+	#isSeriesVisible(): boolean {
+		return this.attached() && this.#series.options().visible;
 	}
 
 	/** Where point `index` is drawn, or `null` when it is not drawn at all. */
-	private _pointInfo(index: number): ScatterPointInfo<TPoint> | null {
-		const resolved = this._model.resolved[index];
-		const mapping = this._xMapping();
+	#pointInfo(index: number): ScatterPointInfo<TPoint> | null {
+		const resolved = this.#model.resolved[index];
+		const mapping = this.#xAxis.xMapping();
 		if (resolved === undefined || !resolved.visible || mapping === null) {
 			return null;
 		}
 		const x = xToCoordinate(mapping, resolved.x);
-		const y = this._series.priceToCoordinate(resolved.y);
+		const y = this.#series.priceToCoordinate(resolved.y);
 		// The hovered point is drawn larger.
-		const size = index === this._hoveredIndex() ? resolved.size + this._paintOptions().hoveredSizeIncrease : resolved.size;
+		const size = index === this.#hover.index() ? resolved.size + this.#paintOptions().hoveredSizeIncrease : resolved.size;
 		const radius = size / 2;
-		if (y === null || !isInPane(x, y, radius, this._chart.timeScale().width(), this._series.getPane().getHeight())) {
+		if (y === null || !isInPane(x, y, radius, this.#chart.timeScale().width(), this.#series.getPane().getHeight())) {
 			return null;
 		}
-		const group = resolved.groupIndex >= 0 ? this._model.groups[resolved.groupIndex] : null;
+		const group = resolved.groupIndex >= 0 ? this.#model.groups[resolved.groupIndex] : null;
 		return {
 			objectId: resolved.id,
-			point: this._points[index],
+			point: this.#points[index],
 			index,
 			groupId: group !== null ? group.id : null,
 			x,
@@ -1388,266 +665,44 @@ export class ScatterSeriesApiImpl<TPoint extends ScatterPoint> implements Scatte
 			opacity: resolved.opacity,
 			shape: resolved.shape,
 			hollow: resolved.hollow,
-			strokeColor: strokeColorOf(resolved, this._backgroundColor()),
+			strokeColor: strokeColorOf(resolved, this.#backgroundColor()),
 			strokeWidth: cappedStrokeWidth(size, resolved.strokeWidth),
 		};
 	}
 
-	/**
-	 * Data index of the hovered point: under the pointer, else set through the
-	 * API. A point is hovered only while it is drawn.
-	 */
-	private _hoveredIndex(): number | null {
-		const model = this._model;
-		const pointer = this._pointerHovered;
-		if (pointer !== null) {
-			const index = model.resolved[pointer.index]?.id === pointer.id ? pointer.index : model.idToIndex.get(pointer.id);
-			if (index !== undefined && model.resolved[index].visible) {
-				return index;
-			}
-		}
-		if (this._apiHoveredId !== null) {
-			const index = model.idToIndex.get(this._apiHoveredId);
-			if (index !== undefined && model.resolved[index].visible) {
-				return index;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Notifies the hovered point after the chart's next paint. The chart
-	 * applies a new visible range and price range on its next frame, so the
-	 * frame callback is registered after the chart's own, which the change has
-	 * already requested; it runs right after that paint. A change the chart
-	 * paints is notified from the paint itself (see `_onDrawn`); this covers
-	 * the ones it does not, such as hiding the series.
-	 */
-	private _scheduleHoveredNotification(): void {
-		if (this._notificationScheduled) {
-			return;
-		}
-		this._notificationScheduled = true;
-		requestAnimationFrame(() => {
-			this._notificationScheduled = false;
-			this._notifyHovered();
-		});
-	}
-
-	private _notifyHovered(): void {
-		if (this._removed) {
-			return;
-		}
-		// The usual case on every frame: nothing hovered, nothing to tell.
-		if (this._notified === null && this._hoveredIndex() === null) {
-			return;
-		}
-		const info = this.hoveredPoint();
-		if (samePointInfo(info, this._notified)) {
-			return;
-		}
-		this._notified = info;
-		this._hoveredChanged.fire(info);
-	}
-
-	/** Repaints without changing the data: the chart redraws a series whose options change. */
-	private _requestRepaint(): void {
-		this._series.applyOptions({});
-	}
-
-	private readonly _autoscaleInfoProvider = (baseImplementation: () => AutoscaleInfo | null): AutoscaleInfo | null => {
-		const scatter = (): AutoscaleInfo | null => this._autoscaleInfo(baseImplementation());
-		const user = this._userAutoscaleInfoProvider;
+	readonly #autoscaleInfoProvider = (baseImplementation: () => AutoscaleInfo | null): AutoscaleInfo | null => {
+		const scatter = (): AutoscaleInfo | null =>
+			scatterAutoscaleInfo(baseImplementation(), this.#model, this.#own.scatter.yRange, this.#paintOptions());
+		const user = this.#own.autoscale;
 		return user !== undefined ? user(scatter) : scatter();
 	};
 
-	/**
-	 * The price range of the visible slots, widened to the horizontal
-	 * baselines and pinned to `yRange`, with room for the largest point at an
-	 * open end (the margins are in pixels) — as it is drawn when hovered.
-	 */
-	private _autoscaleInfo(base: AutoscaleInfo | null): AutoscaleInfo | null {
-		const model = this._model;
-		const yRange = this._scatterOptions.yRange;
-		let min = base?.priceRange?.minValue ?? null;
-		let max = base?.priceRange?.maxValue ?? null;
-		for (const baseline of model.yBaselines) {
-			min = min === null ? baseline.value : Math.min(min, baseline.value);
-			max = max === null ? baseline.value : Math.max(max, baseline.value);
-		}
-		let fixedMin = yRange.min !== null && Number.isFinite(yRange.min) ? yRange.min : null;
-		let fixedMax = yRange.max !== null && Number.isFinite(yRange.max) ? yRange.max : null;
-		if (fixedMin !== null && fixedMax !== null && fixedMin > fixedMax) {
-			// Ends given in the wrong order are swapped, as those of `xRange` are.
-			[fixedMin, fixedMax] = [fixedMax, fixedMin];
-		}
-		min = fixedMin ?? min;
-		max = fixedMax ?? max;
-		if (min === null || max === null) {
-			return base;
-		}
-		if (min > max) {
-			if (fixedMin !== null && fixedMax === null) {
-				max = min;
-			} else {
-				min = max;
+	#afterDraw(): void {
+		if (this.#acts()) {
+			this.#xAxis.afterDraw();
+			// A new price scale mode moves the points: checked when they move.
+			const fills = this.#geometryCache.fills();
+			if (fills !== this.#scaleModeCheckedAt) {
+				this.#scaleModeCheckedAt = fills;
+				this.#warnAboutScaleMode();
 			}
 		}
-		// One pixel more than the radius, for the antialiased edge, and the
-		// growth and the ring of a hovered point.
-		const paint = this._paintOptions();
-		const hoverReach = paint.hoveredSizeIncrease / 2 + (paint.hoveredRingWidth > 0 ? paint.hoveredRingGap + paint.hoveredRingWidth : 0);
-		const radius = model.maxSize > 0 ? model.maxSize / 2 + hoverReach + 1 : 0;
-		return {
-			priceRange: { minValue: min, maxValue: max },
-			margins: {
-				above: fixedMax !== null ? 0 : Math.max(radius, base?.margins?.above ?? 0),
-				below: fixedMin !== null ? 0 : Math.max(radius, base?.margins?.below ?? 0),
-			},
-		};
+		// Of a removed chart, it notifies `null` once.
+		this.#hover.notify();
 	}
-
-	private readonly _onCrosshairMove = (param: MouseEventParams<number>): void => {
-		const info = param.hoveredInfo;
-		const id = info !== undefined && info.series === this._series && typeof info.objectId === 'string'
-			? info.objectId
-			: null;
-		let next: PointerHover | null = null;
-		if (id !== null) {
-			// The renderer's hit test has just found the point: take its index,
-			// which tells apart points sharing the id.
-			const hit = this._lastHit;
-			const index = hit !== null && hit.model === this._model && this._model.resolved[hit.index]?.id === id
-				? hit.index
-				: this._model.idToIndex.get(id);
-			next = index !== undefined ? { id, index } : null;
-		}
-		const current = this._pointerHovered;
-		if (next?.id !== current?.id || next?.index !== current?.index) {
-			this._pointerHovered = next;
-			this._scheduleHoveredNotification();
-		}
-	};
-
-	/**
-	 * After every paint: the hovered point may have moved with the scales, and
-	 * the label font may have changed with the chart options. Runs once the
-	 * paint is over, not in the middle of it.
-	 */
-	private readonly _onDrawn = (): void => {
-		if (this._drawnScheduled) {
-			return;
-		}
-		this._drawnScheduled = true;
-		queueMicrotask(() => {
-			this._drawnScheduled = false;
-			if (this._isLive()) {
-				// The host fixed an edge again while margins need them free: free
-				// them, and fit the domain within the margins again.
-				if (this._applyEdges() && this._followsFit()) {
-					this.fitXDomain();
-				}
-				// The labels were measured in another font, or the host switched
-				// scrolling, zooming or an edge, which moves the end labels: lay the
-				// axis out again (and fit it, should the room for those labels change).
-				if (
-					(this._labelFont !== '' && this._labelFont !== this._currentLabelFont()) ||
-					(this._appliedEdgeState !== '' && this._appliedEdgeState !== this._edgeStateKey())
-				) {
-					this._layOutXAxis();
-				}
-				this._warnAboutScaleMode();
-			}
-			// Of a removed chart, it notifies `null` once.
-			this._notifyHovered();
-		});
-	};
 
 	/**
 	 * Warns once when the price scale shows values relative to the first one
-	 * in view: for a scatter series, that is the first slot of the X axis in
-	 * view, not a point the user can see.
+	 * in view: for a scatter series, the first slot of the X axis in view, not
+	 * a point the user can see.
 	 */
-	private _warnAboutScaleMode(): void {
-		if (this._scaleModeWarned) {
+	#warnAboutScaleMode(): void {
+		if (this.#warned.has(SCALE_MODE_WARNING)) {
 			return;
 		}
-		const mode = this._series.priceScale().options().mode;
+		const mode = this.#series.priceScale().options().mode;
 		if (mode === PriceScaleMode.Percentage || mode === PriceScaleMode.IndexedTo100) {
-			this._scaleModeWarned = true;
-			console.warn(
-				'lwc-plugin-scatter-series: percentage and indexed-to-100 price scales show Y relative to the first ' +
-				'slot of the X axis in view, not to any point, which means nothing on a scatter plot. ' +
-				'Use PriceScaleMode.Normal or PriceScaleMode.Logarithmic.'
-			);
+			this.#warnOnce(SCALE_MODE_WARNING);
 		}
-	}
-
-	private readonly _onSizeChange = (width: number): void => {
-		if (width === this._width) {
-			return;
-		}
-		this._width = width;
-		// The width changes in the middle of a paint when the price scale grows
-		// or shrinks. A range set right now would be merged into that paint's
-		// own invalidation and lose to the range it already applied (verified on
-		// 5.2), so lay the axis out again once the paint is over.
-		queueMicrotask(() => {
-			if (this._isLive()) {
-				this._layOutXAxis(true);
-			}
-		});
-	};
-
-	/**
-	 * Follows the range the chart shows: the fitted one, or one the user
-	 * scrolled or zoomed (when the host lets the user move the axis). Zoomed
-	 * out as far as the fit, or further — at fixed edges the chart stops a few
-	 * pixels short of it — wherever the domain then sits, and after the
-	 * chart's own reset of the axis, that is the fit, which the series then
-	 * sets exactly: a pan at the zoom of the fit springs back. Otherwise the
-	 * labels are chosen again for the part in view.
-	 */
-	private readonly _onVisibleRangeChange = (range: LogicalRange | null): void => {
-		// Live first: a series taken off the chart lets go of it here.
-		if (this._layingOut || !this._isLive() || range === null || this._fittedRange === null) {
-			return;
-		}
-		const fitted = sameRange(range, this._fittedRange);
-		if (!fitted && this._edgesFixedAgain()) {
-			// The chart moved the range to edges the host has just fixed: not the
-			// user's doing. The next draw frees them and fits again (`_onDrawn`).
-			return;
-		}
-		const canMove = canMoveXAxis(this._chart.options());
-		this._rangeFollowsFit = fitted || !canMove || this._isZoomedOut(range) || this._isTimeScaleReset();
-		if (canMove) {
-			this._scheduleLayout(this._rangeFollowsFit && !fitted);
-		}
-	};
-
-	/**
-	 * Lays the axis out again once the chart is done with the range it just
-	 * changed — never from within its event — fitting the domain first when
-	 * asked to.
-	 */
-	private _scheduleLayout(fit: boolean): void {
-		this._fitScheduled = this._fitScheduled || fit;
-		if (this._layoutScheduled) {
-			return;
-		}
-		this._layoutScheduled = true;
-		queueMicrotask(() => {
-			this._layoutScheduled = false;
-			const fitNow = this._fitScheduled;
-			this._fitScheduled = false;
-			if (!this._isLive()) {
-				return;
-			}
-			if (fitNow) {
-				this.fitXDomain();
-			}
-			this._layOutXAxis();
-		});
 	}
 }

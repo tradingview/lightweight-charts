@@ -1,29 +1,26 @@
-import type {
+import {
 	CustomSeriesHitTestResult,
 	ICustomSeriesPaneRenderer,
+	LineStyle,
 	PriceToCoordinateConverter,
 } from 'lightweight-charts';
+import { traceMarker, traceMarkerOffset } from '@tradingview/lwc-toolkit/canvas/markers';
 import type {
 	BitmapCoordinatesRenderingScope,
 	CanvasRenderingTarget2D,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import { positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
-import { setLineStyle, type LineStyle as ToolkitLineStyle } from '@tradingview/lwc-toolkit/line-style';
-import type { LineStyle } from 'lightweight-charts';
+import { setLineStyle } from '@tradingview/lwc-toolkit/line-style';
 
 import { XMapping, YToCoordinate, isInPane, xToCoordinate } from './geometry';
 import { ScatterHitGeometry, hitTestScatter } from './hit-test';
 import type { ScatterModel } from './model';
-import type { ScatterBaseline, ScatterPlotBorder, ScatterShape } from './options';
-import { traceMarkerOffset } from './shapes';
+import { DEFAULT_LINE_COLOR, ScatterBaseline, ScatterPlotBorder } from './options';
 import { cappedStrokeWidth } from './size';
 import { strokeColorOf } from './style';
 
-/** Default colour of a baseline which sets none. */
-const DEFAULT_BASELINE_COLOR = '#9598A1';
-
-/** `LineStyle.Solid`. */
-const SOLID = 0 as LineStyle;
+/** Least radius a marker is traced at, bitmap pixels: a smaller one would vanish. */
+const MIN_TRACE_RADIUS = 0.5;
 
 /** The options the renderer draws and hit tests with. */
 export interface ScatterRenderOptions {
@@ -60,7 +57,7 @@ export interface ScatterRenderState {
 	 * hovered by the pointer, else the one set with `setHoveredPoint`.
 	 */
 	hoveredIndex(): number | null;
-	/** Where the points are, for hit testing. */
+	/** Where the points are, for drawing and hit testing. */
 	geometry(model: ScatterModel, mapping: XMapping, yToCoordinate: YToCoordinate): ScatterHitGeometry;
 	/** Called with the data index of the point every hit test finds, or `null`. */
 	hit(model: ScatterModel, index: number | null): void;
@@ -82,41 +79,6 @@ function isHitData(value: unknown): value is ScatterHitData {
 	return typeof value === 'object' && value !== null && typeof (value as Partial<ScatterHitData>).index === 'number';
 }
 
-function toolkitStyle(style: LineStyle): ToolkitLineStyle {
-	// The library's `LineStyle` enum has the toolkit's values.
-	return style as unknown as ToolkitLineStyle;
-}
-
-/** Adds the outline of a marker centred on `(x, y)` to the current path, in bitmap pixels. */
-function traceMarker(ctx: CanvasRenderingContext2D, shape: ScatterShape, x: number, y: number, r: number): void {
-	switch (shape) {
-		case 'square':
-			ctx.rect(x - r, y - r, 2 * r, 2 * r);
-			return;
-		case 'diamond':
-			ctx.moveTo(x, y - r);
-			ctx.lineTo(x + r, y);
-			ctx.lineTo(x, y + r);
-			ctx.lineTo(x - r, y);
-			ctx.closePath();
-			return;
-		case 'triangleUp':
-			ctx.moveTo(x, y - r);
-			ctx.lineTo(x + r, y + r);
-			ctx.lineTo(x - r, y + r);
-			ctx.closePath();
-			return;
-		case 'triangleDown':
-			ctx.moveTo(x, y + r);
-			ctx.lineTo(x + r, y - r);
-			ctx.lineTo(x - r, y - r);
-			ctx.closePath();
-			return;
-		default:
-			ctx.arc(x, y, r, 0, 2 * Math.PI);
-	}
-}
-
 /**
  * Draws the whole scatter dataset. The series data handed over by the chart
  * is only the slot grid; the points themselves come from the model, drawn at
@@ -126,12 +88,18 @@ function traceMarker(ctx: CanvasRenderingContext2D, shape: ScatterShape, x: numb
  * first, then group by group, each in data order), and the hovered point on
  * top at `hoveredOpacity`. Lines and shapes are drawn in the bitmap
  * coordinate space; a point's size includes its stroke.
+ *
+ * Not a `CustomSeriesRendererBase`: that base draws the series data in the
+ * visible range, and this renderer draws none of it.
  */
 export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
-	private readonly _state: ScatterRenderState;
+	readonly #state: ScatterRenderState;
+	// The hit test data last reported: the chart compares it by reference, and
+	// repaints the pane whenever it is another object.
+	#hitData: ScatterHitData | null = null;
 
 	public constructor(state: ScatterRenderState) {
-		this._state = state;
+		this.#state = state;
 	}
 
 	public draw(
@@ -140,32 +108,34 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 		isHovered: boolean,
 		hitTestData?: unknown
 	): void {
-		const mapping = this._state.xMapping();
+		const mapping = this.#state.xMapping();
 		if (mapping === null) {
 			return;
 		}
-		const model = this._state.model();
-		const options = this._state.options();
+		const model = this.#state.model();
+		const options = this.#state.options();
 		// The chart passes back the hit test data of the point under the
 		// pointer, unless it was found in a model replaced since. When it
 		// reports nothing, fall back to the point hovered through the API.
 		const hoveredIndex = isHovered && isHitData(hitTestData) && hitTestData.model === model
 			? hitTestData.index
-			: this._state.hoveredIndex();
-		const background = this._state.backgroundColor();
+			: this.#state.hoveredIndex();
+		const background = this.#state.backgroundColor();
+		// The coordinates of the points, computed again only when the scales moved.
+		const geometry = this.#state.geometry(model, mapping, priceToCoordinate);
 		target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
 			const ctx = scope.context;
 			ctx.save();
 			try {
-				this._drawPlotBorder(scope, options);
-				this._drawBaselines(scope, options, mapping, priceToCoordinate);
-				this._drawLines(scope, model, mapping, priceToCoordinate);
-				this._drawPoints(scope, model, options, background, mapping, priceToCoordinate, hoveredIndex);
+				this.#drawPlotBorder(scope, options);
+				this.#drawBaselines(scope, options, mapping, priceToCoordinate);
+				this.#drawLines(scope, model, geometry, mapping, priceToCoordinate);
+				this.#drawPoints(scope, model, options, background, geometry, hoveredIndex);
 			} finally {
 				ctx.restore();
 			}
 		});
-		this._state.drawn();
+		this.#state.drawn();
 	}
 
 	/**
@@ -174,29 +144,33 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 	 * chart calls it from `lightweight-charts` 5.2.
 	 */
 	public hitTest(x: number, y: number, priceToCoordinate: PriceToCoordinateConverter): CustomSeriesHitTestResult | null {
-		const mapping = this._state.xMapping();
+		const mapping = this.#state.xMapping();
 		if (mapping === null) {
 			return null;
 		}
-		const model = this._state.model();
-		const geometry = this._state.geometry(model, mapping, priceToCoordinate);
-		const options = this._state.options();
-		const hit = hitTestScatter(geometry, x, y, this._state.hoveredIndex(), options.hitTestTolerance, options.hoveredSizeIncrease);
-		this._state.hit(model, hit !== null ? hit.index : null);
+		const model = this.#state.model();
+		const geometry = this.#state.geometry(model, mapping, priceToCoordinate);
+		const options = this.#state.options();
+		const hit = hitTestScatter(geometry, x, y, this.#state.hoveredIndex(), options.hitTestTolerance, options.hoveredSizeIncrease);
+		this.#state.hit(model, hit !== null ? hit.index : null);
 		if (hit === null) {
 			return null;
 		}
-		const hitTestData: ScatterHitData = { model, index: hit.index };
+		// The same object while the same point is under the pointer: a move
+		// within the point repaints nothing.
+		if (this.#hitData === null || this.#hitData.model !== model || this.#hitData.index !== hit.index) {
+			this.#hitData = { model, index: hit.index };
+		}
 		return {
 			distance: hit.distance,
 			objectId: model.resolved[hit.index].id,
 			type: 'point',
 			cursorStyle: 'pointer',
-			hitTestData,
+			hitTestData: this.#hitData,
 		};
 	}
 
-	private _drawPlotBorder(scope: BitmapCoordinatesRenderingScope, options: Readonly<ScatterRenderOptions>): void {
+	#drawPlotBorder(scope: BitmapCoordinatesRenderingScope, options: Readonly<ScatterRenderOptions>): void {
 		const border = options.plotBorder;
 		if (!border.visible || !(border.width > 0)) {
 			return;
@@ -209,7 +183,7 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 		ctx.globalAlpha = 1;
 		const edge = (width: number, x1: number, y1: number, x2: number, y2: number): void => {
 			ctx.lineWidth = width;
-			setLineStyle(ctx, toolkitStyle(border.style));
+			setLineStyle(ctx, border.style);
 			ctx.beginPath();
 			ctx.moveTo(x1, y1);
 			ctx.lineTo(x2, y2);
@@ -235,7 +209,7 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 		ctx.setLineDash([]);
 	}
 
-	private _drawBaselines(
+	#drawBaselines(
 		scope: BitmapCoordinatesRenderingScope,
 		options: Readonly<ScatterRenderOptions>,
 		mapping: XMapping,
@@ -252,7 +226,7 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 			// At least one device pixel, as the plot border: a line rounded to no
 			// width would be drawn with the width of the line before it.
 			const bitmapWidth = (pixelRatio: number): number => Math.max(1, Math.round(width * pixelRatio));
-			ctx.strokeStyle = baseline.color ?? DEFAULT_BASELINE_COLOR;
+			ctx.strokeStyle = baseline.color ?? DEFAULT_LINE_COLOR;
 			ctx.beginPath();
 			if (baseline.axis === 'y') {
 				const y = priceToCoordinate(baseline.value);
@@ -272,19 +246,21 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 				ctx.moveTo(centre, 0);
 				ctx.lineTo(centre, bitmapSize.height);
 			}
-			setLineStyle(ctx, toolkitStyle(baseline.style ?? (0 as LineStyle)));
+			setLineStyle(ctx, baseline.style ?? LineStyle.Solid);
 			ctx.stroke();
 		}
 		ctx.setLineDash([]);
 	}
 
-	private _drawLines(
+	#drawLines(
 		scope: BitmapCoordinatesRenderingScope,
 		model: ScatterModel,
+		geometry: ScatterHitGeometry,
 		mapping: XMapping,
 		priceToCoordinate: PriceToCoordinateConverter
 	): void {
 		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = scope;
+		const { xs, ys } = geometry;
 		ctx.lineJoin = 'round';
 		ctx.globalAlpha = 1;
 		for (const group of model.groups) {
@@ -294,21 +270,27 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 			// A cap lengthens every dash by the line width, which would close the
 			// gaps of a dotted line: dashed lines are drawn without, as the chart's
 			// own lines are; a solid one keeps its round ends.
-			ctx.lineCap = group.lineStyle === SOLID ? 'round' : 'butt';
+			ctx.lineCap = group.lineStyle === LineStyle.Solid ? 'round' : 'butt';
 			ctx.lineWidth = group.lineWidth * horizontalPixelRatio;
-			setLineStyle(ctx, toolkitStyle(group.lineStyle));
+			setLineStyle(ctx, group.lineStyle);
 			ctx.strokeStyle = group.lineColor;
 			ctx.beginPath();
 			let penDown = false;
 			for (const index of model.groupMembers[group.index]) {
-				const point = model.resolved[index];
-				const y = priceToCoordinate(point.y);
-				if (y === null) {
+				let x = xs[index];
+				let y: number | null = ys[index];
+				if (Number.isNaN(x)) {
+					// Not drawn as a point (beyond the X domain): the line still goes there.
+					const point = model.resolved[index];
+					x = xToCoordinate(mapping, point.x);
+					y = priceToCoordinate(point.y);
+				}
+				if (y === null || Number.isNaN(y)) {
 					// Never draw to NaN: break the line instead.
 					penDown = false;
 					continue;
 				}
-				const bx = xToCoordinate(mapping, point.x) * horizontalPixelRatio;
+				const bx = x * horizontalPixelRatio;
 				const by = y * verticalPixelRatio;
 				if (penDown) {
 					ctx.lineTo(bx, by);
@@ -332,16 +314,16 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 	 * hollow point is the stroke alone, in the point colour unless a stroke
 	 * colour is set. The context state changes only between points that differ.
 	 */
-	private _drawPoints(
+	#drawPoints(
 		scope: BitmapCoordinatesRenderingScope,
 		model: ScatterModel,
 		options: Readonly<ScatterRenderOptions>,
 		background: string,
-		mapping: XMapping,
-		priceToCoordinate: PriceToCoordinateConverter,
+		geometry: ScatterHitGeometry,
 		hoveredIndex: number | null
 	): void {
 		const { context: ctx, mediaSize, horizontalPixelRatio, verticalPixelRatio } = scope;
+		const { xs, ys } = geometry;
 		const pixelRatio = horizontalPixelRatio;
 		ctx.lineJoin = 'round';
 		ctx.setLineDash([]);
@@ -353,16 +335,13 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 		/** Draws a point at `opacity`, `grow` pixels larger, and with the hover ring when `ring`. */
 		const drawPoint = (index: number, opacity: number, grow: number, ring: boolean): void => {
 			const point = model.resolved[index];
-			const y = priceToCoordinate(point.y);
-			if (y === null) {
-				return;
-			}
-			const x = xToCoordinate(mapping, point.x);
 			const size = point.size + grow;
 			const radius = size / 2;
-			const ringReach = ring ? options.hoveredRingGap + options.hoveredRingWidth : 0;
-			// Cull points entirely outside the pane.
-			if (!isInPane(x, y, radius + ringReach, mediaSize.width, mediaSize.height)) {
+			const reach = radius + (ring ? options.hoveredRingGap + options.hoveredRingWidth : 0);
+			// Cull points entirely outside the pane, and those with no coordinates (NaN).
+			const x = xs[index];
+			const y = ys[index];
+			if (!isInPane(x, y, reach, mediaSize.width, mediaSize.height)) {
 				return;
 			}
 			if (opacity !== alpha) {
@@ -371,11 +350,12 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 			}
 			const strokeWidth = cappedStrokeWidth(size, point.strokeWidth) * pixelRatio;
 			const outer = radius * pixelRatio;
-			const centreLine = Math.max(0.5, outer - strokeWidth / 2);
+			const centreLine = Math.max(MIN_TRACE_RADIUS, outer - strokeWidth / 2);
 			const bx = x * horizontalPixelRatio;
 			const by = y * verticalPixelRatio;
+			// One marker per path: a circle is drawn by `arc` alone, as an exact oval.
 			ctx.beginPath();
-			traceMarker(ctx, point.shape, bx, by, centreLine);
+			traceMarker(ctx, point.shape, bx, by, centreLine, true);
 			if (!point.hollow) {
 				if (point.color !== fillStyle) {
 					fillStyle = point.color;
@@ -405,7 +385,8 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 					bx,
 					by,
 					centreLine,
-					strokeWidth / 2 + options.hoveredRingGap * pixelRatio + ringWidth / 2
+					strokeWidth / 2 + options.hoveredRingGap * pixelRatio + ringWidth / 2,
+					true
 				);
 				strokeStyle = options.hoveredRingColor ?? point.color;
 				ctx.strokeStyle = strokeStyle;

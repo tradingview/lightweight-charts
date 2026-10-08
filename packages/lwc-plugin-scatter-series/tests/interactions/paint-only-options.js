@@ -1,7 +1,9 @@
 // Options that only change how the points are painted repaint the series
 // without touching the chart: no new slots, no chart options, no refit. Data
 // and options that change the slots set them; ones that change neither the
-// slots nor the axis (sizes, colours) leave them alone and still rescale.
+// slots nor the axis (sizes, colours) leave them alone and still rescale. A
+// repaint over unmoved scales does not read the price scale's options either
+// (the check of its mode, for the warning, runs when the points move).
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
 		const step = left => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
@@ -25,9 +27,11 @@ async function beforeInteractions(container) {
 	await frames(3);
 
 	const underlying = series.series();
-	const counts = { setData: 0, chartOptions: 0, range: 0 };
+	const counts = { setData: 0, chartOptions: 0, range: 0, priceScale: 0 };
 	const setData = underlying.setData.bind(underlying);
 	underlying.setData = data => { counts.setData++; setData(data); };
+	const priceScale = underlying.priceScale.bind(underlying);
+	underlying.priceScale = () => { counts.priceScale++; return priceScale(); };
 	const applyChartOptions = chart.applyOptions.bind(chart);
 	chart.applyOptions = options => { counts.chartOptions++; applyChartOptions(options); };
 	const setRange = chart.timeScale().setVisibleLogicalRange.bind(chart.timeScale());
@@ -47,11 +51,12 @@ async function beforeInteractions(container) {
 	const painted = pixel(ring.x, ring.y);
 	if (painted[0] > 60 || painted[1] > 60 || painted[2] > 60) { throw new Error(`The new stroke is not painted: ${painted}`); }
 
+	counts.priceScale = 0;
 	series.setHoveredPoint('b');
 	await frames();
 	series.setHoveredPoint(null);
 	await frames();
-	expectCounts('hovering through the API', { setData: 0, chartOptions: 0, range: 0 });
+	expectCounts('hovering through the API', { setData: 0, chartOptions: 0, range: 0, priceScale: 0 });
 
 	// The same data again, and colours or sizes: the slots stay.
 	series.setData([{ id: 'a', x: 0, y: 0 }, { id: 'b', x: 50, y: 50 }, { id: 'c', x: 100, y: 100 }]);

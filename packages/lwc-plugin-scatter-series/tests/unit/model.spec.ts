@@ -46,6 +46,37 @@ void describe('buildScatterModel: X values the axis cannot take', () => {
 		expect(Number.isFinite(model.grid.count)).to.equal(true);
 		expect(build([{ x: 1e20, y: 1 }]).xOutOfRange).to.equal(false);
 	});
+
+	void it('widens a span too narrow for the axis and draws its points, on distinct slots', () => {
+		const model = build([{ x: 1e-300, y: 1 }, { x: 2e-300, y: 2 }]);
+		expect(model.xWidened).to.equal(true);
+		expect(model.resolved.map(point => point.visible)).to.deep.equal([true, true]);
+		model.slots.forEach((slot, index) => expect(index === 0 || slot.time > model.slots[index - 1].time).to.equal(true));
+		expect(build([{ x: 1e-90, y: 1 }, { x: 2e-90, y: 2 }]).xWidened).to.equal(false);
+	});
+
+	void it('draws every point of an automatic range, one a rounding past the end it was rounded to included', () => {
+		// 0.1 + 0.2 is 0.30000000000000004: the range ends at 0.3, and the point is drawn there.
+		const noisy = build([{ x: 0, y: 1 }, { x: 0.1 + 0.2, y: 2 }]);
+		expect(slotValue(noisy.grid, noisy.grid.count - 1)).to.equal(0.3);
+		expect(noisy.resolved.map(point => point.visible)).to.deep.equal([true, true]);
+		const nudged = build([{ x: 0, y: 1 }, { x: 1.0000000001, y: 2 }]);
+		expect(nudged.resolved.map(point => point.visible)).to.deep.equal([true, true]);
+		expect(nudged.drawOrder).to.deep.equal([0, 1]);
+		const low = build([{ x: -1.0000000001, y: 1 }, { x: 0, y: 2 }]);
+		expect(low.resolved.map(point => point.visible)).to.deep.equal([true, true]);
+		// Next to a large index, where the division itself rounds.
+		const tiny = build([{ x: 1.234 * 10 ** -76, y: 1 }, { x: 1.234 * 10 ** -76 * (1 + 1e-13), y: 2 }]);
+		expect(tiny.resolved.map(point => point.visible)).to.deep.equal([true, true]);
+	});
+
+	void it('still leaves out a point just past a given end of xRange', () => {
+		const given = build([{ x: 0, y: 1 }, { x: 0.3, y: 2 }, { x: 0.1 + 0.2, y: 3 }, { x: -1e-17, y: 4 }], { xRange: { min: 0, max: 0.3 } });
+		expect(given.resolved.map(point => point.visible)).to.deep.equal([true, true, false, false]);
+		// One end given, the other automatic.
+		const half = build([{ x: 0, y: 1 }, { x: 0.1 + 0.2, y: 2 }, { x: -1e-17, y: 3 }], { xRange: { min: 0, max: null } });
+		expect(half.resolved.map(point => point.visible)).to.deep.equal([true, true, false]);
+	});
 });
 
 void describe('buildScatterModel: slots', () => {

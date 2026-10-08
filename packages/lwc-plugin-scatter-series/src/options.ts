@@ -4,8 +4,8 @@ import {
 	LineStyle,
 	customSeriesDefaultOptions,
 } from 'lightweight-charts';
+import { cloneOptions, freezeOptions } from '@tradingview/lwc-toolkit/options/merge';
 
-import { cloneOptions, freezeOptions } from './merge';
 import { DEFAULT_POINT_SIZE_LIMITS } from './size';
 
 /**
@@ -111,6 +111,9 @@ export interface ScatterGroup {
 	/** Style of the connecting line. Defaults to solid. */
 	lineStyle?: LineStyle;
 }
+
+/** Default colour of a baseline, and of the plot border. */
+export const DEFAULT_LINE_COLOR = '#9598A1';
 
 /** A reference line across the plot. */
 export interface ScatterBaseline {
@@ -235,7 +238,10 @@ export interface ScatterSeriesOptions extends CustomSeriesOptions {
 	 * tick. A given end is snapped outwards to the nearest slot of the axis grid
 	 * (a tenth or a twentieth of a tick), and points outside are not drawn.
 	 * Ends given in the wrong order are swapped, and an end beyond ±1e300 is
-	 * brought back to it.
+	 * brought back to it. A range only a few floating-point steps wide for its
+	 * magnitude, such as `[1e15, 1e15 + 1]`, has very few slots, and the chart
+	 * keeps slots at most half the plot width apart by default
+	 * (`timeScale.maxBarSpacing`): the data then spans about half the plot.
 	 */
 	xRange: ScatterRange;
 	/**
@@ -244,9 +250,11 @@ export interface ScatterSeriesOptions extends CustomSeriesOptions {
 	 * ends of the domain on the plot edges, as the design does. At most a
 	 * quarter of the plot width is used. Above `0` the series frees the chart's
 	 * fixed edges, which the margins need, and fixes them again when the
-	 * margins return to `0` or the series is removed. While the user can
-	 * scroll or zoom, the chart then centres the end labels on their values,
-	 * and the room at a free edge is widened to keep its label inside the plot.
+	 * margins return to `0` or the series is removed — with an edge the host
+	 * fixed meanwhile; one the host freed meanwhile cannot be told from the
+	 * freed one. While the user can scroll or zoom, the chart then centres the
+	 * end labels on their values, and the room at a free edge is widened to
+	 * keep its label inside the plot.
 	 */
 	xMargins: number;
 	/**
@@ -283,12 +291,15 @@ export type ScatterSeriesPartialOptions =
 	DeepPartial<Omit<ScatterSeriesOptions, ScatterReplacedOptionKeys>> &
 	Partial<Pick<ScatterSeriesOptions, ScatterReplacedOptionKeys>>;
 
+/** The options a scatter series adds to `CustomSeriesOptions`. */
+export type ScatterOnlyOptions = Omit<ScatterSeriesOptions, keyof CustomSeriesOptions>;
+
 /**
  * The options a scatter series adds to `CustomSeriesOptions`, with their
  * defaults. Frozen: a series works on copies, so that nothing it hands out can
  * change the defaults of the next one.
  */
-export const scatterOptionDefaults: Omit<ScatterSeriesOptions, keyof CustomSeriesOptions> = freezeOptions({
+export const scatterOptionDefaults: ScatterOnlyOptions = freezeOptions({
 	opacity: 0.65,
 	pointSize: 9,
 	pointSizeLimits: { ...DEFAULT_POINT_SIZE_LIMITS },
@@ -313,7 +324,7 @@ export const scatterOptionDefaults: Omit<ScatterSeriesOptions, keyof CustomSerie
 	baselines: [],
 	plotBorder: {
 		visible: false,
-		color: '#9598A1',
+		color: DEFAULT_LINE_COLOR,
 		width: 1,
 		style: LineStyle.Solid,
 		top: true,

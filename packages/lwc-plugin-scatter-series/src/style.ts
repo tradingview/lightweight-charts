@@ -1,6 +1,8 @@
+import { LineStyle } from 'lightweight-charts';
+import { clampOpacity, isFiniteNumber, nonNegativeOr } from '@tradingview/lwc-toolkit/numbers';
+
 import type { ScatterGroupInfo, ScatterPoint } from './data';
 import type { ScatterGroup, ScatterSeriesOptions, ScatterShape, ScatterSizeLimits } from './options';
-import type { LineStyle } from 'lightweight-charts';
 import { SizeScaling, cappedStrokeWidth, clampPointSize, mapSizeValue, normalizeSizeLimits } from './size';
 
 /** The series options which style points. */
@@ -85,21 +87,6 @@ export interface ScatterPointStyle {
 	hollow: boolean;
 }
 
-/** Clamps an opacity to `0`–`1`, falling back for a value which is not a number. */
-export function clampOpacity(opacity: number | undefined, fallback: number): number {
-	const value = opacity !== undefined && Number.isFinite(opacity) ? opacity : fallback;
-	return Math.min(1, Math.max(0, value));
-}
-
-function isFiniteNumber(value: number | undefined): value is number {
-	return typeof value === 'number' && Number.isFinite(value);
-}
-
-/** A stroke width, at least `0`, or `fallback` when it is not a number. */
-function strokeWidthOr(width: number | undefined, fallback: number): number {
-	return isFiniteNumber(width) ? Math.max(0, width) : fallback;
-}
-
 /**
  * Width of the outline a point is drawn with: the stroke width, at least
  * 1 px for an open marker, which is nothing but its outline.
@@ -156,7 +143,7 @@ export function resolveSeriesStyle(options: ScatterStyleOptions): ScatterSeriesS
 		shape: options.shape,
 		palette: options.palette,
 		strokeColor: options.strokeColor ?? null,
-		strokeWidth: strokeWidthOr(options.strokeWidth, 0),
+		strokeWidth: nonNegativeOr(options.strokeWidth, 0),
 		hollow: options.hollow === true,
 	};
 }
@@ -188,7 +175,7 @@ export function resolveGroups(
 		}
 	}
 	const palette = series.palette;
-	return all.map(({ group, declared: isDeclared }, index: number): ResolvedScatterGroup => {
+	return all.map(({ group, declared: isDeclared }: { group: ScatterGroup; declared: boolean }, index: number): ResolvedScatterGroup => {
 		const color = group.color ?? (palette.length > 0 ? palette[index % palette.length] : series.color);
 		const lineVisible = group.lineVisible === true;
 		return {
@@ -202,15 +189,31 @@ export function resolveGroups(
 			shape: group.shape ?? series.shape,
 			pointSize: isFiniteNumber(group.pointSize) ? clampPointSize(group.pointSize, series.limits) : series.pointSize,
 			strokeColor: group.strokeColor !== undefined ? group.strokeColor : series.strokeColor,
-			strokeWidth: strokeWidthOr(group.strokeWidth, series.strokeWidth),
+			strokeWidth: nonNegativeOr(group.strokeWidth, series.strokeWidth),
 			hollow: typeof group.hollow === 'boolean' ? group.hollow : series.hollow,
 			visible: group.visible !== false,
 			lineVisible,
-			lineWidth: group.lineWidth !== undefined && Number.isFinite(group.lineWidth) ? Math.max(0, group.lineWidth) : 1,
+			lineWidth: nonNegativeOr(group.lineWidth, 1),
 			lineColor: group.lineColor ?? color,
-			lineStyle: group.lineStyle ?? (0 as LineStyle),
+			lineStyle: group.lineStyle ?? LineStyle.Solid,
 		};
 	});
+}
+
+/** The size of a point: see {@link resolvePointStyle}. */
+function pointSize(
+	point: ScatterPoint,
+	group: ResolvedScatterGroup | null,
+	series: ScatterSeriesStyle,
+	sizeScaling: SizeScaling | null
+): number {
+	if (isFiniteNumber(point.size)) {
+		return clampPointSize(point.size, series.limits);
+	}
+	if (sizeScaling !== null && isFiniteNumber(point.sizeValue)) {
+		return mapSizeValue(point.sizeValue, sizeScaling);
+	}
+	return group !== null ? group.pointSize : series.pointSize;
 }
 
 /**
@@ -225,14 +228,7 @@ export function resolvePointStyle(
 	series: ScatterSeriesStyle,
 	sizeScaling: SizeScaling | null
 ): ScatterPointStyle {
-	let size: number;
-	if (isFiniteNumber(point.size)) {
-		size = clampPointSize(point.size, series.limits);
-	} else if (sizeScaling !== null && isFiniteNumber(point.sizeValue)) {
-		size = mapSizeValue(point.sizeValue, sizeScaling);
-	} else {
-		size = group !== null ? group.pointSize : series.pointSize;
-	}
+	const size = pointSize(point, group, series, sizeScaling);
 	const hollow = typeof point.hollow === 'boolean' ? point.hollow : (group ?? series).hollow;
 	return {
 		color: point.color ?? group?.color ?? series.color,
@@ -240,7 +236,43 @@ export function resolvePointStyle(
 		size,
 		shape: point.shape ?? group?.shape ?? series.shape,
 		strokeColor: point.strokeColor !== undefined ? point.strokeColor : (group ?? series).strokeColor,
-		strokeWidth: outlineWidth(strokeWidthOr(point.strokeWidth, (group ?? series).strokeWidth), hollow),
+		strokeWidth: outlineWidth(nonNegativeOr(point.strokeWidth, (group ?? series).strokeWidth), hollow),
 		hollow,
 	};
+}
+
+/**
+ * The declared groups with `groupId` shown or hidden, as a legend does it, or
+ * `null` when that changes nothing (an unknown group, one already so). A
+ * group the points name without declaring it is declared, with the undeclared
+ * ones before it, so that the order and the palette colours stay as they are.
+ *
+ * @param declared - The `groups` option.
+ * @param resolved - The groups as they are drawn, in drawing order.
+ */
+export function withGroupVisibility(
+	declared: readonly ScatterGroup[],
+	resolved: readonly ResolvedScatterGroup[],
+	groupId: string,
+	visible: boolean
+): ScatterGroup[] | null {
+	const position = declared.findIndex((group: ScatterGroup) => group.id === groupId);
+	if (position !== -1) {
+		if ((declared[position].visible !== false) === visible) {
+			return null;
+		}
+		return declared.map((group: ScatterGroup, index: number) => (index === position ? { ...group, visible } : group));
+	}
+	const target = resolved.findIndex((group: ResolvedScatterGroup) => group.id === groupId);
+	// An unknown group, or an undeclared one being shown: it is shown already.
+	if (target === -1 || visible) {
+		return null;
+	}
+	const next = declared.slice();
+	for (const group of resolved.slice(0, target + 1)) {
+		if (!group.declared) {
+			next.push(group.id === groupId ? { id: groupId, visible: false } : { id: group.id });
+		}
+	}
+	return next;
 }

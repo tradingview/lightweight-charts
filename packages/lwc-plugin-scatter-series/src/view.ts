@@ -5,7 +5,6 @@ import {
 	CustomSeriesWhitespaceData,
 	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
-	PaneRendererCustomData,
 } from 'lightweight-charts';
 
 import type { ScatterSlotData } from './data';
@@ -20,20 +19,17 @@ import { ScatterRenderState, ScatterSeriesRenderer } from './renderer';
  * scale. The points themselves are drawn by the renderer from the model.
  */
 export class ScatterSeriesView implements ICustomSeriesPaneView<number, ScatterSlotData, CustomSeriesOptions> {
-	private readonly _renderer: ScatterSeriesRenderer;
+	readonly #renderer: ScatterSeriesRenderer;
 
 	public constructor(state: ScatterRenderState) {
-		this._renderer = new ScatterSeriesRenderer(state);
+		this.#renderer = new ScatterSeriesRenderer(state);
 	}
 
 	public renderer(): ICustomSeriesPaneRenderer {
-		return this._renderer;
+		return this.#renderer;
 	}
 
-	public update(
-		_data: PaneRendererCustomData<number, ScatterSlotData>,
-		_options: CustomSeriesOptions
-	): void {
+	public update(): void {
 		// The renderer reads everything it needs from the series state.
 	}
 

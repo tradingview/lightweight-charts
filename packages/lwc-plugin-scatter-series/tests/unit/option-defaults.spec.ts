@@ -1,57 +1,10 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
+import { mergeOptions } from '@tradingview/lwc-toolkit/options/merge';
+
 import { scatterChartDefaults } from '../../src/chart.js';
-import { cloneOptions, mergeOptions } from '../../src/merge.js';
 import { DEFAULT_SCATTER_PALETTE, defaultOptions, scatterOptionDefaults, underlyingSeriesDefaults } from '../../src/options.js';
-
-void describe('mergeOptions', () => {
-	void it('shares no object or array with the target, even for keys the source leaves out', () => {
-		const target = { range: { min: 1, max: 2 }, list: [{ id: 'a' }], border: { visible: false } };
-		const merged = mergeOptions(target, { border: { visible: true } });
-		merged.range.min = 10;
-		merged.list[0].id = 'changed';
-		merged.list.push({ id: 'b' });
-		merged.border.visible = false;
-		expect(target).to.deep.equal({ range: { min: 1, max: 2 }, list: [{ id: 'a' }], border: { visible: false } });
-	});
-
-	void it('shares no object or array with the source', () => {
-		const source = { groups: [{ id: 'a', color: '#F23645' }], range: { min: 0, max: null as number | null } };
-		const merged = mergeOptions({ groups: [], range: { min: null, max: null } }, source);
-		source.groups[0].color = '#000000';
-		source.groups.push({ id: 'b', color: '#000000' });
-		source.range.max = 5;
-		expect(merged).to.deep.equal({ groups: [{ id: 'a', color: '#F23645' }], range: { min: 0, max: null } });
-	});
-
-	void it('keeps functions as they are', () => {
-		const formatter = (x: number): string => `${x}`;
-		expect(mergeOptions({ formatter: null as unknown }, { formatter }).formatter).to.equal(formatter);
-		expect(cloneOptions({ list: [formatter] }).list[0]).to.equal(formatter);
-	});
-
-	void it('skips __proto__, constructor and prototype keys, as JSON.parse makes them', () => {
-		const source = JSON.parse('{"__proto__": {"polluted": true}, "range": {"__proto__": {"x": 1}, "min": 2}, "constructor": 3}') as Record<string, unknown>;
-		const merged = mergeOptions({ range: { min: 0, max: 1 } }, source) as Record<string, unknown> & { range: Record<string, unknown> };
-		expect(Object.getPrototypeOf(merged)).to.equal(Object.prototype);
-		expect(Object.getPrototypeOf(merged.range)).to.equal(Object.prototype);
-		expect(merged.polluted).to.equal(undefined);
-		expect(Object.prototype.hasOwnProperty.call(merged, 'constructor')).to.equal(false);
-		expect(merged.range).to.deep.equal({ min: 2, max: 1 });
-		const cloned = cloneOptions(source) as Record<string, unknown>;
-		expect(Object.getPrototypeOf(cloned)).to.equal(Object.prototype);
-		expect(({} as Record<string, unknown>).polluted).to.equal(undefined);
-	});
-
-	void it('still merges nested objects and replaces arrays', () => {
-		const merged = mergeOptions(
-			{ border: { visible: false, color: 'grey' }, palette: ['a', 'b'] },
-			{ border: { visible: true }, palette: ['c'] }
-		);
-		expect(merged).to.deep.equal({ border: { visible: true, color: 'grey' }, palette: ['c'] });
-	});
-});
 
 void describe('option defaults', () => {
 	void it('cannot be changed through the options a series starts from', () => {

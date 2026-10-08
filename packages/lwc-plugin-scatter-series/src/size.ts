@@ -1,3 +1,6 @@
+import { isFiniteNumber } from '@tradingview/lwc-toolkit/numbers';
+
+import type { ScatterSizeMapping } from './data';
 import type { ScatterRange, ScatterSizeLimits, ScatterSizeRange, ScatterSizeScale } from './options';
 
 /** Least value of either end of `pointSizeLimits`, in CSS pixels. */
@@ -17,7 +20,7 @@ export const DEFAULT_POINT_SIZE_LIMITS: Readonly<ScatterSizeLimits> = Object.fre
  */
 export function normalizeSizeLimits(limits: Partial<ScatterSizeLimits> | null | undefined): ScatterSizeLimits {
 	const bound = (value: number | undefined, fallback: number): number =>
-		typeof value === 'number' && Number.isFinite(value)
+		isFiniteNumber(value)
 			? Math.min(POINT_SIZE_LIMITS_CEILING, Math.max(POINT_SIZE_LIMITS_FLOOR, value))
 			: fallback;
 	const a = bound(limits?.min, DEFAULT_POINT_SIZE_LIMITS.min);
@@ -74,8 +77,8 @@ export interface SizeDomain {
  * finite value.
  */
 export function resolveSizeDomain(values: Iterable<number>, explicit: ScatterRange): SizeDomain | null {
-	let min = explicit.min !== null && Number.isFinite(explicit.min) ? explicit.min : null;
-	let max = explicit.max !== null && Number.isFinite(explicit.max) ? explicit.max : null;
+	let min = isFiniteNumber(explicit.min) ? explicit.min : null;
+	let max = isFiniteNumber(explicit.max) ? explicit.max : null;
 	if (min === null || max === null) {
 		let low = Number.POSITIVE_INFINITY;
 		let high = Number.NEGATIVE_INFINITY;
@@ -134,4 +137,14 @@ export function mapSizeValue(value: number, scaling: SizeScaling): number {
 		? Math.sqrt(range.min * range.min + t * (range.max * range.max - range.min * range.min))
 		: range.min + t * (range.max - range.min);
 	return Math.min(range.max, Math.max(range.min, size));
+}
+
+/** The size mapping as a host's bubble-size legend sees it: a snapshot, with the function the points are sized with. */
+export function describeSizeMapping(scaling: SizeScaling): ScatterSizeMapping {
+	return {
+		domain: { ...scaling.domain },
+		range: { ...scaling.range },
+		scale: scaling.scale,
+		sizeFor: (value: number): number => (Number.isFinite(value) ? mapSizeValue(value, scaling) : Number.NaN),
+	};
 }

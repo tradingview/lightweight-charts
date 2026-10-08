@@ -1,5 +1,6 @@
 // With zooming switched back on, the user's zoom survives data refreshes on the
-// same X domain, option changes and resizes; a new X domain, or fitXDomain(),
+// same X domain, option changes, resizes and changes the chart refuses (rolled
+// back after the series gave the chart the new slots); a new X domain, or fitXDomain(),
 // fits the whole domain to the plot again. Zoomed into a part of the axis, the
 // price scale fits the points in view: the end slots, which always carry a
 // value, never drag it towards points out of view.
@@ -98,6 +99,27 @@ async function beforeInteractions(container) {
 		series.applyOptions({ opacity: 0.3, sizeRange: { min: 6, max: 20 }, strokeWidth: 2, xFormatter: x => `${x} u` });
 		await frames(3);
 		if (!same(timeScale.getVisibleLogicalRange(), zoomed)) { throw new Error(`An option change lost the zoom: ${JSON.stringify(timeScale.getVisibleLogicalRange())}`); }
+
+		// The chart refuses the new slots once (the underlying series throws):
+		// the change is rolled back, and the zoom stays.
+		const underlying = series.series();
+		const setSlots = underlying.setData;
+		let calls = 0;
+		underlying.setData = function (data) {
+			if (calls++ === 0) { throw new Error('refused'); }
+			return setSlots.call(this, data);
+		};
+		let refused = false;
+		try {
+			series.setData(points(1).map(point => ({ ...point, y: point.y * 2 })));
+		} catch (error) {
+			refused = /refused/.test(String(error));
+		} finally {
+			delete underlying.setData;
+		}
+		await frames(3);
+		if (!refused || series.data()[1].y !== points(1)[1].y) { throw new Error('The refused change was not rolled back'); }
+		if (!same(timeScale.getVisibleLogicalRange(), zoomed)) { throw new Error(`A refused change lost the zoom: ${JSON.stringify(timeScale.getVisibleLogicalRange())}`); }
 
 		container.style.width = '420px';
 		await frames(5);

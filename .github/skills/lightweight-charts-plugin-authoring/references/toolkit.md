@@ -27,6 +27,11 @@ Reach for it because the guards are exactly where a hand-written renderer
 throws when the whole dataset is scrolled off screen. It also re-exports the
 `CanvasRenderingTarget2D` type so the plugin need not depend on `fancy-canvas`.
 
+If the renderer also implements `hitTest` (called from 5.2), return the *same*
+`hitTestData` object for as long as the same item stays hovered: the chart
+compares it by reference and repaints the pane on every pointer move when it
+changes. Keep the last one, or return a primitive such as the item's index.
+
 Read: `stacked-bars-series/src/renderer.ts` (short), `hlc-area-series/src/renderer.ts`.
 
 ### `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `visibleSegments`, `whitespaceGapCheck`, `barCoordinate`, `getConflationFactor`, `GapCheck`, `AcceptedInput`
@@ -92,7 +97,10 @@ Read: `stacked-area-series/src/stacked-area-series.ts`, `stacked-bars-series/src
 `Path2D` builders in bitmap space: a polyline over a bar range with an
 accessor for `y`, its stepped variant, the closed area between two such
 lines (for bands and stacks), and a polyline whose colour changes along its
-length without a visible seam (adjacent runs share their boundary bar).
+length without a visible seam (adjacent runs share their boundary bar). A run
+of `strokeStyledPolyline` may carry a `dashPattern` (`getDashPattern(style,
+lineWidth)`), stroked with `butt` caps; runs without one keep the context's
+own dash and cap.
 
 Read: `hlc-area-series/src/renderer.ts`, `brushable-area-series/src/renderer.ts`.
 
@@ -157,12 +165,46 @@ Rounded rectangles in bitmap space, with per-corner radii, radius clamping
 to the rectangle's size, and an inset border that does not shrink the fill.
 Read: `pretty-histogram-series/src/renderer.ts`, `dual-range-histogram-series/src/renderer.ts`.
 
+### `canvas/markers` — `traceMarker`, `traceMarkerOffset`, `markerDistance`, `markerVertices`, `segmentDistance`, `MarkerShape`
+
+Point markers (`circle`, `square`, `diamond`, `triangleUp`, `triangleDown`):
+`traceMarker(path, shape, x, y, radius)` adds the outline to a context or
+`Path2D` as a subpath of its own, so many markers can share one path and one
+`fill()` (pass `emptyPath = true` right after `beginPath()` to keep a lone
+circle on Chromium's exact-oval drawing of a bare `arc`);
+`traceMarkerOffset(…, offset)` the outline `offset` outside it, with
+rounded corners, for a hover ring or halo of even width;
+`markerDistance(shape, dx, dy, radius, strokeWidth)` is the distance from a
+point to the marker as drawn, stroke and rounded corners included, `0` inside,
+for `hitTest`. All three read the same vertices, so a marker is hit where it is
+drawn. `segmentDistance` is the building block for hovering a polyline.
+Read: `scatter-series/src/renderer.ts`, `scatter-series/src/hit-test.ts`.
+
 ### `line-style` — `setLineStyle`, `getDashPattern`, `LineStyle`
 
 The chart's own dash patterns for a renderer that receives no drawing utils
-(custom series renderers before 5.1, primitives on some hosts). The toolkit's
-`LineStyle` enum has the library's values, so cast between them.
+(custom series renderers before 5.1, primitives on some hosts). The `LineStyle`
+type takes the library's enum as well, so an option passes without a cast.
+Stroke a dashed style with `ctx.lineCap = 'butt'`, as the chart does: a round
+cap closes the gaps of a dotted line (`strokeStyledPolyline` does it for a
+run given a `dashPattern`).
 Read: `vertical-line/src/vertical-line.ts`.
+
+## Chart behaviour
+
+Library rules a plugin otherwise copies from the library's source. Each
+module names the source it mirrors; the interaction flags are pinned to it by
+a unit test.
+
+| Module | Export | Use |
+| --- | --- | --- |
+| `chart/interaction-flags` | `canUserMoveTimeScale(chart.options())`, `TIME_SCALE_MOVE_FLAGS` | whether the user can scroll or zoom the time scale; with none of the flags on, the chart treats both edges as fixed |
+| `chart/lifecycle` | `isChartRemoved(chart)`, `isSeriesAttached(chart, series)` | for a plugin with its own API in front of a series: stop writing to a chart the host removed, or a series it took off with `chart.removeSeries`. Read-only; decide outside the chart's event dispatch what to release |
+| `chart/time-axis-labels` | `timeAxisLabelFont`, `tickMarkPixelsPerCharacter`, `tickMarkMaxLabelWidth`, `tickMarkCharactersForWidth` | the time axis' label font, and `timeScale.tickMarkMaxCharacterLength` to pixels and back |
+| `text/measure` | `textMeasureContext()`, `createTextWidthCache()` | measuring labels before painting (layout, overlap avoidance); `null` without a DOM |
+
+Read: `scatter-series/src/x-axis-controller.ts`, and `scatter-series-api.ts` for
+the lifecycle checks.
 
 ## General
 
@@ -173,4 +215,7 @@ Read: `vertical-line/src/vertical-line.ts`.
 | `time` | `convertTime`, `convertTimeUTC`, `displayTime`, `formattedDateAndTime` | `Time` (string, business day, timestamp) to a number or display string |
 | `closest-index` | `ClosestTimeIndexFinder` | cached binary search for the index at or after a time |
 | `min-max-in-range` | `UpperLowerInRange` | cached extremes over a range, for autoscale providers |
-| `simple-clone` | `cloneReadonly` | deep clone that drops readonly-ness, for option defaults |
+| `simple-clone` | `cloneReadonly` | deep clone that drops readonly-ness, through JSON (functions and `undefined` are lost) |
+| `options/merge` | `mergeOptions`, `cloneOptions`, `freezeOptions` | `applyOptions` with nested options: a partial nested option changes only its keys (a spread replaces the whole object); arrays and functions replace; unsafe keys are skipped; pass `defaults` to make `null` reset a value |
+| `numbers` | `isFiniteNumber`, `finiteOr`, `nonNegativeOr`, `clampOpacity` | numeric options from JavaScript: the canvas ignores a `NaN` width or opacity silently |
+| `scheduling/coalesced-task` | `createCoalescedTask(run, enqueue?)` | `{ schedule, cancel, pending }`: once per microtask (or frame) for a burst of events, never inside the chart's dispatch; `cancel()` on removal |

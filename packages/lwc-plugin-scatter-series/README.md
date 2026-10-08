@@ -208,11 +208,18 @@ so that none overlap, and formatted with `xFormatter`.
 The ends of the range sit on the plot edges, so a bubble there is cut in half;
 `xMargins` keeps room for it, in pixels. A fixed edge allows no such room, so
 while `xMargins` is above 0 the series frees the chart's fixed edges, and fixes
-them again when the margins return to 0 or the series is removed. For dates,
-pass timestamps and format them: the ticks are nice numbers of the unit, not
+them again when the margins return to 0 or the series is removed. An edge the
+host fixes meanwhile is kept fixed then; one it frees meanwhile cannot be told
+from the freed one, so free it again once the margins are 0. For dates, pass
+timestamps and format them: the ticks are nice numbers of the unit, not
 calendar boundaries, and next to large offsets such as epoch milliseconds the
 slots stay coarse enough to be distinct numbers. X values beyond ±1e300 cannot
-be laid out: those points are not drawn, and the series warns once.
+be laid out: those points are not drawn, and the series warns once; nor can a
+span below 1e-98, which is widened, with a warning. Data spanning only a few
+floating-point steps of its own magnitude, such as `[1e15, 1e15 + 1]`, gets
+an axis of very few slots, since finer ones would not be distinct numbers;
+the chart keeps neighbouring slots at most half the plot width apart (its
+default `timeScale.maxBarSpacing`), so such data spans about half the plot.
 
 ```js
 series.applyOptions({
@@ -481,8 +488,8 @@ price line and last-value label off: the underlying values are X axis slots.
   `baselines`, a group's `lineVisible`, or a
   [primitive](#draw-your-own-overlays).
 - Take the series off with `series.remove()`; one taken off with
-  `chart.removeSeries(series.series())` releases itself on the next chart
-  event or API call. After `chart.remove()` the API returns `null`.
+  `chart.removeSeries(series.series())` releases itself right after the next
+  chart event or API call. After `chart.remove()` the API returns `null`.
 - `series.series()` serves the price scale and Y conversions, not data or
   scatter options: its data is the slot grid of the X axis, and its own
   `options().hitTestTolerance` is `-Infinity`, which turns the chart's hit test

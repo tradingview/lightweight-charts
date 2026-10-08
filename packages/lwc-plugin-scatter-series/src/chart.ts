@@ -6,9 +6,9 @@ import {
 	LineStyle,
 	createChartEx,
 } from 'lightweight-charts';
+import { freezeOptions, mergeOptions } from '@tradingview/lwc-toolkit/options/merge';
 
 import { ScatterHorzScaleBehavior } from './horz-scale-behavior';
-import { freezeOptions, mergeOptions } from './merge';
 
 /** Options of a scatter chart: the chart options with numbers on the horizontal scale. */
 export type ScatterChartOptions = ChartOptionsImpl<number>;

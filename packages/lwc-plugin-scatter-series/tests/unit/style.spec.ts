@@ -11,6 +11,7 @@ import {
 	resolvePointStyle,
 	resolveSeriesStyle,
 	strokeColorOf,
+	withGroupVisibility,
 } from '../../src/style.js';
 import { type SizeScaling, cappedStrokeWidth } from '../../src/size.js';
 
@@ -254,5 +255,31 @@ void describe('describeGroup', () => {
 	void it('resolves the automatic ring colour and keeps the rest of the group', () => {
 		expect(described.map(group => group.strokeColor)).to.deep.equal(['#FFFFFF', '#FFFFFF', '#333333', '#111111', '#000000']);
 		expect(described[0]).to.include({ id: 'big', name: 'big', color: '#111111', pointSize: 20, hollow: false, visible: true, pointCount: 4 });
+	});
+});
+
+void describe('withGroupVisibility', () => {
+	const points: ScatterPoint[] = [{ x: 0, y: 0, group: 'a' }, { x: 1, y: 1, group: 'u1' }, { x: 2, y: 2, group: 'u2' }];
+	const declared = [{ id: 'a', color: '#AA0000' }];
+	const resolved = resolveGroups(declared, points, options);
+
+	void it('hides and shows a declared group, keeping its other fields', () => {
+		const hidden = withGroupVisibility(declared, resolved, 'a', false);
+		expect(hidden).to.deep.equal([{ id: 'a', color: '#AA0000', visible: false }]);
+		expect(withGroupVisibility(hidden ?? [], resolved, 'a', true)).to.deep.equal([{ id: 'a', color: '#AA0000', visible: true }]);
+	});
+
+	void it('changes nothing for a group already so, or unknown, or undeclared and shown', () => {
+		expect(withGroupVisibility(declared, resolved, 'a', true)).to.equal(null);
+		expect(withGroupVisibility(declared, resolved, 'nope', false)).to.equal(null);
+		expect(withGroupVisibility(declared, resolved, 'u2', true)).to.equal(null);
+	});
+
+	void it('declares an undeclared group being hidden, with the undeclared ones before it', () => {
+		const next = withGroupVisibility(declared, resolved, 'u2', false);
+		expect(next).to.deep.equal([{ id: 'a', color: '#AA0000' }, { id: 'u1' }, { id: 'u2', visible: false }]);
+		// The palette colours stay where they were.
+		const after = resolveGroups(next ?? [], points, options);
+		expect(after.map((group: { color: string }) => group.color)).to.deep.equal(resolved.map((group: { color: string }) => group.color));
 	});
 });

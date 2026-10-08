@@ -7,7 +7,10 @@
 //   `xMargins` (the ends of the domain are kept far enough in for their labels);
 // - zoomed deep into either end of the axis at a fixed edge, with long labels;
 // - in every frame of a resize of a wide chart, before the series lays the
-//   axis out for the new width (the chart rescales the spacing at once).
+//   axis out for the new width (the chart rescales the spacing at once);
+// - in every frame after `xMargins` goes back to 0 at fixed edges: the series
+//   fixes the edges again before it chooses the labels, so that no frame shows
+//   labels chosen for the freed edges.
 // Scrolling and zooming off, the fit is as before: the ends on the plot edges.
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
@@ -120,6 +123,30 @@ async function beforeInteractions(container) {
 		await frames(3);
 	}
 	const flicker = outside(wide, start);
-	CanvasRenderingContext2D.prototype.fillText = fillText;
 	if (flicker.length > 0) { throw new Error(`Resizing a wide chart: labels cut off for a frame: ${flicker.join(', ')}`); }
+
+	// xMargins back to 0 at the fixed edges of the scatter chart: every frame
+	// draws the labels of the fixed edges.
+	const marginsChart = LwcPlugin.createScatterChart(box(600, 250), movable);
+	const marginsSeries = LwcPlugin.createScatterSeries(marginsChart, { xMargins: 12, xFormatter: x => `${x.toFixed(1)} m` });
+	marginsSeries.setData(Array.from({ length: 21 }, (_, i) => ({ x: i * 5, y: Math.sin(i) })));
+	await frames(5);
+	drawn.length = 0;
+	const marginsStart = frame;
+	marginsSeries.applyOptions({ xMargins: 0 });
+	await frames(6);
+	CanvasRenderingContext2D.prototype.fillText = fillText;
+	const axis = Array.from(marginsChart.chartElement().querySelectorAll('tr:last-child canvas'));
+	const byFrame = new Map();
+	for (const item of drawn) {
+		if (item.frame >= marginsStart && axis.indexOf(item.canvas) !== -1) {
+			byFrame.set(item.frame, `${byFrame.get(item.frame) ?? ''} ${item.text}`);
+		}
+	}
+	const frameLabels = [...byFrame.values()];
+	if (frameLabels.length === 0 || frameLabels.some(text => text !== frameLabels[frameLabels.length - 1])) {
+		throw new Error(`xMargins back to 0: a frame drew other labels than the final ones: ${JSON.stringify(frameLabels)}`);
+	}
+	const marginsCut = outside(marginsChart, marginsStart);
+	if (marginsCut.length > 0) { throw new Error(`xMargins back to 0: labels cut off: ${marginsCut.join(', ')}`); }
 }

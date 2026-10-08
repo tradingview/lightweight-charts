@@ -6,8 +6,11 @@
 // the call throw with nothing changed: the series keeps its options, points
 // and axis, and works on. A series whose options throw when it is created
 // leaves the chart as it was — no series, no subscription, its own label
-// distance — and another can be created. X values too large for the axis
-// (beyond ±1e300) are not drawn, with one warning.
+// distance — and another can be created. Options of the underlying series
+// the chart refuses throw with nothing changed too, the scatter options given
+// with them included. X values too large for the axis (beyond ±1e300) are not
+// drawn, with one warning; X values spanning less than the axis can tell apart
+// (1e-98) widen it, with one warning, and are drawn.
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
 		const step = left => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
@@ -96,4 +99,25 @@ async function beforeInteractions(container) {
 	}
 	if (series.pointById('far') !== null || b() === null || domain() !== beforeDomain) { throw new Error(`X values beyond the axis: ${domain()}`); }
 	if (warnings.length !== 1 || !/beyond/.test(warnings[0])) { throw new Error(`Expected one warning about X values beyond the axis: ${JSON.stringify(warnings)}`); }
+
+	// A series option the chart refuses, given with a scatter option: neither is taken.
+	const opacity = series.options().opacity;
+	throws('applyOptions with a custom price format without a formatter', () => series.applyOptions({ opacity: 0.2, priceFormat: { type: 'custom' } }));
+	if (series.options().opacity !== opacity) { throw new Error(`A refused series option let the scatter options through: ${series.options().opacity}`); }
+	if (series.series().options().priceFormat.type !== 'price') { throw new Error(`A refused price format was kept: ${JSON.stringify(series.series().options().priceFormat)}`); }
+	await frames(3);
+	if (b() === null) { throw new Error('The series stopped drawing after a refused series option'); }
+
+	// X values too close together for the axis: the axis is widened, the points drawn.
+	warnings.length = 0;
+	console.warn = (...args) => warnings.push(args.join(' '));
+	try {
+		series.setData([{ id: 'tiny', x: 1e-300, y: 1 }, { id: 'tinier', x: 2e-300, y: 2 }]);
+		series.setData([{ id: 'tiny', x: 1e-300, y: 1 }, { id: 'tinier', x: 3e-300, y: 2 }]);
+		await frames(3);
+	} finally {
+		console.warn = warn;
+	}
+	if (series.pointById('tiny') === null || series.pointById('tinier') === null) { throw new Error('Points of a tiny X span are not drawn'); }
+	if (warnings.length !== 1 || !/1e-98/.test(warnings[0])) { throw new Error(`Expected one warning about a tiny X span: ${JSON.stringify(warnings)}`); }
 }

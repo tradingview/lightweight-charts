@@ -2,7 +2,10 @@
 // rather than series.remove(): the series lets go of the chart as soon as it
 // finds out — its subscriptions, its label distance, its hovered-point
 // subscribers told `null` once — and neither new data nor a resize gives the
-// chart its slots back. The next scatter series may be added, and works.
+// chart its slots back. It does so once the chart's own call is over, never
+// from within the chart's dispatch of the range change the removal fires (the
+// host's range handlers run first). The next scatter series may be added, and
+// works.
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
 		const step = left => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
@@ -19,14 +22,27 @@ async function beforeInteractions(container) {
 	const first = LwcPlugin.createScatterSeries(chart, { pointSize: 30, opacity: 1, color: '#F23645' });
 	first.setData([{ id: 'a', x: 0, y: 0 }, { id: 'b', x: 5, y: 5 }, { id: 'c', x: 10, y: 10 }]);
 	const firstNotes = [];
-	first.subscribeHoveredPointChange(info => { firstNotes.push(info === null ? null : info.objectId); });
+	const events = [];
+	first.subscribeHoveredPointChange(info => {
+		firstNotes.push(info === null ? null : info.objectId);
+		events.push(`hovered ${info === null ? null : info.objectId}`);
+	});
 	const firstNotified = () => JSON.stringify(firstNotes);
 	await frames(3);
 	first.setHoveredPoint('b');
 	await frames(3);
 	if (firstNotified() !== '["b"]') { throw new Error(`The first series did not notify: ${firstNotified()}`); }
 
+	const onRange = range => events.push(`host range ${range === null ? null : 'set'}`);
+	chart.timeScale().subscribeVisibleLogicalRangeChange(onRange);
+	events.length = 0;
 	chart.removeSeries(first.series());
+	events.push('removeSeries returned');
+	await Promise.resolve();
+	chart.timeScale().unsubscribeVisibleLogicalRangeChange(onRange);
+	if (JSON.stringify(events) !== JSON.stringify(['host range null', 'removeSeries returned', 'hovered null'])) {
+		throw new Error(`The series let go of the chart from within the chart's call: ${JSON.stringify(events)}`);
+	}
 	await frames(2);
 	// Taken off the chart, the series lets go of it: neither new data nor a
 	// resize gives the chart its slots back, and the label distance is the chart's.

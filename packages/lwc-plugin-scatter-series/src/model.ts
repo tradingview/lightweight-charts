@@ -1,7 +1,9 @@
 import type { WhitespaceData } from 'lightweight-charts';
+import { isFiniteNumber } from '@tradingview/lwc-toolkit/numbers';
 
+import { pinnedYRange } from './autoscale';
 import type { ScatterPoint, ScatterSlotData } from './data';
-import type { ScatterBaseline, ScatterRange, ScatterSeriesOptions, ScatterShape } from './options';
+import type { ScatterBaseline, ScatterRange, ScatterSeriesOptions, ScatterShape, ScatterSizeLimits } from './options';
 import { SizeScaling, normalizeSizeRange, resolveSizeDomain } from './size';
 import { ResolvedScatterGroup, resolveGroups, resolvePointStyle, resolveSeriesStyle } from './style';
 import { SlotGrid, XDomain, buildSlotGrid, computeXDomain, isDrawableX, slotIndexOf, slotValue } from './x-axis';
@@ -77,10 +79,8 @@ export interface ScatterModel<TPoint extends ScatterPoint = ScatterPoint> {
 	yBaselines: readonly ScatterBaseline[];
 	/** Whether a point has a finite X too large for the axis (beyond `MAX_X_MAGNITUDE`), and is not drawn. */
 	xOutOfRange: boolean;
-}
-
-function isFiniteNumber(value: unknown): value is number {
-	return typeof value === 'number' && Number.isFinite(value);
+	/** Whether the X span was too narrow for the axis (below about 1e-98), and the domain was widened. */
+	xWidened: boolean;
 }
 
 /**
@@ -102,48 +102,13 @@ export function buildScatterModel<TPoint extends ScatterPoint>(
 		return index !== undefined ? groups[index] : null;
 	};
 
-	// Sizes compare across every group, hidden ones included, so that showing
-	// or hiding a group leaves the sizes of the others as they are.
-	const sizeValues: number[] = [];
-	for (const point of points) {
-		if (isFiniteNumber(point.sizeValue) && !isFiniteNumber(point.size)) {
-			sizeValues.push(point.sizeValue);
-		}
-	}
-	const sizeDomain = sizeValues.length > 0 ? resolveSizeDomain(sizeValues, options.sizeDomain) : null;
-	const sizeScaling: SizeScaling | null = sizeDomain === null
-		? null
-		: { domain: sizeDomain, range: normalizeSizeRange(options.sizeRange, series.limits), scale: options.sizeScale };
-
-	// The X domain covers every point, hidden groups included, so that a legend
-	// switching groups never moves the X axis, and the vertical baselines.
-	let dataMin: number | null = null;
-	let dataMax: number | null = null;
-	let allYMin = Number.POSITIVE_INFINITY;
-	let allYMax = Number.NEGATIVE_INFINITY;
-	const extend = (x: number): void => {
-		dataMin = dataMin === null ? x : Math.min(dataMin, x);
-		dataMax = dataMax === null ? x : Math.max(dataMax, x);
-	};
-	let xOutOfRange = false;
-	for (const point of points) {
-		if (isDrawableX(point.x) && isFiniteNumber(point.y)) {
-			extend(point.x);
-			allYMin = Math.min(allYMin, point.y);
-			allYMax = Math.max(allYMax, point.y);
-		} else if (isFiniteNumber(point.x)) {
-			xOutOfRange = xOutOfRange || isFiniteNumber(point.y);
-		}
-	}
-	for (const baseline of options.baselines) {
-		if (baseline.axis === 'x' && isDrawableX(baseline.value)) {
-			extend(baseline.value);
-		}
-	}
-	const domain = computeXDomain(dataMin, dataMax, options.xRange);
+	const sizeScaling = sizeScalingOf(points, options, series.limits);
+	const extent = dataExtent(points, options.baselines);
+	const domain = computeXDomain(extent.xMin, extent.xMax, options.xRange);
 	const grid = buildSlotGrid(domain);
-	const domainMin = slotValue(grid, 0);
-	const domainMax = slotValue(grid, grid.count - 1);
+	// The grid, and the data an automatic end was rounded from (a rounding beyond it at most).
+	const domainMin = Math.min(slotValue(grid, 0), domain.holds.min);
+	const domainMax = Math.max(slotValue(grid, grid.count - 1), domain.holds.max);
 
 	const resolved: ResolvedScatterPoint[] = new Array<ResolvedScatterPoint>(points.length);
 	const idToIndex = new Map<string, number>();
@@ -207,11 +172,113 @@ export function buildScatterModel<TPoint extends ScatterPoint>(
 		(baseline: ScatterBaseline) => baseline.axis === 'y' && isFiniteNumber(baseline.value)
 	);
 	const hasVisiblePoints = visibleYMin !== Number.POSITIVE_INFINITY;
-	const fallback = edgeExtent(allYMin, allYMax, options.yRange, yBaselines);
-	// An empty end slot takes the lowest Y of the nearest slot holding points.
-	// Whenever an end slot and any point are in view, that nearest slot is in
-	// view too — the visible range is contiguous — so the value changes no
-	// autoscale, even with the chart zoomed into part of the axis.
+	const fallback = edgeExtent(extent.yMin, extent.yMax, options.yRange, yBaselines);
+	const slots = slotItems(grid, yMin, yMax, fallback);
+
+	return {
+		points,
+		resolved,
+		groups,
+		// Points of no group first, then each group in order, each in data order.
+		drawOrder: ungrouped.concat(...byGroup),
+		groupMembers,
+		idToIndex,
+		duplicateIds,
+		groupPointCounts,
+		domain,
+		grid,
+		slots,
+		maxSize,
+		sizeScaling,
+		hasVisiblePoints,
+		yBaselines,
+		xOutOfRange: extent.xOutOfRange,
+		xWidened: domain.widened === true,
+	};
+}
+
+/**
+ * How `sizeValue` is mapped to sizes, or `null` when no point is sized by its
+ * `sizeValue`. Sizes compare across every group, hidden ones included, so that
+ * showing or hiding a group leaves the sizes of the others as they are.
+ */
+function sizeScalingOf(
+	points: readonly ScatterPoint[],
+	options: Pick<ScatterSeriesOptions, 'sizeDomain' | 'sizeRange' | 'sizeScale'>,
+	limits: ScatterSizeLimits
+): SizeScaling | null {
+	const sizeValues: number[] = [];
+	for (const point of points) {
+		if (isFiniteNumber(point.sizeValue) && !isFiniteNumber(point.size)) {
+			sizeValues.push(point.sizeValue);
+		}
+	}
+	const sizeDomain = sizeValues.length > 0 ? resolveSizeDomain(sizeValues, options.sizeDomain) : null;
+	return sizeDomain === null
+		? null
+		: { domain: sizeDomain, range: normalizeSizeRange(options.sizeRange, limits), scale: options.sizeScale };
+}
+
+/** The extent of the data: what {@link dataExtent} finds. */
+interface DataExtent {
+	/** Least X of the points and the vertical baselines, `null` without any. */
+	xMin: number | null;
+	/** Greatest X of the points and the vertical baselines, `null` without any. */
+	xMax: number | null;
+	/** Least Y of the points, `+Infinity` without any. */
+	yMin: number;
+	/** Greatest Y of the points, `-Infinity` without any. */
+	yMax: number;
+	/** Whether a point has a finite X too large for the axis. */
+	xOutOfRange: boolean;
+}
+
+/**
+ * The extent of every point that can be laid out, hidden groups included — so
+ * that a legend switching groups never moves the X axis — and of the vertical
+ * baselines.
+ */
+function dataExtent(points: readonly ScatterPoint[], baselines: readonly ScatterBaseline[]): DataExtent {
+	let xMin: number | null = null;
+	let xMax: number | null = null;
+	let yMin = Number.POSITIVE_INFINITY;
+	let yMax = Number.NEGATIVE_INFINITY;
+	let xOutOfRange = false;
+	const extend = (x: number): void => {
+		xMin = xMin === null ? x : Math.min(xMin, x);
+		xMax = xMax === null ? x : Math.max(xMax, x);
+	};
+	for (const point of points) {
+		if (isDrawableX(point.x) && isFiniteNumber(point.y)) {
+			extend(point.x);
+			yMin = Math.min(yMin, point.y);
+			yMax = Math.max(yMax, point.y);
+		} else if (isFiniteNumber(point.x)) {
+			xOutOfRange = xOutOfRange || isFiniteNumber(point.y);
+		}
+	}
+	for (const baseline of baselines) {
+		if (baseline.axis === 'x' && isDrawableX(baseline.value)) {
+			extend(baseline.value);
+		}
+	}
+	return { xMin, xMax, yMin, yMax, xOutOfRange };
+}
+
+/**
+ * The data of the underlying series: one item per slot, with the extent of
+ * its points, or whitespace. An empty end slot takes the lowest Y of the
+ * nearest slot holding points: whenever an end slot and any point are in
+ * view, that slot is in view too (the visible range is contiguous), so the
+ * value changes no autoscale, even zoomed into part of the axis. Without any,
+ * it takes `fallback`.
+ */
+function slotItems(
+	grid: SlotGrid,
+	yMin: readonly number[],
+	yMax: readonly number[],
+	fallback: { min: number; max: number }
+): ScatterSlotItem[] {
 	let leftmost = -1;
 	let rightmost = -1;
 	for (let slot = 0; slot < grid.count; slot++) {
@@ -234,26 +301,7 @@ export function buildScatterModel<TPoint extends ScatterPoint>(
 			slots[slot] = { time };
 		}
 	}
-
-	return {
-		points,
-		resolved,
-		groups,
-		// Points of no group first, then each group in order, each in data order.
-		drawOrder: ungrouped.concat(...byGroup),
-		groupMembers,
-		idToIndex,
-		duplicateIds,
-		groupPointCounts,
-		domain,
-		grid,
-		slots,
-		maxSize,
-		sizeScaling,
-		hasVisiblePoints,
-		yBaselines,
-		xOutOfRange,
-	};
+	return slots;
 }
 
 /**
@@ -278,12 +326,10 @@ function edgeExtent(
 	if (allYMin <= allYMax) {
 		return { min: allYMin, max: allYMax };
 	}
-	const pinnedMin = isFiniteNumber(yRange.min) ? yRange.min : null;
-	const pinnedMax = isFiniteNumber(yRange.max) ? yRange.max : null;
-	if (pinnedMin !== null || pinnedMax !== null) {
-		const min = pinnedMin ?? (pinnedMax as number);
-		const max = pinnedMax ?? min;
-		return { min: Math.min(min, max), max: Math.max(min, max) };
+	const pinned = pinnedYRange(yRange);
+	if (pinned.min !== null || pinned.max !== null) {
+		const min = pinned.min ?? (pinned.max as number);
+		return { min, max: pinned.max ?? min };
 	}
 	if (yBaselines.length > 0) {
 		const values = yBaselines.map((baseline: ScatterBaseline) => baseline.value);

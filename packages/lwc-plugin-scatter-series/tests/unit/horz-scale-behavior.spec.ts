@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
-import type { InternalHorzScaleItem, Mutable, TickMark, TickMarkWeightValue, TimeScalePoint } from 'lightweight-charts';
+import type { ChartOptionsImpl, InternalHorzScaleItem, Mutable, TickMark, TickMarkWeightValue, TimeScalePoint } from 'lightweight-charts';
 
 import {
 	ScatterHorzScaleBehavior,
@@ -82,7 +82,7 @@ void describe('ScatterHorzScaleBehavior', () => {
 		const owner = (): ScatterXAxisOwner & { released: number } => ({
 			released: 0,
 			attached: () => true,
-			release(): void { this.released++; },
+			remove(): void { this.released++; },
 		});
 		const first = owner();
 		const second = owner();
@@ -105,16 +105,31 @@ void describe('ScatterHorzScaleBehavior', () => {
 		let released = 0;
 		const detached: ScatterXAxisOwner = {
 			attached: () => false,
-			release: () => {
+			remove: () => {
 				released++;
 				releaseScatterXAxis(behavior, detached);
 			},
 		};
 		claimScatterXAxis(behavior, detached);
-		const next: ScatterXAxisOwner = { attached: () => true, release: () => undefined };
+		const next: ScatterXAxisOwner = { attached: () => true, remove: () => undefined };
 		claimScatterXAxis(behavior, next);
 		expect(released).to.equal(1);
 		expect(() => claimScatterXAxis(behavior, detached)).to.throw(/already has a scatter series/);
+	});
+
+	void it('works behind a Proxy, as a host may pass it to the chart', () => {
+		const behavior = new Proxy(new ScatterHorzScaleBehavior(), {});
+		const options = {} as unknown as ChartOptionsImpl<number>;
+		behavior.setOptions(options);
+		expect(behavior.options()).to.equal(options);
+		expect(isScatterHorzScaleBehavior(behavior)).to.equal(true);
+		const grid = buildSlotGrid(computeXDomain(0, 10, { min: null, max: null }));
+		const levels = tickLevels(grid, niceStep(5));
+		setScatterXAxis(behavior, { grid, levels, ends: false, formatter: (x: number) => `x${x}` });
+		const points = timePoints([0, 5, 2.5]);
+		behavior.fillWeightsForPoints(points, 0);
+		expect(points.map(point => point.timeWeight)).to.deep.equal([0, 5, 2.5].map(x => tickWeight(grid, levels, x)));
+		expect(behavior.formatHorzItem(5 as unknown as InternalHorzScaleItem)).to.equal('x5');
 	});
 
 	void it('publishes nothing but the horizontal scale behaviour', () => {

@@ -4,6 +4,11 @@
 // with the labels of the fit, a zoomed axis could fall to a single one —
 // never overlapping, and evenly spaced; back to the whole domain, the labels
 // of the fit return. Measured as the chart draws them.
+//
+// Scrolled so that the second label sits just past the fixed left edge, the
+// chart may move it back inside (it does so to any overflowing label within
+// round(distance / spacing) slots of the first one): the label distance is
+// kept short of that, so that it never lands on the third label.
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
 		const step = left => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
@@ -61,6 +66,48 @@ async function beforeInteractions(container) {
 		if (labels.length < 2) { throw new Error(`${stage}: ${labels.length} label(s) in view: ${labels.map(l => l.text).join(' ')}`); }
 		return labels.map(label => label.text).join(' ');
 	};
+
+	// The second label just past the fixed left edge, at a tight label step.
+	const edgeElement = document.createElement('div');
+	edgeElement.style.cssText = 'position: absolute; left: 0; top: 320px; width: 600px; height: 200px;';
+	document.body.appendChild(edgeElement);
+	const edgeChart = LwcPlugin.createScatterChart(edgeElement, { handleScroll: true, handleScale: true, layout: { attributionLogo: false } });
+	const edgeSeries = LwcPlugin.createScatterSeries(edgeChart, { xFormatter: x => `${x.toFixed(1)} units` });
+	edgeSeries.setData(Array.from({ length: 21 }, (_, i) => ({ x: i * 5, y: Math.sin(i) })));
+	await frames(3);
+	const edgeScale = edgeChart.timeScale();
+	const edgeFirst = edgeScale.timeToIndex(0, false);
+	for (const slot of [4, 5, 6]) {
+		for (const into of [0.05, 0.2, 0.35, 0.48]) {
+			const from = edgeFirst + slot - 0.5 + into;
+			edgeScale.setVisibleLogicalRange({ from, to: from + 40 });
+			await frames(3);
+			drawn.length = 0;
+			edgeChart.applyOptions({});
+			await frames(2);
+			const axis = Array.from(edgeChart.chartElement().querySelectorAll('tr:last-child canvas'));
+			// The labels of the last paint (two paints may come in two frames).
+			const seen = new Set();
+			const boxes = drawn
+				.filter(item => axis.indexOf(item.canvas) !== -1)
+				.filter(item => {
+					const key = `${item.text}@${item.x}`;
+					const fresh = !seen.has(key);
+					seen.add(key);
+					return fresh;
+				})
+				.map(item => ({ text: item.text, left: item.x - item.width / 2, right: item.x + item.width / 2 }))
+				.sort((a, b) => a.left - b.left);
+			for (let i = 1; i < boxes.length; i++) {
+				if (boxes[i].left < boxes[i - 1].right) {
+					throw new Error(`Scrolled to ${from.toFixed(2)}: "${boxes[i - 1].text}" (${boxes[i - 1].left.toFixed(1)}…${boxes[i - 1].right.toFixed(1)}) ` +
+						`and "${boxes[i].text}" (${boxes[i].left.toFixed(1)}…${boxes[i].right.toFixed(1)}) overlap`);
+				}
+			}
+		}
+	}
+	edgeChart.remove();
+	edgeElement.remove();
 
 	const fitted = await labelsInView('fitted');
 	window.initialInteractionsToPerform = () => [

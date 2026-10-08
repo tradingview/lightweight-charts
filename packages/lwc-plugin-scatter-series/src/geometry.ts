@@ -74,54 +74,58 @@ function fill(arrays: GeometryArrays, model: ScatterModel, mapping: XMapping, yT
 	}
 }
 
-/**
- * Pane coordinates of every visible point of `model`, in CSS pixels, ready for
- * {@link hitTestScatter}. Hidden points and points whose Y has no coordinate
- * get `NaN`.
- */
-export function computeGeometry(model: ScatterModel, mapping: XMapping, yToCoordinate: YToCoordinate): ScatterHitGeometry {
-	const arrays = allocate(model);
-	fill(arrays, model, mapping, yToCoordinate);
-	return { ...arrays, order: model.drawOrder };
-}
-
 /*
- Two prices whose coordinates pin down the price scale: its mapping is linear
- in the price, or in its logarithm, so two positive prices determine it.
+ Prices whose coordinates pin down the price scale: its mapping is linear in
+ the price, or in `log10(|price| + offset)` (the library's logarithmic
+ formula), so three positive prices determine it.
  */
-const PROBE_LOW = 1;
-const PROBE_HIGH = 2;
+const PROBES: readonly number[] = [1, 2, 1000];
 
 /**
- * {@link computeGeometry} for the pointer: the arrays are allocated once per
- * model and filled again only when the scales moved, so hit testing on every
- * pointer move neither allocates nor recomputes the coordinates of thousands
- * of points.
+ * Pane coordinates of every visible point of a model, in CSS pixels, for
+ * drawing and for {@link hitTestScatter}; hidden points and points whose Y
+ * has no coordinate get `NaN`. The arrays are allocated once per model and
+ * filled again only when the scales moved, so neither a repaint over unmoved
+ * scales (a hover change) nor a hit test on every pointer move recomputes the
+ * coordinates of thousands of points.
  */
 export class ScatterGeometryCache {
-	private _model: ScatterModel | null = null;
-	private _arrays: GeometryArrays | null = null;
-	private _geometry: ScatterHitGeometry | null = null;
-	private _key: number[] = [];
+	#model: ScatterModel | null = null;
+	#arrays: GeometryArrays | null = null;
+	#geometry: ScatterHitGeometry | null = null;
+	// The scales the arrays were filled for: the X mapping, then the coordinates of the probes.
+	readonly #scales: Float64Array = new Float64Array(3 + PROBES.length);
+	readonly #next: Float64Array = new Float64Array(3 + PROBES.length);
+	#fills: number = 0;
 
 	public geometry(model: ScatterModel, mapping: XMapping, yToCoordinate: YToCoordinate): ScatterHitGeometry {
-		if (model !== this._model || this._arrays === null) {
-			this._model = model;
-			this._arrays = allocate(model);
-			this._geometry = null;
+		if (model !== this.#model || this.#arrays === null) {
+			this.#model = model;
+			this.#arrays = allocate(model);
+			this.#geometry = null;
 		}
-		const key = [
-			mapping.start,
-			mapping.origin,
-			mapping.pxPerUnit,
-			yToCoordinate(PROBE_LOW) ?? Number.NaN,
-			yToCoordinate(PROBE_HIGH) ?? Number.NaN,
-		];
-		if (this._geometry === null || key.some((value: number, i: number) => !Object.is(value, this._key[i]))) {
-			fill(this._arrays, model, mapping, yToCoordinate);
-			this._geometry = { ...this._arrays, order: model.drawOrder };
-			this._key = key;
+		const next = this.#next;
+		next[0] = mapping.start;
+		next[1] = mapping.origin;
+		next[2] = mapping.pxPerUnit;
+		for (let i = 0; i < PROBES.length; i++) {
+			next[3 + i] = yToCoordinate(PROBES[i]) ?? Number.NaN;
 		}
-		return this._geometry;
+		let moved = this.#geometry === null;
+		for (let i = 0; i < next.length && !moved; i++) {
+			moved = !Object.is(next[i], this.#scales[i]);
+		}
+		if (moved) {
+			fill(this.#arrays, model, mapping, yToCoordinate);
+			this.#geometry = { ...this.#arrays, order: model.drawOrder };
+			this.#scales.set(next);
+			this.#fills++;
+		}
+		return this.#geometry as ScatterHitGeometry;
+	}
+
+	/** How many times the coordinates were computed: it changes whenever the model or the scales do. */
+	public fills(): number {
+		return this.#fills;
 	}
 }

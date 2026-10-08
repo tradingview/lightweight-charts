@@ -82,8 +82,9 @@ primitive: it draws in a primitive and reacts through `subscribeClick`,
 
 Keep hover and interaction in mind when choosing: primitives get a `hitTest`
 so the chart can report them in crosshair and click events; custom series get
-`hitTest`, `isHovered` and `hitTestData` on their renderer, but only on
-Lightweight Charts™ 5.1 and later.
+a `hitTest` on their renderer only on Lightweight Charts™ 5.2 and later, which
+is what makes the `isHovered` and `hitTestData` arguments of `draw` report a
+hover.
 
 ## Working method
 
@@ -218,7 +219,8 @@ every page, `docs_map.md` the same with headings, and
    contract for your type: `attached` / `detached`, `updateAllViews`,
    `paneViews`, `priceAxisViews`, `timeAxisViews`, `hitTest`.
 3. `custom_series` — `ICustomSeriesPaneView`: `priceValueBuilder`,
-   `isWhitespace`, `renderer`, `update`, `defaultOptions`, and the 5.1 hooks.
+   `isWhitespace`, `renderer`, `update`, `defaultOptions`, the 5.1 conflation
+   hooks and the 5.2 `hitTest`.
 4. `canvas-rendering-target` — the `CanvasRenderingTarget2D` you draw on and
    its two coordinate spaces.
 5. `pixel-perfect-rendering` — why widths and positions go through the
@@ -283,9 +285,14 @@ be recognised in a new shape, not just avoided in the old one.
   `getConflationFactor(data)` as its `minGap` so a whitespace run narrower
   than one conflation bucket is absorbed rather than splitting every bucket
   into a single-point segment.
-- `hitTest`, `isHovered` / `hitTestData`, `conflationReducer` and
-  `conflationFactor` exist from 5.1. Implement them as optional extras, keep
-  the peer range at `^5.0.0` unless you need them, and say so in the README.
+- `conflationReducer` and `conflationFactor` exist from 5.1, and the
+  renderer's `hitTest` from 5.2: series hit testing, which reports a custom
+  series hovered through `isHovered` / `hitTestData` (`draw` arguments since
+  5.0), arrived with it. Implement them as optional extras, keep the peer
+  range at `^5.0.0` unless you need them, and say so in the README.
+- `hitTest` must return the same `hitTestData` object while the same item
+  stays hovered: the chart compares it by reference and repaints the pane on
+  every pointer move when it is a new object.
 - `conflationReducer(a, b)` must return a data item of your own type that
   makes sense as the merge of two: sum for stacks, high/low/last for OHLC,
   the later value for a rate.

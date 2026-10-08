@@ -1,10 +1,27 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import { ScatterGeometryCache, computeGeometry } from '../../src/geometry.js';
-import { ScatterHitGeometry, hitTestScatter, shapeDistance } from '../../src/hit-test.js';
-import { buildScatterModel } from '../../src/model.js';
+import { ScatterGeometryCache, XMapping, YToCoordinate } from '../../src/geometry.js';
+import { ScatterHit, ScatterHitGeometry, hitTestScatter as hitTestWith } from '../../src/hit-test.js';
+import { ScatterModel, buildScatterModel } from '../../src/model.js';
 import { ScatterShape, defaultOptions } from '../../src/options.js';
+
+/** {@link hitTestWith} with the series' default tolerance and no hover growth unless given. */
+function hitTestScatter(
+	points: ScatterHitGeometry,
+	x: number,
+	y: number,
+	hoveredIndex: number | null,
+	tolerance: number = defaultOptions.hitTestTolerance,
+	hoveredSizeIncrease: number = 0
+): ScatterHit | null {
+	return hitTestWith(points, x, y, hoveredIndex, tolerance, hoveredSizeIncrease);
+}
+
+/** The geometry of every visible point of `model`, as drawn. */
+function computeGeometry(model: ScatterModel, mapping: XMapping, yToCoordinate: YToCoordinate): ScatterHitGeometry {
+	return new ScatterGeometryCache().geometry(model, mapping, yToCoordinate);
+}
 
 interface TestPoint {
 	x: number;
@@ -14,10 +31,12 @@ interface TestPoint {
 	stroke?: number;
 }
 
+/** The geometry of `points`, drawn in `order`: a point not drawn has no coordinates (`NaN`). */
 function geometry(points: TestPoint[], order: number[] = points.map((_: TestPoint, index: number) => index)): ScatterHitGeometry {
+	const drawn = (index: number, value: number): number => (order.includes(index) ? value : Number.NaN);
 	return {
-		xs: points.map((point: TestPoint) => point.x),
-		ys: points.map((point: TestPoint) => point.y),
+		xs: points.map((point: TestPoint, index: number) => drawn(index, point.x)),
+		ys: points.map((point: TestPoint, index: number) => drawn(index, point.y)),
 		radii: points.map((point: TestPoint) => point.r),
 		shapes: points.map((point: TestPoint) => point.shape ?? 'circle'),
 		strokeWidths: points.map((point: TestPoint) => point.stroke ?? 0),
@@ -104,49 +123,6 @@ void describe('hitTestScatter', () => {
 	});
 });
 
-void describe('shapeDistance', () => {
-	void it('is zero inside and the gap to the outline outside', () => {
-		expect(shapeDistance('circle', 3, 4, 5)).to.equal(0);
-		expect(shapeDistance('circle', 6, 8, 5)).to.equal(5);
-		expect(shapeDistance('square', 7, 0, 5)).to.equal(2);
-		expect(shapeDistance('diamond', 3, 2, 5)).to.equal(0);
-	});
-
-	void it('measures to the corner of a square, not to its sides', () => {
-		expect(shapeDistance('square', 5, 5, 5)).to.equal(0);
-		expect(shapeDistance('square', 8, 9, 5)).to.equal(5);
-	});
-
-	void it('measures to the vertex of a diamond beyond its tip', () => {
-		expect(shapeDistance('diamond', 0, 8, 5)).to.be.closeTo(3, 1e-9);
-		expect(shapeDistance('diamond', 3, 3, 5)).to.be.closeTo(1 / Math.SQRT2, 1e-9);
-	});
-
-	void it('follows the triangles as drawn: corners at the full radius, a tip at the top or the bottom', () => {
-		// Triangle up: tip (0, −r), base corners (±r, r).
-		expect(shapeDistance('triangleUp', 9.5, 9.5, 10)).to.equal(0);
-		expect(shapeDistance('triangleUp', 0, -9.5, 10)).to.equal(0);
-		expect(shapeDistance('triangleUp', 0, 11, 10)).to.be.closeTo(1, 1e-9);
-		// Beside the tip, outside the triangle although inside its circle.
-		expect(shapeDistance('triangleUp', 7, -7, 10)).to.be.greaterThan(4);
-		// Beyond a base corner: the distance to the corner, which the circle of radius r missed.
-		expect(shapeDistance('triangleUp', 13, 14, 10)).to.be.closeTo(5, 1e-9);
-		// Triangle down mirrors it.
-		expect(shapeDistance('triangleDown', 9.5, -9.5, 10)).to.equal(0);
-		expect(shapeDistance('triangleDown', 0, 9.5, 10)).to.equal(0);
-		expect(shapeDistance('triangleDown', 7, 7, 10)).to.be.greaterThan(4);
-	});
-
-	void it('reaches half the stroke beyond the traced outline', () => {
-		// A 20 px circle with a 2 px stroke is traced at radius 9 and stroked to 10.
-		expect(shapeDistance('circle', 10, 0, 10, 2)).to.equal(0);
-		expect(shapeDistance('circle', 12, 0, 10, 2)).to.be.closeTo(2, 1e-9);
-		// The corner of a stroked triangle is rounded: just beyond it, outside.
-		expect(shapeDistance('triangleUp', 9.9, 9.9, 10, 2)).to.be.greaterThan(0);
-		expect(shapeDistance('triangleUp', 9, 9, 10, 2)).to.equal(0);
-	});
-});
-
 void describe('hitTestScatter on shapes', () => {
 	void it('hits the corners of a triangle and misses beside its tip', () => {
 		const triangle = [{ x: 50, y: 50, r: 10, shape: 'triangleUp' as const }];
@@ -174,7 +150,7 @@ void describe('computeGeometry', () => {
 		expect(Number.isNaN(geometry.xs[1])).to.equal(true);
 		expect(Number.isNaN(geometry.ys[2])).to.equal(true);
 		expect(geometry.radii[0]).to.equal(4.5);
-		expect(Array.from(geometry.strokeWidths ?? [])).to.deep.equal([1, 1, 1]);
+		expect(Array.from(geometry.strokeWidths)).to.deep.equal([1, 1, 1]);
 	});
 
 	void it('takes the shape, size and stroke of every point as resolved', () => {
@@ -187,7 +163,7 @@ void describe('computeGeometry', () => {
 		expect(shaped.shapes).to.deep.equal(['diamond', 'triangleDown', 'triangleDown']);
 		expect(Array.from(shaped.radii)).to.deep.equal([10, 4.5, 4.5]);
 		// A hollow point's outline is at least 1 px.
-		expect(Array.from(shaped.strokeWidths ?? [])).to.deep.equal([3, 1, 0]);
+		expect(Array.from(shaped.strokeWidths)).to.deep.equal([3, 1, 0]);
 		// Just above the diamond's right corner: inside its circle, outside the diamond.
 		expect(hitTestScatter(shaped, 17, 3, null, 0)).to.equal(null);
 		expect(hitTestScatter(shaped, 18, 10, null, 0)?.index).to.equal(0);
@@ -215,8 +191,8 @@ void describe('ScatterGeometryCache', () => {
 		const callsAfterFirst = calls;
 		const again = cache.geometry(model, mapping, y(1));
 		expect(again).to.equal(first);
-		// Two probes per call, no point converted again.
-		expect(calls - callsAfterFirst).to.equal(2);
+		// Three probes per call, no point converted again.
+		expect(calls - callsAfterFirst).to.equal(3);
 		expect(Array.from(first.ys)).to.deep.equal([10, 20]);
 		const rescaled = cache.geometry(model, mapping, y(2));
 		expect(Array.from(rescaled.ys)).to.deep.equal([20, 40]);
@@ -224,6 +200,21 @@ void describe('ScatterGeometryCache', () => {
 		expect(Array.from(moved.xs)).to.deep.equal([15, 35]);
 		// The arrays are reused, not allocated again.
 		expect(moved.xs).to.equal(first.xs);
+	});
+
+	void it('notices a logarithmic scale whose offset changed, though 1 and 2 stay where they were', () => {
+		const cache = new ScatterGeometryCache();
+		// a·log10(p + c) + b through the same coordinates at 1 and 2, with another offset c.
+		const log = (c: number) => (price: number): number => {
+			const a = 100 / (Math.log10(2 + c) - Math.log10(1 + c));
+			return 300 - (a * (Math.log10(price + c) - Math.log10(1 + c)));
+		};
+		const before = log(0);
+		const after = (price: number): number => (price === 1 || price === 2 ? before(price) : log(0.01)(price));
+		const first = Array.from(cache.geometry(model, mapping, before).ys);
+		const second = Array.from(cache.geometry(model, mapping, after).ys);
+		expect(second).to.not.deep.equal(first);
+		expect(second).to.deep.equal([after(10), after(20)]);
 	});
 
 	void it('starts over for a new model', () => {

@@ -28,10 +28,11 @@ const demo: Record<string, DemoEntry> = {};
 
 const app = document.getElementById('app') as HTMLElement;
 
-// The scatter defaults switch the library's scrolling and zooming off. The
-// toolbar switches both back on for every chart, to try dragging the plot and
-// the axes, wheel and pinch zoom, the way a host that enables them would.
-let interactive = false;
+// The scatter defaults switch the library's scrolling and zooming off. The demo
+// switches both back on for every chart, to try dragging the plot and the
+// axes, wheel and pinch zoom, the way a host that enables them would; the
+// toolbar switches them off again.
+let interactive = true;
 // The scatter chart default. With scrolling on, the library keeps the end labels
 // of the X axis inside the plot only at a fixed edge; fixed edges also stop
 // panning past the X range. Unticking shows the chart without them.
@@ -57,6 +58,7 @@ function toolbar(): void {
 	const label = document.createElement('label');
 	const checkbox = document.createElement('input');
 	checkbox.type = 'checkbox';
+	checkbox.checked = interactive;
 	checkbox.addEventListener('change', () => {
 		interactive = checkbox.checked;
 		for (const entry of Object.values(demo)) {

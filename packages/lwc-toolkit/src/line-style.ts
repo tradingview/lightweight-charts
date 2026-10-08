@@ -1,3 +1,5 @@
+import type { LineStyle as ChartLineStyle } from 'lightweight-charts';
+
 /**
  * The line styles the chart itself draws, by their numeric values. The values
  * match `LineStyle` in `lightweight-charts`, so an option typed with the
@@ -16,8 +18,17 @@ export const LineStyle = {
 	SparseDotted: 4,
 } as const;
 
-/** One of the {@link LineStyle} values. */
-export type LineStyle = (typeof LineStyle)[keyof typeof LineStyle];
+/**
+ * One of the {@link LineStyle} values, or the library's own `LineStyle`
+ * enum, which has the same values: an option typed with either is passed to
+ * {@link setLineStyle} and {@link getDashPattern} without a cast.
+ *
+ * Stroke a dashed style with `ctx.lineCap = 'butt'`, as the chart's own lines
+ * are: a `round` or `square` cap lengthens every dash by the line width, which
+ * closes the gaps of `Dotted` altogether. `strokeStyledPolyline` in
+ * `custom-series/line-paths` does so for a run given a `dashPattern`.
+ */
+export type LineStyle = (typeof LineStyle)[keyof typeof LineStyle] | ChartLineStyle;
 
 /**
  * The dash pattern the chart uses for a line style, as multiples of

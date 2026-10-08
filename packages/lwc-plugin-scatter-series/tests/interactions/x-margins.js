@@ -3,7 +3,8 @@
 // the plot edges, through resizes, back on the edges with 0, and never more
 // than a quarter of the plot. The series frees the chart's fixed edges while
 // margins are in use — again when the host fixes one meanwhile, whose setting
-// then comes back with the margins at 0.
+// then comes back with the margins at 0 or on remove(), even when that comes
+// before the series has seen the host's change.
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
 		const step = left => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
@@ -91,6 +92,26 @@ async function beforeInteractions(container) {
 	if (freeEdges() !== 'true/false') { throw new Error(`Without margins the host's left edge should be fixed: ${freeEdges()}`); }
 	freeSeries.remove();
 	freeChart.remove();
+
+	// The host fixes an edge and, in the same task, the margins go to 0 or the
+	// series goes: the host's latest setting comes back, not the one kept.
+	for (const how of ['margins to 0', 'remove()']) {
+		const hostChart = LwcPlugin.createScatterChart(otherContainer, { layout: { attributionLogo: false }, timeScale: { fixLeftEdge: false, fixRightEdge: true } });
+		const hostSeries = LwcPlugin.createScatterSeries(hostChart, { xMargins: 12 });
+		hostSeries.setData([{ x: 0, y: 0 }, { x: 10, y: 1 }]);
+		await frames(3);
+		hostChart.applyOptions({ timeScale: { fixLeftEdge: true } });
+		if (how === 'remove()') {
+			hostSeries.remove();
+		} else {
+			hostSeries.applyOptions({ xMargins: 0 });
+		}
+		await frames(2);
+		const hostEdges = `${hostChart.options().timeScale.fixLeftEdge}/${hostChart.options().timeScale.fixRightEdge}`;
+		if (hostEdges !== 'true/true') { throw new Error(`${how}: the edge the host has just fixed should stay fixed: ${hostEdges}`); }
+		hostSeries.remove();
+		hostChart.remove();
+	}
 	otherContainer.remove();
 
 	series.applyOptions({ xMargins: 1000 });

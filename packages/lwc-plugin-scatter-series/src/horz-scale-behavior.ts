@@ -59,8 +59,8 @@ export function setScatterXAxis(behavior: ScatterHorzScaleBehavior, state: Scatt
 export interface ScatterXAxisOwner {
 	/** Whether its underlying series is still on the chart. */
 	attached(): boolean;
-	/** Releases everything it holds, as its `remove()` does. */
-	release(): void;
+	/** Releases everything it holds. */
+	remove(): void;
 }
 
 const owners = new WeakMap<ScatterHorzScaleBehavior, ScatterXAxisOwner>();
@@ -75,12 +75,9 @@ export function claimScatterXAxis(behavior: ScatterHorzScaleBehavior, owner: Sca
 	const current = owners.get(behavior);
 	if (current !== undefined && current !== owner) {
 		if (current.attached()) {
-			throw new Error(
-				'This chart already has a scatter series. A chart takes one scatter series, which holds every group: ' +
-				'add the points to it, or remove it first with its remove().'
-			);
+			throw new Error('This chart already has a scatter series: add the points to it, or remove() it first.');
 		}
-		current.release();
+		current.remove();
 	}
 	owners.set(behavior, owner);
 }
@@ -114,6 +111,7 @@ export function formatScatterX(state: Readonly<ScatterXAxisState>, x: number): s
  * scatter chart defaults do).
  */
 export class ScatterHorzScaleBehavior implements IHorzScaleBehavior<number> {
+	// Not `#private`: the chart calls the behaviour it was given, which a host may have wrapped in a Proxy.
 	private _options!: ChartOptionsImpl<number>;
 
 	public options(): ChartOptionsImpl<number> {
