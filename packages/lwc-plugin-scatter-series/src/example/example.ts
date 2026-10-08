@@ -2,10 +2,9 @@ import { DeepPartial, IChartApiBase, LineStyle } from 'lightweight-charts';
 
 import { ScatterChartOptions, createScatterChart } from '../chart';
 import type { ScatterGroupInfo, ScatterPoint, ScatterPointInfo } from '../data';
-import type { ScatterGroup, ScatterSeriesPartialOptions, ScatterShape } from '../options';
+import { type ScatterGroup, type ScatterSeriesPartialOptions, type ScatterShape, defaultOptions } from '../options';
 import { ScatterSeriesApi } from '../scatter-series-api';
 import { createScatterSeries } from '../scatter-series';
-import { SCATTER_MAX_POINT_SIZE, SCATTER_MIN_POINT_SIZE } from '../size';
 import { RegionShading } from './region-shading';
 import {
 	Bond,
@@ -249,14 +248,15 @@ function sizeInput(label: string, value: number, onChange: (value: number) => vo
 	const wrapper = document.createElement('label');
 	const input = document.createElement('input');
 	input.type = 'number';
-	input.min = String(SCATTER_MIN_POINT_SIZE);
-	input.max = String(SCATTER_MAX_POINT_SIZE);
+	const limits = defaultOptions.pointSizeLimits;
+	input.min = String(limits.min);
+	input.max = String(limits.max);
 	input.step = '1';
 	input.value = String(value);
 	const clamped = (): number | null => {
 		const raw = input.valueAsNumber;
 		return Number.isFinite(raw)
-			? Math.min(SCATTER_MAX_POINT_SIZE, Math.max(SCATTER_MIN_POINT_SIZE, Math.round(raw)))
+			? Math.min(limits.max, Math.max(limits.min, Math.round(raw)))
 			: null;
 	};
 	let current = value;

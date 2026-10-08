@@ -5,8 +5,6 @@ import {
 	createScatterSeries,
 	DEFAULT_SCATTER_PALETTE,
 	defaultOptions,
-	SCATTER_MAX_POINT_SIZE,
-	SCATTER_MIN_POINT_SIZE,
 	scatterChartDefaults,
 	ScatterHorzScaleBehavior,
 	type ScatterGroup,
@@ -22,6 +20,7 @@ import {
 	type ScatterUnderlyingSeries,
 	type ScatterXDomain,
 } from '@tradingview/lwc-plugin-scatter-series';
+import * as scatterPlugin from '@tradingview/lwc-plugin-scatter-series';
 import {
 	createScatterChart as createChartStandalone,
 	createScatterSeries as createSeriesStandalone,
@@ -181,15 +180,18 @@ interface ReadmeBond extends ScatterPoint {
 	title: string;
 }
 const readme = createScatterSeries<ReadmeBond>(chart, {
-	groups: [{ id: 'aaa', name: 'AAA-AA', color: '#089981' }],
-	sizeRange: { min: 5, max: 30 },
-	sizeScale: 'area',
+	groups: [
+		{ id: 'aaa', name: 'AAA-AA', color: '#089981' },
+		{ id: 'hy', name: 'High yield', color: '#FF9800' },
+	],
 	xRange: { min: 0, max: 30 },
-	yRange: { min: 0, max: 12 },
 	xFormatter: (x: number) => `${x}Y`,
 	priceFormat: { type: 'custom', minMove: 0.01, formatter: (y: number) => `${y.toFixed(2)}%` },
 });
-readme.setData([{ id: 'PEMX1', x: 4.5, y: 3.2, group: 'aaa', sizeValue: 120, title: 'PEMX1' }]);
+readme.setData([
+	{ id: 'PEMX1', x: 4.5, y: 3.2, group: 'aaa', sizeValue: 120, title: 'PEMX1' },
+	{ id: 'PEMX3', x: 21.7, y: 9.4, group: 'hy', sizeValue: 75, title: 'PEMX3' },
+]);
 readme.subscribeHoveredPointChange((info: ScatterPointInfo<ReadmeBond> | null) => {
 	const title: string | undefined = info?.point.title;
 });
@@ -209,12 +211,13 @@ createScatterSeries(custom).remove();
 custom.horzBehaviour().setScatterXAxis;
 // @ts-expect-error So is its formatting helper.
 new ScatterHorzScaleBehavior().formatX(1);
-expectTrue<Equal<typeof SCATTER_MIN_POINT_SIZE, 5>>();
-expectTrue<Equal<typeof SCATTER_MAX_POINT_SIZE, 50>>();
 const palette: readonly string[] = DEFAULT_SCATTER_PALETTE;
 const defaults: ScatterSeriesOptions = defaultOptions;
 
-// Size limits: the defaults are the exported constants; every end is a number.
+// Size limits: the defaults are in defaultOptions, the one source of them; every end is a number.
+const defaultLimits: ScatterSizeLimits = defaultOptions.pointSizeLimits;
+// @ts-expect-error No size constants of their own beside defaultOptions.pointSizeLimits.
+scatterPlugin.SCATTER_MIN_POINT_SIZE;
 expectTrue<Equal<ScatterSeriesOptions['pointSizeLimits'], ScatterSizeLimits>>();
 expectTrue<Equal<ScatterSizeLimits, { min: number; max: number }>>();
 series.applyOptions({ pointSizeLimits: { min: 2, max: 3 } });

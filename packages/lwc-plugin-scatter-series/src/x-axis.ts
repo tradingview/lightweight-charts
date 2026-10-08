@@ -22,8 +22,11 @@ import type { ScatterRange } from './options';
  The chain is therefore built around the label step of the width at hand
  (`chooseXLabels`): the finest step of the form {1, 2, 5} × 10ⁿ whose labels,
  measured in the chart's font, fit side by side with a gap between them — the
- chart moves a label overflowing an end of the axis back inside, and the
- measure accounts for it. Above that step the chain goes through 2 (S, 2S,
+ chart moves a label overflowing an end of the axis back inside at a fixed
+ edge (on a movable axis, only while the labels are twice the slot spacing
+ apart), and the measure accounts for it. At a free edge of a movable axis it
+ centres the label on its slot: the series then keeps the end of the domain
+ far enough in (`endLabelRoom`). Above that step the chain goes through 2 (S, 2S,
  10S …, coarser labels for a narrower chart), below it through 5 (finer ones
  for a chart the user zooms into). The minimum distance handed to the chart is
  chosen so that it stops exactly at the label step. Zero is the heaviest slot
@@ -38,7 +41,9 @@ import type { ScatterRange } from './options';
  Slot keys. A slot's X value is its index in the grid times the slot step,
  rounded to the decimals of the step, so a value is always the same number no
  matter how it was reached (0.1 * 3 is not 0.3). Weights are decided on the
- integer index, never on the float.
+ integer index, never on the float. Next to a large offset (epoch
+ milliseconds) the slot step is kept coarse enough for the index to stay
+ exact; X values beyond ±1e300 are not laid out at all.
  */
 
 /** The number of tick intervals the automatic domain aims at. */
@@ -50,6 +55,26 @@ export const ZERO_TICK_WEIGHT = 1000;
 /** Slot counts above this are refused; the grid is coarsened instead. */
 export const MAX_SLOT_COUNT = 2000;
 
+/**
+ * The largest magnitude of an X value the axis lays out. Beyond it the slot
+ * arithmetic would overflow: points further out are not drawn, and an end of
+ * `xRange` further out is brought back to it.
+ */
+export const MAX_X_MAGNITUDE = 1e300;
+
+/** Whether an X value can be laid out on the axis: a finite number within {@link MAX_X_MAGNITUDE}. */
+export function isDrawableX(x: number): boolean {
+	return Number.isFinite(x) && Math.abs(x) <= MAX_X_MAGNITUDE;
+}
+
+/**
+ * The finest slot step, relative to the magnitude of the X values: a slot
+ * index is then below 2⁴⁴, so that every slot value is a distinct number and
+ * its index is found back from it exactly, whatever the offset of the domain
+ * (an axis of epoch milliseconds, say).
+ */
+const SLOT_PRECISION = 2 ** -44;
+
 /** A step of the form mantissa × 10^exponent. */
 export interface NiceStep {
 	/** 1, 2 or 5. */
@@ -58,11 +83,24 @@ export interface NiceStep {
 	exponent: number;
 }
 
+/** The largest power of ten that is a number exactly. */
+const EXACT_POWER_OF_TEN = 22;
+
+/**
+ * `multiple × 10^exponent`, the double nearest to the decimal: so that 0.1 is
+ * 1 / 10, not 1 × 0.1, and a power of ten beyond 10²² is read as a decimal
+ * rather than computed (`10 ** 298` is not `1e298`).
+ */
+function decimal(multiple: number, exponent: number): number {
+	if (exponent > EXACT_POWER_OF_TEN || exponent < -EXACT_POWER_OF_TEN) {
+		return Number(`${multiple}e${exponent}`);
+	}
+	return exponent >= 0 ? multiple * 10 ** exponent : multiple / 10 ** -exponent;
+}
+
 /** The value of a {@link NiceStep}, computed so that 0.1 is 1 / 10, not 1 × 0.1. */
 export function stepValue(step: NiceStep): number {
-	return step.exponent >= 0
-		? step.mantissa * 10 ** step.exponent
-		: step.mantissa / 10 ** -step.exponent;
+	return decimal(step.mantissa, step.exponent);
 }
 
 /** Whether `a` is smaller than `b`, compared exactly on mantissa and exponent. */
@@ -142,15 +180,17 @@ function padding(value: number): number {
 	return value === 0 ? 1 : Math.abs(value) * 0.1;
 }
 
+/** A given end of a range: `null` when it is not a finite number, else within {@link MAX_X_MAGNITUDE}. */
 function finiteOrNull(value: number | null): number | null {
-	return value !== null && Number.isFinite(value) ? value : null;
+	return value !== null && Number.isFinite(value) ? Math.min(MAX_X_MAGNITUDE, Math.max(-MAX_X_MAGNITUDE, value)) : null;
 }
 
 /**
  * The X domain for data spanning `dataMin`…`dataMax` (both `null` when there
- * is no data) and the user's `range`. An open end of `range` is rounded
- * outwards from the data to a multiple of a nice tick step; a given end is
- * used as it is (the slot grid snaps it to its own step later).
+ * is no data; both within {@link MAX_X_MAGNITUDE}) and the user's `range`. An
+ * open end of `range` is rounded outwards from the data to a multiple of a
+ * nice tick step; a given end is used as it is (the slot grid snaps it to its
+ * own step later).
  */
 export function computeXDomain(
 	dataMin: number | null,
@@ -194,7 +234,8 @@ export function computeXDomain(
 		lo = 0;
 		hi = 10;
 	}
-	const tickStep = niceStep((hi - lo) / TARGET_TICK_INTERVALS);
+	// In halves, so that the span of the widest domain does not overflow.
+	const tickStep = niceStep((hi / 2 - lo / 2) / (TARGET_TICK_INTERVALS / 2));
 	const tick = stepValue(tickStep);
 	const decimals = stepDecimals(tickStep);
 	return {
@@ -232,40 +273,49 @@ export interface SlotGrid {
 /**
  * The slots covering `domain`: multiples of the slot step from the one at or
  * below `domain.min` to the one at or above `domain.max`.
+ *
+ * The tick step, and with it the slot step, is made coarser while the grid
+ * would take more than {@link MAX_SLOT_COUNT} slots, or while the slot step
+ * is too fine for the magnitude of the values ({@link SLOT_PRECISION}): next
+ * to a large offset, a step below the precision of the numbers would give
+ * slots the same X value.
  */
 export function buildSlotGrid(domain: XDomain): SlotGrid {
 	let tickStep = domain.tickStep;
 	let step = slotStepFor(tickStep);
+	const finest = Math.max(Math.abs(domain.min), Math.abs(domain.max)) * SLOT_PRECISION;
 	let first = 0;
-	let count = 0;
-	for (;;) {
+	let count = 2;
+	for (let attempt = 0; attempt < 2000; attempt++) {
 		const value = stepValue(step);
+		if (!Number.isFinite(value)) {
+			// Unreachable within MAX_X_MAGNITUDE: a grid of two slots at least.
+			break;
+		}
 		first = Math.floor(domain.min / value + 1e-9);
 		const last = Math.ceil(domain.max / value - 1e-9);
 		count = Math.max(2, last - first + 1);
-		if (count <= MAX_SLOT_COUNT || !Number.isFinite(count)) {
+		if (count <= MAX_SLOT_COUNT && value > finest) {
 			break;
 		}
-		// Only an explicit range far wider than its tick step gets here.
 		tickStep = nextStep(tickStep);
 		step = slotStepFor(tickStep);
 	}
-	return {
-		step,
-		first,
-		count,
-		decimals: stepDecimals(step),
-		tickStep,
-	};
+	const grid = { step, first, count, decimals: stepDecimals(step), tickStep };
+	// The ends of the domain inside the grid, whatever the rounding of the division.
+	while (slotValue(grid, 0) > domain.min && grid.count < MAX_SLOT_COUNT + 2) {
+		grid.first--;
+		grid.count++;
+	}
+	while (slotValue(grid, grid.count - 1) < domain.max && grid.count < MAX_SLOT_COUNT + 2) {
+		grid.count++;
+	}
+	return grid;
 }
 
 /** The X value of slot `index` (`0` is the first slot). */
 export function slotValue(grid: SlotGrid, index: number): number {
-	const slot = grid.first + index;
-	const value = grid.step.exponent >= 0
-		? slot * grid.step.mantissa * 10 ** grid.step.exponent
-		: (slot * grid.step.mantissa) / 10 ** -grid.step.exponent;
-	return roundTo(value, grid.decimals);
+	return roundTo(decimal((grid.first + index) * grid.step.mantissa, grid.step.exponent), grid.decimals);
 }
 
 /**
@@ -298,15 +348,16 @@ export function stepRatio(grid: SlotGrid, step: NiceStep): number {
 export function labelStepCandidates(grid: SlotGrid, finest: NiceStep = grid.tickStep): NiceStep[] {
 	const steps: NiceStep[] = [];
 	const span = Math.max(1, grid.count - 1);
-	for (let step: NiceStep = isSmaller(finest, grid.step) ? grid.step : finest; ; step = nextStep(step)) {
+	for (let step: NiceStep = isSmaller(finest, grid.step) ? grid.step : finest; Number.isFinite(stepValue(step)); step = nextStep(step)) {
 		const ratio = stepRatio(grid, step);
 		if (ratio > 0) {
 			steps.push(step);
 		}
 		if (stepValue(step) / stepValue(grid.step) >= span) {
-			return steps;
+			break;
 		}
 	}
+	return steps;
 }
 
 /** One step of the label chain. */
@@ -325,7 +376,8 @@ export interface TickLevel {
 export function tickLevels(grid: SlotGrid, labelStep: NiceStep): TickLevel[] {
 	const levels: TickLevel[] = [];
 	const span = Math.max(1, grid.count - 1);
-	for (let step: NiceStep = grid.step; ; step = nextStep(step)) {
+	// Steps beyond the largest number end the chain too.
+	for (let step: NiceStep = grid.step; Number.isFinite(stepValue(step)); step = nextStep(step)) {
 		const ratio = stepRatio(grid, step);
 		const below = isSmaller(step, labelStep);
 		const above = isSmaller(labelStep, step);
@@ -334,9 +386,10 @@ export function tickLevels(grid: SlotGrid, labelStep: NiceStep): TickLevel[] {
 			levels.push({ ratio, weight: levels.length + 1 });
 		}
 		if (above && ratio >= 2 * span) {
-			return levels;
+			break;
 		}
 	}
+	return levels;
 }
 
 /** Where the slots of a grid are drawn, in CSS pixels. */
@@ -356,6 +409,19 @@ export interface XAxisGeometry {
 	 * the grid are never labelled on their own.
 	 */
 	zoomed?: boolean;
+	/**
+	 * At which ends of the axis the chart moves an overflowing end label of
+	 * the grid back inside: at a fixed edge (`fixLeftEdge` / `fixRightEdge`),
+	 * and at both while the user can move neither. At a free edge it centres
+	 * the label on its slot, cut off by the edge. Both by default.
+	 */
+	movedInside?: { left: boolean; right: boolean };
+	/**
+	 * Whether the user can scroll or zoom the axis. The chart then moves an end
+	 * label back inside only while the labels are at least twice the slot
+	 * spacing apart: the distance is kept that far whenever it has to.
+	 */
+	movable?: boolean;
 }
 
 /** How far apart X labels must be. */
@@ -391,6 +457,16 @@ const ENDS_DISTANCE = 0.75;
 /** Relative room kept between a label step's spacing and the distance it needs, against rounding. */
 const FIT_MARGIN = 1e-3;
 
+/**
+ * Relative room kept above twice the slot spacing, the least label distance
+ * at which the chart of a movable axis moves an end label back inside: wide
+ * enough for the frames of a resize the series has not laid the axis out for
+ * yet (the chart rescales the spacing at once).
+ */
+const ALIGN_MARGIN = 0.05;
+
+const BOTH_ENDS: { left: boolean; right: boolean } = { left: true, right: true };
+
 /** The labels of one step: how many there are and how far apart they must be. */
 interface LabelFit {
 	/** Number of labels within the axis. */
@@ -400,14 +476,28 @@ interface LabelFit {
 }
 
 /**
+ * The least label distance at which the chart moves an overflowing end label
+ * back inside the axis: the label must be within `round(distance / spacing)`
+ * slots of its end of the grid, `slotsFromEnd` away — and, on an axis the
+ * user can move, the distance at least twice the spacing.
+ */
+function alignmentDistance(slotsFromEnd: number, spacing: number, movable: boolean): number {
+	const window = slotsFromEnd * spacing;
+	return movable ? Math.max(window, 2 * spacing * (1 + ALIGN_MARGIN)) : window;
+}
+
+/**
  * How far apart the labels of a step `ratio` slots long must be so that none
  * comes closer than `gap` pixels to the next and their centres are at least
  * `minPitch` apart, or `null` when that is more than `limit`.
  *
  * A label is centred on its slot, except that the chart moves one which
- * overflows an end of the axis back inside it — on a zoomed axis, only the
- * first and the last label of the grid, the others being cut off at the edge.
- * A label out of view on a zoomed axis is not drawn, and does not count.
+ * overflows an end of the axis back inside it at an end where it does so
+ * ({@link XAxisGeometry.movedInside}) — on a zoomed axis, only the first and
+ * the last label of the grid, the others being cut off at the edge — provided
+ * the labels are far enough apart ({@link alignmentDistance}), which is then
+ * part of what they need. A label out of view on a zoomed axis is not drawn,
+ * and does not count, unless the chart moves it into view.
  */
 function fitLabels(
 	grid: SlotGrid,
@@ -417,29 +507,37 @@ function fitLabels(
 	{ gap, minPitch }: XLabelSpacing,
 	limit: number
 ): LabelFit | null {
-	const { spacing, origin, width, zoomed = false } = geometry;
+	const { spacing, origin, width, zoomed = false, movedInside = BOTH_ENDS, movable = false } = geometry;
 	const distance = ratio * spacing;
+	const last = grid.count - 1;
 	let required = 0;
 	let count = 0;
 	let previousRight = 0;
 	for (let slot = (((-grid.first) % ratio) + ratio) % ratio; slot < grid.count; slot += ratio) {
 		const centre = origin + slot * spacing;
-		if (zoomed && (centre < 0 || centre > width)) {
+		const atLeft = (!zoomed || slot < ratio) && movedInside.left;
+		const atRight = (!zoomed || slot > last - ratio) && movedInside.right;
+		// The chart draws the slots in view, and half a slot beyond.
+		if (zoomed && (centre < -spacing / 2 - 1 || centre > width + spacing / 2)) {
 			continue;
 		}
 		const labelSize = labelWidth(slot);
 		let left = centre - labelSize / 2;
-		const movedInside = !zoomed || slot < ratio || slot >= grid.count - ratio;
-		if (movedInside && left < 0) {
+		if (left < 0 && atLeft) {
 			left = 0;
-		} else if (movedInside && left + labelSize > width) {
+			required = Math.max(required, alignmentDistance(slot, spacing, movable));
+		} else if (left + labelSize > width && atRight) {
 			left = width - labelSize;
+			required = Math.max(required, alignmentDistance(last - slot, spacing, movable));
+		} else if (zoomed && (centre < 0 || centre > width)) {
+			// Out of view, and not moved into it.
+			continue;
 		}
 		if (count > 0) {
 			required = Math.max(required, minPitch, distance - (left - previousRight) + gap);
-			if (required > limit) {
-				return null;
-			}
+		}
+		if (required > limit) {
+			return null;
 		}
 		previousRight = left + labelSize;
 		count++;
@@ -454,17 +552,19 @@ function endsFit(
 	labelWidth: (slot: number) => number,
 	{ gap, minPitch }: XLabelSpacing
 ): boolean {
-	const { spacing, origin, width } = geometry;
+	const { spacing, origin, width, movedInside = BOTH_ENDS } = geometry;
 	const last = grid.count - 1;
 	if (last < 1 || last * spacing < minPitch) {
 		return false;
 	}
 	const firstSize = labelWidth(0);
 	const lastSize = labelWidth(last);
-	// Each end label is moved back inside the axis when it overflows it.
-	const firstRight = Math.max(0, origin - firstSize / 2) + firstSize;
-	const lastLeft = Math.min(origin + last * spacing - lastSize / 2, width - lastSize);
-	return lastLeft - firstRight >= gap;
+	// An end label is moved back inside the axis when it overflows it, at an
+	// end where the chart does so.
+	const firstLeft = origin - firstSize / 2;
+	const firstRight = (movedInside.left ? Math.max(0, firstLeft) : firstLeft) + firstSize;
+	const lastLeft = origin + last * spacing - lastSize / 2;
+	return (movedInside.right ? Math.min(lastLeft, width - lastSize) : lastLeft) - firstRight >= gap;
 }
 
 /**
@@ -514,7 +614,12 @@ export function chooseXLabels(
 	}
 	const levels = tickLevels(grid, step);
 	if (!zoomed && labelCount < 2 && endsFit(grid, geometry, labelWidth, spacing)) {
-		return { step, levels, minDistance: ENDS_DISTANCE * (grid.count - 1) * geometry.spacing, ends: true };
+		// Far enough apart for the chart to move both labels inside, too.
+		const minDistance = Math.max(
+			ENDS_DISTANCE * (grid.count - 1) * geometry.spacing,
+			Math.min(alignmentDistance(0, geometry.spacing, geometry.movable === true), (grid.count - 1) * geometry.spacing)
+		);
+		return { step, levels, minDistance, ends: true };
 	}
 	const ratio = stepRatio(grid, step);
 	let finer = 0;
@@ -533,6 +638,39 @@ export function chooseXLabels(
 }
 
 /**
+ * The room each end of a fitted axis needs for its outermost label, centred
+ * on its slot (as the chart draws it at a free edge): how far from the edge
+ * of the plot the end of the domain must be for the label to stay inside,
+ * with a pixel to spare. `0` for an end whose outermost label is far enough
+ * in already.
+ *
+ * @param grid - The slot grid.
+ * @param labels - The labels of the axis.
+ * @param spacing - Distance between neighbouring slots, CSS pixels.
+ * @param labelWidth - Width in CSS pixels of the label of a slot, by index in the grid.
+ */
+export function endLabelRoom(
+	grid: SlotGrid,
+	labels: Pick<XAxisLabels, 'step' | 'ends'>,
+	spacing: number,
+	labelWidth: (slot: number) => number
+): { left: number; right: number } {
+	const last = grid.count - 1;
+	const ratio = labels.ends ? last : stepRatio(grid, labels.step);
+	if (ratio < 1) {
+		return { left: 0, right: 0 };
+	}
+	// The labelled slots are the multiples of the step (both ends, with `ends`).
+	const first = labels.ends ? 0 : (((-grid.first) % ratio) + ratio) % ratio;
+	const final = labels.ends ? last : last - ((((grid.first + last) % ratio) + ratio) % ratio);
+	const room = (slot: number, slotsIn: number): number => Math.max(0, labelWidth(slot) / 2 + 1 - slotsIn * spacing);
+	return {
+		left: first <= last ? room(first, first) : 0,
+		right: final >= 0 ? room(final, last - final) : 0,
+	};
+}
+
+/**
  * The tick weight of the X value `x`: the weight of the largest step of
  * `levels` that `x` is a multiple of, {@link ZERO_TICK_WEIGHT} for zero, and
  * `0` for a value which is not on the grid at all. With `ends`, the two ends
@@ -541,7 +679,9 @@ export function chooseXLabels(
 export function tickWeight(grid: SlotGrid, levels: readonly TickLevel[], x: number, ends: boolean = false): number {
 	const ratio = x / stepValue(grid.step);
 	const slot = Math.round(ratio);
-	if (Math.abs(ratio - slot) > 1e-6) {
+	// Relative to the index for a domain far from zero, whose slot values carry
+	// the rounding of their magnitude (see SLOT_PRECISION).
+	if (Math.abs(ratio - slot) > Math.max(1e-6, Math.abs(ratio) * 2 ** -46)) {
 		return 0;
 	}
 	if (ends && (slot === grid.first || slot === grid.first + grid.count - 1)) {

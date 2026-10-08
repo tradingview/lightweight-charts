@@ -1,5 +1,5 @@
-// The README recipe "Draw your own overlays", as a page would write it: only
-// the import of the scatter series type differs (the package, in the README).
+// The README recipe "Draw your own overlays" as a class, with `setRegions` to
+// replace the regions in place; the README has the shorter function form.
 import type { IPrimitivePaneView, ISeriesPrimitive, SeriesAttachedParameter } from 'lightweight-charts';
 import type { ScatterSeriesApi } from '../scatter-series-api';
 

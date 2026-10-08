@@ -19,7 +19,6 @@ export type {
 	ScatterSizeScale,
 } from './options';
 export { DEFAULT_SCATTER_PALETTE, defaultOptions } from './options';
-export { SCATTER_MAX_POINT_SIZE, SCATTER_MIN_POINT_SIZE } from './size';
 export type {
 	ScatterHoveredPointHandler,
 	ScatterSeriesApi,

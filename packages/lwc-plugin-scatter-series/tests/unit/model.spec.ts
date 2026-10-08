@@ -30,6 +30,24 @@ function slotExtent(model: ScatterModel): [number, number] {
 	return [Math.min(...values), Math.max(...values)];
 }
 
+void describe('buildScatterModel: X values the axis cannot take', () => {
+	void it('neither draws points beyond the largest X magnitude nor lets them stretch the axis', () => {
+		const model = build([{ x: 1e308, y: 1 }, { x: -1e308, y: 2 }, { x: 5, y: 3 }, { x: 25, y: 4 }]);
+		expect(model.xOutOfRange).to.equal(true);
+		expect(sameGrid(model.grid, build([{ x: 5, y: 3 }, { x: 25, y: 4 }]).grid)).to.equal(true);
+		expect(model.resolved.map(point => point.visible)).to.deep.equal([false, false, true, true]);
+		expect(model.drawOrder).to.deep.equal([2, 3]);
+	});
+
+	void it('builds an axis, and no out-of-range flag, from nothing but such points', () => {
+		const model = build([{ x: 1e307, y: 1 }, { x: 9e307, y: 2 }]);
+		expect(model.xOutOfRange).to.equal(true);
+		expect(model.hasVisiblePoints).to.equal(false);
+		expect(Number.isFinite(model.grid.count)).to.equal(true);
+		expect(build([{ x: 1e20, y: 1 }]).xOutOfRange).to.equal(false);
+	});
+});
+
 void describe('buildScatterModel: slots', () => {
 	void it('has one slot item per grid slot, at the slot values', () => {
 		const model = build([{ x: 0.3, y: 1 }, { x: 89, y: 2 }]);

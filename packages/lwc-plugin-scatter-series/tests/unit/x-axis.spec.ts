@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 import type { ScatterRange } from '../../src/options.js';
 import {
 	MAX_SLOT_COUNT,
+	MAX_X_MAGNITUDE,
 	NiceStep,
 	SlotGrid,
 	TickLevel,
@@ -15,6 +16,7 @@ import {
 	computeXDomain,
 	fallbackTickWeight,
 	formatXValue,
+	isDrawableX,
 	labelStepCandidates,
 	niceStep,
 	sameLevels,
@@ -215,6 +217,71 @@ void describe('slot grid', () => {
 		const grid = buildSlotGrid({ min: 0, max: 1e6, tickStep: niceStep(1) });
 		expect(grid.count).to.be.at.most(MAX_SLOT_COUNT);
 		expect(slotValue(grid, grid.count - 1)).to.be.at.least(1e6);
+	});
+});
+
+void describe('large X magnitudes', () => {
+	/** A grid of `min`…`max`, checked as the chart needs it: strictly increasing slots, each found back and weighed. */
+	const checkedGrid = (min: number, max: number, range: ScatterRange = open): SlotGrid => {
+		const grid = buildSlotGrid(computeXDomain(min, max, range));
+		expect(Number.isFinite(grid.count)).to.equal(true);
+		expect(grid.count).to.be.within(2, MAX_SLOT_COUNT);
+		const levels = tickLevels(grid, grid.tickStep);
+		let previous = Number.NEGATIVE_INFINITY;
+		for (let slot = 0; slot < grid.count; slot++) {
+			const x = slotValue(grid, slot);
+			expect(x, `slot ${slot} of ${min}…${max}`).to.be.greaterThan(previous);
+			expect(slotIndexOf(grid, x)).to.equal(slot);
+			expect(tickWeight(grid, levels, x), `weight of slot ${slot} (${x})`).to.be.greaterThan(0);
+			previous = x;
+		}
+		// The data stays inside the grid.
+		expect(slotValue(grid, 0)).to.be.at.most(min);
+		expect(slotValue(grid, grid.count - 1)).to.be.at.least(max);
+		return grid;
+	};
+
+	void it('weighs every slot next to a large offset', () => {
+		checkedGrid(1e10 + 0.001, 1e10 + 0.009);
+		checkedGrid(1.7e12, 1.7e12 + 0.02);
+	});
+
+	void it('labels epoch milliseconds over hours and days at the usual steps', () => {
+		const hour = checkedGrid(1.7e12, 1.7e12 + 3.6e6);
+		expect(value(hour.tickStep)).to.equal(5e5);
+		const week = checkedGrid(1.7e12, 1.7e12 + 7 * 864e5);
+		expect(value(week.tickStep)).to.equal(1e8);
+	});
+
+	void it('coarsens a slot step below the precision of the values rather than repeat slot values', () => {
+		const tight = checkedGrid(1e15, 1e15 + 1);
+		expect(value(tight.step)).to.be.greaterThan(1e15 * 2 ** -44);
+		checkedGrid(1e17, 1e17 + 1000);
+		checkedGrid(-1e17 - 1000, -1e17);
+	});
+
+	void it('lays out the widest domain the axis takes without overflowing', () => {
+		const widest = checkedGrid(-MAX_X_MAGNITUDE, MAX_X_MAGNITUDE);
+		expect(slotValue(widest, 0)).to.equal(-MAX_X_MAGNITUDE);
+		expect(slotValue(widest, widest.count - 1)).to.equal(MAX_X_MAGNITUDE);
+		// A given range beyond it is brought back to it.
+		const clamped = computeXDomain(null, null, { min: -1e308, max: 1e308 });
+		expect([clamped.min, clamped.max]).to.deep.equal([-MAX_X_MAGNITUDE, MAX_X_MAGNITUDE]);
+	});
+
+	void it('ends the label chain at the largest number instead of looping', () => {
+		// A domain near the largest number: the chain of steps overflows.
+		const grid = buildSlotGrid(computeXDomain(1e307, 9e307, open));
+		const started = Date.now();
+		const levels = tickLevels(grid, grid.tickStep);
+		expect(Date.now() - started).to.be.below(1000);
+		expect(levels.length).to.be.greaterThan(0);
+		expect(labelStepCandidates(grid).length).to.be.greaterThan(0);
+	});
+
+	void it('takes only finite X values within the largest magnitude', () => {
+		expect([1e300, -1e300, 1.7e12, 0].every(isDrawableX)).to.equal(true);
+		expect([1e301, -1e308, Number.NaN, Number.POSITIVE_INFINITY].some(isDrawableX)).to.equal(false);
 	});
 });
 

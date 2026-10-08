@@ -5,8 +5,9 @@
 // timeToCoordinate puts the slots. Values off the pane get coordinates off the
 // pane; hiding the series or a group changes nothing; a value which is not a
 // finite number, a series taken off the chart, removed, or a removed chart
-// give null. The README's overlay recipe — a series primitive shading a region
-// with xToCoordinate and priceToCoordinate — paints where the points are, and
+// give null. The overlay recipe (the demo's RegionShading: the README's, as a
+// class with setRegions) — a series primitive shading a region with
+// xToCoordinate and priceToCoordinate — paints where the points are, and
 // follows new regions, a zoom, hiding the series and an inverted price scale.
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
@@ -137,7 +138,7 @@ async function beforeInteractions(container) {
 	await frames(3);
 	expectEnds('fitted again', 0);
 
-	// The README recipe, as plain JavaScript.
+	// The overlay recipe of the demo (src/example/region-shading.ts), as plain JavaScript.
 	class RegionShading {
 		constructor(scatter, regions) {
 			this._scatter = scatter;

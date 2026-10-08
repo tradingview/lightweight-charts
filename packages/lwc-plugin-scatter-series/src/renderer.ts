@@ -22,9 +22,12 @@ import { strokeColorOf } from './style';
 /** Default colour of a baseline which sets none. */
 const DEFAULT_BASELINE_COLOR = '#9598A1';
 
+/** `LineStyle.Solid`. */
+const SOLID = 0 as LineStyle;
+
 /** The options the renderer draws and hit tests with. */
 export interface ScatterRenderOptions {
-	/** Opacity of the hovered point. */
+	/** Opacity of the hovered point, `0`–`1`. */
 	hoveredOpacity: number;
 	/** Pixels added to the size of the hovered point, at least `0`. */
 	hoveredSizeIncrease: number;
@@ -212,7 +215,11 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 			ctx.lineTo(x2, y2);
 			ctx.stroke();
 		};
-		// Each edge sits inside the plot, so the whole width is visible.
+		// Each edge sits inside the plot, so the whole width is visible. The
+		// side edges stop at the top and bottom ones, so that a translucent
+		// colour does not darken the corners.
+		const top = border.top ? horizontal : 0;
+		const bottom = bitmapSize.height - (border.bottom ? horizontal : 0);
 		if (border.top) {
 			edge(horizontal, 0, horizontal / 2, bitmapSize.width, horizontal / 2);
 		}
@@ -220,10 +227,10 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 			edge(horizontal, 0, bitmapSize.height - horizontal / 2, bitmapSize.width, bitmapSize.height - horizontal / 2);
 		}
 		if (border.left) {
-			edge(vertical, vertical / 2, 0, vertical / 2, bitmapSize.height);
+			edge(vertical, vertical / 2, top, vertical / 2, bottom);
 		}
 		if (border.right) {
-			edge(vertical, bitmapSize.width - vertical / 2, 0, bitmapSize.width - vertical / 2, bitmapSize.height);
+			edge(vertical, bitmapSize.width - vertical / 2, top, bitmapSize.width - vertical / 2, bottom);
 		}
 		ctx.setLineDash([]);
 	}
@@ -242,6 +249,9 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 				continue;
 			}
 			const width = baseline.width !== undefined && baseline.width > 0 ? baseline.width : 1;
+			// At least one device pixel, as the plot border: a line rounded to no
+			// width would be drawn with the width of the line before it.
+			const bitmapWidth = (pixelRatio: number): number => Math.max(1, Math.round(width * pixelRatio));
 			ctx.strokeStyle = baseline.color ?? DEFAULT_BASELINE_COLOR;
 			ctx.beginPath();
 			if (baseline.axis === 'y') {
@@ -249,14 +259,14 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 				if (y === null) {
 					continue;
 				}
-				const line = positionsLine(y, verticalPixelRatio, width);
+				const line = positionsLine(y, verticalPixelRatio, bitmapWidth(verticalPixelRatio), true);
 				const centre = line.position + line.length / 2;
 				ctx.lineWidth = line.length;
 				ctx.moveTo(0, centre);
 				ctx.lineTo(bitmapSize.width, centre);
 			} else {
 				const x = xToCoordinate(mapping, baseline.value);
-				const line = positionsLine(x, horizontalPixelRatio, width);
+				const line = positionsLine(x, horizontalPixelRatio, bitmapWidth(horizontalPixelRatio), true);
 				const centre = line.position + line.length / 2;
 				ctx.lineWidth = line.length;
 				ctx.moveTo(centre, 0);
@@ -276,12 +286,15 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 	): void {
 		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = scope;
 		ctx.lineJoin = 'round';
-		ctx.lineCap = 'round';
 		ctx.globalAlpha = 1;
 		for (const group of model.groups) {
 			if (!group.visible || !group.lineVisible || !(group.lineWidth > 0)) {
 				continue;
 			}
+			// A cap lengthens every dash by the line width, which would close the
+			// gaps of a dotted line: dashed lines are drawn without, as the chart's
+			// own lines are; a solid one keeps its round ends.
+			ctx.lineCap = group.lineStyle === SOLID ? 'round' : 'butt';
 			ctx.lineWidth = group.lineWidth * horizontalPixelRatio;
 			setLineStyle(ctx, toolkitStyle(group.lineStyle));
 			ctx.strokeStyle = group.lineColor;
@@ -410,7 +423,7 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 		if (hoveredIndex !== null && model.resolved[hoveredIndex]?.visible === true) {
 			drawPoint(
 				hoveredIndex,
-				Math.min(1, Math.max(0, options.hoveredOpacity)),
+				options.hoveredOpacity,
 				options.hoveredSizeIncrease,
 				options.hoveredRingWidth > 0
 			);

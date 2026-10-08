@@ -6,6 +6,7 @@ import {
 } from 'lightweight-charts';
 
 import { cloneOptions, freezeOptions } from './merge';
+import { DEFAULT_POINT_SIZE_LIMITS } from './size';
 
 /**
  * The categorical palette groups without a colour of their own take their
@@ -95,7 +96,11 @@ export interface ScatterGroup {
 	strokeWidth?: number;
 	/** Draw the points as open markers: an outline, no fill. Defaults to the series `hollow`. */
 	hollow?: boolean;
-	/** Whether the group is drawn, hit tested and autoscaled. Defaults to `true`. */
+	/**
+	 * Whether the group is drawn, hit tested and autoscaled. Defaults to
+	 * `true`. A hidden group still counts for the automatic X range and size
+	 * domain, so hiding it neither moves the X axis nor resizes other points.
+	 */
 	visible?: boolean;
 	/** Connect the group's points with a line, in data order. Defaults to `false`. */
 	lineVisible?: boolean;
@@ -186,9 +191,19 @@ export interface ScatterSeriesOptions extends CustomSeriesOptions {
 	hollow: boolean;
 	/** Opacity of the hovered point, which is also drawn on top of the others. */
 	hoveredOpacity: number;
-	/** Pixels added to the size of the hovered point. `0` keeps it as it is. */
+	/**
+	 * Pixels added to the size of the hovered point. `0` keeps it as it is.
+	 * The grown point is hit tested at its grown size, and `pointById`,
+	 * `hoveredPoint` and the hovered-point subscription report its grown
+	 * `radius`.
+	 */
 	hoveredSizeIncrease: number;
-	/** Width of a ring drawn around the hovered point, in CSS pixels. `0` draws none. */
+	/**
+	 * Width of a ring drawn around the hovered point, in CSS pixels. `0` draws
+	 * none. The ring follows the marker's shape `hoveredRingGap` pixels outside
+	 * its reported `radius`, is not hovered itself, and the price scale keeps
+	 * room for it.
+	 */
 	hoveredRingWidth: number;
 	/** Colour of the ring around the hovered point. `null` takes the point colour. */
 	hoveredRingColor: string | null;
@@ -205,8 +220,12 @@ export interface ScatterSeriesOptions extends CustomSeriesOptions {
 	/** Sizes the `sizeValue` of a point is mapped to. Each end is clamped to `pointSizeLimits`. */
 	sizeRange: ScatterSizeRange;
 	/**
-	 * The `sizeValue`s mapped to the ends of `sizeRange`. An open end is taken
-	 * from the points of every visible group, so sizes compare across groups.
+	 * The `sizeValue`s mapped to the ends of `sizeRange`; values beyond the
+	 * domain take the size of its ends. An open end is taken
+	 * from the points of every group, hidden ones included, so sizes compare
+	 * across groups and stay as they are when a group is hidden. When every
+	 * value lies past the one given end, the domain is that end alone: the
+	 * values get the size of that end.
 	 */
 	sizeDomain: ScatterRange;
 	/** How `sizeValue` is turned into a size. */
@@ -215,16 +234,27 @@ export interface ScatterSeriesOptions extends CustomSeriesOptions {
 	 * The X axis range. An open end is rounded outwards from the data to a nice
 	 * tick. A given end is snapped outwards to the nearest slot of the axis grid
 	 * (a tenth or a twentieth of a tick), and points outside are not drawn.
+	 * Ends given in the wrong order are swapped, and an end beyond ±1e300 is
+	 * brought back to it.
 	 */
 	xRange: ScatterRange;
 	/**
 	 * Room between each end of the X domain and the edge of the plot, in CSS
 	 * pixels, so that the bubbles at the ends are not cut in half. `0` puts the
 	 * ends of the domain on the plot edges, as the design does. At most a
-	 * quarter of the plot width is used.
+	 * quarter of the plot width is used. Above `0` the series frees the chart's
+	 * fixed edges, which the margins need, and fixes them again when the
+	 * margins return to `0` or the series is removed. While the user can
+	 * scroll or zoom, the chart then centres the end labels on their values,
+	 * and the room at a free edge is widened to keep its label inside the plot.
 	 */
 	xMargins: number;
-	/** Pins the ends of the Y axis. An open end autoscales. */
+	/**
+	 * Pins the ends of the Y axis: a pinned end is at the edge of the price
+	 * scale margins, with no room added. An open end autoscales to the visible
+	 * points and the horizontal baselines, with room for the largest point.
+	 * Ends given in the wrong order are swapped.
+	 */
 	yRange: ScatterRange;
 	/**
 	 * Formats X values for the axis labels (and the crosshair label when it is
@@ -232,7 +262,11 @@ export interface ScatterSeriesOptions extends CustomSeriesOptions {
 	 * needs.
 	 */
 	xFormatter: ((x: number) => string) | null;
-	/** Reference lines drawn under the points. */
+	/**
+	 * Reference lines drawn under the points. The price scale keeps the
+	 * horizontal ones in view, and the automatic X range includes the vertical
+	 * ones.
+	 */
 	baselines: readonly ScatterBaseline[];
 	/** Accent border drawn along the edges of the plot. */
 	plotBorder: ScatterPlotBorder;
@@ -257,7 +291,7 @@ export type ScatterSeriesPartialOptions =
 export const scatterOptionDefaults: Omit<ScatterSeriesOptions, keyof CustomSeriesOptions> = freezeOptions({
 	opacity: 0.65,
 	pointSize: 9,
-	pointSizeLimits: { min: 5, max: 50 },
+	pointSizeLimits: { ...DEFAULT_POINT_SIZE_LIMITS },
 	shape: 'circle',
 	strokeColor: null,
 	strokeWidth: 1,

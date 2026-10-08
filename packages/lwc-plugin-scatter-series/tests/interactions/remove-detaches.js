@@ -1,8 +1,9 @@
 // remove() takes the series off the chart and releases its subscriptions: no
 // throw, nothing painted, the hovered-point subscribers told `null` once (the
 // host's tooltip goes away) and nothing more, the chart gets back its own label
-// distance, and it keeps working — a chart takes one scatter series, so a
-// second one throws until the first is removed, and is then added and hovered.
+// distance — the host's latest, should it have set one meanwhile — and it keeps
+// working: a chart takes one scatter series, so a second one throws until the
+// first is removed, and is then added and hovered.
 async function beforeInteractions(container) {
 	const frames = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 	const pixel = (x, y) => {
@@ -74,8 +75,31 @@ async function beforeInteractions(container) {
 			throw new Error(`The new series is not hoverable: ${JSON.stringify(info && info.objectId)}`);
 		}
 		if (notified() !== '["b",null]') { throw new Error(`The removed series was notified of the new hover: ${notified()}`); }
-		// Removing the chart first, then the series, as a host's teardown may do.
-		chart.remove();
+
+		// The host sets a label distance of its own meanwhile: the series manages
+		// it again, and remove() gives back the host's latest, not the first one.
+		chart.applyOptions({ timeScale: { tickMarkMaxCharacterLength: 7 } });
+		next.applyOptions({ xFormatter: x => `${x} units` });
+		await frames();
+		if (chart.options().timeScale.tickMarkMaxCharacterLength === 7) { throw new Error('The series no longer manages the label distance'); }
 		next.remove();
+		if (chart.options().timeScale.tickMarkMaxCharacterLength !== 7) {
+			throw new Error(`remove() should give back the host's latest label distance, 7, not ${chart.options().timeScale.tickMarkMaxCharacterLength}`);
+		}
+		// Set by the host after the series' last change: left as it is.
+		const last = LwcPlugin.createScatterSeries(chart);
+		last.setData([{ x: 1, y: 1 }, { x: 9, y: 2 }]);
+		await frames();
+		chart.applyOptions({ timeScale: { tickMarkMaxCharacterLength: 5 } });
+		last.remove();
+		if (chart.options().timeScale.tickMarkMaxCharacterLength !== 5) {
+			throw new Error(`remove() should leave the host's own label distance, 5, not ${chart.options().timeScale.tickMarkMaxCharacterLength}`);
+		}
+
+		// Removing the chart first, then the series, as a host's teardown may do.
+		const final = LwcPlugin.createScatterSeries(chart);
+		final.setData([{ x: 1, y: 1 }, { x: 9, y: 2 }]);
+		chart.remove();
+		final.remove();
 	};
 }

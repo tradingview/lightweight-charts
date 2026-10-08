@@ -2,8 +2,9 @@
 // the points and the price scale keeps room for the largest one only. A small
 // point keeps its colour under its ring, which groups() reports as drawn. sizeMapping() gives a bubble-size
 // legend the sizes as drawn: sizeFor(sizeValue) is the diameter pointById
-// reports, hidden groups included in the domain, through limits changes and a
-// degenerate domain; null without sizeValue.
+// reports, hidden groups included in the domain, through limits changes, a
+// degenerate domain and a one-sided one all the values lie beyond; null
+// without sizeValue.
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
 		const step = left => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
@@ -112,13 +113,30 @@ async function beforeInteractions(container) {
 	const centre = pixel(dot.x - 0.5, dot.y - 0.5);
 	if (centre[0] < 200 || centre[1] > 120) { throw new Error(`The 6 px dot lost its colour under its ring: ${centre}`); }
 
-	// A degenerate domain: every point at the middle of the range, as sizeFor says.
+	// A degenerate domain: every point at the middle of the range, as sizeFor
+	// says; values beyond the domain at its ends.
 	series.applyOptions({ sizeDomain: { min: null, max: null }, sizeRange: { min: 10, max: 20 }, sizeScale: 'linear' });
 	series.setData([{ id: 'e1', x: 10, y: 10, sizeValue: 7 }, { id: 'e2', x: 90, y: 90, sizeValue: 7 }]);
 	await frames(3);
 	mapping = series.sizeMapping();
 	if (mapping.domain.min !== 7 || mapping.domain.max !== 7) { throw new Error(`Degenerate domain: ${JSON.stringify(mapping.domain)}`); }
 	close(mapping.sizeFor(7), 15, 'sizeFor on a degenerate domain');
-	close(mapping.sizeFor(-100), 15, 'sizeFor of any value on a degenerate domain');
+	close(mapping.sizeFor(-100), 10, 'sizeFor of a value below a degenerate domain');
+	close(mapping.sizeFor(100), 20, 'sizeFor of a value above a degenerate domain');
 	close(series.pointById('e1').radius * 2, 15, 'drawn size on a degenerate domain');
+
+	// A one-sided domain the values all lie beyond: their end's size, not a reversed mapping.
+	series.applyOptions({ sizeDomain: { min: 100, max: null } });
+	series.setData([{ id: 'o1', x: 10, y: 10, sizeValue: 1 }, { id: 'o2', x: 50, y: 50, sizeValue: 20 }, { id: 'o3', x: 90, y: 90, sizeValue: 50 }]);
+	await frames(3);
+	mapping = series.sizeMapping();
+	if (mapping.domain.min !== 100 || mapping.domain.max !== 100) { throw new Error(`One-sided domain: ${JSON.stringify(mapping.domain)}`); }
+	for (const id of ['o1', 'o2', 'o3']) {
+		close(series.pointById(id).radius * 2, 10, `drawn size of ${id}, below a one-sided min`);
+	}
+	series.applyOptions({ sizeDomain: { min: null, max: -5 } });
+	await frames(3);
+	for (const id of ['o1', 'o2', 'o3']) {
+		close(series.pointById(id).radius * 2, 20, `drawn size of ${id}, above a one-sided max`);
+	}
 }

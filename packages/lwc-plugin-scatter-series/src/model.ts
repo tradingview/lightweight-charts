@@ -4,7 +4,7 @@ import type { ScatterPoint, ScatterSlotData } from './data';
 import type { ScatterBaseline, ScatterRange, ScatterSeriesOptions, ScatterShape } from './options';
 import { SizeScaling, normalizeSizeRange, resolveSizeDomain } from './size';
 import { ResolvedScatterGroup, resolveGroups, resolvePointStyle, resolveSeriesStyle } from './style';
-import { SlotGrid, XDomain, buildSlotGrid, computeXDomain, slotIndexOf, slotValue } from './x-axis';
+import { SlotGrid, XDomain, buildSlotGrid, computeXDomain, isDrawableX, slotIndexOf, slotValue } from './x-axis';
 
 /** A point with every style decided. */
 export interface ResolvedScatterPoint {
@@ -30,7 +30,10 @@ export interface ResolvedScatterPoint {
 	strokeWidth: number;
 	/** Whether the point is an open marker. */
 	hollow: boolean;
-	/** Whether the point is drawn: finite coordinates, a visible group, inside the X domain. */
+	/**
+	 * Whether the point is drawn: finite coordinates (X within
+	 * `MAX_X_MAGNITUDE`), a visible group, inside the X domain.
+	 */
 	visible: boolean;
 }
 
@@ -72,6 +75,8 @@ export interface ScatterModel<TPoint extends ScatterPoint = ScatterPoint> {
 	hasVisiblePoints: boolean;
 	/** The horizontal baselines, which the price scale includes. */
 	yBaselines: readonly ScatterBaseline[];
+	/** Whether a point has a finite X too large for the axis (beyond `MAX_X_MAGNITUDE`), and is not drawn. */
+	xOutOfRange: boolean;
 }
 
 function isFiniteNumber(value: unknown): value is number {
@@ -120,15 +125,18 @@ export function buildScatterModel<TPoint extends ScatterPoint>(
 		dataMin = dataMin === null ? x : Math.min(dataMin, x);
 		dataMax = dataMax === null ? x : Math.max(dataMax, x);
 	};
+	let xOutOfRange = false;
 	for (const point of points) {
-		if (isFiniteNumber(point.x) && isFiniteNumber(point.y)) {
+		if (isDrawableX(point.x) && isFiniteNumber(point.y)) {
 			extend(point.x);
 			allYMin = Math.min(allYMin, point.y);
 			allYMax = Math.max(allYMax, point.y);
+		} else if (isFiniteNumber(point.x)) {
+			xOutOfRange = xOutOfRange || isFiniteNumber(point.y);
 		}
 	}
 	for (const baseline of options.baselines) {
-		if (baseline.axis === 'x' && isFiniteNumber(baseline.value)) {
+		if (baseline.axis === 'x' && isDrawableX(baseline.value)) {
 			extend(baseline.value);
 		}
 	}
@@ -154,7 +162,7 @@ export function buildScatterModel<TPoint extends ScatterPoint>(
 		const group = groupOf(point);
 		const style = resolvePointStyle(point, group, series, sizeScaling);
 		const id = point.id ?? String(index);
-		const finite = isFiniteNumber(point.x) && isFiniteNumber(point.y);
+		const finite = isDrawableX(point.x) && isFiniteNumber(point.y);
 		const inDomain = finite && point.x >= domainMin && point.x <= domainMax;
 		const visible = inDomain && (group === null || group.visible);
 		resolved[index] = {
@@ -244,6 +252,7 @@ export function buildScatterModel<TPoint extends ScatterPoint>(
 		sizeScaling,
 		hasVisiblePoints,
 		yBaselines,
+		xOutOfRange,
 	};
 }
 

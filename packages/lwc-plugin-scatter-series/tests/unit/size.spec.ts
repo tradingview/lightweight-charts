@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
+import { defaultOptions } from '../../src/options.js';
 import {
+	DEFAULT_POINT_SIZE_LIMITS,
 	POINT_SIZE_LIMITS_CEILING,
 	POINT_SIZE_LIMITS_FLOOR,
-	SCATTER_MAX_POINT_SIZE,
-	SCATTER_MIN_POINT_SIZE,
 	SizeScaling,
 	cappedStrokeWidth,
 	clampPointSize,
@@ -23,7 +23,9 @@ const linear = (min: number, max: number): SizeScaling => ({
 
 void describe('clampPointSize', () => {
 	void it('keeps sizes within 5–50 px', () => {
-		expect([SCATTER_MIN_POINT_SIZE, SCATTER_MAX_POINT_SIZE]).to.deep.equal([5, 50]);
+		expect(DEFAULT_POINT_SIZE_LIMITS).to.deep.equal({ min: 5, max: 50 });
+		// One source of truth: the published default options carry the same limits.
+		expect(defaultOptions.pointSizeLimits).to.deep.equal(DEFAULT_POINT_SIZE_LIMITS);
 		expect(clampPointSize(1)).to.equal(5);
 		expect(clampPointSize(9)).to.equal(9);
 		expect(clampPointSize(80)).to.equal(50);
@@ -93,6 +95,27 @@ void describe('resolveSizeDomain', () => {
 		expect(resolveSizeDomain([], { min: 0, max: 10 })).to.deep.equal({ min: 0, max: 10 });
 	});
 
+	void it('collapses an open end the values put past the given one, rather than reversing the domain', () => {
+		// Every value below a given min: the domain is that min alone, the values below it.
+		expect(resolveSizeDomain([1, 20, 50], { min: 100, max: null })).to.deep.equal({ min: 100, max: 100 });
+		expect(resolveSizeDomain([1, 20, 50], { min: null, max: -5 })).to.deep.equal({ min: -5, max: -5 });
+		// Values on both sides of the given end keep their own extreme.
+		expect(resolveSizeDomain([1, 20, 150], { min: 100, max: null })).to.deep.equal({ min: 100, max: 150 });
+		expect(resolveSizeDomain([-10, 20], { min: null, max: 0 })).to.deep.equal({ min: -10, max: 0 });
+		// Two given ends in reverse order still reverse the mapping on purpose.
+		expect(resolveSizeDomain([1, 2], { min: 10, max: 0 })).to.deep.equal({ min: 10, max: 0 });
+	});
+
+	void it('sizes every value below a one-sided min at the smallest size, above a one-sided max at the largest', () => {
+		const range = { min: 5, max: 25 };
+		const below = resolveSizeDomain([1, 20, 50], { min: 100, max: null });
+		const above = resolveSizeDomain([1, 20, 50], { min: null, max: -5 });
+		for (const value of [1, 20, 50]) {
+			expect(mapSizeValue(value, { domain: below!, range, scale: 'linear' })).to.equal(5);
+			expect(mapSizeValue(value, { domain: above!, range, scale: 'area' })).to.equal(25);
+		}
+	});
+
 	void it('is null when an end is open and there is no value', () => {
 		expect(resolveSizeDomain([], { min: null, max: 10 })).to.equal(null);
 		expect(resolveSizeDomain([Number.NaN], { min: null, max: null })).to.equal(null);
@@ -121,10 +144,17 @@ void describe('mapSizeValue', () => {
 		expect(mapSizeValue(25, area)).to.be.closeTo(Math.sqrt(100 + 0.25 * 800), 1e-9);
 	});
 
-	void it('draws every point at the middle of the range for a single-value domain', () => {
+	void it('draws the value of a single-value domain at the middle of the range, the others at its ends', () => {
 		const flat: SizeScaling = { domain: { min: 7, max: 7 }, range: { min: 10, max: 20 }, scale: 'linear' };
 		expect(mapSizeValue(7, flat)).to.equal(15);
-		expect(mapSizeValue(100, flat)).to.equal(15);
+		expect(mapSizeValue(100, flat)).to.equal(20);
+		expect(mapSizeValue(-3, flat)).to.equal(10);
+	});
+
+	void it('maps domains of huge values without overflowing', () => {
+		const huge: SizeScaling = { domain: { min: -1e308, max: 1e308 }, range: { min: 10, max: 20 }, scale: 'linear' };
+		expect(mapSizeValue(0, huge)).to.equal(15);
+		expect(mapSizeValue(1e308, huge)).to.equal(20);
 	});
 
 	void it('stays within the range, however the area is rounded', () => {

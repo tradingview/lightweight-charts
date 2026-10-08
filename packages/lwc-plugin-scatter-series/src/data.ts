@@ -5,15 +5,25 @@ import type { ScatterShape, ScatterSizeScale } from './options';
 /**
  * One point of a scatter series. Extend it with fields of your own (a title,
  * a source record, …): they are kept and handed back by `pointById`.
+ *
+ * A point whose `x` or `y` is not a finite number, or whose `x` is outside the
+ * X domain, is not drawn.
  */
 export interface ScatterPoint {
-	/** Horizontal position, in X axis units. */
+	/**
+	 * Horizontal position, in X axis units. Beyond ±1e300 the axis cannot lay
+	 * the point out: it is not drawn, and the series warns once.
+	 */
 	x: number;
 	/** Vertical position, in price scale units. */
 	y: number;
 	/**
 	 * Stable identifier, reported as `objectId` when the point is hovered.
-	 * Defaults to the point's index in the data as a string. Keep it unique.
+	 * Defaults to the point's index in the data as a string, which may name
+	 * another point after `setData`: give points ids when the data changes
+	 * while the user hovers it. Keep it unique — `pointById`,
+	 * `setHoveredPoint` and `hoveredInfo.objectId` cannot tell points sharing
+	 * an id apart, and the series warns once.
 	 */
 	id?: string;
 	/** Identifier of the group the point belongs to. */

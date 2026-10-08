@@ -1,7 +1,8 @@
 // A host taking the scatter series off with chart.removeSeries(series.series())
-// rather than series.remove(): the next scatter series may still be added —
-// the first one is released then, its subscriptions with it, its hovered-point
-// subscribers told `null` once — and works.
+// rather than series.remove(): the series lets go of the chart as soon as it
+// finds out — its subscriptions, its label distance, its hovered-point
+// subscribers told `null` once — and neither new data nor a resize gives the
+// chart its slots back. The next scatter series may be added, and works.
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
 		const step = left => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
@@ -27,6 +28,21 @@ async function beforeInteractions(container) {
 
 	chart.removeSeries(first.series());
 	await frames(2);
+	// Taken off the chart, the series lets go of it: neither new data nor a
+	// resize gives the chart its slots back, and the label distance is the chart's.
+	first.setData([{ id: 'a', x: 0, y: 0 }, { id: 'z', x: 40, y: 4 }]);
+	chart.resize(480, 400);
+	await frames(3);
+	const timeScale = chart.timeScale();
+	if (timeScale.getVisibleLogicalRange() !== null || timeScale.timeToIndex(0, false) !== null || timeScale.timeToIndex(40, false) !== null) {
+		throw new Error(`A series taken off the chart gave it slots again: ${JSON.stringify(timeScale.getVisibleLogicalRange())}`);
+	}
+	if (chart.options().timeScale.tickMarkMaxCharacterLength !== 11) {
+		throw new Error(`A series taken off the chart still manages its label distance: ${chart.options().timeScale.tickMarkMaxCharacterLength}`);
+	}
+	if (first.xToCoordinate(10) !== null || first.pointById('a') !== null) { throw new Error('A series taken off the chart still maps points'); }
+	// Its hovered point went with it, told once.
+	if (firstNotified() !== '["b",null]') { throw new Error(`Taken off the chart, the series should notify null once: ${firstNotified()}`); }
 
 	let second = null;
 	try {

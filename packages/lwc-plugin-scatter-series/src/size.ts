@@ -1,20 +1,15 @@
 import type { ScatterRange, ScatterSizeLimits, ScatterSizeRange, ScatterSizeScale } from './options';
 
-/** Default smallest size of a point (`pointSizeLimits.min`), in CSS pixels, stroke included. */
-export const SCATTER_MIN_POINT_SIZE = 5;
-/** Default largest size of a point (`pointSizeLimits.max`), in CSS pixels, stroke included. */
-export const SCATTER_MAX_POINT_SIZE = 50;
-
 /** Least value of either end of `pointSizeLimits`, in CSS pixels. */
 export const POINT_SIZE_LIMITS_FLOOR = 1;
 /** Greatest value of either end of `pointSizeLimits`, in CSS pixels. */
 export const POINT_SIZE_LIMITS_CEILING = 500;
 
-/** The default `pointSizeLimits`. */
-export const DEFAULT_POINT_SIZE_LIMITS: Readonly<ScatterSizeLimits> = Object.freeze({
-	min: SCATTER_MIN_POINT_SIZE,
-	max: SCATTER_MAX_POINT_SIZE,
-});
+/**
+ * The default `pointSizeLimits`, in CSS pixels, stroke included: the one
+ * source of the default sizes, published as `defaultOptions.pointSizeLimits`.
+ */
+export const DEFAULT_POINT_SIZE_LIMITS: Readonly<ScatterSizeLimits> = Object.freeze({ min: 5, max: 50 });
 
 /**
  * The size limits in use: each end within 1–500 px, an end which is not a
@@ -25,8 +20,8 @@ export function normalizeSizeLimits(limits: Partial<ScatterSizeLimits> | null | 
 		typeof value === 'number' && Number.isFinite(value)
 			? Math.min(POINT_SIZE_LIMITS_CEILING, Math.max(POINT_SIZE_LIMITS_FLOOR, value))
 			: fallback;
-	const a = bound(limits?.min, SCATTER_MIN_POINT_SIZE);
-	const b = bound(limits?.max, SCATTER_MAX_POINT_SIZE);
+	const a = bound(limits?.min, DEFAULT_POINT_SIZE_LIMITS.min);
+	const b = bound(limits?.max, DEFAULT_POINT_SIZE_LIMITS.max);
 	return a <= b ? { min: a, max: b } : { min: b, max: a };
 }
 
@@ -72,7 +67,11 @@ export interface SizeDomain {
 
 /**
  * The size domain: the given ends of `explicit`, the open ones taken from
- * `values`. `null` when an end is open and there is no finite value.
+ * `values`. An open end the values put on the wrong side of the given one
+ * (every value below a given `min`, say) is the given end: the domain is
+ * that single value, and the values are beyond it — not a reversed domain,
+ * which only two given ends make. `null` when an end is open and there is no
+ * finite value.
  */
 export function resolveSizeDomain(values: Iterable<number>, explicit: ScatterRange): SizeDomain | null {
 	let min = explicit.min !== null && Number.isFinite(explicit.min) ? explicit.min : null;
@@ -89,8 +88,14 @@ export function resolveSizeDomain(values: Iterable<number>, explicit: ScatterRan
 		if (low > high) {
 			return null;
 		}
-		min = min ?? low;
-		max = max ?? high;
+		if (min !== null) {
+			max = Math.max(min, high);
+		} else if (max !== null) {
+			min = Math.min(max, low);
+		} else {
+			min = low;
+			max = high;
+		}
 	}
 	return { min, max };
 }
@@ -107,8 +112,9 @@ export interface SizeScaling {
 
 /**
  * The size of a point whose `sizeValue` is `value`. Values outside the domain
- * are clamped to its ends. A domain of a single value draws every point at the
- * middle of the range — there is nothing to compare.
+ * are clamped to its ends. A domain of a single value draws that value at the
+ * middle of the range — there is nothing to compare — and the values below
+ * and above it at the ends.
  *
  * `area` interpolates the area between the areas of the two ends of the
  * range, so the diameter follows a square root. The result is always within
@@ -116,12 +122,13 @@ export interface SizeScaling {
  */
 export function mapSizeValue(value: number, scaling: SizeScaling): number {
 	const { domain, range, scale } = scaling;
-	const span = domain.max - domain.min;
+	// In halves, so that no span of finite values overflows.
+	const span = domain.max / 2 - domain.min / 2;
 	let t: number;
-	if (span === 0 || !Number.isFinite(span)) {
-		t = 0.5;
+	if (span === 0) {
+		t = value < domain.min ? 0 : value > domain.max ? 1 : 0.5;
 	} else {
-		t = Math.min(1, Math.max(0, (value - domain.min) / span));
+		t = Math.min(1, Math.max(0, (value / 2 - domain.min / 2) / span));
 	}
 	const size = scale === 'area'
 		? Math.sqrt(range.min * range.min + t * (range.max * range.max - range.min * range.min))

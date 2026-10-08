@@ -1,7 +1,8 @@
 // What the API hands out is a copy, and what it is given is copied: changing
 // the objects of options(), groups() or data(), or the arrays and objects
 // passed to applyOptions, changes neither the series, nor the defaults, nor a
-// series created later.
+// series created later. The scatter chart defaults are frozen, and can be
+// passed to createChartEx as they are, which leaves them unchanged.
 async function beforeInteractions(container) {
 	const frames = (count = 2) => new Promise(resolve => {
 		const step = left => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
@@ -80,5 +81,26 @@ async function beforeInteractions(container) {
 	if (borderDrawn(other, q.y)) { throw new Error('The new series draws a plot border'); }
 	otherSeries.remove();
 	otherChart.remove();
+
+	// The scatter chart defaults are frozen, and work as they are with
+	// createChartEx, which leaves them unchanged; mutating them throws.
+	const chartDefaults = LwcPlugin.scatterChartDefaults;
+	const frozen = JSON.stringify(chartDefaults);
+	const exChart = LightweightCharts.createChartEx(other, new LwcPlugin.ScatterHorzScaleBehavior(), chartDefaults);
+	const exSeries = LwcPlugin.createScatterSeries(exChart);
+	exSeries.setData([{ x: 0, y: 0 }, { x: 10, y: 10 }]);
+	await frames(2);
+	if (JSON.stringify(chartDefaults) !== frozen) { throw new Error('createChartEx changed the scatter chart defaults'); }
+	if (exChart.options().handleScroll.mouseWheel || exChart.options().handleScale.axisDoubleClickReset.time) {
+		throw new Error('The scatter chart defaults should switch scrolling and zooming off');
+	}
+	try {
+		chartDefaults.timeScale.fixLeftEdge = false;
+	} catch {
+		// Frozen: a strict-mode page throws, this one ignores the assignment.
+	}
+	if (!Object.isFrozen(chartDefaults.timeScale) || chartDefaults.timeScale.fixLeftEdge !== true) { throw new Error('The scatter chart defaults can be changed'); }
+	exSeries.remove();
+	exChart.remove();
 	other.remove();
 }
