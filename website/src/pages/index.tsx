@@ -1,4 +1,5 @@
 import Head from '@docusaurus/Head';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import React from 'react';
 
@@ -194,13 +195,15 @@ const paragraph = `Lightweight Charts™ is a library for creating interactive f
 const showBanner = true;
 
 function Index(): React.JSX.Element {
+	const pluginCatalogUrl = useBaseUrl('/plugins');
+
 	return (
 		<>
 			{showBanner ? (
 				<Banner
-					text="Exciting Update: Version 5.0 now available, introducing pane support and decreased bundle size."
-					link="https://tradingview.github.io/lightweight-charts/docs/release-notes#500"
-					linkText="Read more"
+					text="New: extend your charts with ready-made plugins"
+					link={pluginCatalogUrl}
+					linkText="Browse the catalog"
 				/>
 			) : (
 				''
