@@ -103,9 +103,13 @@ series.attachPrimitive(highlighting);
 ```
 
 The highlighter is called once per bar when the series data is set, and once
-for the bar an incremental `series.update()` touches, so it can do real work
-per call. Translucent colours let the grid and the series show through; the
-shading is drawn behind both by default.
+for the last bar when `series.update()` appends or replaces it, so it can do
+real work per call; `series.pop()` drops the popped bars without calling it.
+Keep it a function of the time alone: a historical update, which is
+`series.update(bar, true)`, re-asks it for the last bar rather than for the
+bar it changed, and one that turns a bar into whitespace re-asks it for every
+bar. Translucent colours let the grid and the series show through; the shading
+is drawn behind both by default.
 
 To remove the shading, detach it from the series:
 
@@ -140,10 +144,12 @@ defaults are exported as `defaultOptions`.
 - Each column is exactly one bar wide, taken from the time scale's bar
   spacing, so neighbouring columns abut with no seams and no overlap at any
   zoom level or device pixel ratio.
-- Only bars of the attached series are shaded. A gap in the data, a stretch
-  of time with no bar, gets no column; whitespace items are bars and do.
+- Only bars of the attached series are shaded. Whitespace items and gaps in
+  the data get no column, even where another series has a bar at that time.
 - The shading appears only in the pane the series is drawn in, never under
   the price scales or the time scale. To shade a second pane, attach another
   `SessionHighlighting` to a series in that pane.
-- Only the bars on screen are drawn, so the plugin stays cheap on long
-  histories.
+- Only the bars on screen are drawn, so the cost of a paint is bounded by the
+  width of the chart, not by the length of the history. An incremental
+  `series.update()` or `series.pop()` does read the series data once to find
+  out what changed, which is proportional to the number of bars.
