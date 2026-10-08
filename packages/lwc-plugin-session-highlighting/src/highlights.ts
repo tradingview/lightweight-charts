@@ -1,51 +1,107 @@
-import { Time } from 'lightweight-charts';
+import { Time, UTCTimestamp } from 'lightweight-charts';
+import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
 
 /** Returns the background colour for a bar's time; an empty string draws nothing. */
 export type SessionHighlighter = (time: Time) => string;
 
 /** One bar of the series and the colour the highlighter gave it. */
 export interface Highlight {
+	/** The time as the data gives it, which is what the highlighter is shown. */
 	time: Time;
+	/**
+	 * The same bar as the time scale keys it. Every form of `Time` maps to the
+	 * UTC timestamp of its bar, so this is what is handed to the time scale on
+	 * each paint: the time is converted once here instead of on every lookup.
+	 */
+	timestamp: UTCTimestamp;
 	color: string;
 }
 
-/** A half-open range of data indices, `from` inclusive and `to` exclusive. */
-
-/** A range of logical indices, as the time scale reports its visible range. */
+/**
+ * A range of logical indices, as the time scale reports its visible range.
+ * It is the shape of the library's `LogicalRange` without the branded
+ * `Logical` type, so that plain numbers can be passed in tests.
+ */
 export interface VisibleRange {
 	from: number;
 	to: number;
 }
+
+/** A half-open range of data indices, `from` inclusive and `to` exclusive. */
 export interface IndexRange {
 	from: number;
 	to: number;
 }
 
-function sameTime(a: Time, b: Time): boolean {
-	if (typeof a === 'object' && typeof b === 'object') {
-		return a.year === b.year && a.month === b.month && a.day === b.day;
-	}
-	return a === b;
+/** The UTC timestamp the time scale keys a bar by, for any form of `Time`. */
+export function timestampOf(time: Time): UTCTimestamp {
+	return Math.round(convertTimeUTC(time) / 1000) as UTCTimestamp;
+}
+
+/** Whether two times name the same bar, however each of them is written. */
+export function sameBar(a: Time, b: Time): boolean {
+	return timestampOf(a) === timestampOf(b);
+}
+
+function highlightFor(time: Time, highlighter: SessionHighlighter): Highlight {
+	return { time, timestamp: timestampOf(time), color: highlighter(time) };
 }
 
 /** Asks the highlighter for the colour of every bar, in data order. */
 export function colorsForTimes(times: readonly Time[], highlighter: SessionHighlighter): Highlight[] {
-	return times.map(time => ({ time, color: highlighter(time) }));
+	return times.map(time => highlightFor(time, highlighter));
 }
 
 /**
- * Applies an incremental data update, which only ever touches the last bar:
- * the last entry is recoloured when the time is the same, and a new one is
- * appended otherwise.
+ * Applies an incremental data update that kept or grew the bar count by one,
+ * which is what `series.update()` does: the last entry is replaced when the
+ * count is unchanged and `time` is still the same bar, whatever form the time
+ * now has, and a new one is appended when the count grew by one. Returns
+ * false without touching the list when the change is neither, such as the
+ * last bar being a different bar at the same count, meaning every bar has to
+ * be recoloured.
  */
-export function updateLastColor(highlights: Highlight[], time: Time, highlighter: SessionHighlighter): void {
-	const color = highlighter(time);
+export function updateLastColor(
+	highlights: Highlight[],
+	count: number,
+	time: Time,
+	highlighter: SessionHighlighter,
+	isSameBar: (a: Time, b: Time) => boolean = sameBar
+): boolean {
 	const last = highlights[highlights.length - 1];
-	if (last !== undefined && sameTime(last.time, time)) {
-		last.color = color;
-	} else {
-		highlights.push({ time, color });
+	if (count === highlights.length) {
+		if (last === undefined || !isSameBar(last.time, time)) {
+			return false;
+		}
+		highlights[highlights.length - 1] = highlightFor(time, highlighter);
+		return true;
 	}
+	if (count === highlights.length + 1) {
+		highlights.push(highlightFor(time, highlighter));
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Cuts the list back to `count` entries after bars were removed from the end,
+ * by `series.pop()` or by an update that turned the last bar into whitespace;
+ * the entries kept are untouched. A historical update can instead remove a
+ * bar from the middle, in which case the kept last entry is not `lastTime`'s
+ * bar: nothing is cut and false is returned, meaning every bar has to be
+ * recoloured.
+ */
+export function shrinkTo(
+	highlights: Highlight[],
+	count: number,
+	lastTime: Time,
+	isSameBar: (a: Time, b: Time) => boolean = sameBar
+): boolean {
+	if (count > 0 && !isSameBar(highlights[count - 1].time, lastTime)) {
+		return false;
+	}
+	highlights.length = count;
+	return true;
 }
 
 /** The first index in `[0, count)` for which `test` holds; `count` when there is none. */
