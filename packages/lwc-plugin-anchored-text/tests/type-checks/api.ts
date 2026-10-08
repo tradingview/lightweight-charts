@@ -34,7 +34,7 @@ expectTrue<Equal<ReturnType<AnchoredTextPane['options']>['zOrder'], PrimitivePan
 // @ts-expect-error Returned options are read-only.
 text.options().text = 'Mutated';
 // @ts-expect-error Unsupported alignment spelling.
-text.applyOptions({ horzAlign: 'centre' });
+text.applyOptions({ horzAlign: 'centered' });
 // @ts-expect-error Unsupported layer.
 text.applyOptions({ zOrder: 'above' });
 // @ts-expect-error The (chart, series, options) form used by an old inline copy is not supported.

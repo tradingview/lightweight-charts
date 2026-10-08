@@ -1,12 +1,12 @@
 # Anchored text
 
-A single line of text anchored to an edge, a corner or the centre of a pane,
+A single line of text anchored to an edge, a corner or the center of a pane,
 as a [series primitive](https://tradingview.github.io/lightweight-charts/docs/plugins/series-primitives)
 (`AnchoredText`) or as a
 [pane primitive](https://tradingview.github.io/lightweight-charts/docs/plugins/pane-primitives)
 (`AnchoredTextPane`). The text keeps its place while the chart scrolls and
 zooms, inset from the pane edges by a margin you choose. The text, its anchor,
-margins, font, colour, layer and visibility can all be changed after the
+margins, font, color, layer and visibility can all be changed after the
 primitive has been attached.
 
 The series primitive belongs to the series it is attached to: it lives in that
@@ -18,12 +18,12 @@ a "preview" or "draft" stamp.
 
 > **Lightweight Charts™ 5 also ships a built-in text watermark.**
 > [`createTextWatermark(pane, options)`](https://tradingview.github.io/lightweight-charts/docs/api/functions/createTextWatermark)
-> is a pane primitive which draws one or more lines of text, centred by default
+> is a pane primitive which draws one or more lines of text, centered by default
 > and scaled down to fit the pane. If that is all you need, the built-in
 > function is the right choice. Use this package for text tied to a specific
 > series rather than to a pane, or for what the built-in does not offer:
 > margins from the pane edge, a CSS `font` shorthand, `zOrder` and
-> `applyOptions` / `setText`.
+> `setText`.
 
 ## Installation
 
@@ -149,20 +149,20 @@ as `defaultOptions`.
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `text` | `string` | `''` | The line of text. An empty string draws nothing. |
-| `horzAlign` | `'left' \| 'center' \| 'right'` | `'left'` | Which side of the pane the text is anchored to, or centred. |
-| `vertAlign` | `'top' \| 'center' \| 'bottom'` | `'top'` | Which edge of the pane the text is anchored to, or centred. |
+| `horzAlign` | `'left' \| 'center' \| 'right'` | `'left'` | Which side of the pane the text is anchored to, or centered. |
+| `vertAlign` | `'top' \| 'center' \| 'bottom'` | `'top'` | Which edge of the pane the text is anchored to, or centered. |
 | `horzMargin` | `number` | `20` | Distance from the left or right pane edge, in CSS pixels. Not used when `horzAlign` is `'center'`. |
 | `vertMargin` | `number` | `10` | Distance from the top or bottom pane edge, in CSS pixels. Not used when `vertAlign` is `'center'`. |
 | `font` | `string` | `bold 14px` system sans-serif | Font, as a CSS `font` shorthand. |
 | `lineHeight` | `number` | — (measured) | Height of the text, in CSS pixels. Measured from the font when not set. |
-| `color` | `string` | `'#131722'` | Text colour. |
+| `color` | `string` | `'#131722'` | Text color. |
 | `visible` | `boolean` | `true` | Whether the text is drawn at all. |
 | `zOrder` | `'bottom' \| 'normal' \| 'top'` | `'normal'` | Layer the text is drawn in. `'normal'` draws it with the series, under the crosshair; `'top'` puts it over everything in the pane, the crosshair included; `'bottom'` puts it behind the series. |
 
 ### Alignment and margins
 
 The text is placed against the anchored edge of its pane, `horzMargin` and
-`vertMargin` away from it. A centred axis ignores its margin. With a
+`vertMargin` away from it. A centered axis ignores its margin. With a
 `lineHeight` the text's baseline sits at the bottom of that height, as it did
 in the `plugin-examples` version; without one the height is that of the font,
 so it does not change with the text, and the baseline sits at the font's

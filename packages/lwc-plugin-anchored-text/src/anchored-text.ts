@@ -15,7 +15,7 @@ export {
 } from './options.js';
 
 /**
- * A line of text anchored to an edge, a corner or the centre of the pane the
+ * A line of text anchored to an edge, a corner or the center of the pane the
  * attached series is drawn in. Attach it with `series.attachPrimitive(text)`.
  */
 export class AnchoredText extends PluginBase {

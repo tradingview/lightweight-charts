@@ -9,7 +9,7 @@ function generateData() {
 }
 
 // Every option at its default: top-left, 20px / 10px margins, the default
-// font and colour, drawn over the series.
+// font and color, drawn over the series.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },

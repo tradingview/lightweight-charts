@@ -63,7 +63,7 @@ void describe('mergeOptions', () => {
 		expect(merged.lineHeight).to.equal(undefined);
 	});
 
-	void it("normalises the legacy 'middle' alignment", () => {
+	void it("normalizes the legacy 'middle' alignment", () => {
 		const merged = mergeOptions(base, { vertAlign: 'middle' });
 		expect(merged.vertAlign).to.equal('center');
 	});

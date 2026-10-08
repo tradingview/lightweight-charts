@@ -8,7 +8,7 @@ function generateData() {
 	return res;
 }
 
-// Text wider than the pane is neither wrapped nor scaled: a centred line
+// Text wider than the pane is neither wrapped nor scaled: a centered line
 // overflows both edges and is clipped at the pane.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {

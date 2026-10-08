@@ -8,8 +8,8 @@ function generateData() {
 	return res;
 }
 
-// One instance per anchor pair, each in its own colour, so the margin and the
-// centring maths are visible for all nine positions at once.
+// One instance per anchor pair, each in its own color, so the margin and the
+// centering maths are visible for all nine positions at once.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {
 		layout: { attributionLogo: false },

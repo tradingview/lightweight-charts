@@ -13,7 +13,7 @@ collection of the Lightweight Charts™ repository.
 ### Added
 
 - `AnchoredText`, a series primitive that draws one line of text anchored to
-  an edge, a corner or the centre of the pane the attached series is drawn in.
+  an edge, a corner or the center of the pane the attached series is drawn in.
 - `AnchoredTextPane`, the same text as a pane primitive, for a chart whose
   series come and go. Both classes share their options and methods.
 - Options `text`, `horzAlign`, `vertAlign`, `horzMargin`, `vertMargin`, `font`,

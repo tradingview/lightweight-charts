@@ -1,7 +1,7 @@
 {
 	"name": "@tradingview/lwc-plugin-anchored-text",
 	"version": "1.0.0",
-	"description": "Text label anchored to an edge, a corner or the centre of a pane, on a series or a pane, with configurable margins.",
+	"description": "Text label anchored to an edge, a corner or the center of a pane, on a series or a pane, with configurable margins.",
 	"author": "TradingView",
 	"license": "Apache-2.0",
 	"type": "module",

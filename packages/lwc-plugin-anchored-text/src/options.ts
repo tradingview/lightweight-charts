@@ -17,9 +17,9 @@ export type LegacyMiddleAlign = 'middle';
 export interface AnchoredTextOptions {
 	/** The line of text. An empty string draws nothing. */
 	text: string;
-	/** Which side of the pane the text is anchored to, or centred. */
+	/** Which side of the pane the text is anchored to, or centered. */
 	horzAlign: AnchoredTextHorzAlign;
-	/** Which edge of the pane the text is anchored to, or centred. */
+	/** Which edge of the pane the text is anchored to, or centered. */
 	vertAlign: AnchoredTextVertAlign;
 	/**
 	 * Distance from the left or right pane edge, in CSS pixels. Not used when
@@ -38,7 +38,7 @@ export interface AnchoredTextOptions {
 	 * this height. When not set, the height is measured from the font.
 	 */
 	lineHeight?: number;
-	/** Text colour. */
+	/** Text color. */
 	color: string;
 	/** Whether the text is drawn at all. */
 	visible: boolean;

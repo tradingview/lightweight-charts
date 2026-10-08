@@ -13,7 +13,7 @@ void describe('layoutAnchoredText', () => {
 		expect(layout).to.deep.equal({ x: 20, y: 10, width: 100, height: 20, baselineY: 26 });
 	});
 
-	void it('centres on both axes', () => {
+	void it('centers on both axes', () => {
 		const layout = layoutAnchoredText(text, pane, resolveOptions({ horzAlign: 'center', vertAlign: 'center' }));
 		expect(layout.x).to.equal(150);
 		expect(layout.y).to.equal(90);
@@ -33,7 +33,7 @@ void describe('layoutAnchoredText', () => {
 		expect(layout.y).to.equal(178);
 	});
 
-	void it('ignores the margin of a centred axis', () => {
+	void it('ignores the margin of a centered axis', () => {
 		const layout = layoutAnchoredText(text, pane, resolveOptions({ horzAlign: 'center', vertAlign: 'center', horzMargin: 50, vertMargin: 50 }));
 		expect(layout.x).to.equal(150);
 		expect(layout.y).to.equal(90);

@@ -8,7 +8,7 @@ function generateData() {
 	return res;
 }
 
-// The pane primitive needs no series: one centred label per pane, attached to
+// The pane primitive needs no series: one centered label per pane, attached to
 // the panes themselves, as the library's own pane-primitives case does.
 function runTestCase(container) {
 	const chart = (window.chart = LightweightCharts.createChart(container, {

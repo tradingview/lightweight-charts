@@ -6,7 +6,7 @@ description: >-
   turning a chart idea ("I want the chart to show/draw X") into a working
   plugin. Covers choosing the plugin type, scaffolding with create-lwc-plugin,
   building on @tradingview/lwc-toolkit instead of hand-rolled helpers, which of
-  the eleven official plugin packages to read as the reference implementation,
+  the official plugin packages to read as the reference implementation,
   where the docs are, and the autoscale, whitespace, visible-range, hit-test
   and conflation mistakes every plugin author makes once. Reach for it whenever
   the user mentions a custom series, primitive, renderer, drawing on the chart
@@ -139,7 +139,7 @@ the release tooling run.
 
 ## Build on the toolkit
 
-`@tradingview/lwc-toolkit` is what the eleven official plugins are built from,
+`@tradingview/lwc-toolkit` is what the official plugins are built from,
 extracted from the helpers every example used to copy by hand. Reaching for
 it is not about saving lines; it is that the helpers encode chart behaviour
 that is easy to get subtly wrong — the exact width the built-in candlestick
@@ -176,7 +176,7 @@ template is the smallest correct plugin of its type.
 
 ## Read the reference implementations
 
-The eleven official packages are the canonical examples: maintained, tested,
+The official packages are the canonical examples: maintained, tested,
 published, and built exactly the way this skill describes. Read the one
 nearest your idea *before* designing — most questions ("how do I get the
 hovered item?", "how do I autoscale a stack?") are answered by a file in
@@ -203,7 +203,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 (`https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples`)
 holds a further set of proof-of-concept plugins — tooltips, drawing tools,
 session highlighting, heatmaps, … — good for breadth and ideas, but they are
-unpublished starting points, not the standard to match. The eleven graduated
+unpublished starting points, not the standard to match. The graduated
 plugins' folders there are redirects to the packages.
 
 ## Read the documentation in this order
