@@ -28,6 +28,7 @@ aliases:
         - packages/create-lwc-plugin/node_modules
         - packages/lwc-toolkit/node_modules
         - packages/lwc-plugin-accessibility/node_modules
+        - packages/lwc-plugin-anchored-text/node_modules
         - packages/lwc-plugin-brushable-area-series/node_modules
         - packages/lwc-plugin-dual-range-histogram-series/node_modules
         - packages/lwc-plugin-hlc-area-series/node_modules

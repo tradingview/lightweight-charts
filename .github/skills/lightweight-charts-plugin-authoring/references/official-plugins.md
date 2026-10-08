@@ -1,4 +1,4 @@
-# The ten official plugins, and what each one teaches
+# The official plugins, and what each one teaches
 
 Upstream: `packages/lwc-plugin-<name>/`. Published: `@tradingview/lwc-plugin-<name>`,
 which ships the README and `dist/` (`.js` + `.d.ts`) but not the source. From
@@ -108,6 +108,18 @@ frame), positioning from the *pane's* size rather than the chart element,
 `objectFit`/`position`/`padding` layout, `zOrder`, a decoded-image cache by
 URL, and `detached()` cancelling a pending load.
 
+### `anchored-text` — the smallest two-class primitive
+
+`AnchoredText` (series primitive) and `AnchoredTextPane` (pane primitive)
+sharing one core, with no image to load and no interaction: the shape of
+`image-watermark` reduced to its essentials. Read for: laying text out in the
+media coordinate space from `measureText` (`layout.ts` is a pure function the
+unit tests cover for all nine anchors), a renderer that returns `null` while
+there is nothing to draw, `save`/`restore` around context changes, options
+that accept a deprecated spelling (`'middle'`) on input and never return it,
+and `mergeOptions` where one option (`lineHeight`) treats an explicit
+`undefined` as a value.
+
 ## Pane primitives
 
 ### `accessibility` — DOM overlays and multi-pane lifecycle
@@ -119,7 +131,7 @@ through reordering (the constructor index is only a pre-build hint; the first
 draw's canvas resolves the real pane), a single shared ARIA-live region,
 `subscribeMediaQuery` for high contrast, message bundles and localisation,
 keyboard handling on the overlay, and a controller that reconciles panes added
-or removed at runtime. Also the largest test suite of the ten; its
+or removed at runtime. Also the largest test suite of the official plugins; its
 `pane-reorder`, `mismatched-pane-index` and `announce-callback-throws`
 interaction tests show how to assert on DOM state.
 
@@ -129,7 +141,7 @@ Upstream `plugin-examples/src/plugins/` holds unpublished proof-of-concept
 plugins: tooltips and delta tooltips, a rectangle drawing tool, trend lines,
 session highlighting, a heatmap series, lollipop, grouped bars, box-whisker,
 background shading, price alerts, a volume profile, a partial price line,
-crosshair highlighting, and anchored text. Good for seeing the shape of an
+and crosshair highlighting. Good for seeing the shape of an
 idea; they predate the toolkit and skip the tests and README the packages
-carry, so use the official plugins for *how* and these for *what*. The ten
+carry, so use the official plugins for *how* and these for *what*. The
 graduated plugins' folders there are redirect stubs to the packages.
