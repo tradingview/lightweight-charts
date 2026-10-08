@@ -10,6 +10,7 @@ import {
 	Highlight,
 	SessionHighlighter,
 	colorsForTimes,
+	shrinkTo,
 	updateLastColor,
 	visibleDataRange,
 } from './highlights.js';
@@ -24,8 +25,10 @@ export type { SessionHighlighter } from './highlights.js';
  * colour a highlighter function returns for the bar's time. Attach it with
  * `series.attachPrimitive(highlighting)`.
  *
- * The highlighter is asked once per bar when data is set and once for the bar
- * an incremental update touches; only the bars on screen are drawn.
+ * The highlighter is asked once per bar when data is set and once for the last
+ * bar when an incremental update appends or replaces it; popping bars does not
+ * ask it, and a historical update that removes a bar asks it for every bar
+ * again. Only the bars on screen are drawn.
  */
 export class SessionHighlighting extends PluginBase {
 	private readonly _paneViews: readonly SessionHighlightingPaneView[];
@@ -53,6 +56,7 @@ export class SessionHighlighting extends PluginBase {
 		super.detached();
 	}
 
+	/** Called by the chart before it paints, so a `requestUpdate()` is enough to get here. */
 	public updateAllViews(): void {
 		const state = this._state(this._attached ? this._visibleColumns() : []);
 		this._paneViews.forEach(view => view.update(state));
@@ -70,7 +74,6 @@ export class SessionHighlighting extends PluginBase {
 	/** Changes any subset of the options. An option left out is not changed. */
 	public applyOptions(options: Partial<SessionHighlightingOptions>): void {
 		this._options = mergeOptions(this._options, options);
-		this.updateAllViews();
 		this.requestUpdate();
 	}
 
@@ -89,9 +92,14 @@ export class SessionHighlighting extends PluginBase {
 			if (last === undefined) {
 				this._highlights = [];
 			} else {
-				updateLastColor(this._highlights, last.time, this._highlighter);
+				const patched = data.length < this._highlights.length
+					? shrinkTo(this._highlights, data.length, last.time)
+					: updateLastColor(this._highlights, data.length, last.time, this._highlighter);
+				if (!patched) {
+					this._recolorAll();
+					return;
+				}
 			}
-			this.updateAllViews();
 			this.requestUpdate();
 			return;
 		}
@@ -100,7 +108,6 @@ export class SessionHighlighting extends PluginBase {
 
 	private _recolorAll(): void {
 		this._highlights = colorsForTimes(this.series.data().map(item => item.time), this._highlighter);
-		this.updateAllViews();
 		this.requestUpdate();
 	}
 
@@ -110,7 +117,7 @@ export class SessionHighlighting extends PluginBase {
 		const highlights = this._highlights;
 		const { from, to } = visibleDataRange(
 			highlights.length,
-			index => timeScale.timeToIndex(highlights[index].time, true) ?? 0,
+			index => timeScale.timeToIndex(highlights[index].timestamp, true) ?? 0,
 			timeScale.getVisibleLogicalRange()
 		);
 		const columns: HighlightColumn[] = [];
@@ -119,7 +126,7 @@ export class SessionHighlighting extends PluginBase {
 			if (highlight.color === '') {
 				continue;
 			}
-			const x = timeScale.timeToCoordinate(highlight.time);
+			const x = timeScale.timeToCoordinate(highlight.timestamp);
 			if (x !== null) {
 				columns.push({ x, color: highlight.color });
 			}

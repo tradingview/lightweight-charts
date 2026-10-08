@@ -5,9 +5,8 @@ import {
 	PrimitivePaneViewZOrder,
 	Time,
 	createChart,
-	isBusinessDay,
-	isUTCTimestamp,
 } from 'lightweight-charts';
+import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
 import { CandleData, generateCandleData } from './sample-data';
 
 import { SessionHighlighter, SessionHighlighting } from '../session-highlighting';
@@ -19,23 +18,14 @@ const chart = ((window as unknown as any).chart = createChart(container, {
 	timeScale: { barSpacing: 8 },
 }));
 
-function toDate(time: Time): Date {
-	if (isUTCTimestamp(time)) {
-		return new Date(time * 1000);
-	}
-	if (isBusinessDay(time)) {
-		return new Date(Date.UTC(time.year, time.month - 1, time.day));
-	}
-	return new Date(time);
-}
 
 const highlighters: Record<string, SessionHighlighter> = {
 	weekends: time => {
-		const day = toDate(time).getUTCDay();
+		const day = new Date(convertTimeUTC(time)).getUTCDay();
 		return day === 0 || day === 6 ? 'rgba(255, 152, 1, 0.2)' : 'rgba(41, 98, 255, 0.06)';
 	},
 	alternate: time => (Math.round((time as number) / 86400) % 2 === 0 ? 'rgba(41, 98, 255, 0.12)' : ''),
-	'month-start': time => (toDate(time).getUTCDate() <= 7 ? 'rgba(8, 153, 129, 0.15)' : ''),
+	'month-start': time => (new Date(convertTimeUTC(time)).getUTCDate() <= 7 ? 'rgba(8, 153, 129, 0.15)' : ''),
 	none: () => '',
 };
 
@@ -127,6 +117,5 @@ secondPaneInput.addEventListener('change', () => {
 		secondPaneSeries.detachPrimitive(paneHighlighting);
 		chart.removeSeries(secondPaneSeries);
 		secondPaneSeries = null;
-		chart.removePane(1);
 	}
 });

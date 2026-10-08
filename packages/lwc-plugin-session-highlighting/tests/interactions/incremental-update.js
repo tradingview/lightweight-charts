@@ -3,18 +3,15 @@
 // highlighter for it.
 const frames = async () => { for (let i = 0; i < 4; i++) { await new Promise(requestAnimationFrame); } };
 
-// Samples the pane canvases 4px below the top edge at the bar's x and returns
-// whether a red column is painted there. The highlighters in these cases use
-// opaque red so the sample is unambiguous.
+// Samples a screenshot of the chart 4px below the top edge at the bar's x and
+// returns whether a red column is painted there. The first pane sits at the
+// screenshot's origin because the left price scale is hidden, and the
+// highlighters in these cases use opaque red so the sample is unambiguous.
 function redAt(chart, x) {
-	for (const canvas of chart.panes()[0].getHTMLElement().querySelectorAll("td[style*=\"relative\"] canvas")) {
-		const ratio = canvas.width / canvas.getBoundingClientRect().width;
-		const [r, g, b, a] = canvas.getContext("2d").getImageData(Math.round(x * ratio), Math.round(4 * ratio), 1, 1).data;
-		if (a > 0 && r > 200 && g < 80 && b < 80) {
-			return true;
-		}
-	}
-	return false;
+	const canvas = chart.takeScreenshot();
+	const ratio = canvas.width / chart.chartElement().clientWidth;
+	const [r, g, b, a] = canvas.getContext('2d').getImageData(Math.round(x * ratio), Math.round(4 * ratio), 1, 1).data;
+	return a > 0 && r > 200 && g < 80 && b < 80;
 }
 
 function dailyBars(count, start = 1704067200) {
@@ -43,8 +40,8 @@ async function beforeInteractions(container) {
 	series.attachPrimitive(highlighting);
 	await frames();
 	const callsAfterAttach = calls;
-	if (callsAfterAttach < 20) {
-		throw new Error(`The highlighter was not asked for every bar on attach: ${callsAfterAttach} calls`);
+	if (callsAfterAttach !== 20) {
+		throw new Error(`The highlighter was not asked exactly once per bar on attach: ${callsAfterAttach} calls`);
 	}
 
 	// Append a bar: only it should be coloured, and only it should be asked for.
