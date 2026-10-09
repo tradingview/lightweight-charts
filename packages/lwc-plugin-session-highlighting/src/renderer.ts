@@ -8,7 +8,7 @@ import {
 
 import { SessionHighlightingOptions } from './options.js';
 
-/** One visible bar to shade: its centre in media pixels and its colour. */
+/** One visible bar to shade: its center in media pixels and its color. */
 export interface HighlightColumn {
 	x: number;
 	color: string;

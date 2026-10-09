@@ -24,7 +24,7 @@ highlighting.setHighlighter(() => '');
 expectTrue<Equal<ReturnType<SessionHighlighting['options']>, Readonly<SessionHighlightingOptions>>>();
 // @ts-expect-error A highlighter is required.
 new SessionHighlighting();
-// @ts-expect-error The highlighter returns a colour string.
+// @ts-expect-error The highlighter returns a color string.
 new SessionHighlighting((time: Time) => 1);
 // @ts-expect-error Returned options are read-only.
 highlighting.options().visible = false;

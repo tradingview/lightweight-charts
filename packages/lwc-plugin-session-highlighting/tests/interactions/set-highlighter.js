@@ -1,4 +1,4 @@
-// setHighlighter recolours every bar and asks the chart to redraw by itself.
+// setHighlighter recolors every bar and asks the chart to redraw by itself.
 const frames = async () => { for (let i = 0; i < 4; i++) { await new Promise(requestAnimationFrame); } };
 
 // Samples a screenshot of the chart 4px below the top edge at the bar's x and

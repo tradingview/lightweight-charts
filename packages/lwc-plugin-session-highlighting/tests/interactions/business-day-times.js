@@ -1,6 +1,6 @@
 // With date strings as data, an update that writes the same bar as a
 // BusinessDay object replaces the bar's shading instead of adding a second
-// column on top of it. The colour is translucent so that a double paint shows
+// column on top of it. The color is translucent so that a double paint shows
 // up as a darker sample.
 const frames = async () => { for (let i = 0; i < 4; i++) { await new Promise(requestAnimationFrame); } };
 
