@@ -2,8 +2,8 @@
 
 A [series primitive](https://tradingview.github.io/lightweight-charts/docs/plugins/series-primitives)
 that shades the background behind each bar of a series. You give it a
-function from a bar's time to a colour, and every bar of the attached series
-gets a full-height column in that colour, as wide as the bar itself. The
+function from a bar's time to a color, and every bar of the attached series
+gets a full-height column in that color, as wide as the bar itself. The
 columns follow the series as the chart scrolls and zooms.
 
 Use it to show where one trading session ends and the next begins, to tint
@@ -76,7 +76,7 @@ series.attachPrimitive(new SessionHighlighting(time => {
 ### The highlighter
 
 The first constructor argument is the highlighter: a function which receives
-a bar's time and returns a CSS colour. Return an empty string for a bar that
+a bar's time and returns a CSS color. Return an empty string for a bar that
 should not be shaded. The time comes in whatever form your data uses, so for
 business-day data check for an object:
 
@@ -108,7 +108,7 @@ real work per call; `series.pop()` drops the popped bars without calling it.
 Keep it a function of the time alone: a historical update, which is
 `series.update(bar, true)`, re-asks it for the last bar rather than for the
 bar it changed, and one that turns a bar into whitespace re-asks it for every
-bar. Translucent colours let the grid and the series show through; the shading
+bar. Translucent colors let the grid and the series show through; the shading
 is drawn behind both by default.
 
 To remove the shading, detach it from the series:
@@ -121,7 +121,7 @@ series.detachPrimitive(highlighting);
 
 ```js
 highlighting.applyOptions({ zOrder: 'top', visible: false });
-highlighting.setHighlighter(time => '#F0F3FA'); // recolours every bar
+highlighting.setHighlighter(time => '#F0F3FA'); // recolors every bar
 highlighting.options(); // the current options, with the defaults filled in
 ```
 

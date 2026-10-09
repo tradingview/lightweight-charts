@@ -2,7 +2,7 @@
 // the highlighter is never asked about it. An update that turns a bar into
 // whitespace removes its shading. For the last bar the highlighter is not
 // asked; for a bar in the middle, reached by a historical update, every bar
-// is recoloured so that the right one goes.
+// is recolored so that the right one goes.
 // The whitespace keeps the time on the scale, so a stale entry would still be
 // painted. The columns are located by time at each step, because the chart
 // scrolls when the last bar changes.
@@ -83,7 +83,7 @@ async function beforeInteractions(container) {
 	callsBefore = calls;
 
 	// A bar in the middle becomes whitespace: its column goes, the last bar
-	// keeps its column, and every bar is recoloured.
+	// keeps its column, and every bar is recolored.
 	series.update({ time: data[17].time }, true);
 	await frames();
 	if (redAtTime(middle)) {

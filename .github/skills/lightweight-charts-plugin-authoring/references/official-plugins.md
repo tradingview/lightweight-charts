@@ -123,14 +123,14 @@ and `mergeOptions` where one option (`lineHeight`) treats an explicit
 ### `session-highlighting` — per-bar background from the series' own data
 
 `SessionHighlighting` shades a full-height column behind every bar with the
-colour a user function returns for its time. Read for: deriving per-bar state
+color a user function returns for its time. Read for: deriving per-bar state
 from `series.data()` in `dataUpdated` and patching only the end of it on an
 `'update'` scope. The scope covers more than append and replace: `pop()` and
 an update that turns the last bar into whitespace shrink the data, and a
 historical update can remove a bar from the middle, so the bar count decides
 the case and a shrink is only cut back when the kept last entry still names
 the last bar (compared through `timeToIndex`, which ignores how the time is
-written); otherwise every bar is recoloured. Also read for mapping the visible
+written); otherwise every bar is recolored. Also read for mapping the visible
 logical range back to data indices by binary search over `timeToIndex` (so
 other series starting earlier do not shift the slice), `fullBarWidth` from the
 time scale's `barSpacing` so columns abut at any pixel ratio, and
