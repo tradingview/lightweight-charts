@@ -11,7 +11,7 @@ aliases:
   - &restore-node-modules-cache
       name: Restore dependencies cache
       keys:
-        - &cache-key v2-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
+        - &cache-key v3-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}-{{ checksum "pnpm-workspace.yaml" }}
 
   - &save-node-modules-cache
       name: Save dependencies cache
@@ -35,6 +35,7 @@ aliases:
         - packages/lwc-plugin-image-watermark/node_modules
         - packages/lwc-plugin-pretty-histogram-series/node_modules
         - packages/lwc-plugin-rounded-candles-series/node_modules
+        - packages/lwc-plugin-scatter-series/node_modules
         - packages/lwc-plugin-stacked-area-series/node_modules
         - packages/lwc-plugin-stacked-bars-series/node_modules
         - packages/lwc-plugin-vertical-line/node_modules
