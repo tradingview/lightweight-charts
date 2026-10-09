@@ -32,22 +32,36 @@ async function beforeInteractions(container) {
 	};
 	const timeScale = chart.timeScale();
 	const fitted = timeScale.options().barSpacing;
-	const pane = container.querySelector('tr:nth-of-type(1) td:nth-of-type(2) canvas').getBoundingClientRect();
-	const move = { action: 'moveMouseXY', target: 'pane', options: { x: Math.round(pane.width * 0.4), y: Math.round(pane.height / 2) } };
-	const steps = 25;
-	window.initialInteractionsToPerform = () => [move, ...Array.from({ length: steps }, () => ({ action: 'scrollUp' }))];
-	window.afterInitialInteractions = async () => {
+	// Wheel events dispatched here rather than through the runner: the zoom of a
+	// real wheel step depends on the platform (the runner's step zooms 2 % on
+	// macOS and 1 % on the Linux CI), and only steps of 2 % zoom far enough to
+	// show the difference (25 of them, before the fix, re-applied the label
+	// distance 11 times; steps of 1 % only twice).
+	const cell = container.querySelector('tr:nth-of-type(1) td:nth-of-type(2)');
+	const pane = cell.querySelector('canvas').getBoundingClientRect();
+	const wheel = async (deltaY, steps) => {
+		for (let i = 0; i < steps; i++) {
+			cell.dispatchEvent(new WheelEvent('wheel', {
+				deltaY,
+				clientX: pane.left + pane.width * 0.4,
+				clientY: pane.top + pane.height / 2,
+				bubbles: true,
+				cancelable: true,
+			}));
+			await frames(1);
+		}
 		await frames(3);
-		const zoomed = timeScale.options().barSpacing;
-		if (!(zoomed > fitted * 1.3)) { throw new Error(`The wheel did not zoom in: ${fitted} → ${zoomed}`); }
-		if (applied.length > 2) { throw new Error(`Zooming in ${steps} steps applied the label distance ${applied.length} times`); }
-		applied.length = 0;
 	};
-	window.finalInteractionsToPerform = () => [move, ...Array.from({ length: steps }, () => ({ action: 'scrollDown' }))];
-	// The runner waits a frame and more after this: an error thrown then fails the case as a page error.
-	window.afterFinalInteractions = async () => {
-		await frames();
-		if (applied.length > 2) { throw new Error(`Zooming out ${steps} steps applied the label distance ${applied.length} times`); }
-		chart.applyOptions = applyOptions;
-	};
+	const steps = 25;
+
+	await wheel(-20, steps);
+	const zoomed = timeScale.options().barSpacing;
+	if (!(zoomed > fitted * 1.5)) { throw new Error(`The wheel did not zoom in: ${fitted} → ${zoomed}`); }
+	if (applied.length > 2) { throw new Error(`Zooming in ${steps} steps applied the label distance ${applied.length} times`); }
+	applied.length = 0;
+
+	await wheel(20, steps);
+	if (!(timeScale.options().barSpacing < zoomed / 1.5)) { throw new Error(`The wheel did not zoom out: ${zoomed} → ${timeScale.options().barSpacing}`); }
+	if (applied.length > 2) { throw new Error(`Zooming out ${steps} steps applied the label distance ${applied.length} times`); }
+	chart.applyOptions = applyOptions;
 }
