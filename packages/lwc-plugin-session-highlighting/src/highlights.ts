@@ -1,10 +1,10 @@
 import { Time, UTCTimestamp } from 'lightweight-charts';
 import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
 
-/** Returns the background colour for a bar's time; an empty string draws nothing. */
+/** Returns the background color for a bar's time; an empty string draws nothing. */
 export type SessionHighlighter = (time: Time) => string;
 
-/** One bar of the series and the colour the highlighter gave it. */
+/** One bar of the series and the color the highlighter gave it. */
 export interface Highlight {
 	/** The time as the data gives it, which is what the highlighter is shown. */
 	time: Time;
@@ -47,7 +47,7 @@ function highlightFor(time: Time, highlighter: SessionHighlighter): Highlight {
 	return { time, timestamp: timestampOf(time), color: highlighter(time) };
 }
 
-/** Asks the highlighter for the colour of every bar, in data order. */
+/** Asks the highlighter for the color of every bar, in data order. */
 export function colorsForTimes(times: readonly Time[], highlighter: SessionHighlighter): Highlight[] {
 	return times.map(time => highlightFor(time, highlighter));
 }
@@ -59,7 +59,7 @@ export function colorsForTimes(times: readonly Time[], highlighter: SessionHighl
  * now has, and a new one is appended when the count grew by one. Returns
  * false without touching the list when the change is neither, such as the
  * last bar being a different bar at the same count, meaning every bar has to
- * be recoloured.
+ * be recolored.
  */
 export function updateLastColor(
 	highlights: Highlight[],
@@ -89,7 +89,7 @@ export function updateLastColor(
  * the entries kept are untouched. A historical update can instead remove a
  * bar from the middle, in which case the kept last entry is not `lastTime`'s
  * bar: nothing is cut and false is returned, meaning every bar has to be
- * recoloured.
+ * recolored.
  */
 export function shrinkTo(
 	highlights: Highlight[],

@@ -1,7 +1,7 @@
 // series.pop() drops the shading of the popped bars without asking the
 // highlighter, and the bars left keep theirs, painted once. A second series
 // holds the same times so that the popped bar stays on the time scale: a
-// stale entry for it would still be painted. The colour is translucent so
+// stale entry for it would still be painted. The color is translucent so
 // that a double paint shows up as a darker sample, and the columns are
 // located by time at each step, because the chart may scroll when the last
 // bar changes.

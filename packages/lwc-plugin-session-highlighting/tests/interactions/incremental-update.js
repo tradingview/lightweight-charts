@@ -1,4 +1,4 @@
-// series.update() recolours only the bar it touched: a new bar is shaded as
+// series.update() recolors only the bar it touched: a new bar is shaded as
 // soon as it is appended, and updating the last bar in place re-asks the
 // highlighter for it.
 const frames = async () => { for (let i = 0; i < 4; i++) { await new Promise(requestAnimationFrame); } };
@@ -44,7 +44,7 @@ async function beforeInteractions(container) {
 		throw new Error(`The highlighter was not asked exactly once per bar on attach: ${callsAfterAttach} calls`);
 	}
 
-	// Append a bar: only it should be coloured, and only it should be asked for.
+	// Append a bar: only it should be colored, and only it should be asked for.
 	const appended = { time: data[data.length - 1].time + 86400, open: 31, high: 33, low: 29, close: 32 };
 	data.push(appended);
 	redLast = true;
@@ -62,7 +62,7 @@ async function beforeInteractions(container) {
 	series.update({ ...appended, close: 30 });
 	await frames();
 	if (redAt(chart, chart.timeScale().timeToCoordinate(appended.time))) {
-		throw new Error('Updating the last bar in place did not recolour it');
+		throw new Error('Updating the last bar in place did not recolor it');
 	}
 	if (calls !== callsAfterAttach + 2) {
 		throw new Error(`An in-place update re-asked the highlighter for every bar: ${calls - callsAfterAttach} calls`);

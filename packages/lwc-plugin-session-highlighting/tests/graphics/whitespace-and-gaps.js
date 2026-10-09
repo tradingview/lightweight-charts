@@ -29,7 +29,7 @@ function createCandles(container, options) {
 }
 
 // Neither a whitespace item nor a run of missing days is a bar, so neither
-// gets a colour and the shading simply stops there.
+// gets a color and the shading simply stops there.
 function runTestCase(container) {
 	const { chart, series } = createCandles(container);
 	const data = generateData(60)

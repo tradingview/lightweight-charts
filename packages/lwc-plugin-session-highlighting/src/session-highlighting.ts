@@ -22,7 +22,7 @@ export type { SessionHighlighter } from './highlights.js';
 
 /**
  * Shades the background behind each bar of the attached series with the
- * colour a highlighter function returns for the bar's time. Attach it with
+ * color a highlighter function returns for the bar's time. Attach it with
  * `series.attachPrimitive(highlighting)`.
  *
  * The highlighter is asked once per bar when data is set and once for the last
@@ -77,7 +77,7 @@ export class SessionHighlighting extends PluginBase {
 		this.requestUpdate();
 	}
 
-	/** Replaces the highlighter and recolours every bar with it. */
+	/** Replaces the highlighter and recolors every bar with it. */
 	public setHighlighter(highlighter: SessionHighlighter): void {
 		this._highlighter = highlighter;
 		if (this._attached) {

@@ -4,7 +4,7 @@ import '@tradingview/lwc-plugin-preview-kit/preview.css';
 import { SessionHighlighter, SessionHighlighting } from '../session-highlighting';
 import { generateCandleData } from './sample-data';
 
-// The catalogue preview: daily candles with weekends shaded. The dev demo next
+// The catalog preview: daily candles with weekends shaded. The dev demo next
 // door adds the layer, bar spacing, left price scale, second pane and
 // incremental-update controls.
 const chart = createChart('chart', { autoSize: true, timeScale: { barSpacing: 10 } });

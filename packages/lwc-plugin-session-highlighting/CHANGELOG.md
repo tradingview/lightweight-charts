@@ -13,7 +13,7 @@ collection of the Lightweight Charts™ repository.
 ### Added
 
 - `SessionHighlighting`, a series primitive that shades the background behind
-  each bar of the attached series with the colour a highlighter function
+  each bar of the attached series with the color a highlighter function
   returns for the bar's time. It is created with
   `new SessionHighlighting(highlighter, options)`, as in the `plugin-examples`
   collection, and an empty string from the highlighter leaves a bar unshaded.
