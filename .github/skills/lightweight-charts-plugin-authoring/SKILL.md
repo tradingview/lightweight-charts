@@ -347,6 +347,11 @@ frames a preview page built from the package; `references/package-contract.md`
 has the fields, the pages and the first-release changelog convention (short:
 an `Added` list, no `Fixed` — there is nothing to have fixed yet).
 
+Write documentation and user-facing text (README, CHANGELOG, the package
+`description`, JSDoc on public API) in American English: color, center,
+catalog, normalize, not colour, centre, catalogue, normalise. Write comments
+in new code the same way, but don't bulk-fix older plugins.
+
 ## Answer contract
 
 When helping with a plugin:
