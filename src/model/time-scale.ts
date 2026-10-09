@@ -303,6 +303,7 @@ export interface ITimeScale {
 
 	barSpacing(): number;
 	rightOffset(): number;
+	baseIndex(): TimePointIndex;
 
 	indexesToCoordinates<T extends TimedValue>(points: T[], visibleRange?: SeriesItemsIndexesRange): void;
 	indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint | null;

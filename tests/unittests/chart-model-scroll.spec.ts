@@ -3,7 +3,6 @@ import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
 import { chartOptionsDefaults } from '../../src/api/options/chart-options-defaults';
-import { getAnimationScrollPosition } from '../../src/gui/pane-widget';
 import { ChartModel, ChartOptionsInternal } from '../../src/model/chart-model';
 import { Coordinate } from '../../src/model/coordinate';
 import { HorzScaleBehaviorTime } from '../../src/model/horz-scale-behavior-time/horz-scale-behavior-time';
@@ -31,7 +30,7 @@ function points(count: number): TimeScalePoint[] {
 }
 
 describe('ChartModel time scale scrolling', () => {
-	// drives a drag the way the pane widget does: 10px per 16ms into the past, sampling positions for the kinetic animation,
+	// drives a drag the way the pane widget does: 10px per 16ms into the past, sampling logical positions for the kinetic animation,
 	// optionally with 50 bars arriving in the middle of the drag; returns the distance the fling would travel after release
 	function flingDistance(appendDuringDrag: boolean): number {
 		const model = createModel({ barSpacing: 6 });
@@ -42,11 +41,12 @@ describe('ChartModel time scale scrolling', () => {
 
 		const barSpacing = timeScale.barSpacing();
 		const animation = new KineticAnimation(0.2 / barSpacing, 7 / barSpacing, 0.997, 15 / barSpacing);
+		const logicalPosition = () => (timeScale.baseIndex() + timeScale.rightOffset()) as Coordinate;
 
 		let localX = 300 as Coordinate;
 		let now = 0;
 		model.startScrollTime(localX);
-		animation.addPosition(getAnimationScrollPosition(localX, barSpacing), now);
+		animation.addPosition(logicalPosition(), now);
 		for (let i = 0; i < 6; ++i) {
 			now += 16;
 			localX = localX + 10 as Coordinate;
@@ -54,7 +54,7 @@ describe('ChartModel time scale scrolling', () => {
 			if (appendDuringDrag && i === 3) {
 				model.updateTimeScale(1049 as TimePointIndex, points(1050), 1000);
 			}
-			animation.addPosition(getAnimationScrollPosition(localX, barSpacing), now);
+			animation.addPosition(logicalPosition(), now);
 		}
 		model.endScrollTime();
 
@@ -63,23 +63,6 @@ describe('ChartModel time scale scrolling', () => {
 		expect(animation.finished(now)).to.be.equal(false);
 		return animation.getPosition(now + 5000) - releaseOffset;
 	}
-
-	it('samples the kinetic scroll position at the same rate as the right offset during an unclamped drag', () => {
-		const model = createModel({ barSpacing: 6 });
-		const timeScale = model.timeScale();
-		timeScale.setWidth(600);
-		model.updateTimeScale(999 as TimePointIndex, points(1000), 0);
-		timeScale.setRightOffset(-100);
-
-		model.startScrollTime(300 as Coordinate);
-		const offsetBefore = timeScale.rightOffset();
-		const sampleBefore = getAnimationScrollPosition(300 as Coordinate, timeScale.barSpacing());
-
-		model.scrollTimeTo(360 as Coordinate);
-		const sampleAfter = getAnimationScrollPosition(360 as Coordinate, timeScale.barSpacing());
-
-		expect(sampleAfter - sampleBefore).to.be.closeTo(timeScale.rightOffset() - offsetBefore, 1e-9);
-	});
 
 	it('does not change the kinetic fling when bars are appended during the drag', () => {
 		const flingWithoutAppend = flingDistance(false);
