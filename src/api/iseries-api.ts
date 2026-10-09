@@ -214,7 +214,7 @@ export interface ISeriesApi<
 	 * @returns The data item at the logical index, or `null` if there is none.
 	 * @example
 	 * ```js
-	 * const bar = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
+	 * const data = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
 	 * ```
 	 */
 	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null;
