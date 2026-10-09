@@ -846,7 +846,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 					KineticScrollConstants.DumpingCoeff,
 					KineticScrollConstants.ScrollMinMove / barSpacing
 				);
-				this._scrollXAnimation.addPosition(timeScale.rightOffset() as Coordinate, this._startScrollingPos.timestamp);
+				this._scrollXAnimation.addPosition((timeScale.baseIndex() + timeScale.rightOffset()) as Coordinate, this._startScrollingPos.timestamp);
 			} else {
 				this._scrollXAnimation = null;
 			}
@@ -867,7 +867,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 			model.scrollTimeTo(event.localX);
 			if (this._scrollXAnimation !== null) {
-				this._scrollXAnimation.addPosition(timeScale.rightOffset() as Coordinate, now);
+				this._scrollXAnimation.addPosition((timeScale.baseIndex() + timeScale.rightOffset()) as Coordinate, now);
 			}
 		}
 	}

@@ -303,6 +303,7 @@ export interface ITimeScale {
 
 	barSpacing(): number;
 	rightOffset(): number;
+	baseIndex(): TimePointIndex;
 
 	indexesToCoordinates<T extends TimedValue>(points: T[], visibleRange?: SeriesItemsIndexesRange): void;
 	indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint | null;
@@ -592,6 +593,18 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._model.lightUpdate();
 	}
 
+	/**
+	 * Shifts the right offset to compensate for bars being appended or replace to the right
+	 * so that the visible range stays in place.
+	 */
+	public shiftRightOffset(delta: number): void {
+		if (this._commonTransitionStartState !== null) {
+			this._commonTransitionStartState.rightOffset -= delta;
+		}
+
+		this.setRightOffset(this._rightOffset - delta);
+	}
+
 	public barSpacing(): number {
 		return this._barSpacing;
 	}
@@ -834,7 +847,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			throw new RangeError('animationDuration (optional) must be finite positive number');
 		}
 
-		const source = this._rightOffset;
+		let source = this._rightOffset;
 		const animationStart = performance.now();
 
 		this._model.setTimeScaleAnimation({
@@ -843,6 +856,12 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 				const animationProgress = (time - animationStart) / animationDuration;
 				const finishAnimation = animationProgress >= 1;
 				return finishAnimation ? offset : source + (offset - source) * animationProgress;
+			},
+			shift: (delta: number) => {
+				const progress = (performance.now() - animationStart) / animationDuration;
+				if (progress < 1) {
+					source -= delta / (1 - progress);
+				}
 			},
 		});
 	}
