@@ -29,6 +29,7 @@ Then create a scatter chart and add the series to it:
 import { createScatterChart, createScatterSeries } from '@tradingview/lwc-plugin-scatter-series';
 
 const chart = createScatterChart(document.getElementById('container'), { autoSize: true });
+
 const series = createScatterSeries(chart, {
     groups: [
         { id: 'win', name: 'Win trades', color: '#089981' },
