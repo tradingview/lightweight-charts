@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Scatter series Plugin Example</title>
+		<style>
+			:root {
+				--text: rgba(19, 23, 34, 1);
+				--muted: rgba(106, 109, 120, 1);
+				--card: #ffffff;
+				--border: rgba(224, 227, 235, 1);
+			}
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				background-color: rgba(248, 249, 253, 1);
+				color: var(--text);
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+					sans-serif;
+				font-size: 14px;
+			}
+			main {
+				max-width: 1440px;
+				margin: 0 auto;
+				padding: 24px 32px 64px;
+			}
+			h1 {
+				font-size: 24px;
+				margin: 0 0 4px;
+			}
+			h2 {
+				font-size: 20px;
+				margin: 40px 0 4px;
+			}
+			main > p,
+			section > p {
+				margin: 4px 0 0;
+				color: var(--muted);
+				max-width: 900px;
+			}
+			.toolbar {
+				position: sticky;
+				top: 0;
+				z-index: 10;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 8px 16px;
+				margin: 16px -12px 0;
+				padding: 10px 12px;
+				background: rgba(248, 249, 253, 0.95);
+				border-bottom: 1px solid var(--border);
+				font-size: 13px;
+			}
+			.toolbar label {
+				font-weight: 600;
+				cursor: pointer;
+			}
+			.toolbar .hint {
+				color: var(--muted);
+			}
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(560px, 1fr));
+				gap: 24px;
+				margin-top: 16px;
+			}
+			.card {
+				background: var(--card);
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 20px 24px 16px;
+				min-width: 0;
+			}
+			.card.wide {
+				grid-column: 1 / -1;
+			}
+			.card.narrow {
+				width: 300px;
+				box-sizing: content-box;
+				padding: 20px 16px 16px;
+			}
+			.card h3 {
+				font-size: 17px;
+				font-weight: 600;
+				margin: 0;
+			}
+			.card .description {
+				margin: 4px 0 12px;
+				color: var(--text);
+			}
+			.chart {
+				height: 320px;
+				position: relative;
+			}
+			.legend {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+				gap: 4px 16px;
+				margin-top: 10px;
+				font-size: 13px;
+				color: var(--muted);
+			}
+			.legend button {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				border: 0;
+				background: none;
+				color: inherit;
+				font: inherit;
+				cursor: pointer;
+				padding: 2px 4px;
+			}
+			.legend button.off {
+				opacity: 0.4;
+			}
+			.legend .marker {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				display: inline-block;
+			}
+			.legend .marker.square {
+				border-radius: 0;
+			}
+			.legend .marker.diamond {
+				border-radius: 0;
+				transform: rotate(45deg) scale(0.85);
+			}
+			.legend .marker.triangleUp {
+				border-radius: 0;
+				clip-path: polygon(50% 0, 100% 100%, 0 100%);
+			}
+			.legend .marker.triangleDown {
+				border-radius: 0;
+				clip-path: polygon(0 0, 100% 0, 50% 100%);
+			}
+			.legend .marker.hollow {
+				box-sizing: border-box;
+				background: none;
+			}
+			.bubble-legend {
+				display: flex;
+				justify-content: center;
+				align-items: flex-end;
+				gap: 16px;
+				margin-top: 8px;
+				font-size: 12px;
+				color: var(--muted);
+			}
+			.bubble-legend .item {
+				display: inline-flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 4px;
+			}
+			.bubble-legend .bubble {
+				display: inline-block;
+				box-sizing: border-box;
+				border-radius: 50%;
+				border: 1px solid rgba(106, 109, 120, 0.8);
+				background: rgba(106, 109, 120, 0.15);
+			}
+			.bubble-legend .caption {
+				align-self: center;
+			}
+			.readout {
+				margin-top: 8px;
+				font-size: 12px;
+				color: var(--muted);
+				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				min-height: 1.4em;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px 16px;
+				align-items: center;
+				margin-bottom: 8px;
+				font-size: 13px;
+			}
+			.controls input[type='number'] {
+				width: 56px;
+			}
+			.rows {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+				margin-top: 8px;
+				font-size: 12px;
+			}
+			.rows span {
+				padding: 2px 8px;
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				cursor: default;
+			}
+			.rows span:hover {
+				background: rgba(41, 98, 255, 0.08);
+			}
+		</style>
+		<script type="module" crossorigin src="./assets/main-Ce3QoqJt.js"></script>
+	</head>
+	<body>
+		<main id="app">
+			<h1>Scatter series</h1>
+			<p>
+				Scenarios of the scatter chart design. Titles, descriptions,
+				legends and the hovered readout are page markup, as a host would
+				render them; the plugin draws the chart content only and has no
+				tooltip.
+			</p>
+		</main>
+	</body>
+</html>
