@@ -165,15 +165,22 @@ Rounded rectangles in bitmap space, with per-corner radii, radius clamping
 to the rectangle's size, and an inset border that does not shrink the fill.
 Read: `pretty-histogram-series/src/renderer.ts`, `dual-range-histogram-series/src/renderer.ts`.
 
-### `canvas/markers` — `traceMarker`, `traceMarkerOffset`, `markerDistance`, `markerVertices`, `segmentDistance`, `MarkerShape`
+### `canvas/markers` — `beginMarker`, `beginMarkerOffset`, `traceMarker`, `traceMarkerOffset`, `markerDistance`, `markerVertices`, `segmentDistance`, `MarkerShape`
 
-Point markers (`circle`, `square`, `diamond`, `triangleUp`, `triangleDown`):
-`traceMarker(path, shape, x, y, radius)` adds the outline to a context or
-`Path2D` as a subpath of its own, so many markers can share one path and one
-`fill()` (pass `emptyPath = true` right after `beginPath()` to keep a lone
-circle on Chromium's exact-oval drawing of a bare `arc`);
-`traceMarkerOffset(…, offset)` the outline `offset` outside it, with
-rounded corners, for a hover ring or halo of even width;
+Point markers (`circle`, `square`, `diamond`, `triangleUp`, `triangleDown`),
+two ways:
+
+- one marker per path (a different colour or opacity per point):
+  `beginMarker(ctx, shape, x, y, radius)` calls `ctx.beginPath()` and traces
+  the marker as the path's only subpath, then fill or stroke. A circle is a
+  bare `arc`, which Chromium draws faster, as an exact oval.
+- many markers per path (one style, one `fill()`): `traceMarker(path, shape,
+  x, y, radius)` adds each to a context or `Path2D` as a subpath of its own,
+  so no line joins them. Begin the path yourself.
+
+`traceMarkerOffset(…, offset)` / `beginMarkerOffset(…, offset)` trace the
+outline `offset` outside the marker, with rounded corners, for a hover ring
+or halo of even width;
 `markerDistance(shape, dx, dy, radius, strokeWidth)` is the distance from a
 point to the marker as drawn, stroke and rounded corners included, `0` inside,
 for `hitTest`. All three read the same vertices, so a marker is hit where it is

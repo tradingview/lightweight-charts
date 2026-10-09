@@ -4,7 +4,7 @@ import {
 	LineStyle,
 	PriceToCoordinateConverter,
 } from 'lightweight-charts';
-import { traceMarker, traceMarkerOffset } from '@tradingview/lwc-toolkit/canvas/markers';
+import { beginMarker, beginMarkerOffset } from '@tradingview/lwc-toolkit/canvas/markers';
 import type {
 	BitmapCoordinatesRenderingScope,
 	CanvasRenderingTarget2D,
@@ -354,8 +354,7 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 			const bx = x * horizontalPixelRatio;
 			const by = y * verticalPixelRatio;
 			// One marker per path: a circle is drawn by `arc` alone, as an exact oval.
-			ctx.beginPath();
-			traceMarker(ctx, point.shape, bx, by, centreLine, true);
+			beginMarker(ctx, point.shape, bx, by, centreLine);
 			if (!point.hollow) {
 				if (point.color !== fillStyle) {
 					fillStyle = point.color;
@@ -378,15 +377,13 @@ export class ScatterSeriesRenderer implements ICustomSeriesPaneRenderer {
 			if (ring) {
 				// Centred `gap + width / 2` outside the outer edge of the marker.
 				const ringWidth = options.hoveredRingWidth * pixelRatio;
-				ctx.beginPath();
-				traceMarkerOffset(
+				beginMarkerOffset(
 					ctx,
 					point.shape,
 					bx,
 					by,
 					centreLine,
-					strokeWidth / 2 + options.hoveredRingGap * pixelRatio + ringWidth / 2,
-					true
+					strokeWidth / 2 + options.hoveredRingGap * pixelRatio + ringWidth / 2
 				);
 				strokeStyle = options.hoveredRingColor ?? point.color;
 				ctx.strokeStyle = strokeStyle;

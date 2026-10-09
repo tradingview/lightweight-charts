@@ -20,13 +20,17 @@ writing for themselves.
   as plain. `__proto__`, `constructor` and `prototype` keys are never copied.
   `null` replaces a value unless the caller passes `defaults`, which makes a
   `null` reset the value to its default.
-- `canvas/markers` — `traceMarker`, `traceMarkerOffset`, `markerDistance`,
-  `markerVertices`, `segmentDistance`, `MarkerShape`, `MarkerPath`: circle,
-  square, diamond and triangle markers traced on a canvas path, each as a
-  subpath of its own so that many can be filled or stroked at once, the
-  outline at a distance around them (hover rings, halos), and the distance
-  from a point to a marker as drawn, stroke included, for hit testing. Drawing
-  and hit testing read the same vertices.
+- `canvas/markers` — `beginMarker`, `beginMarkerOffset`, `traceMarker`,
+  `traceMarkerOffset`, `markerDistance`, `markerVertices`, `segmentDistance`,
+  `MarkerShape`, `MarkerPath`, `MarkerContext`: circle, square, diamond and
+  triangle markers, and the outline at a distance around them (hover rings,
+  halos). `beginMarker` and `beginMarkerOffset` start a new path holding just
+  the marker, for drawing markers one by one; a circle is then a bare `arc`,
+  which Chromium draws faster, as an exact oval. `traceMarker` and
+  `traceMarkerOffset` add the marker to the current path as a subpath of its
+  own, so that many can be filled or stroked at once. `markerDistance` is the
+  distance from a point to a marker as drawn, stroke included, for hit
+  testing. Drawing and hit testing read the same vertices.
 - `text/measure` — `textMeasureContext`, `createTextWidthCache`,
   `TextWidthCache`: a shared offscreen context, created on first use and
   `null` without a DOM, and a bounded cache of text widths.

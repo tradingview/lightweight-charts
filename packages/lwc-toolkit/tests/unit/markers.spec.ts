@@ -2,8 +2,10 @@ import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
 import {
-	MarkerPath,
+	MarkerContext,
 	MarkerShape,
+	beginMarker,
+	beginMarkerOffset,
 	markerDistance,
 	markerVertices,
 	segmentDistance,
@@ -22,8 +24,8 @@ interface Arc {
 	end: number;
 }
 
-/** A path which records what is traced on it. */
-function recordingPath(): MarkerPath & { ops: string[]; points: number[][]; arcs: Arc[] } {
+/** A context which records what is traced on it, `beginPath` included. */
+function recordingPath(): MarkerContext & { ops: string[]; points: number[][]; arcs: Arc[] } {
 	const ops: string[] = [];
 	const points: number[][] = [];
 	const arcs: Arc[] = [];
@@ -31,6 +33,9 @@ function recordingPath(): MarkerPath & { ops: string[]; points: number[][]; arcs
 		ops,
 		points,
 		arcs,
+		beginPath: (): void => {
+			ops.push('beginPath');
+		},
 		moveTo: (x: number, y: number): void => {
 			ops.push('moveTo');
 			points.push([x, y]);
@@ -90,19 +95,6 @@ void describe('traceMarker', () => {
 		expect(path.arcs).to.deep.equal([{ x: 10, y: 20, radius: 5, start: 0, end: 2 * Math.PI }]);
 	});
 
-	void it('traces a circle with the arc alone on an empty path, and polygons as ever', () => {
-		const path = recordingPath();
-		traceMarker(path, 'circle', 10, 20, 5, true);
-		expect(path.ops).to.deep.equal(['arc']);
-		for (const shape of POLYGONS) {
-			const batched = recordingPath();
-			const alone = recordingPath();
-			traceMarker(batched, shape, 10, 20, 5);
-			traceMarker(alone, shape, 10, 20, 5, true);
-			expect(alone.ops, shape).to.deep.equal(batched.ops);
-			expect(alone.points, shape).to.deep.equal(batched.points);
-		}
-	});
 
 	void it('traces each polygon through the vertices the hit test and the offset outline use, in their order', () => {
 		for (const shape of POLYGONS) {
@@ -132,9 +124,6 @@ void describe('traceMarkerOffset', () => {
 		expect(path.ops).to.deep.equal(['moveTo', 'arc']);
 		expect(path.points).to.deep.equal([[18, 20]]);
 		expect(path.arcs).to.deep.equal([{ x: 10, y: 20, radius: 8, start: 0, end: 2 * Math.PI }]);
-		const alone = recordingPath();
-		traceMarkerOffset(alone, 'circle', 10, 20, 5, 3, true);
-		expect(alone.ops).to.deep.equal(['arc']);
 	});
 
 	void it('rounds every corner of a polygon with the offset, outside it, and closes the outline', () => {
@@ -165,17 +154,24 @@ void describe('traceMarkerOffset', () => {
 });
 
 /**
- * A path following the canvas rules for where lines go: `arc` draws a line
- * from the current point to its start, `closePath` returns to the start of
- * the subpath. Records every straight line drawn, with the marker it was
- * traced for.
+ * A context following the canvas rules for where lines go: `arc` draws a
+ * line from the current point to its start, `closePath` returns to the start
+ * of the subpath, `beginPath` empties the path. Records every straight line
+ * of the path, with the marker it was traced for, and every arc.
  */
-function linePath(): MarkerPath & { marker: number; lines: { marker: number; from: number[]; to: number[] }[] } {
+function linePath(): MarkerContext & { marker: number; lines: { marker: number; from: number[]; to: number[] }[]; arcs: number } {
 	let current: number[] | null = null;
 	let subpathStart: number[] | null = null;
 	const result = {
 		marker: -1,
 		lines: [] as { marker: number; from: number[]; to: number[] }[],
+		arcs: 0,
+		beginPath: (): void => {
+			current = null;
+			subpathStart = null;
+			result.lines = [];
+			result.arcs = 0;
+		},
 		moveTo: (x: number, y: number): void => {
 			current = [x, y];
 			subpathStart = [x, y];
@@ -194,6 +190,7 @@ function linePath(): MarkerPath & { marker: number; lines: { marker: number; fro
 			}
 			subpathStart ??= from;
 			current = [x + radius * Math.cos(end), y + radius * Math.sin(end)];
+			result.arcs++;
 		},
 		closePath: (): void => {
 			current = subpathStart;
@@ -228,6 +225,67 @@ void describe('several markers in one path', () => {
 			}
 		}
 		expect(path.lines.length).to.be.greaterThan(0);
+	});
+});
+
+void describe('beginMarker and beginMarkerOffset', () => {
+	void it('start a new path whose only subpath is a circle traced by arc alone, as a bare `arc` call traces it', () => {
+		const marker = recordingPath();
+		beginMarker(marker, 'circle', 10, 20, 5);
+		expect(marker.ops).to.deep.equal(['beginPath', 'arc']);
+		expect(marker.arcs).to.deep.equal([{ x: 10, y: 20, radius: 5, start: 0, end: 2 * Math.PI }]);
+		const ring = recordingPath();
+		beginMarkerOffset(ring, 'circle', 10, 20, 5, 3);
+		expect(ring.ops).to.deep.equal(['beginPath', 'arc']);
+		expect(ring.arcs).to.deep.equal([{ x: 10, y: 20, radius: 8, start: 0, end: 2 * Math.PI }]);
+	});
+
+	void it('trace polygons and their offset outlines as the trace functions do', () => {
+		for (const shape of POLYGONS) {
+			const traced = recordingPath();
+			const begun = recordingPath();
+			traceMarker(traced, shape, 10, 20, 5);
+			beginMarker(begun, shape, 10, 20, 5);
+			expect(begun.ops, shape).to.deep.equal(['beginPath', ...traced.ops]);
+			expect(begun.points, shape).to.deep.equal(traced.points);
+			const tracedRing = recordingPath();
+			const begunRing = recordingPath();
+			traceMarkerOffset(tracedRing, shape, 10, 20, 5, 3);
+			beginMarkerOffset(begunRing, shape, 10, 20, 5, 3);
+			expect(begunRing.ops, shape).to.deep.equal(['beginPath', ...tracedRing.ops]);
+			expect(begunRing.points, shape).to.deep.equal(tracedRing.points);
+			expect(begunRing.arcs, shape).to.deep.equal(tracedRing.arcs);
+		}
+	});
+
+	void it('drop whatever the path held, so nothing joins an earlier subpath', () => {
+		for (const begin of ['marker', 'offset'] as const) {
+			for (const shape of SHAPES) {
+				const path = linePath();
+				path.marker = 0;
+				// An earlier marker, and a line left open, far from the new one.
+				traceMarker(path, 'square', 200, 200, 6);
+				path.moveTo(300, 300);
+				path.lineTo(310, 310);
+				path.marker = 1;
+				if (begin === 'marker') {
+					beginMarker(path, shape, 20, 30, 6);
+				} else {
+					beginMarkerOffset(path, shape, 20, 30, 6, 3);
+				}
+				expect(path.lines.every((line: { marker: number }) => line.marker === 1), `${begin} ${shape}`).to.equal(true);
+				const reach = (6 + 3) * Math.SQRT2 + 1e-9;
+				for (const line of path.lines) {
+					for (const [x, y] of [line.from, line.to]) {
+						expect(Math.max(Math.abs(x - 20), Math.abs(y - 30)), `${begin} ${shape}`).to.be.at.most(reach);
+					}
+				}
+				if (shape === 'circle') {
+					expect(path.lines, `${begin} circle`).to.deep.equal([]);
+					expect(path.arcs, `${begin} circle`).to.equal(1);
+				}
+			}
+		}
 	});
 });
 

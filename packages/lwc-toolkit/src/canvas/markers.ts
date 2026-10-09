@@ -7,10 +7,18 @@
 export type MarkerShape = 'circle' | 'square' | 'diamond' | 'triangleUp' | 'triangleDown';
 
 /**
- * The part of a canvas path a marker is traced with: a
- * `CanvasRenderingContext2D` or a `Path2D` will do.
+ * The part of a canvas path a marker is traced with by {@link traceMarker}
+ * and {@link traceMarkerOffset}: a `CanvasRenderingContext2D` or a `Path2D`
+ * will do.
  */
 export type MarkerPath = Pick<CanvasPath, 'arc' | 'closePath' | 'lineTo' | 'moveTo'>;
+
+/**
+ * The part of a canvas context a marker is begun on by {@link beginMarker}
+ * and {@link beginMarkerOffset}: a `CanvasRenderingContext2D`, which can
+ * begin a new path.
+ */
+export type MarkerContext = MarkerPath & Pick<CanvasRenderingContext2D, 'beginPath'>;
 
 /*
  The polygons, as `[x0, y0, x1, y1, …]` for a marker of radius 1 centred on
@@ -43,35 +51,34 @@ export function markerVertices(shape: MarkerShape): readonly number[] | null {
 	}
 }
 
-/**
- * Adds the outline of a marker of `radius` centred on `(x, y)` to the path as
- * a subpath of its own, which ends where it starts, leaving the path to be
- * filled or stroked. Several markers can be traced into one path and filled
- * or stroked at once: no line joins them. Use the same coordinate space
- * throughout: bitmap pixels in a bitmap-space renderer.
- *
- * A stroke is centred on the outline, so to draw a marker whose outer edge is
- * `radius` with a stroke `w` wide, trace it at `radius − w / 2` (see
- * {@link markerDistance}, which measures the marker drawn that way).
- *
- * @param emptyPath - pass `true` when the path holds nothing else (just after
- * `beginPath()`, or a new `Path2D`) and nothing will be added to it: a circle
- * is then traced with `arc` alone. Chromium draws a path of one such circle as
- * an exact oval, whose edge pixels differ slightly from those of the same
- * circle begun with `moveTo`, so a renderer which used to call `arc` keeps its
- * pixels. Polygons are traced the same either way.
+/*
+ Two ways to put a marker on a path:
+
+ - `traceMarker` / `traceMarkerOffset` add it to whatever the path holds, as a
+   subpath of its own begun with `moveTo`, so that several markers can share
+   one path and one `fill()` or `stroke()` without lines joining them.
+ - `beginMarker` / `beginMarkerOffset` start a new path (`beginPath()`), which
+   drops whatever the current path held, with the marker as its only subpath:
+   for drawing markers one by one. A circle is then traced by `arc` alone,
+   which Chromium draws as an exact oval: about 1.5 to 2 times faster than the
+   same circle begun with `moveTo`, with slightly different edge pixels.
+
+ Polygons are traced the same either way.
  */
-export function traceMarker(
-	path: MarkerPath,
-	shape: MarkerShape,
-	x: number,
-	y: number,
-	radius: number,
-	emptyPath: boolean = false
-): void {
+
+/** A circle; begun with `moveTo` unless it is the only subpath of a new path. */
+function traceCircle(path: MarkerPath, x: number, y: number, radius: number, alone: boolean): void {
+	if (!alone) {
+		// Where the arc starts: without it, `arc` joins the previous subpath with a line.
+		path.moveTo(x + radius, y);
+	}
+	path.arc(x, y, radius, 0, 2 * Math.PI);
+}
+
+function traceShape(path: MarkerPath, shape: MarkerShape, x: number, y: number, radius: number, alone: boolean): void {
 	const vertices = markerVertices(shape);
 	if (vertices === null) {
-		traceCircle(path, x, y, radius, emptyPath);
+		traceCircle(path, x, y, radius, alone);
 		return;
 	}
 	path.moveTo(x + vertices[0] * radius, y + vertices[1] * radius);
@@ -81,36 +88,18 @@ export function traceMarker(
 	path.closePath();
 }
 
-/** A circle as a subpath of its own: begun with `moveTo`, unless the path is empty (see {@link traceMarker}). */
-function traceCircle(path: MarkerPath, x: number, y: number, radius: number, emptyPath: boolean): void {
-	if (!emptyPath) {
-		// Where the arc starts: without it, `arc` joins the previous subpath with a line.
-		path.moveTo(x + radius, y);
-	}
-	path.arc(x, y, radius, 0, 2 * Math.PI);
-}
-
-/**
- * Adds to the path, as a subpath of its own, the outline `offset` outside a
- * marker of `radius` centred on `(x, y)`: a circle `offset` larger, or the
- * polygon with every side moved `offset` outwards and its corners rounded —
- * the outer edge of the polygon stroked `2 × offset` wide with round joins.
- * Stroked `w` wide, it draws a ring of even width `w` at an even distance
- * `offset − w / 2` from the marker on every side: a hover ring or a selection
- * halo. `emptyPath` is that of {@link traceMarker}.
- */
-export function traceMarkerOffset(
+function traceShapeOffset(
 	path: MarkerPath,
 	shape: MarkerShape,
 	x: number,
 	y: number,
 	radius: number,
 	offset: number,
-	emptyPath: boolean = false
+	alone: boolean
 ): void {
 	const vertices = markerVertices(shape);
 	if (vertices === null) {
-		traceCircle(path, x, y, radius + offset, emptyPath);
+		traceCircle(path, x, y, radius + offset, alone);
 		return;
 	}
 	const count = vertices.length / 2;
@@ -135,6 +124,78 @@ export function traceMarkerOffset(
 		path.arc(vx, vy, offset, start, normal(i), false);
 	}
 	path.closePath();
+}
+
+/**
+ * Adds the outline of a marker of `radius` centred on `(x, y)` to the path,
+ * as a subpath of its own which ends where it starts, and leaves the path to
+ * be filled or stroked. For batching: several markers traced into one path are
+ * filled or stroked at once, and no line joins them. To draw markers one by
+ * one, use {@link beginMarker}, which also starts the path.
+ *
+ * Use the same coordinate space throughout: bitmap pixels in a bitmap-space
+ * renderer. A stroke is centred on the outline, so to draw a marker whose
+ * outer edge is `radius` with a stroke `w` wide, trace it at `radius − w / 2`
+ * (see {@link markerDistance}, which measures the marker drawn that way).
+ */
+export function traceMarker(path: MarkerPath, shape: MarkerShape, x: number, y: number, radius: number): void {
+	traceShape(path, shape, x, y, radius, false);
+}
+
+/**
+ * Starts a new path on the context with the outline of a marker as its only
+ * subpath, as {@link traceMarker} traces it, and leaves it to be filled or
+ * stroked: for drawing markers one by one. It calls `ctx.beginPath()`, so
+ * whatever the current path held is dropped.
+ *
+ * A circle is traced by `arc` alone, which Chromium draws as an exact oval:
+ * about 1.5 to 2 times faster than {@link traceMarker}'s circle, which begins
+ * with `moveTo` so that it can share a path, and with slightly different edge
+ * pixels. Polygons are traced as {@link traceMarker} traces them.
+ */
+export function beginMarker(ctx: MarkerContext, shape: MarkerShape, x: number, y: number, radius: number): void {
+	ctx.beginPath();
+	traceShape(ctx, shape, x, y, radius, true);
+}
+
+/**
+ * Adds to the path, as a subpath of its own, the outline `offset` outside a
+ * marker of `radius` centred on `(x, y)`: a circle `offset` larger, or the
+ * polygon with every side moved `offset` outwards and its corners rounded —
+ * the outer edge of the polygon stroked `2 × offset` wide with round joins.
+ * Stroked `w` wide, it draws a ring of even width `w` at an even distance
+ * `offset − w / 2` from the marker on every side: a hover ring or a selection
+ * halo. For batching, as {@link traceMarker}; {@link beginMarkerOffset}
+ * draws one at a time.
+ */
+export function traceMarkerOffset(
+	path: MarkerPath,
+	shape: MarkerShape,
+	x: number,
+	y: number,
+	radius: number,
+	offset: number
+): void {
+	traceShapeOffset(path, shape, x, y, radius, offset, false);
+}
+
+/**
+ * Starts a new path on the context with the outline `offset` outside a marker
+ * as its only subpath, as {@link traceMarkerOffset} traces it: for drawing a
+ * ring around one marker. It calls `ctx.beginPath()`, so whatever the current
+ * path held is dropped. A circle is traced by `arc` alone, as by
+ * {@link beginMarker}.
+ */
+export function beginMarkerOffset(
+	ctx: MarkerContext,
+	shape: MarkerShape,
+	x: number,
+	y: number,
+	radius: number,
+	offset: number
+): void {
+	ctx.beginPath();
+	traceShapeOffset(ctx, shape, x, y, radius, offset, true);
 }
 
 /**

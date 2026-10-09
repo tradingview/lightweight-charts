@@ -35,7 +35,7 @@ setting ignores the `exports` field and will report the imports as unresolved.
 | --- | --- |
 | `assertions` | `ensureDefined`, `ensureNotNull` — narrow a value or throw |
 | `axis-label-view` | `AxisLabelView`, `AxisLabelSource` — a price- or time-axis label over a source that may have no coordinate yet |
-| `canvas/markers` | `traceMarker`, `traceMarkerOffset`, `markerDistance`, `markerVertices`, `segmentDistance`, `MarkerShape` — circle, square, diamond and triangle markers (many to a path, if need be), the ring around them, and the distance to them as drawn, for hit testing, all from the same vertices |
+| `canvas/markers` | `beginMarker`, `beginMarkerOffset`, `traceMarker`, `traceMarkerOffset`, `markerDistance`, `markerVertices`, `segmentDistance`, `MarkerShape` — circle, square, diamond and triangle markers, one per path (`begin*`, which start the path) or many to a path (`trace*`), the ring around them, and the distance to them as drawn, for hit testing, all from the same vertices |
 | `canvas/round-rect` | `drawRoundRect`, `drawRoundRectWithBorder`, `clampCornerRadius`, `CornerRadii` — rounded rectangles with an inset border |
 | `chart/interaction-flags` | `canUserMoveTimeScale`, `TIME_SCALE_MOVE_FLAGS` — whether `handleScroll` / `handleScale` let the user scroll or zoom the time scale, by the library's own rule |
 | `chart/lifecycle` | `isChartRemoved`, `isSeriesAttached` — side-effect-free checks for a removed chart and a series taken off the chart |
