@@ -24,6 +24,7 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 	pointMarkersVisible: false,
+	connectGaps: true,
 };
 const createPaneView = (series: ISeries<'Area'>, model: IChartModelBase): IUpdatablePaneView => new SeriesAreaPaneView(series, model);
 export const createSeries = (): SeriesDefinition<'Area'> => {
