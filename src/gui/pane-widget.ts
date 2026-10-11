@@ -28,7 +28,6 @@ import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { HoveredSourcePaneViews } from '../views/pane/hovered-source-pane-views';
 import { IPaneView } from '../views/pane/ipane-view';
 
-import { AttributionLogoWidget } from './attribution-logo-widget';
 import { createBoundCanvas, releaseCanvas } from './canvas-utils';
 import { IChartWidgetBase } from './chart-widget';
 import { drawBackground, drawForeground, DrawFunction, drawPaneViews, drawSourceViews, ViewsGetter } from './draw-functions';
@@ -67,7 +66,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _size: Size = size({ width: 0, height: 0 });
 	private _leftPriceAxisWidget: PriceAxisWidget | null = null;
 	private _rightPriceAxisWidget: PriceAxisWidget | null = null;
-	private _attributionLogoWidget: AttributionLogoWidget | null = null;
 	private readonly _paneCell: HTMLElement;
 	private readonly _leftAxisCell: HTMLElement;
 	private readonly _rightAxisCell: HTMLElement;
@@ -152,8 +150,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._rightPriceAxisWidget !== null) {
 			this._rightPriceAxisWidget.destroy();
 		}
-		this._attributionLogoWidget = null;
-
 		this._topCanvasBinding.unsubscribeSuggestedBitmapSizeChanged(this._topCanvasSuggestedBitmapSizeChangedHandler);
 		releaseCanvas(this._topCanvasBinding.canvasElement);
 		this._topCanvasBinding.dispose();
@@ -186,14 +182,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		this.updatePriceAxisWidgetsStates();
-
-		if (this._chart.paneWidgets().indexOf(this) === this._chart.paneWidgets().length - 1) {
-			this._attributionLogoWidget = this._attributionLogoWidget ?? new AttributionLogoWidget(this._paneCell, this._chart);
-			this._attributionLogoWidget.update();
-		} else {
-			this._attributionLogoWidget?.removeElement();
-			this._attributionLogoWidget = null;
-		}
 	}
 
 	public chart(): IChartWidgetBase {

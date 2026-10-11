@@ -9,7 +9,7 @@ import { Trade, winLossTrades } from './sample-data';
 // were held. The dev demo next door has every scenario of the design.
 const chart = createScatterChart('chart', {
 	autoSize: true,
-	layout: { attributionLogo: false },
+	layout: { textColor: '#191919' },
 	grid: { vertLines: { color: '#E0E3EB' }, horzLines: { color: '#E0E3EB' } },
 });
 

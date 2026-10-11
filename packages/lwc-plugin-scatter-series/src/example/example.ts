@@ -101,7 +101,7 @@ const yieldPriceFormat = { type: 'custom' as const, formatter: percentFormatter,
 
 const chartDefaults: DeepPartial<ScatterChartOptions> = {
 	autoSize: true,
-	layout: { attributionLogo: false, textColor: '#131722', fontSize: 11 },
+	layout: { textColor: '#131722', fontSize: 11 },
 	grid: { vertLines: { color: '#E0E3EB' }, horzLines: { color: '#E0E3EB' } },
 };
 
