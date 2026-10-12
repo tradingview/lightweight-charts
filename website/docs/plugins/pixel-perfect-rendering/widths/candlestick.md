@@ -24,7 +24,7 @@ It is recommend that you first read the [Pixel Perfect Rendering](../index.md) p
 
 The following functions can be used to get the calculated width that the library would use for a candlestick at a specific bar spacing and device pixel ratio.
 
-Below a bar spacing of 4, the library will attempt to use as large a width as possible without the possibility of overlapping, whilst above 4 then the width will start to trend towards an 80% width of the available space.
+Below a bar spacing of 4, the library will attempt to use as large a width as possible without the possibility of overlapping, while above 4 then the width will start to trend towards an 80% width of the available space.
 
 :::warning
 

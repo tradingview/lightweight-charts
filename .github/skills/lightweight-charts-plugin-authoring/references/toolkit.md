@@ -96,7 +96,7 @@ Read: `stacked-area-series/src/stacked-area-series.ts`, `stacked-bars-series/src
 
 `Path2D` builders in bitmap space: a polyline over a bar range with an
 accessor for `y`, its stepped variant, the closed area between two such
-lines (for bands and stacks), and a polyline whose colour changes along its
+lines (for bands and stacks), and a polyline whose color changes along its
 length without a visible seam (adjacent runs share their boundary bar). A run
 of `strokeStyledPolyline` may carry a `dashPattern` (`getDashPattern(style,
 lineWidth)`), stroked with `butt` caps; runs without one keep the context's
@@ -170,7 +170,7 @@ Read: `pretty-histogram-series/src/renderer.ts`, `dual-range-histogram-series/sr
 Point markers (`circle`, `square`, `diamond`, `triangleUp`, `triangleDown`),
 two ways:
 
-- one marker per path (a different colour or opacity per point):
+- one marker per path (a different color or opacity per point):
   `beginMarker(ctx, shape, x, y, radius)` calls `ctx.beginPath()` and traces
   the marker as the path's only subpath, then fill or stroke. A circle is a
   bare `arc`, which Chromium draws faster, as an exact oval.
@@ -197,7 +197,7 @@ cap closes the gaps of a dotted line (`strokeStyledPolyline` does it for a
 run given a `dashPattern`).
 Read: `vertical-line/src/vertical-line.ts`.
 
-## Chart behaviour
+## Chart behavior
 
 Library rules a plugin otherwise copies from the library's source. Each
 module names the source it mirrors; the interaction flags are pinned to it by

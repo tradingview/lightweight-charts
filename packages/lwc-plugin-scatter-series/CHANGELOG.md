@@ -17,7 +17,7 @@ First release.
   (`scatterChartDefaults`), and `ScatterHorzScaleBehavior` for building it with
   `createChartEx`.
 - `createScatterSeries`, a custom series drawing a whole scatter dataset:
-  points at their exact X, in groups with their own colour, opacity, size and
+  points at their exact X, in groups with their own color, opacity, size and
   marker shape, with per-point overrides and host fields kept on the points.
   Hidden groups leave drawing, hover and the price scale, but not the X axis.
 - Data-driven bubble sizes (`sizeRange`, `sizeDomain`, `sizeScale` and

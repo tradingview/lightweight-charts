@@ -18,7 +18,7 @@ collection of the Lightweight Charts™ repository.
   plugin is `Time`-only by design.
 - `AccessibilityPlugin` for direct per-pane use, taking `AccessibilityPaneOptions`
   and the pane's index as a second constructor argument.
-- A semantic layer for each pane: a labelled, keyboard-focusable overlay with
+- A semantic layer for each pane: a labeled, keyboard-focusable overlay with
   `role="application"`. Its `lw-chart-a11y-*` class names are public and stable.
 - Keyboard navigation across data points and series, with `pageStep`, `zoomStep`
   and `minZoomSpan` for the jump and zoom amounts, and `keyBindings` to remap or

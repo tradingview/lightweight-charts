@@ -22,7 +22,7 @@ collection of the Lightweight Charts™ repository.
 - Styling options: per-segment `colors`, `base`, `columnWidthMode` with
   `widthPercent`, `segmentBorderColor`, `segmentBorderWidth`, `radius`,
   `stackOrder` and `percent` (100% stacked) mode.
-- Per-point segment colour overrides through `colors` on the data item.
+- Per-point segment color overrides through `colors` on the data item.
 - `hitTest` reporting the hovered segment (`objectId` is the index of the value
   within the point), with the other segments dimmed while one is hovered, and a
   `conflationReducer` which sums each segment. Both are used only by Lightweight

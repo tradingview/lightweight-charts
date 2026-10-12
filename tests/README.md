@@ -61,7 +61,7 @@ Alternatively, you can run the test on a specific file like this:
 pnpm exec esno ./tests/e2e/coverage/runner.ts ./dist/lightweight-charts.standalone.development.js
 ```
 
-#### Analysing the Coverage test
+#### Analyzing the Coverage test
 
 If you set the environmental variable `GENERATE_COVERAGE_FILE` to `true` then the coverage test will generate a `covered.js` file within the `tests/e2e/coverage/.gendata` folder (folder can be changed with the `CMP_OUT_DIR` environmental variable). This file only includes the lines of code which were executed during the test. You can compare this file (diff) with the test input file to identify which lines are not being executed during the test.
 
