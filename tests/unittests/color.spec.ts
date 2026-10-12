@@ -41,6 +41,102 @@ const initialCache: Map<string, Rgba> = new Map([
 ]);
 const colorParser = new ColorParser([], initialCache);
 
+interface BrowserColorState {
+	readyState: DocumentReadyState;
+	color: string;
+	reads: number;
+}
+
+function withBrowserColor(callback: (state: BrowserColorState) => void): void {
+	const state: BrowserColorState = { readyState: 'loading', color: 'rgb(128, 128, 128)', reads: 0 };
+	const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+	const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+	Object.defineProperty(globalThis, 'document', {
+		configurable: true,
+		value: {
+			get readyState(): DocumentReadyState { return state.readyState; },
+			createElement: () => ({ style: {} }),
+			body: { appendChild: () => {}, removeChild: () => {} },
+		},
+	});
+	Object.defineProperty(globalThis, 'window', {
+		configurable: true,
+		value: {
+			getComputedStyle: () => {
+				state.reads++;
+				return { color: state.color };
+			},
+		},
+	});
+	try {
+		callback(state);
+	} finally {
+		if (originalDocument) {
+			Object.defineProperty(globalThis, 'document', originalDocument);
+		} else {
+			Reflect.deleteProperty(globalThis, 'document');
+		}
+		if (originalWindow) {
+			Object.defineProperty(globalThis, 'window', originalWindow);
+		} else {
+			Reflect.deleteProperty(globalThis, 'window');
+		}
+	}
+}
+
+describe('browser color caching', () => {
+	for (const readyState of ['loading', 'interactive'] as const) {
+		it(`does not retain a transient browser color while the document is ${readyState}`, () => {
+			withBrowserColor((state: BrowserColorState) => {
+				const parser = new ColorParser([]);
+				state.readyState = readyState;
+				expect(parser.applyAlpha('red', 0.5)).to.equal('rgba(128, 128, 128, 0.5)');
+				state.color = 'rgb(255, 0, 0)';
+				expect(parser.applyAlpha('red', 0.5)).to.equal('rgba(255, 0, 0, 0.5)');
+				expect(state.reads).to.equal(2);
+				state.readyState = 'complete';
+				expect(parser.applyAlpha('red', 0.5)).to.equal('rgba(255, 0, 0, 0.5)');
+				expect(parser.applyAlpha('red', 0.25)).to.equal('rgba(255, 0, 0, 0.25)');
+				expect(state.reads).to.equal(3);
+			});
+		});
+	}
+
+	it('caches browser colors immediately after document loading is complete', () => {
+		withBrowserColor((state: BrowserColorState) => {
+			state.readyState = 'complete';
+			state.color = 'rgba(255, 0, 0, 0.5)';
+			const parser = new ColorParser([]);
+			expect(parser.applyAlpha('red', 0.5)).to.equal('rgba(255, 0, 0, 0.25)');
+			expect(parser.applyAlpha('red', 1)).to.equal('rgba(255, 0, 0, 0.5)');
+			expect(state.reads).to.equal(1);
+		});
+	});
+
+	it('preserves explicitly seeded colors during loading', () => {
+		withBrowserColor((state: BrowserColorState) => {
+			const parser = new ColorParser([], new Map([['red', generateRgba([255, 0, 0, 1])]]));
+			expect(parser.applyAlpha('red', 0.5)).to.equal('rgba(255, 0, 0, 0.5)');
+			expect(state.reads).to.equal(0);
+		});
+	});
+
+	it('still caches custom parser results during loading', () => {
+		withBrowserColor((state: BrowserColorState) => {
+			state.color = 'color(display-p3 1 0 0)';
+			let customReads = 0;
+			const parser = new ColorParser([() => {
+				customReads++;
+				return generateRgba([255, 0, 0, 1]);
+			}]);
+			expect(parser.applyAlpha(state.color, 0.5)).to.equal('rgba(255, 0, 0, 0.5)');
+			expect(parser.applyAlpha(state.color, 1)).to.equal('rgba(255, 0, 0, 1)');
+			expect(state.reads).to.equal(1);
+			expect(customReads).to.equal(1);
+		});
+	});
+});
+
 describe('generateContrastColors', () => {
 	it('should work', () => {
 		expect(colorParser.generateContrastColors('rgb(255, 255, 255)')).to.be.deep.equal({ foreground: 'black', background: 'rgb(255, 255, 255)' });
