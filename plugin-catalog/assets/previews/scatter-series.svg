@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Scatter Series preview placeholder">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="135" x2="320" y2="135"/>
+    <line x1="80" y1="0" x2="80" y2="180"/><line x1="160" y1="0" x2="160" y2="180"/><line x1="240" y1="0" x2="240" y2="180"/>
+  </g>
+  <line x1="0" y1="90" x2="320" y2="90" stroke="#8c8c8c" stroke-width="1.5"/>
+  <g fill="#089981" fill-opacity="0.35" stroke="#089981" stroke-width="1.5">
+    <circle cx="38" cy="74" r="6"/>
+    <circle cx="92" cy="62" r="10"/>
+    <circle cx="146" cy="76" r="5"/>
+    <circle cx="198" cy="60" r="8"/>
+    <circle cx="234" cy="80" r="4"/>
+    <circle cx="282" cy="64" r="11"/>
+  </g>
+  <g fill="#f23645" fill-opacity="0.35" stroke="#f23645" stroke-width="1.5">
+    <circle cx="58" cy="108" r="8"/>
+    <circle cx="124" cy="102" r="5"/>
+    <circle cx="172" cy="118" r="10"/>
+    <circle cx="252" cy="106" r="6"/>
+    <circle cx="298" cy="120" r="7"/>
+  </g>
+</svg>
