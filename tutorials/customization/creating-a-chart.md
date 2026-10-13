@@ -104,7 +104,7 @@ At this point we should have a chart like this:
 
 🎉 Congrats! We now have a basic, yet beautiful, candlestick chart rendering on our page.
 
-The rest of the tutorial will focus on how to customise this chart to further match our desired visual style and functionality. The next step will be to adjust the chart colors to better suit a dark theme.
+The rest of the tutorial will focus on how to customize this chart to further match our desired visual style and functionality. The next step will be to adjust the chart colors to better suit a dark theme.
 
 ## Download
 

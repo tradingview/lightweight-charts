@@ -52,7 +52,7 @@ At this point we should have a chart like this (noting the wider candlestick bar
 
 ## Next steps
 
-In the next step, we will be adjusting the visual style and behaviour of the crosshair.
+In the next step, we will be adjusting the visual style and behavior of the crosshair.
 
 ## Download
 

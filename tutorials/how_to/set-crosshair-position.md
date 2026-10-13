@@ -2,7 +2,7 @@
 
 Lightweight Charts™ allows the crosshair position to be set programatically using the [`setCrosshairPosition`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#setcrosshairposition), and cleared using [`clearCrosshairPosition`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#clearcrosshairposition).
 
-Usually the crosshair position is set automatically by the user's actions. However in some cases you may want to set it explicitly. For example if you want to synchronise the crosshairs of two separate charts.
+Usually the crosshair position is set automatically by the user's actions. However in some cases you may want to set it explicitly. For example if you want to synchronize the crosshairs of two separate charts.
 
 ## Syncing two charts
 

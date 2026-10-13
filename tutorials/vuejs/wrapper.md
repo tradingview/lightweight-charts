@@ -67,7 +67,7 @@ functionality.
 
 When Vue wraps an object in a reference object, it modifies the object (to
 enable reactivity) in such a way that it interferes with the internal logic of
-the Lightweight Charts™. This can lead to unexpected behaviour. If you really need
+the Lightweight Charts™. This can lead to unexpected behavior. If you really need
 to use a [`ref`](https://vuejs.org/api/reactivity-core.html#ref) then please
 consider using
 [`shallowRef`](https://vuejs.org/api/reactivity-advanced.html#shallowref)
@@ -149,9 +149,9 @@ the saved chart instance.
 
 ### Providing option properties
 
-A simple way to provide customisation of the chart to the component's consumers
-is to create component properties for the options you wish to be customised.
-Lightweight Charts™ has a variety of customisation options which can be applied
+A simple way to provide customization of the chart to the component's consumers
+is to create component properties for the options you wish to be customized.
+Lightweight Charts™ has a variety of customization options which can be applied
 through the [`applyOptions`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#applyoptions) method
 on an Api instance (such as [IChartApi](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi),
 [ISeriesApi](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesApi),

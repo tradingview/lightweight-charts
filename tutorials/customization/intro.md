@@ -17,9 +17,9 @@ The following topics will be covered within the tutorial:
 - Setting a custom price formatter
 - Adjusting the Price Scale
 - Adjusting the Time Scale
-- Customising the Crosshair
+- Customizing the Crosshair
 - Adding a second series
-- Customising the appearance of a few data points
+- Customizing the appearance of a few data points
 - Setting a different font
 
 ## Prerequisite knowledge

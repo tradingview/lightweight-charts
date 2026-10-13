@@ -45,7 +45,7 @@ We'd like to thank our external contributors for their valuable contributions to
 
 - Fixed line series point markers not being drawn correctly when per-point colors change. (PR [#2064](https://github.com/tradingview/lightweight-charts/pull/2064), fixes [#2017](https://github.com/tradingview/lightweight-charts/issues/2017))
 - Fixed a visual bug where a pane's DOM element could persist on screen after removing the last series from that pane via `removeSeries()` when the series contained large values. (PR [#2063](https://github.com/tradingview/lightweight-charts/pull/2063))
-- Fixed visual jitter that occurred when charts with `autoSize` enabled were resized within dynamic containers. Resize behaviour triggered by `ResizeObserver` now paints synchronously, avoiding the timing mismatch with container resize. (PR [#2055](https://github.com/tradingview/lightweight-charts/pull/2055), contributed by [@DarrenHaba](https://github.com/DarrenHaba))
+- Fixed visual jitter that occurred when charts with `autoSize` enabled were resized within dynamic containers. Resize behavior triggered by `ResizeObserver` now paints synchronously, avoiding the timing mismatch with container resize. (PR [#2055](https://github.com/tradingview/lightweight-charts/pull/2055), contributed by [@DarrenHaba](https://github.com/DarrenHaba))
 - Fixed the description of the `timeToIndex()` method. (PR [#2072](https://github.com/tradingview/lightweight-charts/pull/2072))
 
 **Development**
@@ -397,7 +397,7 @@ See [changes since the last published version](https://github.com/tradingview/li
 **Bug Fixes**
 
 - Fixed hoveredSeries being undefined during series removal and creation. (PR [#1529](https://github.com/tradingview/lightweight-charts/pull/1529), fixes [#1406](https://github.com/tradingview/lightweight-charts/pull/1406), fixes [#1499](https://github.com/tradingview/lightweight-charts/pull/1499))
-- Fixed price label rendering artefact. (PR [#1585](https://github.com/tradingview/lightweight-charts/pull/1585), fixes [#1584](https://github.com/tradingview/lightweight-charts/pull/1584))
+- Fixed price label rendering artifact. (PR [#1585](https://github.com/tradingview/lightweight-charts/pull/1585), fixes [#1584](https://github.com/tradingview/lightweight-charts/pull/1584))
 - Fixed an issue that prevented primitives with `zOrder` set to `top` from drawing above the last price animation. (PR [#1576](https://github.com/tradingview/lightweight-charts/pull/1576))
 - Fixed possible ReDos. (PR [#1536](https://github.com/tradingview/lightweight-charts/pull/1536))
 - Fixed marker positioning, which could cause a space between histogram and bottom of the chart. (PR [#1538](https://github.com/tradingview/lightweight-charts/pull/1538) & [#1539](https://github.com/tradingview/lightweight-charts/pull/1539), fixes [#1382](https://github.com/tradingview/lightweight-charts/pull/1382))
@@ -438,7 +438,7 @@ See [changes since the last published version](https://github.com/tradingview/li
 
 **Bug Fixes**
 
-- Fixed `shiftVisibleRangeOnNewBar` behaviour for realtime updates to a series. Additionally, a new option `allowShiftVisibleRangeOnWhitespaceReplacement` has been added if you wish to have the old 4.0 behaviour for when new data replaces existing whitespace. (PR [#1444](https://github.com/tradingview/lightweight-charts/pull/1444))
+- Fixed `shiftVisibleRangeOnNewBar` behavior for realtime updates to a series. Additionally, a new option `allowShiftVisibleRangeOnWhitespaceReplacement` has been added if you wish to have the old 4.0 behavior for when new data replaces existing whitespace. (PR [#1444](https://github.com/tradingview/lightweight-charts/pull/1444))
 - When disabling touch scrolling on the chart via either the `vertTouchDrag` or `horzTouchDrag` setting in the `handleScroll` options, any touch scroll events over the corresponding scale will now be ignored so the page can be scrolled. (PR [#1445](https://github.com/tradingview/lightweight-charts/pull/1445))
 
 [Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v4.1.0..v4.1.1).
@@ -463,7 +463,7 @@ To help you get started quickly, we have created an NPM package called [create-l
 
 **Horizontal Scale Customization**
 
-The horizontal scale is no longer restricted to only time-based values. The API has been extended to allow customization of the horizontal scale behavior, and enable uses cases like options chart where price values are displayed in the horizontal scale. The most common use-case would be to customise the tick marks behaviour.
+The horizontal scale is no longer restricted to only time-based values. The API has been extended to allow customization of the horizontal scale behavior, and enable uses cases like options chart where price values are displayed in the horizontal scale. The most common use-case would be to customize the tick marks behavior.
 
 The [createChartEx](https://tradingview.github.io/lightweight-charts/docs/api/functions/createChartEx) function should be used instead of the usual `createChart` function, and an instance of a class implementing [IHorzScaleBehavior](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IHorzScaleBehavior) should be provided.
 
@@ -504,7 +504,7 @@ See [issues assigned to this version's milestone](https://github.com/tradingvie
 
 **Enhancements**
 
-- Add the ability to specify font colour for the Priceline labels. [#1274](https://github.com/tradingview/lightweight-charts/issues/1274) [#1287](https://github.com/tradingview/lightweight-charts/issues/1287)
+- Add the ability to specify font color for the Priceline labels. [#1274](https://github.com/tradingview/lightweight-charts/issues/1274) [#1287](https://github.com/tradingview/lightweight-charts/issues/1287)
 - Ignore resize method if `autoSize` is active, and added API to check if active. [#1301](https://github.com/tradingview/lightweight-charts/issues/1301)
 
 **Bug fixes**
@@ -591,7 +591,7 @@ Please view the migration guide here: [Migrating from v3 to v4](https://tradingv
 - lockVisibleTimeRangeOnResize does not work with fixLeftEdge | [#991](https://github.com/tradingview/lightweight-charts/issues/991)
   - The visible range is no longer changed after resizing the chart.
 - Crosshair label text appears on the chart during initial render | [#1255](https://github.com/tradingview/lightweight-charts/issues/1255)
-  - Small text artefacts from the crosshair no longer appear on the time axis before any interaction with the chart.
+  - Small text artifacts from the crosshair no longer appear on the time axis before any interaction with the chart.
 
 As always, we thank you for your support and help in making Lightweight Charts™ the best product on the financial web. And a big shout out to our hero contributors [thanhlmm](https://github.com/thanhlmm), [CommanderRoot](https://github.com/CommanderRoot), [samhainsamhainsamhain](https://github.com/samhainsamhainsamhain) & colleague [Nipheris](https://github.com/Nipheris)!
 You can always send us your feedback via GitHub.
@@ -610,7 +610,7 @@ We're happy to announce the next release of Lightweight Charts™ library. This 
 
 - Documentation website (see [#875](https://github.com/tradingview/lightweight-charts/issues/875), [#918](https://github.com/tradingview/lightweight-charts/issues/918), [#411](https://github.com/tradingview/lightweight-charts/issues/411), [#919](https://github.com/tradingview/lightweight-charts/issues/919), [#922](https://github.com/tradingview/lightweight-charts/issues/922), [#983](https://github.com/tradingview/lightweight-charts/issues/983), [#980](https://github.com/tradingview/lightweight-charts/issues/980), [#1006](https://github.com/tradingview/lightweight-charts/issues/1006))
 - Quick tracking mode (see [#830](https://github.com/tradingview/lightweight-charts/issues/830))
-- Improved mouse behaviour on touch devices (like mouse connected to mobile phone/tablet) (see [#106](https://github.com/tradingview/lightweight-charts/issues/106))
+- Improved mouse behavior on touch devices (like mouse connected to mobile phone/tablet) (see [#106](https://github.com/tradingview/lightweight-charts/issues/106))
 - Custom color for items of candlestick and line series (see [#195](https://github.com/tradingview/lightweight-charts/issues/195))
 - Labels might be cut off when disabling scale and scroll ([#947](https://github.com/tradingview/lightweight-charts/issues/947))
 - Add ability to disable visibility of price line line (see [#969](https://github.com/tradingview/lightweight-charts/issues/969))
@@ -657,7 +657,7 @@ See [issues assigned to this version's milestone](https://github.com/tradingview
 - Increased min price tick mark step up to 1e-14 (from 1e-9) (see [#841](https://github.com/tradingview/lightweight-charts/issues/841))
 - Fix typo in customization docs (see [#844](https://github.com/tradingview/lightweight-charts/issues/844))
 - Do not paint time axis if it not visible (see [#865](https://github.com/tradingview/lightweight-charts/issues/865))
-- Remove color customisation from settings.json (see [#869](https://github.com/tradingview/lightweight-charts/issues/869))
+- Remove color customization from settings.json (see [#869](https://github.com/tradingview/lightweight-charts/issues/869))
 
 Thanks to our contributors:
 

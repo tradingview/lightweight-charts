@@ -161,8 +161,8 @@ class LightweightChartWC extends HTMLElement {
 
 ## Attributes and properties
 
-Whilst we could encapsulate everything required to create a chart within the
-custom element, generally we wish to allow further customisation of the chart to
+While we could encapsulate everything required to create a chart within the
+custom element, generally we wish to allow further customization of the chart to
 the consumers of the custom element. Attributes and properties are a great way
 to provide this 'API' to the consumer.
 
@@ -317,7 +317,7 @@ class LightweightChartWC extends HTMLElement {
                 value = JSON.parse(valueString);
             } catch (error) {
                 console.error(
-                    `Unable to read attribute ${name}'s value during initialisation.`
+                    `Unable to read attribute ${name}'s value during initialization.`
                 );
                 return;
             }

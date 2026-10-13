@@ -120,7 +120,7 @@ chart.timeScale().applyOptions({
 });
 ```
 
-At a later stage, we will customise these scales further.
+At a later stage, we will customize these scales further.
 
 ## Result
 
