@@ -18,7 +18,7 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The wizard offers to install the plugin-authoring Agent Skill for AI coding
   assistants such as Claude Code, Codex and Cursor, either into the new project
   or into the current directory when you quit the wizard early.
-- New wizard questions for the plugin description, licence, minimum supported
+- New wizard questions for the plugin description, license, minimum supported
   Lightweight Charts™ version and catalog tags. The answers populate the
   `lwcPlugin` block in `package.json` that the plugin catalog reads.
 - A `check-package` script in scaffolded projects that runs `publint` and

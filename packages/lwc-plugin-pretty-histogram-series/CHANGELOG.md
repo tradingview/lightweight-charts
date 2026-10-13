@@ -21,7 +21,7 @@ collection of the Lightweight Charts™ repository.
   corner `radius`, series `color`, and per-point color overrides.
 - `base`, the price the bars grow from, reported to the autoscale the way the
   built-in histogram series does, and `upColor` / `downColor` for two-tone bars
-  coloured by their sign relative to it.
+  colored by their sign relative to it.
 - `widthMode` (`'percent'` or `'histogram'`), `minColumnWidth`, `borderColor`,
   `borderWidth` and `roundInnerCorners`.
 - `gradientColor`, fading the fill from the bar's color at `base` into a second

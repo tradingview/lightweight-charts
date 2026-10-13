@@ -118,7 +118,7 @@ npm create lwc-plugin@latest
 The wizard is interactive. It first offers to install this skill (say no if it
 is already installed, or the user quit the wizard to hand over to you), then
 asks for the type, a name, a one-sentence description, a package name, a class
-name, author, licence, the minimum library version, tags, whether to keep hint
+name, author, license, the minimum library version, tags, whether to keep hint
 comments, and the target folder. Work those answers out with the user before
 anyone runs it — the type decision above is the one that matters — then have
 the user run the wizard in their terminal, unless your environment gives you a
@@ -142,7 +142,7 @@ the release tooling run.
 
 `@tradingview/lwc-toolkit` is what the official plugins are built from,
 extracted from the helpers every example used to copy by hand. Reaching for
-it is not about saving lines; it is that the helpers encode chart behaviour
+it is not about saving lines; it is that the helpers encode chart behavior
 that is easy to get subtly wrong — the exact width the built-in candlestick
 uses at a given bar spacing, pixel-perfect line positions at every device
 pixel ratio, the dash patterns of `LineStyle`, how conflation changes a bar's
@@ -167,7 +167,7 @@ with the shape of each API and the official plugin that uses it.
 | stacked values: band edges and autoscale extremes | `custom-series/stacking` — `stackLevels`, `stackedPlotValues` |
 | columns, candles or lines the same width as the built-ins, pixel-aligned | `dimensions/*` — `calculateColumnPositions`, `candlestickWidth`, `positionsLine`, `positionsBox` |
 | rounded rectangles with an inset border | `canvas/round-rect` |
-| polylines, step lines, the area between two lines, a line whose colour changes | `custom-series/line-paths` |
+| polylines, step lines, the area between two lines, a line whose color changes | `custom-series/line-paths` |
 | a label on the price or time axis | `axis-label-view` (`AxisLabelView`) |
 | a DOM overlay inside the pane | `dom/pane-element` (`paneContentElement`) |
 | a small event, or a `Time` as a timestamp or display string | `delegate`, `time` |
@@ -236,7 +236,7 @@ have.
 ## Correctness checklist
 
 Each of these has bitten a shipped plugin. The reasons are here so they can
-be recognised in a new shape, not just avoided in the old one.
+be recognized in a new shape, not just avoided in the old one.
 
 ### Drawing
 
@@ -328,7 +328,7 @@ packages have all three under `tests/`; the scaffold sets up the first.
 - **Interactions** (`tests/interactions/*.js`): a page with an async
   `beforeInteractions(container)` that drives the chart and throws on a
   wrong outcome — pixel sampling for "did it paint", DOM checks, hit tests.
-  This is where whitespace, update, `pop` and pointer behaviour are tested.
+  This is where whitespace, update, `pop` and pointer behavior are tested.
 
 Run upstream with `pnpm test`, `pnpm e2e:graphics:plugins` and
 `GREP="lwc-plugin-<name>/" pnpm e2e:interactions`, after `pnpm build:prod`

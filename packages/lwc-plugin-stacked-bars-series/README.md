@@ -107,7 +107,7 @@ away from the base, a negative one comes back towards it and past it, so a
 mixed point stays contiguous and never overlaps. Values which are not finite
 are skipped without shifting the segments above them.
 
-A point may override the series colours for its own segments:
+A point may override the series colors for its own segments:
 
 ```js
 series.setData([

@@ -65,7 +65,7 @@ The exported files are generated in `postBuild`, so they exist only in a full `n
 
 Run the following command replacing $VERSION with the name of a version you would like to create. $VERSION should match one of the available versions of the package on [unpkg.com](https://unpkg.com)
 
-See [the Docusaurus versioning docs](https://docusaurus.io/docs/versioning#tagging-a-new-version) for an explanation of the Docusaurus versioning behaviour.
+See [the Docusaurus versioning docs](https://docusaurus.io/docs/versioning#tagging-a-new-version) for an explanation of the Docusaurus versioning behavior.
 
 ```bash
 pnpm docusaurus docs:version $VERSION

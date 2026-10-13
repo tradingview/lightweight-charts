@@ -26,7 +26,7 @@ collection of the Lightweight Charts™ repository.
   `areaVisible`, plus the series-wide `lineWidth`, `lineStyle`, `lineVisible`,
   `areaVisible`, `base`, `lineType` (`simple`/`step`/`curved`), `gapHandling`
   (`break`/`bridge`) and `percent` (100% stacked) mode.
-- Per-point band colour overrides through `colors` on the data item.
+- Per-point band color overrides through `colors` on the data item.
 - Autoscaling follows `percent` and `base`, so a 100% stack added with the
   factory scales to `base`…`base + 100` rather than to the raw totals.
 - `hitTest` reporting the hovered band (`objectId` is the index of the band),

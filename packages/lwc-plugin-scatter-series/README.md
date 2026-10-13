@@ -1,7 +1,7 @@
 # Scatter series
 
 A scatter and bubble chart for Lightweight Charts™: points placed by two
-numbers on a numeric X axis, in named groups with their own colours and marker
+numbers on a numeric X axis, in named groups with their own colors and marker
 shapes, sized by a data value, optionally connected by lines, with baselines
 and accent borders around the plot.
 
@@ -133,11 +133,11 @@ replaced as a whole by `applyOptions`.
 | --- | --- | --- |
 | `id` | — | Identifier points refer to. Required. |
 | `name` | `id` | Display name, for your legend. |
-| `color` | the `palette` entry | Fill colour. |
+| `color` | the `palette` entry | Fill color. |
 | `opacity`, `shape`, `pointSize`, `strokeColor`, `strokeWidth`, `hollow` | the series option | Style of the group's points; `opacity` is `1` with `lineVisible`. |
 | `visible` | `true` | Whether the group is drawn, hovered and autoscaled. |
 | `lineVisible` | `false` | Connect the group's points in data order, as a tail. |
-| `lineWidth`, `lineColor`, `lineStyle` | `1`, the group colour, solid | The connecting line. |
+| `lineWidth`, `lineColor`, `lineStyle` | `1`, the group color, solid | The connecting line. |
 
 A hidden group still counts for the automatic X range and size domain, so
 switching it moves neither; `series.setGroupVisible(id, visible)` switches one
@@ -149,20 +149,20 @@ A point's style beats its group's, which beats the series options; its size
 is its `size`, else its mapped `sizeValue`, else the `pointSize` of its group,
 else of the series. Every point has a thin ring, `strokeWidth` wide but at
 most a quarter of its size, to show where points overlap; a `hollow` point is
-an outline at least 1 px wide and no fill. The ring colour is automatic by
+an outline at least 1 px wide and no fill. The ring color is automatic by
 default: the chart's background, following theme changes, or the point's own
-colour when it is hollow.
+color when it is hollow.
 
 `strokeColor` is the only style that also takes `null`, on a group or a point,
-and `null` is not the same as leaving it out: left out, the colour comes from
-the group, then the series; `null` asks for the automatic colour even when the
+and `null` is not the same as leaving it out: left out, the color comes from
+the group, then the series; `null` asks for the automatic color even when the
 group or the series sets one.
 
 ```js
 series.applyOptions({
     strokeColor: '#131722',
     groups: [
-        { id: 'aaa', hollow: true, strokeWidth: 2, strokeColor: null }, // outlined in its own colour
+        { id: 'aaa', hollow: true, strokeWidth: 2, strokeColor: null }, // outlined in its own color
         { id: 'bbb', strokeWidth: 2 }, // ringed in #131722
     ],
 });
@@ -219,7 +219,7 @@ be laid out: those points are not drawn, and the series warns once; nor can a
 span below 1e-98, which is widened, with a warning. Data spanning only a few
 floating-point steps of its own magnitude, such as `[1e15, 1e15 + 1]`, gets
 an axis of very few slots, since finer ones would not be distinct numbers;
-the chart keeps neighbouring slots at most half the plot width apart (its
+the chart keeps neighboring slots at most half the plot width apart (its
 default `timeScale.maxBarSpacing`), so such data spans about half the plot.
 
 ```js
@@ -244,7 +244,7 @@ and the series `priceScaleId: 'left'`.
 ## The scatter chart
 
 `createScatterChart` is `createChartEx` with a numeric horizontal scale
-behaviour (`ScatterHorzScaleBehavior`) and these defaults
+behavior (`ScatterHorzScaleBehavior`) and these defaults
 (`scatterChartDefaults`), which the options you pass override:
 
 - scrolling and zooming off, flag by flag: `handleScroll`'s `mouseWheel`,
@@ -282,7 +282,7 @@ further, wherever the range sat, the user is back at the fit: a pan at that
 zoom springs back to it, as does the chart's double-click reset of the time
 axis. Keep the fixed edges: they keep the user within the X range, and only at
 a fixed edge does the chart move an end label inside the plot. At a free edge
-it centres the label on its value, so the series keeps that end of the range
+it centers the label on its value, so the series keeps that end of the range
 far enough inside for it. To let the user pan past the range, set `xMargins`.
 Zoom from code with `chart.timeScale().setVisibleLogicalRange(...)`: a zoom
 set through the `timeScale.barSpacing` and `rightOffset` options looks like the
@@ -314,7 +314,7 @@ series.subscribeHoveredPointChange(info => {
 ```
 
 It gets what `series.pointById(objectId)` returns: your point, its `index`
-and `groupId`, its centre `x` and `y` in pane coordinates (CSS pixels from the
+and `groupId`, its center `x` and `y` in pane coordinates (CSS pixels from the
 top-left corner of the plot), its `radius` as drawn, and its resolved style.
 The chart's crosshair and click events carry the hovered `objectId` in
 `param.hoveredInfo` (with `hoveredInfo.series === series.series()`), but come
@@ -324,7 +324,7 @@ the chart, a table row say, call `series.setHoveredPoint(objectId)`, and
 `null` to clear it.
 
 Build a legend from `series.groups()`, the groups as drawn, with their palette
-colour, shape, ring and `pointCount` resolved, and switch them with
+color, shape, ring and `pointCount` resolved, and switch them with
 `setGroupVisible`:
 
 ```js
@@ -430,14 +430,14 @@ In addition to the standard
 
 | Option | Default | Description |
 | --- | --- | --- |
-| `color` | `'#2962FF'` | Fill colour of points with no group, and of groups when `palette` is empty. |
+| `color` | `'#2962FF'` | Fill color of points with no group, and of groups when `palette` is empty. |
 | `opacity` | `0.65` | Opacity of the points, `0`–`1`. |
 | `pointSize` | `9` | Size of the points in CSS pixels, stroke included. |
 | `pointSizeLimits` | `{ min: 5, max: 50 }` | Smallest and largest size of any point. |
 | `shape` | `'circle'` | `'circle'`, `'square'`, `'diamond'`, `'triangleUp'` or `'triangleDown'`. |
-| `strokeColor`, `strokeWidth` | `null`, `1` | Colour (`null`: automatic) and width in CSS pixels (`0`: none) of the ring around every point. |
+| `strokeColor`, `strokeWidth` | `null`, `1` | Color (`null`: automatic) and width in CSS pixels (`0`: none) of the ring around every point. |
 | `hollow` | `false` | Draw points as open markers. |
-| `palette` | `DEFAULT_SCATTER_PALETTE` | Colours of the groups which set none, in group order: ten by default. |
+| `palette` | `DEFAULT_SCATTER_PALETTE` | Colors of the groups which set none, in group order: ten by default. |
 | `groups` | `[]` | The groups, in drawing order. |
 | `sizeRange` | `{ min: 5, max: 25 }` | Sizes `sizeValue` is mapped onto, in CSS pixels. |
 | `sizeDomain` | `{ min: null, max: null }` | Values mapped to the ends of `sizeRange`; `null` takes the end from the data. |
@@ -450,7 +450,7 @@ In addition to the standard
 | `plotBorder` | `visible: false`, `'#9598A1'`, 1 px, solid, every side | Accent border along the edges of the plot (`visible`, `color`, `width`, `style`, `top`, `right`, `bottom`, `left`). |
 | `hoveredOpacity` | `1` | Opacity of the hovered point, drawn on top. |
 | `hoveredSizeIncrease` | `0` | Pixels added to the size of the hovered point. |
-| `hoveredRingWidth`, `hoveredRingGap`, `hoveredRingColor` | `0`, `1`, `null` | Width (`0`: none), distance and colour (`null`: the point's) of a ring around the hovered point. |
+| `hoveredRingWidth`, `hoveredRingGap`, `hoveredRingColor` | `0`, `1`, `null` | Width (`0`: none), distance and color (`null`: the point's) of a ring around the hovered point. |
 | `hitTestTolerance` | `3` | How many pixels outside a point the pointer may be and still hover it. |
 
 `applyOptions` merges nested objects; `groups`, `baselines`, `palette` and
@@ -470,7 +470,7 @@ price line and last-value label off: the underlying values are X axis slots.
 | `applyOptions(options)` / `options()` | Changes / reads (a copy of) the options. |
 | `series()` | The underlying custom series, for its price scale and Y conversions. |
 | `groups()` | The groups as drawn, resolved, with their point counts, for a legend. |
-| `setGroupVisible(groupId, visible)` | Shows or hides a group, keeping its colour and the X axis. |
+| `setGroupVisible(groupId, visible)` | Shows or hides a group, keeping its color and the X axis. |
 | `xDomain()` / `fitXDomain()` | The X axis range in use and its tick step / fits it to the plot again. |
 | `xToCoordinate(x)` / `coordinateToX(coordinate)` | An X value to a horizontal pane coordinate and back, as the points are drawn, or `null`. |
 | `sizeMapping()` | How `sizeValue` maps to sizes, or `null` when no point uses it. |
