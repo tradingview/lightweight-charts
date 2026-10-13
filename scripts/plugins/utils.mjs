@@ -8,6 +8,8 @@ import Ajv from 'ajv';
 const AjvCtor = Ajv.default ?? Ajv;
 const SCHEMA_PATH = fileURLToPath(new URL('./lwc-plugin-metadata.schema.json', import.meta.url));
 const DEFAULT_REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
+const PALETTE_PATH = fileURLToPath(new URL('./tv-palette.json', import.meta.url));
+const ILLUSTRATIONS_DIR = 'website/static/plugin-catalog/assets/previews';
 
 /**
  * The placeholders the create-lwc-plugin wizard substitutes, see
@@ -412,6 +414,83 @@ function validateRepositoryDirectory(pkg, packageDir, repoRoot) {
 }
 
 /**
+ * Unscoped name without the `lwc-plugin-` prefix: the catalog's URL segment.
+ *
+ * @param {string} packageName
+ * @returns {string}
+ */
+export function catalogSlugOf(packageName) {
+	return packageName.slice(packageName.indexOf('/') + 1).replace(/^lwc-plugin-/, '');
+}
+
+/** `#abc` and `#AABBCC` as `#aabbcc`; null for anything that is not a 3- or 6-digit hex color. */
+function normalizeHexColor(value) {
+	const match = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(value);
+	if (!match) {
+		return null;
+	}
+	const digits = match[1].toLowerCase();
+	return `#${digits.length === 3 ? [...digits].map(d => d + d).join('') : digits}`;
+}
+
+/**
+ * Checks a catalog card illustration: the 320×180 frame every card is drawn
+ * for, and only colors of the TradingView design-system palette
+ * (`tv-palette.json`). Transparency goes in `opacity`, not in the color.
+ *
+ * @param {string} label - How the file is named in error messages.
+ * @param {string} svg - The file's text.
+ * @returns {string[]} Error messages, empty when the illustration is valid.
+ */
+export function validateCatalogIllustrationContent(label, svg) {
+	const errors = [];
+	if (!/<svg\b[^>]*\bviewBox="0 0 320 180"/.test(svg)) {
+		errors.push(`${label} must have viewBox="0 0 320 180"`);
+	}
+
+	const palette = new Set(Object.values(JSON.parse(fs.readFileSync(PALETTE_PATH, 'utf-8'))));
+	const offPalette = new Set();
+	// Attributes (fill="…") and style declarations (fill: …); `fill-rule`,
+	// `stroke-width` and the like do not match.
+	const colorPattern = /\b(?:fill|stroke|stop-color|flood-color|lighting-color|color)\s*[=:]\s*["']?\s*([^"';>]+)/g;
+	for (const [, raw] of svg.matchAll(colorPattern)) {
+		const value = raw.trim();
+		if (/^(none|currentColor|transparent|url\(.*\))$/i.test(value)) {
+			continue;
+		}
+		const hex = normalizeHexColor(value);
+		if (hex === null || !palette.has(hex)) {
+			offPalette.add(value);
+		}
+	}
+	if (offPalette.size > 0) {
+		errors.push(
+			`${label} uses colors outside the TradingView palette (scripts/plugins/tv-palette.json): ${[...offPalette].join(', ')}`
+		);
+	}
+	return errors;
+}
+
+/**
+ * The catalog card shows a curated illustration from the docs site, found by
+ * slug. A missing one only leaves the card's frame empty, which nobody notices,
+ * so every package under this repository's `packages/` must have one. Any other
+ * target (a fixture, a `--path` package elsewhere) is not a catalog entry.
+ */
+function validateCatalogIllustration(pkg, packageDir, repoRoot) {
+	const relativeDir = path.relative(repoRoot, path.resolve(packageDir)).split(path.sep).join('/');
+	if (!/^packages\/lwc-plugin-[^/]+$/.test(relativeDir) || typeof pkg.name !== 'string') {
+		return [];
+	}
+	const file = `${ILLUSTRATIONS_DIR}/${catalogSlugOf(pkg.name)}.svg`;
+	const filePath = path.join(repoRoot, file);
+	if (!fs.existsSync(filePath)) {
+		return [`Catalog illustration '${file}' is missing`];
+	}
+	return validateCatalogIllustrationContent(file, fs.readFileSync(filePath, 'utf-8'));
+}
+
+/**
  * Validates package.json contract and lwcPlugin metadata against JSON schema.
  *
  * @param {string} packageDir - Absolute path to package directory.
@@ -466,7 +545,10 @@ export function validatePackageMetadata(packageDir, { isOfficial = true, repoRoo
 		}
 	}
 
-	errors.push(...validateRepositoryDirectory(pkg, packageDir, repoRoot));
+	errors.push(
+		...validateRepositoryDirectory(pkg, packageDir, repoRoot),
+		...validateCatalogIllustration(pkg, packageDir, repoRoot)
+	);
 
 	// A declared page that is not there would leave the catalogue framing a 404.
 	for (const field of ['demo', 'preview']) {
