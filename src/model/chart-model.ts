@@ -505,6 +505,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private readonly _rendererOptionsProvider: PriceAxisRendererOptionsProvider;
 
 	private readonly _timeScale: TimeScale<HorzScaleItem>;
+	private _timeScaleAnimation: ITimeScaleAnimation | null = null;
 	private readonly _panes: Pane[] = [];
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
@@ -975,8 +976,13 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 			const replacedExistingWhitespace = firstChangedPointIndex === undefined;
 			const needShiftVisibleRangeOnNewBar = isLastSeriesBarVisible && (!replacedExistingWhitespace || allowShiftWhenReplacingWhitespace) && this._timeScale.options().shiftVisibleRangeOnNewBar;
 			if (isSeriesPointsAddedToRight && !needShiftVisibleRangeOnNewBar) {
-				const compensationShift = newBaseIndex - currentBaseIndex;
-				this._timeScale.setRightOffset(this._timeScale.rightOffset() - compensationShift);
+				// keep the visible range in place: apply the new base index first so that the shifted offset is clamped against it,
+				// then shift everything that holds an absolute right offset (the time scale, its scroll gesture snapshot and a running animation)
+				const delta = newBaseIndex - currentBaseIndex;
+				this._timeScale.setBaseIndex(newBaseIndex);
+				this._timeScale.shiftRightOffset(delta);
+				this._shiftTimeScaleAnimation(delta);
+				return;
 			}
 		}
 
@@ -1096,12 +1102,14 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public setTimeScaleAnimation(animation: ITimeScaleAnimation): void {
+		this._timeScaleAnimation = animation;
 		const mask = InvalidateMask.light();
 		mask.setTimeScaleAnimation(animation);
 		this._invalidate(mask);
 	}
 
 	public stopTimeScaleAnimation(): void {
+		this._timeScaleAnimation = null;
 		const mask = InvalidateMask.light();
 		mask.stopTimeScaleAnimation();
 		this._invalidate(mask);
@@ -1281,5 +1289,11 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		}
 
 		return false;
+	}
+
+	private _shiftTimeScaleAnimation(delta: number): void {
+		if (this._timeScaleAnimation !== null) {
+			this._timeScaleAnimation.shift(delta);
+		}
 	}
 }
