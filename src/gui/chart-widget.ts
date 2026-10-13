@@ -27,6 +27,7 @@ import { TouchMouseEventData } from '../model/touch-mouse-event-data';
 
 import { buildHoveredEventInfo, HoveredInfoImpl } from './hovered-event-info';
 import { suggestChartSize, suggestPriceScaleWidth, suggestTimeScaleHeight } from './internal-layout-sizes-hints';
+import { isMouseWheelModifierPressed } from './mouse-wheel-modifier';
 import { PaneSeparator, SeparatorConstants } from './pane-separator';
 import { PaneWidget } from './pane-widget';
 import { TimeAxisWidget } from './time-axis-widget';
@@ -595,8 +596,12 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	}
 
 	private _onMousewheel(event: WheelEvent): void {
-		if ((event.deltaX === 0 || !this._options['handleScroll'].mouseWheel) &&
-			(event.deltaY === 0 || !this._options['handleScale'].mouseWheel)) {
+		const handleScale = this._options['handleScale'];
+		const scrollEnabled = this._options['handleScroll'].mouseWheel;
+		const scaleEnabled = handleScale.mouseWheel && isMouseWheelModifierPressed(event, handleScale.mouseWheelModifierKey);
+
+		if ((event.deltaX === 0 || !scrollEnabled) &&
+			(event.deltaY === 0 || !scaleEnabled)) {
 			return;
 		}
 
@@ -609,13 +614,13 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			event.preventDefault();
 		}
 
-		if (deltaY !== 0 && this._options['handleScale'].mouseWheel) {
+		if (deltaY !== 0 && scaleEnabled) {
 			const zoomScale = Math.sign(deltaY) * Math.min(1, Math.abs(deltaY));
 			const scrollPosition = event.clientX - this._element.getBoundingClientRect().left;
 			this.model().zoomTime(scrollPosition as Coordinate, zoomScale);
 		}
 
-		if (deltaX !== 0 && this._options['handleScroll'].mouseWheel) {
+		if (deltaX !== 0 && scrollEnabled) {
 			this.model().scrollChart(deltaX * -80 as Coordinate); // 80 is a made up coefficient, and minus is for the "natural" scroll
 		}
 	}
