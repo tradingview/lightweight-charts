@@ -142,7 +142,7 @@ defaults are exported as `defaultOptions`.
 ## Notes
 
 - Each column is exactly one bar wide, taken from the time scale's bar
-  spacing, so neighbouring columns abut with no seams and no overlap at any
+  spacing, so neighboring columns abut with no seams and no overlap at any
   zoom level or device pixel ratio.
 - Only bars of the attached series are shaded. Whitespace items and gaps in
   the data get no column, even where another series has a bar at that time.

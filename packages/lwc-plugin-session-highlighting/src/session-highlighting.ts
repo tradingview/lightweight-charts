@@ -96,7 +96,7 @@ export class SessionHighlighting extends PluginBase {
 					? shrinkTo(this._highlights, data.length, last.time)
 					: updateLastColor(this._highlights, data.length, last.time, this._highlighter);
 				if (!patched) {
-					this._recolorAll();
+					this._recolorAll(data);
 					return;
 				}
 			}
@@ -106,8 +106,8 @@ export class SessionHighlighting extends PluginBase {
 		this._recolorAll();
 	}
 
-	private _recolorAll(): void {
-		this._highlights = colorsForTimes(this.series.data().map(item => item.time), this._highlighter);
+	private _recolorAll(data: readonly { time: Time }[] = this.series.data()): void {
+		this._highlights = colorsForTimes(data.map(item => item.time), this._highlighter);
 		this.requestUpdate();
 	}
 

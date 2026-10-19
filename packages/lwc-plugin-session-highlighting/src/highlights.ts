@@ -6,12 +6,10 @@ export type SessionHighlighter = (time: Time) => string;
 
 /** One bar of the series and the color the highlighter gave it. */
 export interface Highlight {
-	/** The time as the data gives it, which is what the highlighter is shown. */
-	time: Time;
 	/**
-	 * The same bar as the time scale keys it. Every form of `Time` maps to the
-	 * UTC timestamp of its bar, so this is what is handed to the time scale on
+	 * The bar's time as the time scale keys it, handed to the time scale on
 	 * each paint: the time is converted once here instead of on every lookup.
+	 * See `timestampOf`.
 	 */
 	timestamp: UTCTimestamp;
 	color: string;
@@ -33,18 +31,20 @@ export interface IndexRange {
 	to: number;
 }
 
-/** The UTC timestamp the time scale keys a bar by, for any form of `Time`. */
+/**
+ * The key the time scale gives a bar, for any form of `Time`. A number is
+ * passed through unchanged, fractional or not, because that is how the time
+ * scale keys it; this also covers the price-based horizontal scale of an
+ * options chart. Business days and `yyyy-mm-dd` strings, which only the
+ * default time scale accepts, become the UTC timestamp of their day, so the
+ * same bar written two ways gets one key.
+ */
 export function timestampOf(time: Time): UTCTimestamp {
-	return Math.round(convertTimeUTC(time) / 1000) as UTCTimestamp;
-}
-
-/** Whether two times name the same bar, however each of them is written. */
-export function sameBar(a: Time, b: Time): boolean {
-	return timestampOf(a) === timestampOf(b);
+	return (typeof time === 'number' ? time : convertTimeUTC(time) / 1000) as UTCTimestamp;
 }
 
 function highlightFor(time: Time, highlighter: SessionHighlighter): Highlight {
-	return { time, timestamp: timestampOf(time), color: highlighter(time) };
+	return { timestamp: timestampOf(time), color: highlighter(time) };
 }
 
 /** Asks the highlighter for the color of every bar, in data order. */
@@ -65,12 +65,11 @@ export function updateLastColor(
 	highlights: Highlight[],
 	count: number,
 	time: Time,
-	highlighter: SessionHighlighter,
-	isSameBar: (a: Time, b: Time) => boolean = sameBar
+	highlighter: SessionHighlighter
 ): boolean {
 	const last = highlights[highlights.length - 1];
 	if (count === highlights.length) {
-		if (last === undefined || !isSameBar(last.time, time)) {
+		if (last === undefined || last.timestamp !== timestampOf(time)) {
 			return false;
 		}
 		highlights[highlights.length - 1] = highlightFor(time, highlighter);
@@ -91,13 +90,8 @@ export function updateLastColor(
  * bar: nothing is cut and false is returned, meaning every bar has to be
  * recolored.
  */
-export function shrinkTo(
-	highlights: Highlight[],
-	count: number,
-	lastTime: Time,
-	isSameBar: (a: Time, b: Time) => boolean = sameBar
-): boolean {
-	if (count > 0 && !isSameBar(highlights[count - 1].time, lastTime)) {
+export function shrinkTo(highlights: Highlight[], count: number, lastTime: Time): boolean {
+	if (count > 0 && highlights[count - 1].timestamp !== timestampOf(lastTime)) {
 		return false;
 	}
 	highlights.length = count;
