@@ -21,8 +21,9 @@ collection of the Lightweight Charts™ repository.
   argument is optional, and the defaults are exported as `defaultOptions`.
 - `applyOptions`, `setHighlighter` and `options`, so the shading can be
   changed, hidden or given a new highlighter while it is attached.
-- Columns as wide as the time scale's bar spacing, so neighbouring bars abut
+- Columns as wide as the time scale's bar spacing, so neighboring bars abut
   exactly at every zoom level and pixel ratio, with or without gaps in the
   data.
 - Only the bars on screen are drawn, and an incremental `series.update()` asks
-  the highlighter for the bar it touched rather than for every bar.
+  the highlighter for the last bar when it appends or replaces it, rather than
+  for every bar.

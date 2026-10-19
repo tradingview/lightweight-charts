@@ -1,6 +1,6 @@
-// series.update() recolors only the bar it touched: a new bar is shaded as
-// soon as it is appended, and updating the last bar in place re-asks the
-// highlighter for it.
+// series.update() recolors only the last bar when it appends or replaces it:
+// a new bar is shaded as soon as it is appended, and updating the last bar in
+// place re-asks the highlighter for it.
 const frames = async () => { for (let i = 0; i < 4; i++) { await new Promise(requestAnimationFrame); } };
 
 // Samples a screenshot of the chart 4px below the top edge at the bar's x and

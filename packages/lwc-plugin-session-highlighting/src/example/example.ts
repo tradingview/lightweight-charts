@@ -18,7 +18,6 @@ const chart = ((window as unknown as any).chart = createChart(container, {
 	timeScale: { barSpacing: 8 },
 }));
 
-
 const highlighters: Record<string, SessionHighlighter> = {
 	weekends: time => {
 		const day = new Date(convertTimeUTC(time)).getUTCDay();
@@ -55,7 +54,7 @@ zOrderSelect.addEventListener('change', () => {
 });
 
 // The columns are as wide as the time scale's bar spacing, so zooming never
-// leaves seams or overlaps between neighbouring bars.
+// leaves seams or overlaps between neighboring bars.
 const barSpacingInput = control<HTMLInputElement>('bar-spacing');
 barSpacingInput.addEventListener('input', () => {
 	chart.timeScale().applyOptions({ barSpacing: Number(barSpacingInput.value) });

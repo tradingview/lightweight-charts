@@ -38,7 +38,7 @@ class SessionHighlightingPaneRenderer implements IPrimitivePaneRenderer {
 			const halfSpacing = barSpacing / 2;
 			ctx.save();
 			for (const column of columns) {
-				// Full-width columns abut exactly, so neighbouring bars neither
+				// Full-width columns abut exactly, so neighboring bars neither
 				// overlap nor leave a seam at any pixel ratio.
 				const { position, length } = fullBarWidth(column.x, halfSpacing, scope.horizontalPixelRatio);
 				if (position + length <= 0 || position >= width) {

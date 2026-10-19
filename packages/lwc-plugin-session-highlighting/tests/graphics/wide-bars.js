@@ -34,7 +34,7 @@ function createCandles(container, options) {
 }
 
 // Wide bar spacing: the columns come from the time scale's barSpacing and
-// abut exactly, with no seams and no overlap between neighbours.
+// abut exactly, with no seams and no overlap between neighbors.
 function runTestCase(container) {
 	const { chart, series } = createCandles(container, {
 		timeScale: { barSpacing: 40, rightOffset: 2 },
