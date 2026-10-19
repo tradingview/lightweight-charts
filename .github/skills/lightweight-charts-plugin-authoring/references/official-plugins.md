@@ -1,4 +1,4 @@
-# The ten official plugins, and what each one teaches
+# The official plugins, and what each one teaches
 
 Upstream: `packages/lwc-plugin-<name>/`. Published: `@tradingview/lwc-plugin-<name>`,
 which ships the README and `dist/` (`.js` + `.d.ts`) but not the source. From
@@ -42,13 +42,13 @@ an empty visible range.
 
 Cumulative bands from `values[]`, negatives folding back to the base,
 `gapHandling: 'break' | 'bridge'`, `percent` mode, per-band and per-point
-colours, `lineType` simple/step/curved. Shows `createWhitespaceSeries` with
+colors, `lineType` simple/step/curved. Shows `createWhitespaceSeries` with
 `['base', 'percent']`; `visibleSegments` with the `GapCheck` and
 `getConflationFactor(data)` as `minGap`; `extendRange` + `barCoordinate` so
 lines reach the pane edge with correct offscreen coordinates; `stackLevels`;
 a `hitTest` that ignores whitespace gaps and unpainted extents. Its
 interaction tests (`shared-timeline`, `whitespace-hit-test`,
-`conflation-holidays`) are the model for testing gap behaviour.
+`conflation-holidays`) are the model for testing gap behavior.
 
 ### `hlc-area-series` — two lines with a band between
 
@@ -81,7 +81,7 @@ scale support, role-keyed `colors`/`borderRadius`, and `normalize`.
 ### `rounded-candles-series` — a drop-in replacement for a built-in
 
 Candlesticks with rounded bodies. Read for how to *match* the built-in:
-the same colour option set and shorthand semantics, `candlestickWidth` for
+the same color option set and shorthand semantics, `candlestickWidth` for
 the body, body and wick aligned on one pixel grid at every DPR,
 `upDownMode`, per-point overrides, `conflationFactor` widening candles under
 conflation, and a `radius` that may be a number or a function of bar spacing.
@@ -106,7 +106,19 @@ sharing options and a renderer. Read for: drawing nothing until an image has
 decoded (and reporting failures through `onError` instead of throwing every
 frame), positioning from the *pane's* size rather than the chart element,
 `objectFit`/`position`/`padding` layout, `zOrder`, a decoded-image cache by
-URL, and `detached()` cancelling a pending load.
+URL, and `detached()` canceling a pending load.
+
+### `anchored-text` — the smallest two-class primitive
+
+`AnchoredText` (series primitive) and `AnchoredTextPane` (pane primitive)
+sharing one core, with no image to load and no interaction: the shape of
+`image-watermark` reduced to its essentials. Read for: laying text out in the
+media coordinate space from `measureText` (`layout.ts` is a pure function the
+unit tests cover for all nine anchors), a renderer that returns `null` while
+there is nothing to draw, `save`/`restore` around context changes, options
+that accept a deprecated spelling (`'middle'`) on input and never return it,
+and `mergeOptions` where one option (`lineHeight`) treats an explicit
+`undefined` as a value.
 
 ## Pane primitives
 
@@ -117,9 +129,9 @@ options)` controller. The reference for anything DOM-based: appending a
 semantic layer to `paneContentElement(pane)`, following the pane by identity
 through reordering (the constructor index is only a pre-build hint; the first
 draw's canvas resolves the real pane), a single shared ARIA-live region,
-`subscribeMediaQuery` for high contrast, message bundles and localisation,
+`subscribeMediaQuery` for high contrast, message bundles and localization,
 keyboard handling on the overlay, and a controller that reconciles panes added
-or removed at runtime. Also the largest test suite of the ten; its
+or removed at runtime. Also the largest test suite of the official plugins; its
 `pane-reorder`, `mismatched-pane-index` and `announce-callback-throws`
 interaction tests show how to assert on DOM state.
 
@@ -129,7 +141,7 @@ Upstream `plugin-examples/src/plugins/` holds unpublished proof-of-concept
 plugins: tooltips and delta tooltips, a rectangle drawing tool, trend lines,
 session highlighting, a heatmap series, lollipop, grouped bars, box-whisker,
 background shading, price alerts, a volume profile, a partial price line,
-crosshair highlighting, and anchored text. Good for seeing the shape of an
+and crosshair highlighting. Good for seeing the shape of an
 idea; they predate the toolkit and skip the tests and README the packages
-carry, so use the official plugins for *how* and these for *what*. The ten
+carry, so use the official plugins for *how* and these for *what*. The
 graduated plugins' folders there are redirect stubs to the packages.

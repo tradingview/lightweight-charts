@@ -146,7 +146,7 @@ overrides the built-in candlestick series supports.
 
 - A candle counts as *rising* when `open <= close`, exactly as the built-in
   candlestick series decides it. `upDownMode: 'previousClose'` restores the
-  behaviour this plugin had while it was an example (close compared with the
+  behavior this plugin had while it was an example (close compared with the
   previous close, the first candle always rising).
 - `borderColor` and `wickColor` are resolved at draw time, so clearing them
   (setting them to an empty string) brings the up/down pair back. The built-in

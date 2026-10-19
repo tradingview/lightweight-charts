@@ -1,6 +1,6 @@
 {
 	"name": "@tradingview/lwc-toolkit",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Helpers for authoring Lightweight Charts\u2122 plugins: pixel-perfect dimension calculations, a plugin base class, and time conversion.",
 	"license": "Apache-2.0",
 	"author": "TradingView, Inc.",
@@ -22,9 +22,25 @@
 			"types": "./dist/axis-label-view.d.ts",
 			"default": "./dist/axis-label-view.js"
 		},
+		"./canvas/markers": {
+			"types": "./dist/canvas/markers.d.ts",
+			"default": "./dist/canvas/markers.js"
+		},
 		"./canvas/round-rect": {
 			"types": "./dist/canvas/round-rect.d.ts",
 			"default": "./dist/canvas/round-rect.js"
+		},
+		"./chart/interaction-flags": {
+			"types": "./dist/chart/interaction-flags.d.ts",
+			"default": "./dist/chart/interaction-flags.js"
+		},
+		"./chart/lifecycle": {
+			"types": "./dist/chart/lifecycle.d.ts",
+			"default": "./dist/chart/lifecycle.js"
+		},
+		"./chart/time-axis-labels": {
+			"types": "./dist/chart/time-axis-labels.d.ts",
+			"default": "./dist/chart/time-axis-labels.js"
 		},
 		"./closest-index": {
 			"types": "./dist/closest-index.d.ts",
@@ -90,6 +106,14 @@
 			"types": "./dist/min-max-in-range.d.ts",
 			"default": "./dist/min-max-in-range.js"
 		},
+		"./numbers": {
+			"types": "./dist/numbers.d.ts",
+			"default": "./dist/numbers.js"
+		},
+		"./options/merge": {
+			"types": "./dist/options/merge.d.ts",
+			"default": "./dist/options/merge.js"
+		},
 		"./pane-plugin-base": {
 			"types": "./dist/pane-plugin-base.d.ts",
 			"default": "./dist/pane-plugin-base.js"
@@ -98,9 +122,17 @@
 			"types": "./dist/plugin-base.d.ts",
 			"default": "./dist/plugin-base.js"
 		},
+		"./scheduling/coalesced-task": {
+			"types": "./dist/scheduling/coalesced-task.d.ts",
+			"default": "./dist/scheduling/coalesced-task.js"
+		},
 		"./simple-clone": {
 			"types": "./dist/simple-clone.d.ts",
 			"default": "./dist/simple-clone.js"
+		},
+		"./text/measure": {
+			"types": "./dist/text/measure.d.ts",
+			"default": "./dist/text/measure.js"
 		},
 		"./time": {
 			"types": "./dist/time.d.ts",

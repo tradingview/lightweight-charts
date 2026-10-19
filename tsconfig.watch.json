@@ -1,0 +1,7 @@
+{
+	"extends": "./tsconfig.prod.json",
+	"compilerOptions": {
+		"incremental": true,
+		"tsBuildInfoFile": "lib/prod/.tsbuildinfo"
+	}
+}

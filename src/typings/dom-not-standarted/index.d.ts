@@ -24,6 +24,20 @@ interface Navigator {
 	};
 }
 
+/**
+ * Prioritized Task Scheduling API
+ * https://developer.mozilla.org/en-US/docs/Web/API/Scheduler
+ * Note: This is a partial type definition. It must stay in this ambient file
+ * so the production property-rename transformer leaves the host names alone.
+ */
+interface SchedulerPostTaskOptions {
+	priority?: 'user-blocking' | 'user-visible' | 'background';
+}
+interface Scheduler {
+	postTask<T>(callback: () => T, options?: SchedulerPostTaskOptions): Promise<T>;
+}
+
 interface Window {
 	chrome: unknown;
+	scheduler?: Scheduler;
 }

@@ -107,6 +107,21 @@ describe('Helpers', () => {
 			expect((Object.prototype as any).polluted).to.be.undefined;
 		});
 
+		it('should assign null as a leaf value over a primitive', () => {
+			const result = merge({ a: 'str', b: 1 }, { a: null });
+			expect(result).to.deep.equal({ a: null, b: 1 });
+		});
+
+		it('should assign null as a leaf value over an object', () => {
+			const result = merge({ a: { b: 1 } }, { a: null });
+			expect(result).to.deep.equal({ a: null });
+		});
+
+		it('should assign null when the destination key is absent', () => {
+			const result = merge({}, { a: null });
+			expect(result).to.deep.equal({ a: null });
+		});
+
 		it('should handle circular references safely', () => {
 			const dst: Record<string, unknown> = { a: 1 };
 			dst.circular = dst;

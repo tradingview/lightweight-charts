@@ -298,7 +298,7 @@ export interface ISeriesApi<
 	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.seriesType()); // "Line"
 	 *
-	 * const candlestickSeries = chart.addCandlestickSeries();
+	 * const candlestickSeries = chart.addSeries(CandlestickSeries);
 	 * console.log(candlestickSeries.seriesType()); // "Candlestick"
 	 * ```
 	 */
@@ -314,7 +314,7 @@ export interface ISeriesApi<
 	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.lastValueData(true)); // { noData: false, price: 24.11, color: '#000000' }
 	 *
-	 * const candlestickSeries = chart.addCandlestickSeries();
+	 * const candlestickSeries = chart.addSeries(CandlestickSeries);
 	 * console.log(candlestickSeries.lastValueData(false)); // { noData: false, price: 145.72, color: '#000000' }
 	 * ```
 	 */

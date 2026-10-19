@@ -150,6 +150,17 @@ export interface PolylineStroke {
 	strokeStyle: string | CanvasGradient | CanvasPattern;
 	/** Value assigned to `ctx.lineWidth`, in the coordinate space of the points. */
 	lineWidth: number;
+	/**
+	 * A dash pattern of the chart's, set for the run: `getDashPattern(style,
+	 * lineWidth)` from `line-style`, `[]` for a solid run. A dashed run is
+	 * stroked with `butt` caps, as the chart strokes its dashed lines — a
+	 * `round` or `square` cap lengthens every dash by the line width, which
+	 * closes the gaps of a dotted line — and a solid one with the cap the
+	 * context had. When omitted, the run is stroked with the dash pattern and
+	 * cap the context has, whatever they are (round dots drawn with
+	 * `setLineDash([0, gap])` and `lineCap = 'round'`, say).
+	 */
+	dashPattern?: readonly number[];
 }
 
 /**
@@ -163,6 +174,11 @@ export interface PolylineStroke {
  * path, so a resolver that hands out a shared object per range keeps the number
  * of strokes down to the number of runs. Points with fewer than two entries
  * draw nothing.
+ *
+ * Runs with a {@link PolylineStroke.dashPattern} are dashed and capped by it;
+ * the context's dash pattern and cap are put back once the polyline is
+ * stroked, even should `styleAt` throw. The stroke style and line width are
+ * left as the last run set them.
  */
 export function strokeStyledPolyline(
 	ctx: CanvasRenderingContext2D,
@@ -172,24 +188,44 @@ export function strokeStyledPolyline(
 	if (points.length < 2) {
 		return;
 	}
+	// The context's dash and cap, kept once a run changes them.
+	let saved: { dash: number[]; cap: CanvasLineCap } | null = null;
 	const strokeRun = (style: PolylineStroke): void => {
 		ctx.strokeStyle = style.strokeStyle;
 		ctx.lineWidth = style.lineWidth;
+		const pattern = style.dashPattern;
+		if (pattern !== undefined) {
+			saved ??= { dash: ctx.getLineDash(), cap: ctx.lineCap };
+			ctx.setLineDash(pattern as number[]);
+			ctx.lineCap = pattern.length > 0 ? 'butt' : saved.cap;
+		} else if (saved !== null) {
+			ctx.setLineDash(saved.dash);
+			ctx.lineCap = saved.cap;
+		}
 		ctx.stroke();
 	};
-	let runStyle = styleAt(1);
-	ctx.beginPath();
-	ctx.moveTo(points[0].x, points[0].y);
-	ctx.lineTo(points[1].x, points[1].y);
-	for (let i = 2; i < points.length; i++) {
-		const style = styleAt(i);
-		if (style !== runStyle) {
-			strokeRun(runStyle);
-			runStyle = style;
-			ctx.beginPath();
-			ctx.moveTo(points[i - 1].x, points[i - 1].y);
+	try {
+		let runStyle = styleAt(1);
+		ctx.beginPath();
+		ctx.moveTo(points[0].x, points[0].y);
+		ctx.lineTo(points[1].x, points[1].y);
+		for (let i = 2; i < points.length; i++) {
+			const style = styleAt(i);
+			if (style !== runStyle) {
+				strokeRun(runStyle);
+				runStyle = style;
+				ctx.beginPath();
+				ctx.moveTo(points[i - 1].x, points[i - 1].y);
+			}
+			ctx.lineTo(points[i].x, points[i].y);
 		}
-		ctx.lineTo(points[i].x, points[i].y);
+		strokeRun(runStyle);
+	} finally {
+		// Set from `strokeRun`, which the narrowing of `saved` here does not see.
+		const context = saved as { dash: number[]; cap: CanvasLineCap } | null;
+		if (context !== null) {
+			ctx.setLineDash(context.dash);
+			ctx.lineCap = context.cap;
+		}
 	}
-	strokeRun(runStyle);
 }

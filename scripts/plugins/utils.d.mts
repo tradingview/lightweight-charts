@@ -37,6 +37,10 @@ export function validatePackageMetadata(
 	options?: { isOfficial?: boolean; repoRoot?: string }
 ): { valid: boolean; errors: string[] };
 
+export function catalogSlugOf(packageName: string): string;
+
+export function validateCatalogIllustrationContent(label: string, svg: string): string[];
+
 export function validateReadmeContent(content: string): { valid: boolean; errors: string[] };
 
 export function findPlaceholders(text: string): string[];
