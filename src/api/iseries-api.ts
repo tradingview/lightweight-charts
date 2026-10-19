@@ -205,7 +205,7 @@ export interface ISeriesApi<
 	/**
 	 * Returns a bar data by provided logical index.
 	 *
-	 * The returned item is a copy rebuilt from the series' internal data, so it is not the same object passed to setData or update.
+	 * The returned item is a copy rebuilt from the series' internal data, so it is not the same object passed to `setData` or `update`.
 	 * For built-in series types it contains only the fields the series supports; any other fields are dropped.
 	 * Custom series return all fields of the original item.
 	 *
@@ -222,7 +222,7 @@ export interface ISeriesApi<
 	/**
 	 * Returns all the bar data for the series.
 	 *
-	 * The returned items are copies rebuilt from the series' internal data, not the objects passed to setData or update.
+	 * The returned items are copies rebuilt from the series' internal data, not the objects passed to `setData` or `update`.
 	 * Whitespace items are excluded. For built-in series types each item contains only the fields the series supports;
 	 * any other fields are dropped. Custom series return all fields of the original items.
 	 *
