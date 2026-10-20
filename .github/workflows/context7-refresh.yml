@@ -1,0 +1,38 @@
+name: Context7 Documentation Refresh
+
+on:
+  push:
+    branches:
+      - master
+    # Context7 indexes only documentation files, not source code: markdown
+    # plus the tutorial step pages, which are HTML. Changes to these file
+    # types, or to its config, are the ones that affect the index.
+    paths:
+      - '**/*.md'
+      - '**/*.mdx'
+      - '**/*.html'
+      - 'context7.json'
+      - '.github/workflows/context7-refresh.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: true
+    steps:
+      # Asks Context7 to re-index the repository.
+      - name: Trigger Context7 re-indexing
+        env:
+          CONTEXT7_API_KEY: ${{ secrets.CONTEXT7_API_KEY }}
+          LIBRARY_NAME: /${{ github.repository }}
+        run: |
+          body=$(jq -nc --arg name "$LIBRARY_NAME" '{ libraryName: $name }')
+          curl --fail-with-body -sS --retry 3 -X POST https://context7.com/api/v1/refresh \
+            -H 'Content-Type: application/json' \
+            -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+            --data-binary "$body"
