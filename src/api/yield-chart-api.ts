@@ -24,6 +24,14 @@ interface WhitespaceState {
 	resolution: number;
 }
 
+/**
+ * Upper bound for the number of points in the generated whitespace series.
+ * The whitespace series only pads the visible range, so this is far above any
+ * realistic yield curve while preventing an oversized option value from
+ * allocating an enormous array synchronously.
+ */
+const maxWhitespacePoints = 100000;
+
 function generateWhitespaceData({
 	start,
 	end,
@@ -40,10 +48,13 @@ function buildWhitespaceState(
 	options: YieldCurveOptions,
 	lastIndex: number
 ): WhitespaceState {
+	const start = Math.max(0, options.startTimeRange);
+	const resolution = Math.max(1, options.baseResolution);
+	const end = Math.max(0, options.minimumTimeRange, lastIndex || 0);
 	return {
-		start: Math.max(0, options.startTimeRange),
-		end: Math.max(0, options.minimumTimeRange, lastIndex || 0),
-		resolution: Math.max(1, options.baseResolution),
+		start,
+		end: Math.min(end, start + maxWhitespacePoints * resolution),
+		resolution,
 	};
 }
 
