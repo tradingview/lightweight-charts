@@ -20,7 +20,8 @@ permissions: {}
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/master' }}
+    timeout-minutes: 5
+    if: ${{ github.repository == 'tradingview/lightweight-charts' && github.ref == 'refs/heads/master' }}
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: true
