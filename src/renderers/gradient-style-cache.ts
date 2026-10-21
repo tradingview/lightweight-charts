@@ -4,6 +4,16 @@ import { clamp } from '../helpers/mathex';
 
 import { Coordinate } from '../model/coordinate';
 
+function addColorStopSafe(gradient: CanvasGradient, offset: number, color: string): void {
+	try {
+		gradient.addColorStop(offset, color);
+	} catch {
+		// An unparsable colour makes addColorStop throw, unlike fillStyle/strokeStyle,
+		// which ignore it. Fall back to a transparent stop so rendering isn't aborted.
+		gradient.addColorStop(offset, 'transparent');
+	}
+}
+
 export interface GradientCacheParams {
 	topColor1: string;
 	topColor2: string;
@@ -44,15 +54,15 @@ export class GradientStyleCache {
 			const baseline = (baseLevelCoordinate ?? 0) * multiplier;
 			const gradient = scope.context.createLinearGradient(0, top, 0, bottom);
 
-			gradient.addColorStop(0, topColor1);
+			addColorStopSafe(gradient, 0, topColor1);
 			if (baseLevelCoordinate !== null && baseLevelCoordinate !== undefined) {
 				const range = bottom - top;
 				const baselineRatio = clamp(((baseline - top) / range), 0, 1);
 
-				gradient.addColorStop(baselineRatio, topColor2);
-				gradient.addColorStop(baselineRatio, bottomColor1);
+				addColorStopSafe(gradient, baselineRatio, topColor2);
+				addColorStopSafe(gradient, baselineRatio, bottomColor1);
 			}
-			gradient.addColorStop(1, bottomColor2);
+			addColorStopSafe(gradient, 1, bottomColor2);
 
 			this._cachedValue = gradient;
 			this._params = params;
