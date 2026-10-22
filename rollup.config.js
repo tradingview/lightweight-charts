@@ -19,6 +19,8 @@ function getCurrentVersion() {
 }
 
 const currentVersion = getCurrentVersion();
+// plain MAJOR.MINOR.PATCH, without any pre-release or build metadata
+const currentSemver = packageJson.version.match(/^\d+\.\d+\.\d+/)[0];
 
 const year = new Date().getFullYear();
 
@@ -49,6 +51,7 @@ function getConfig(inputFile, { format, isProd, isStandalone }) {
 					// make sure that this values are synced with src/typings/globals/index.d.ts
 					'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
 					'process.env.BUILD_VERSION': JSON.stringify(currentVersion),
+					'process.env.BUILD_SEMVER': JSON.stringify(currentSemver),
 				},
 			}),
 			isProd && terser({

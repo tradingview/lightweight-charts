@@ -9,6 +9,10 @@ declare namespace NodeJS {
 
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		BUILD_VERSION: string;
+
+		// plain MAJOR.MINOR.PATCH version (without pre-release or build metadata)
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		BUILD_SEMVER: string;
 	}
 
 	interface Process {
