@@ -17,9 +17,9 @@ function createModel(timeScaleOptions: Partial<ChartOptionsInternal<Time>['timeS
 	return new ChartModel<Time>(() => {}, options, new HorzScaleBehaviorTime());
 }
 
-function points(count: number): TimeScalePoint[] {
+function points(count: number, from: number = 0): TimeScalePoint[] {
 	const result: TimeScalePoint[] = [];
-	for (let i = 0; i < count; ++i) {
+	for (let i = from; i < from + count; ++i) {
 		result.push({
 			time: { timestamp: i as UTCTimestamp } as unknown as InternalHorzScaleItem,
 			timeWeight: 20 as TickMarkWeightValue,
@@ -30,46 +30,144 @@ function points(count: number): TimeScalePoint[] {
 }
 
 describe('ChartModel time scale scrolling', () => {
-	// drives a drag the way the pane widget does: 10px per 16ms into the past, sampling logical positions for the kinetic animation,
-	// optionally with 50 bars arriving in the middle of the drag; returns the distance the fling would travel after release
-	function flingDistance(appendDuringDrag: boolean): number {
-		const model = createModel({ barSpacing: 6 });
+	interface FlingParams {
+		// pointer movement per 16ms into the past
+		pxPerMove: number;
+		// data update applied during the drag, right after the move with index `updateAtMove` (0..5)
+		update?: (model: ChartModel<Time>) => void;
+		updateAtMove?: number;
+		// time between the last move and the release
+		releaseDelay?: number;
+		barSpacing?: number;
+		rightOffset?: number;
+	}
+
+	// drives a drag the way the pane widget does: 6 moves of `pxPerMove` px per 16ms into the past over 1000 bars,
+	// sampling the kinetic scroll position for the kinetic animation, optionally with a data update arriving during the drag;
+	// returns the distance the fling would travel after release (0 if no fling starts)
+	function flingDistance(params: FlingParams): number {
+		const { pxPerMove, update, updateAtMove = 5, releaseDelay = 0, barSpacing = 6, rightOffset = -100 } = params;
+		const model = createModel({ barSpacing });
 		const timeScale = model.timeScale();
 		timeScale.setWidth(600);
 		model.updateTimeScale(999 as TimePointIndex, points(1000), 0);
-		timeScale.setRightOffset(-100);
+		timeScale.setRightOffset(rightOffset);
 
-		const barSpacing = timeScale.barSpacing();
 		const animation = new KineticAnimation(0.2 / barSpacing, 7 / barSpacing, 0.997, 15 / barSpacing);
-		const logicalPosition = () => (timeScale.baseIndex() + timeScale.rightOffset()) as Coordinate;
+		const kineticPosition = () => timeScale.kineticScrollPosition() as Coordinate;
 
 		let localX = 300 as Coordinate;
 		let now = 0;
 		model.startScrollTime(localX);
-		animation.addPosition(logicalPosition(), now);
+		animation.addPosition(kineticPosition(), now);
 		for (let i = 0; i < 6; ++i) {
 			now += 16;
-			localX = localX + 10 as Coordinate;
+			localX = localX + pxPerMove as Coordinate;
 			model.scrollTimeTo(localX);
-			if (appendDuringDrag && i === 3) {
-				model.updateTimeScale(1049 as TimePointIndex, points(1050), 1000);
+			if (update !== undefined && i === updateAtMove) {
+				update(model);
 			}
-			animation.addPosition(logicalPosition(), now);
+			animation.addPosition(kineticPosition(), now);
 		}
 		model.endScrollTime();
 
 		const releaseOffset = timeScale.rightOffset();
-		animation.start(releaseOffset as Coordinate, now);
-		expect(animation.finished(now)).to.be.equal(false);
-		return animation.getPosition(now + 5000) - releaseOffset;
+		const releaseTime = now + releaseDelay;
+		animation.start(releaseOffset as Coordinate, releaseTime);
+		if (animation.finished(releaseTime)) {
+			return 0;
+		}
+		return animation.getPosition(releaseTime + 5000) - releaseOffset;
 	}
 
+	// 50 bars appended to the right, base index 999 -> 1049 (compensated, the view stays in place)
+	const append50 = (model: ChartModel<Time>) => model.updateTimeScale(1049 as TimePointIndex, points(1050), 1000);
+	// infinite history: setData() with 50 older bars in front of the existing ones, base index 999 -> 1049, not compensated
+	const prepend50 = (model: ChartModel<Time>) => model.updateTimeScale(1049 as TimePointIndex, points(1050, -50), 0);
+	// setData() with the newest 100 bars removed, base index 999 -> 899
+	const truncate100 = (model: ChartModel<Time>) => model.updateTimeScale(899 as TimePointIndex, points(900), 900);
+	// one live bar while the last bar is visible: shiftVisibleRangeOnNewBar moves the view by one bar, not compensated
+	const newBar = (model: ChartModel<Time>) => model.updateTimeScale(1000 as TimePointIndex, points(1001), 1000);
+
 	it('does not change the kinetic fling when bars are appended during the drag', () => {
-		const flingWithoutAppend = flingDistance(false);
-		const flingWithAppend = flingDistance(true);
+		const flingWithoutAppend = flingDistance({ pxPerMove: 10 });
+		const flingWithAppend = flingDistance({ pxPerMove: 10, update: append50, updateAtMove: 3 });
 
 		expect(flingWithoutAppend).to.be.lessThan(0);
 		expect(flingWithAppend).to.be.closeTo(flingWithoutAppend, 1e-9);
+	});
+
+	it('does not start a kinetic fling when older bars are prepended during a slow drag', () => {
+		expect(flingDistance({ pxPerMove: 1, releaseDelay: 10 })).to.be.equal(0);
+		expect(flingDistance({ pxPerMove: 1, update: prepend50, releaseDelay: 10 })).to.be.equal(0);
+		expect(flingDistance({ pxPerMove: 1, update: prepend50, releaseDelay: 49 })).to.be.equal(0);
+	});
+
+	it('does not start a kinetic fling when newer bars are removed during a slow drag', () => {
+		expect(flingDistance({ pxPerMove: 1, update: truncate100, releaseDelay: 10 })).to.be.equal(0);
+		expect(flingDistance({ pxPerMove: 1, update: truncate100, releaseDelay: 49 })).to.be.equal(0);
+	});
+
+	it('does not start a kinetic fling when a new bar shifts the visible range during a slow drag', () => {
+		const lastBarVisible = { pxPerMove: 1, barSpacing: 30, rightOffset: 5 };
+
+		expect(flingDistance({ ...lastBarVisible, releaseDelay: 10 })).to.be.equal(0);
+		expect(flingDistance({ ...lastBarVisible, update: newBar, releaseDelay: 10 })).to.be.equal(0);
+		expect(flingDistance({ ...lastBarVisible, update: newBar, releaseDelay: 49 })).to.be.equal(0);
+	});
+
+	it('does not change the kinetic fling when older bars are prepended during a fast drag', () => {
+		const flingWithoutPrepend = flingDistance({ pxPerMove: 10 });
+		const flingWithPrepend = flingDistance({ pxPerMove: 10, update: prepend50 });
+
+		expect(flingWithoutPrepend).to.be.lessThan(0);
+		expect(flingWithPrepend).to.be.closeTo(flingWithoutPrepend, 1e-9);
+	});
+
+	it('moves the kinetic scroll position only when the view is scrolled', () => {
+		const model = createModel();
+		const timeScale = model.timeScale();
+		timeScale.setWidth(500);
+		model.updateTimeScale(499 as TimePointIndex, points(500), 0);
+
+		model.startScrollTime(100 as Coordinate);
+		model.scrollTimeTo(300 as Coordinate);
+		const position = timeScale.kineticScrollPosition();
+
+		// compensated append: the right offset changes by -50, the view and the kinetic position don't
+		model.updateTimeScale(549 as TimePointIndex, points(550), 500);
+		expect(timeScale.rightOffset()).to.be.equal(-250);
+		expect(timeScale.kineticScrollPosition()).to.be.equal(position);
+
+		// prepend: the base index changes by +50, the view and the kinetic position don't
+		model.updateTimeScale(599 as TimePointIndex, points(600, -50), 0);
+		expect(timeScale.rightOffset()).to.be.equal(-250);
+		expect(timeScale.kineticScrollPosition()).to.be.equal(position);
+
+		// scrolling by 10 bars moves the kinetic position by 10 bars
+		model.scrollTimeTo(310 as Coordinate);
+		expect(timeScale.kineticScrollPosition()).to.be.equal(position - 10);
+		model.endScrollTime();
+	});
+
+	it('keeps the kinetic scroll position when the compensation is applied while the drag is clamped at the oldest bar', () => {
+		const model = createModel();
+		const timeScale = model.timeScale();
+		timeScale.setWidth(500);
+		model.updateTimeScale(499 as TimePointIndex, points(500), 0);
+
+		model.startScrollTime(0 as Coordinate);
+		model.scrollTimeTo(1000 as Coordinate);
+		const position = timeScale.kineticScrollPosition();
+
+		model.updateTimeScale(549 as TimePointIndex, points(550), 500);
+		expect(timeScale.rightOffset()).to.be.equal(-548);
+		expect(timeScale.kineticScrollPosition()).to.be.equal(position);
+
+		// still clamped: neither the view nor the kinetic position move
+		model.scrollTimeTo(1000 as Coordinate);
+		expect(timeScale.kineticScrollPosition()).to.be.equal(position);
+		model.endScrollTime();
 	});
 
 	it('keeps the scrolled position when bars are appended to the right during a scroll', () => {

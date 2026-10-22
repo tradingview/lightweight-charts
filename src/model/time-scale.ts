@@ -303,7 +303,7 @@ export interface ITimeScale {
 
 	barSpacing(): number;
 	rightOffset(): number;
-	baseIndex(): TimePointIndex;
+	kineticScrollPosition(): number;
 
 	indexesToCoordinates<T extends TimedValue>(points: T[], visibleRange?: SeriesItemsIndexesRange): void;
 	indexToTimeScalePoint(index: TimePointIndex): TimeScalePoint | null;
@@ -340,6 +340,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 
 	private readonly _optionsApplied: Delegate = new Delegate();
 	private _commonTransitionStartState: TransitionState | null = null;
+	private _appendCompensation: number = 0;
 	private _timeMarksCache: TimeMark[] | null = null;
 
 	private _indicesWithData: Map<TimePointIndex, boolean> = new Map();
@@ -602,7 +603,20 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			this._commonTransitionStartState.rightOffset -= delta;
 		}
 
-		this.setRightOffset(this._rightOffset - delta);
+		const rightOffsetBefore = this._rightOffset;
+		this.setRightOffset(rightOffsetBefore - delta);
+		this._appendCompensation += rightOffsetBefore - this._rightOffset;
+	}
+
+	/**
+	 * The right offset plus every compensation applied by {@link shiftRightOffset}.
+	 * Unlike `rightOffset()` it does not change when bars appended during a drag are compensated,
+	 * and unlike `baseIndex() + rightOffset()` it does not change when older bars are prepended
+	 * or when the visible range is shifted for a new bar, so it only moves when the view itself moves.
+	 * Used to sample the velocity of a scroll gesture for kinetic scrolling.
+	 */
+	public kineticScrollPosition(): number {
+		return this._rightOffset + this._appendCompensation;
 	}
 
 	public barSpacing(): number {
