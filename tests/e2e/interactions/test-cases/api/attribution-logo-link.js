@@ -44,14 +44,15 @@ function afterFinalInteractions() {
 		throw new Error(`Expected the existing utm parameters to be preserved, got ${href}`);
 	}
 
-	const lwcVersion = params.get('lwc_version');
-	if (lwcVersion === null || !/^\d+\.\d+\.\d+$/.test(lwcVersion)) {
-		throw new Error(`Expected lwc_version to be a plain MAJOR.MINOR.PATCH version, got ${href}`);
+	const utmContent = params.get('utm_content');
+	const match = /^lwc-(\d+\.\d+\.\d+)$/.exec(utmContent ?? '');
+	if (match === null) {
+		throw new Error(`Expected utm_content to be lwc- followed by a plain MAJOR.MINOR.PATCH version, got ${href}`);
 	}
 
 	const fullVersion = LightweightCharts.version();
-	if (!fullVersion.startsWith(lwcVersion)) {
-		throw new Error(`Expected lwc_version (${lwcVersion}) to match the library version (${fullVersion})`);
+	if (!fullVersion.startsWith(match[1])) {
+		throw new Error(`Expected utm_content (${utmContent}) to match the library version (${fullVersion})`);
 	}
 
 	return Promise.resolve();
