@@ -1,3 +1,5 @@
+/// <reference types="_build-time-constants" />
+
 import { IChartWidgetBase } from './chart-widget';
 
 type LogoTheme = 'dark' | 'light';
@@ -74,7 +76,7 @@ export class AttributionLogoWidget {
 			this._cssElement = document.createElement('style');
 			this._cssElement.innerText = css;
 			this._element = document.createElement('a');
-			this._element.href = `https://www.tradingview.com/?utm_medium=lwc-link&utm_campaign=lwc-chart${this._getUTMSource()}`;
+			this._element.href = `https://www.tradingview.com/?utm_medium=lwc-link&utm_campaign=lwc-chart${this._getUTMSource()}&lwc_version=${process.env.BUILD_SEMVER}`;
 			this._element.title = 'Charting by TradingView';
 			this._element.id = 'tv-attr-logo';
 			this._element.target = '_blank';
