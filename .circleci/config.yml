@@ -36,6 +36,7 @@ aliases:
         - packages/lwc-plugin-pretty-histogram-series/node_modules
         - packages/lwc-plugin-rounded-candles-series/node_modules
         - packages/lwc-plugin-scatter-series/node_modules
+        - packages/lwc-plugin-session-highlighting/node_modules
         - packages/lwc-plugin-stacked-area-series/node_modules
         - packages/lwc-plugin-stacked-bars-series/node_modules
         - packages/lwc-plugin-vertical-line/node_modules
