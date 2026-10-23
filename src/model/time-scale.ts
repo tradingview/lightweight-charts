@@ -585,9 +585,14 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	public setRightOffset(offset: number): void {
+		const previousOffset = this._rightOffset;
 		this._visibleRangeInvalidated = true;
 		this._rightOffset = offset;
 		this._correctOffset();
+		if (this._scrollStartPoint !== null && this._commonTransitionStartState !== null) {
+			// Preserve offset changes (such as appended bars) across later drag moves.
+			this._commonTransitionStartState.rightOffset += this._rightOffset - previousOffset;
+		}
 		this._model.recalculateAllPanes();
 		this._model.lightUpdate();
 	}
