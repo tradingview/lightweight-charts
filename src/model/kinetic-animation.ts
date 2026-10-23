@@ -127,7 +127,7 @@ export class KineticAnimation {
 
 	public getPosition(time: number): Coordinate {
 		const startPosition = ensureNotNull(this._animationStartPosition);
-		const durationMsecs = time - startPosition.time;
+		const durationMsecs = this._progressDuration(time);
 		return startPosition.position + this._speedPxPerMsec * (Math.pow(this._dumpingCoeff, durationMsecs) - 1) / (Math.log(this._dumpingCoeff)) as Coordinate;
 	}
 
