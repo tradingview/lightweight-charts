@@ -51,6 +51,7 @@ export function chartOptionsDefaults<HorzScaleItem>(): ChartOptionsInternal<Horz
 				price: true,
 			},
 			mouseWheel: true,
+			mouseWheelModifierKey: null,
 			pinch: true,
 		},
 		kineticScroll: {
