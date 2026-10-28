@@ -91,6 +91,20 @@ export interface IPaneApi<HorzScaleItem> {
 	preserveEmptyPane(): boolean;
 
 	/**
+	 * Shows or hides the pane. A hidden pane takes no height and keeps its series and stretch factor.
+	 *
+	 * @param visible - Whether the pane is shown
+	 */
+	setVisible(visible: boolean): void;
+
+	/**
+	 * Returns whether the pane is shown
+	 *
+	 * @returns Whether the pane is shown
+	 */
+	visible(): boolean;
+
+	/**
 	 * Returns the stretch factor of the pane.
 	 * Stretch factor determines the relative size of the pane compared to other panes.
 	 *

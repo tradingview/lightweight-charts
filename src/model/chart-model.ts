@@ -721,16 +721,20 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public changePanesHeight(paneIndex: number, height: number): void {
-		if (this._panes.length < 2) {
+		const visiblePanes = this._panes.filter((pane: Pane) => pane.visible());
+		if (visiblePanes.length < 2) {
 			return;
 		}
 
 		assert(paneIndex >= 0 && paneIndex < this._panes.length, 'Invalid pane index');
 		const targetPane = this._panes[paneIndex];
+		if (!targetPane.visible()) {
+			return;
+		}
 
-		const totalStretch = this._panes.reduce((prevValue: number, pane: Pane) => prevValue + pane.stretchFactor(), 0);
-		const totalHeight = this._panes.reduce((prevValue: number, pane: Pane) => prevValue + pane.height(), 0);
-		const maxPaneHeight = totalHeight - MIN_PANE_HEIGHT * (this._panes.length - 1);
+		const totalStretch = visiblePanes.reduce((prevValue: number, pane: Pane) => prevValue + pane.stretchFactor(), 0);
+		const totalHeight = visiblePanes.reduce((prevValue: number, pane: Pane) => prevValue + pane.height(), 0);
+		const maxPaneHeight = totalHeight - MIN_PANE_HEIGHT * (visiblePanes.length - 1);
 		height = Math.min(maxPaneHeight, Math.max(MIN_PANE_HEIGHT, height));
 		const pixelStretchFactor = totalStretch / totalHeight;
 
@@ -738,9 +742,9 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		targetPane.setStretchFactor(height * pixelStretchFactor);
 
 		let otherPanesChange = height - oldHeight;
-		let panesCount = this._panes.length - 1;
+		let panesCount = visiblePanes.length - 1;
 
-		for (const pane of this._panes) {
+		for (const pane of visiblePanes) {
 			if (pane !== targetPane) {
 				const newPaneHeight = Math.min(maxPaneHeight, Math.max(30, pane.height() - otherPanesChange / panesCount));
 				otherPanesChange -= (pane.height() - newPaneHeight);
