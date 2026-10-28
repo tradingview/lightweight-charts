@@ -20,6 +20,7 @@ import {
 	parseRemoteVersionError,
 	verifyChangelog,
 	validatePackageMetadata,
+	validateCatalogIllustrationContent,
 	validateReadmeContent,
 	findPlaceholders,
 	extractReadmeSnippet,
@@ -57,6 +58,30 @@ const minimalValidReadme = [
 	'```',
 	'',
 ].join('\n');
+
+const validIllustration = [
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">',
+	'  <line x1="0" y1="90" x2="320" y2="90" stroke="#dbdbdb"/>',
+	'  <polyline points="20,115 300,56" fill="none" stroke="#8c8c8c"/>',
+	'</svg>',
+].join('\n');
+
+const minimalPackage = {
+	name: '@tradingview/lwc-plugin-test',
+	version: '1.0.0',
+	description: 'Test',
+	license: 'Apache-2.0',
+	publishConfig: { access: 'public' },
+	peerDependencies: { 'lightweight-charts': '^5.0.0' },
+	keywords: ['lightweight-charts-plugin'],
+	lwcPlugin: { title: 'Test', category: 'series-primitive', lifecycle: 'current', origin: 'official', demo: 'src/example/index.html' },
+};
+
+function writeIllustration(repoRoot: string, slug: string, svg: string): void {
+	const dir = path.join(repoRoot, 'website', 'static', 'plugin-catalog', 'assets', 'previews');
+	fs.mkdirSync(dir, { recursive: true });
+	fs.writeFileSync(path.join(dir, `${slug}.svg`), svg);
+}
 
 describe('Plugin Repo Scripts Unit Tests', () => {
 	describe('Workspace Plugin Discovery (findWorkspacePlugins)', () => {
@@ -574,10 +599,52 @@ const p = new Plugin();
 
 				pkg.repository.directory = 'packages/lwc-plugin-test';
 				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(pkg, null, 2));
+				writeIllustration(tempRoot, 'test', validIllustration);
 				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: tempRoot }).valid).to.be.true;
 			} finally {
 				fs.rmSync(tempRoot, { recursive: true, force: true });
 			}
+		});
+
+		it('should require a catalog illustration for a package under the repository\'s packages/', () => {
+			const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-illustration-test-'));
+			const tempDir = path.join(tempRoot, 'packages', 'lwc-plugin-test');
+			try {
+				fs.mkdirSync(path.join(tempDir, 'src', 'example'), { recursive: true });
+				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(minimalPackage, null, 2));
+				fs.writeFileSync(path.join(tempDir, 'README.md'), minimalValidReadme);
+				fs.writeFileSync(path.join(tempDir, 'src', 'example', 'index.html'), '<html></html>');
+
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: tempRoot }).errors)
+					.to.include("Catalog illustration 'website/static/plugin-catalog/assets/previews/test.svg' is missing");
+
+				writeIllustration(tempRoot, 'test', validIllustration.replace('#8c8c8c', '#123456'));
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: tempRoot }).errors.join('\n'))
+					.to.include('colors outside the TradingView palette');
+
+				writeIllustration(tempRoot, 'test', validIllustration);
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: tempRoot }).valid).to.be.true;
+
+				// Outside packages/ the package is not a catalog entry.
+				expect(validatePackageMetadata(tempDir, { isOfficial: true, repoRoot: path.join(tempRoot, 'elsewhere') }).errors.join('\n'))
+					.to.not.include('Catalog illustration');
+			} finally {
+				fs.rmSync(tempRoot, { recursive: true, force: true });
+			}
+		});
+
+		it('should accept only TradingView palette colors and the card frame in an illustration', () => {
+			expect(validateCatalogIllustrationContent('a.svg', validIllustration)).to.deep.equal([]);
+			// Shorthand, uppercase, style declarations, none and url() references are all fine.
+			expect(validateCatalogIllustrationContent('a.svg',
+				'<svg viewBox="0 0 320 180"><rect fill="#FFF" style="stroke: #F23645"/><g fill="none" clip-path="url(#c)" fill-rule="evenodd"/><rect fill="url(#g)"/></svg>'
+			)).to.deep.equal([]);
+
+			const errors = validateCatalogIllustrationContent('a.svg',
+				'<svg viewBox="0 0 100 100"><rect fill="red" stroke="#2962ff80"/><stop stop-color="rgb(1, 2, 3)"/></svg>'
+			);
+			expect(errors).to.include('a.svg must have viewBox="0 0 320 180"');
+			expect(errors.join('\n')).to.include('red, #2962ff80, rgb(1, 2, 3)');
 		});
 
 		it('should fail if declared demo path does not exist', () => {

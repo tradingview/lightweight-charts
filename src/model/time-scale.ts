@@ -378,7 +378,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._updateDateTimeFormatter();
 	}
 
-	public applyOptions(options: DeepPartial<HorzScaleOptions>, localizationOptions?: DeepPartial<LocalizationOptions<HorzScaleItem>>): void {
+	public applyOptions(options: DeepPartial<HorzScaleOptions>): void {
 		merge(this._options, options);
 
 		if (this._options.fixLeftEdge) {
@@ -914,7 +914,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	public formatDateTime(timeScalePoint: TimeScalePoint): string {
-		if (this._localizationOptions.timeFormatter !== undefined) {
+		if (this._localizationOptions.timeFormatter != null) {
 			return this._localizationOptions.timeFormatter(timeScalePoint.originalTime as HorzScaleItem);
 		}
 
@@ -1123,7 +1123,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 
 		const barsEstimation = this._options.fixLeftEdge
 			? this._width / this._barSpacing
-			: Math.min(Constants.MinVisibleBarsCount, this._points.length);
+			: Math.min(Constants.MinVisibleBarsCount, this._points.length, this._width / this._barSpacing);
 
 		return firstIndex - baseIndex - 1 + barsEstimation;
 	}
@@ -1131,7 +1131,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	private _maxRightOffset(): number {
 		return this._options.fixRightEdge
 			? 0
-			: (this._width / this._barSpacing) - Math.min(Constants.MinVisibleBarsCount, this._points.length);
+			: (this._width / this._barSpacing) - Math.min(Constants.MinVisibleBarsCount, this._points.length, this._width / this._barSpacing);
 	}
 
 	private _saveCommonTransitionsStartState(): void {

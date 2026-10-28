@@ -572,7 +572,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
-		if (this._options.autoscaleInfoProvider !== undefined) {
+		if (this._options.autoscaleInfoProvider != null) {
 			const autoscaleInfo = this._options.autoscaleInfoProvider(() => {
 				const res = this._autoscaleInfoImpl(startTimePoint, endTimePoint);
 				return (res === null) ? null : res.toRaw();
@@ -873,11 +873,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 				this._precomputeConflationLevel(lvl);
 			};
 			// Use Prioritized Task Scheduling API if available
-			const globalObj = ((typeof window === 'object' && window) || (typeof self === 'object' && self)) as unknown as {
-				scheduler?: {
-					postTask?: (cb: () => void, opts: { priority: 'background' | 'user-visible' | 'user-blocking' }) => Promise<void>;
-				};
-			} | undefined;
+			const globalObj = (typeof window === 'object' && window) || (typeof self === 'object' && self) || undefined;
 
 			if (globalObj?.scheduler?.postTask) {
 				void globalObj.scheduler.postTask(() => { task(); }, { priority });

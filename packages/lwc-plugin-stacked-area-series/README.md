@@ -126,7 +126,7 @@ Values are stacked from `base` (`0` by default): a positive value continues
 away from the base, a negative one comes back towards it and past it, so each
 band is a single ribbon between two lines and never folds over itself.
 
-A point may override the colours of its own bands:
+A point may override the colors of its own bands:
 
 ```js
 series.setData([

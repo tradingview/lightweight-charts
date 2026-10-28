@@ -4,7 +4,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import semver from 'semver';
-import { findWorkspacePlugins, validatePackageMetadata } from './utils.mjs';
+import { catalogSlugOf as slugOf, findWorkspacePlugins, validatePackageMetadata } from './utils.mjs';
 
 export const DEFAULT_REGISTRY = 'https://registry.npmjs.org';
 
@@ -190,11 +190,6 @@ function integrityOf(dist) {
 	}
 	const shasum = textOrNull(dist?.shasum);
 	return shasum !== null && /^[0-9a-f]{40}$/i.test(shasum) ? `sha1-${Buffer.from(shasum, 'hex').toString('base64')}` : null;
-}
-
-/** Unscoped name without the `lwc-plugin-` prefix: the catalogue's URL segment. */
-function slugOf(packageName) {
-	return packageName.slice(packageName.indexOf('/') + 1).replace(/^lwc-plugin-/, '');
 }
 
 /** Runs `fn` over `items` with at most `limit` in flight, preserving order. */

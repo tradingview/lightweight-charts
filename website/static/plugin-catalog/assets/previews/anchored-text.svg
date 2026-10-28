@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Anchored Text preview placeholder">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <polyline points="20,134 60,120 100,128 140,108 180,118 220,100 260,110 300,94"
+            fill="none" stroke="#8c8c8c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <rect x="190" y="52" width="106" height="14" rx="7" fill="#ff9800"/>
+  <rect x="236" y="74" width="60" height="9" rx="4.5" fill="#ffcc80"/>
+</svg>

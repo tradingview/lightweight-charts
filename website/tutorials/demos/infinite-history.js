@@ -112,7 +112,10 @@ const series = chart.addSeries(CandlestickSeries, {
 
 const datafeed = new Datafeed();
 
-series.setData(datafeed.getBars(200));
+// Estimate how many bars fit in the visible area and load 20% extra bars to allow scrolling
+const timeScale = chart.timeScale();
+const visibleBars = Math.ceil(timeScale.width() / timeScale.options().barSpacing);
+series.setData(datafeed.getBars(visibleBars + (visibleBars * 0.2)));
 
 chart.timeScale().subscribeVisibleLogicalRangeChange(logicalRange => {
 	if (logicalRange.from < 10) {

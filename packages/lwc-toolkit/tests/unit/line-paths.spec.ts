@@ -264,21 +264,37 @@ interface RecordedStroke {
 
 interface FakeContext {
 	strokes: RecordedStroke[];
+	/** The `lineCap` in effect at each stroke. */
+	caps: CanvasLineCap[];
+	/** The dash pattern in effect at each stroke. */
+	dashes: number[][];
 	strokeStyle: string;
 	lineWidth: number;
+	lineCap: CanvasLineCap;
 }
 
 /**
  * Minimal context which records each stroked run: the style in effect and the
- * points which were added to the path since the last `beginPath`.
+ * points which were added to the path since the last `beginPath`, and the cap
+ * it was stroked with. It starts with `dash` as its dash pattern.
  */
-function fakeContext(): FakeContext & CanvasRenderingContext2D {
+function fakeContext(dash: number[] = []): FakeContext & CanvasRenderingContext2D {
 	const strokes: RecordedStroke[] = [];
+	const caps: CanvasLineCap[] = [];
+	const dashes: number[][] = [];
+	let currentDash = dash.slice();
 	let points: string[] = [];
 	const context = {
 		strokes,
+		caps,
+		dashes,
 		strokeStyle: '',
 		lineWidth: 0,
+		lineCap: 'round',
+		getLineDash: (): number[] => currentDash.slice(),
+		setLineDash: (segments: number[]): void => {
+			currentDash = [...segments];
+		},
 		beginPath: (): void => {
 			points = [];
 		},
@@ -295,6 +311,8 @@ function fakeContext(): FakeContext & CanvasRenderingContext2D {
 			lineWidth: context.lineWidth,
 			points: [...points],
 		});
+		caps.push(context.lineCap);
+		dashes.push(context.getLineDash());
 	};
 	return context;
 }
@@ -379,5 +397,47 @@ void describe('strokeStyledPolyline', () => {
 		strokeStyledPolyline(ctx, points([0]), () => red);
 		strokeStyledPolyline(ctx, [], () => red);
 		expect(ctx.strokes).to.deep.equal([]);
+	});
+
+	void it("leaves a dash and cap of the caller's as they are, such as round dots", () => {
+		const ctx = fakeContext([0, 4]);
+		strokeStyledPolyline(ctx, points([0, 1, 2]), (i: number) => (i < 2 ? red : blue));
+		expect(ctx.caps).to.deep.equal(['round', 'round']);
+		expect(ctx.dashes).to.deep.equal([[0, 4], [0, 4]]);
+	});
+
+	void it('strokes a run with a dash pattern of its own dashed with butt caps, which keep the gaps open', () => {
+		const dotted: PolylineStroke = { strokeStyle: 'red', lineWidth: 2, dashPattern: [2, 2] };
+		const solid: PolylineStroke = { strokeStyle: 'blue', lineWidth: 2, dashPattern: [] };
+		const ctx = fakeContext();
+		strokeStyledPolyline(ctx, points([0, 1, 2, 3]), (i: number) => [dotted, dotted, solid, red][i]);
+		expect(ctx.dashes).to.deep.equal([[2, 2], [], []]);
+		expect(ctx.caps).to.deep.equal(['butt', 'round', 'round']);
+	});
+
+	void it("strokes a run without a pattern with the context's dash and cap, between styled ones", () => {
+		const dashed: PolylineStroke = { strokeStyle: 'red', lineWidth: 1, dashPattern: [2, 2] };
+		const ctx = fakeContext([5, 1]);
+		strokeStyledPolyline(ctx, points([0, 1, 2, 3]), (i: number) => [dashed, dashed, blue, dashed][i]);
+		expect(ctx.dashes).to.deep.equal([[2, 2], [5, 1], [2, 2]]);
+		expect(ctx.caps).to.deep.equal(['butt', 'round', 'butt']);
+	});
+
+	void it('puts back the dash and cap of the context, even when a style cannot be resolved', () => {
+		const dashed: PolylineStroke = { strokeStyle: 'red', lineWidth: 1, dashPattern: [1, 1] };
+		const ctx = fakeContext([3, 3]);
+		strokeStyledPolyline(ctx, points([0, 1, 2]), () => dashed);
+		expect(ctx.lineCap).to.equal('round');
+		expect(ctx.getLineDash()).to.deep.equal([3, 3]);
+		const failing = fakeContext([3, 3]);
+		expect(() => strokeStyledPolyline(failing, points([0, 1, 2, 3]), (i: number) => {
+			if (i === 3) {
+				throw new Error('no style');
+			}
+			return i === 1 ? dashed : blue;
+		})).to.throw('no style');
+		expect(failing.caps).to.deep.equal(['butt']);
+		expect(failing.lineCap).to.equal('round');
+		expect(failing.getLineDash()).to.deep.equal([3, 3]);
 	});
 });

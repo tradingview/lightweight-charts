@@ -2,8 +2,8 @@
 
 A [custom series](https://tradingview.github.io/lightweight-charts/docs/plugins/custom_series) that draws a histogram with rounded bars. Unlike the built-in
 histogram series, it can round the outer corners of each bar, control the bar
-width as a share of the bar spacing, colour bars by their sign, draw a border
-and fade the fill into a second colour. The result is a softer look that fits
+width as a share of the bar spacing, color bars by their sign, draw a border
+and fade the fill into a second color. The result is a softer look that fits
 dashboards and marketing-style charts.
 
 Use it for volume panes, single-value indicators, or any bar chart where the
@@ -108,7 +108,7 @@ Options can be changed at runtime with `series.applyOptions({ ... })`.
 
 ### Two-tone bars
 
-Set `upColor` and `downColor` to colour each bar by its sign relative to
+Set `upColor` and `downColor` to color each bar by its sign relative to
 `base`, the way a volume pane usually does:
 
 ```js

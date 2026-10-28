@@ -205,12 +205,16 @@ export interface ISeriesApi<
 	/**
 	 * Returns a bar data by provided logical index.
 	 *
+	 * The returned item is a copy rebuilt from the series' internal data, so it is not the same object passed to `setData` or `update`.
+	 * For built-in series types it contains only the fields the series supports; any other fields are dropped.
+	 * Custom series return all fields of the original item.
+	 *
 	 * @param logicalIndex - Logical index
 	 * @param mismatchDirection - Search direction if no data found at provided logical index.
-	 * @returns Original data item provided via setData or update methods.
+	 * @returns The data item at the logical index, or `null` if there is none.
 	 * @example
 	 * ```js
-	 * const originalData = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
+	 * const data = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
 	 * ```
 	 */
 	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null;
@@ -218,10 +222,14 @@ export interface ISeriesApi<
 	/**
 	 * Returns all the bar data for the series.
 	 *
-	 * @returns Original data items provided via setData or update methods.
+	 * The returned items are copies rebuilt from the series' internal data, not the objects passed to `setData` or `update`.
+	 * Whitespace items are excluded. For built-in series types each item contains only the fields the series supports;
+	 * any other fields are dropped. Custom series return all fields of the original items.
+	 *
+	 * @returns Data items of the series, excluding whitespace items.
 	 * @example
 	 * ```js
-	 * const originalData = series.data();
+	 * const data = series.data();
 	 * ```
 	 */
 	data(): readonly TData[];
@@ -298,7 +306,7 @@ export interface ISeriesApi<
 	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.seriesType()); // "Line"
 	 *
-	 * const candlestickSeries = chart.addCandlestickSeries();
+	 * const candlestickSeries = chart.addSeries(CandlestickSeries);
 	 * console.log(candlestickSeries.seriesType()); // "Candlestick"
 	 * ```
 	 */
@@ -314,7 +322,7 @@ export interface ISeriesApi<
 	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.lastValueData(true)); // { noData: false, price: 24.11, color: '#000000' }
 	 *
-	 * const candlestickSeries = chart.addCandlestickSeries();
+	 * const candlestickSeries = chart.addSeries(CandlestickSeries);
 	 * console.log(candlestickSeries.lastValueData(false)); // { noData: false, price: 145.72, color: '#000000' }
 	 * ```
 	 */

@@ -627,6 +627,30 @@ describe('DataLayer', () => {
 		]);
 	});
 
+	it('should keep time-scale points when the only series is set twice before another series is added gh#2154', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series1 = createSeriesMock();
+		const series2 = createSeriesMock();
+
+		dataLayer.setSeriesData(series1, [dataItemAt(1000 as UTCTimestamp), dataItemAt(3000 as UTCTimestamp)]);
+		dataLayer.setSeriesData(series1, [dataItemAt(1000 as UTCTimestamp), dataItemAt(3000 as UTCTimestamp)]);
+		dataLayer.setSeriesData(series2, [dataItemAt(1000 as UTCTimestamp), dataItemAt(3000 as UTCTimestamp)]);
+
+		const updateResult = dataLayer.setSeriesData(series1, [dataItemAt(1000 as UTCTimestamp), dataItemAt(3000 as UTCTimestamp)]);
+
+		expect(updateResult.timeScale.baseIndex).to.be.equal(1 as TimePointIndex);
+		expect(updateResult.timeScale.points).to.be.equal(undefined);
+		expect(updateResult.timeScale.firstChangedPointIndex).to.be.equal(undefined);
+		expect(updateResult.series.size).to.be.equal(1);
+
+		const series1Update = updateResult.series.get(series1);
+		expect(series1Update).not.to.be.equal(undefined);
+		expect(series1Update?.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
+			{ index: 0, time: { timestamp: 1000 } },
+			{ index: 1, time: { timestamp: 3000 } },
+		]);
+	});
+
 	describe('should update base index to null when all series data is cleared gh#757', () => {
 		const data: LineData<Time>[] = [
 			{

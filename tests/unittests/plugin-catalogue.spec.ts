@@ -84,6 +84,10 @@ function makeRepo(packages: Record<string, Record<string, unknown> | string>): s
 		fs.writeFileSync(path.join(dir, 'README.md'), validReadme);
 		fs.writeFileSync(path.join(dir, 'src', 'example', 'index.html'), '<!doctype html>');
 		fs.writeFileSync(path.join(dir, 'src', 'example', 'preview.html'), '<!doctype html>');
+		// The catalog card illustration the docs site keeps for every package.
+		const illustrations = path.join(root, 'website', 'static', 'plugin-catalog', 'assets', 'previews');
+		fs.mkdirSync(illustrations, { recursive: true });
+		fs.writeFileSync(path.join(illustrations, `${folder.replace(/^lwc-plugin-/, '')}.svg`), '<svg viewBox="0 0 320 180"/>');
 	}
 	return root;
 }

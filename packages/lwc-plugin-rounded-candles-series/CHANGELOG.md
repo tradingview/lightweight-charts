@@ -15,7 +15,7 @@ collection of the Lightweight Charts™ repository.
 - The `RoundedCandleSeries` custom series draws candlesticks with rounded bodies.
   The corner `radius` is either a constant or a function of the bar spacing, and
   defaults to a function that adapts to it.
-- The whole set of built-in candlestick colour options: `upColor`, `downColor`,
+- The whole set of built-in candlestick color options: `upColor`, `downColor`,
   `borderVisible`, `borderColor`, `borderUpColor`, `borderDownColor`,
   `wickVisible`, `wickColor`, `wickUpColor` and `wickDownColor`, with the built-in
   series' shorthand semantics and the per-point `color` / `borderColor` /

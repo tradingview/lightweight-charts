@@ -53,6 +53,7 @@ export interface Plugin {
 // bucket derived from its technical category.
 export const CATALOGUE_CATEGORIES: ReadonlyMap<string, string> = new Map([
 	['accessibility', 'UX & accessibility'],
+	['anchored-text', 'Overlays'],
 	['brushable-area-series', 'Series types'],
 	['dual-range-histogram-series', 'Series types'],
 	['hlc-area-series', 'Series types'],

@@ -46,7 +46,19 @@ export interface CustomSeriesDrawArgs<
 	to: number;
 	/** Whether the series is hovered. `false` on hosts which do not pass it. */
 	isHovered: boolean;
-	/** Hit test data for the hovered item, when the host provides it. */
+	/**
+	 * Hit test data for the hovered item, when the host provides it: the
+	 * `hitTestData` the renderer's own `hitTest` returned for the item under
+	 * the pointer (hosts which call `hitTest`, `lightweight-charts` 5.2 on).
+	 *
+	 * `hitTest` must return the *same object* for as long as the same item stays
+	 * hovered. The chart compares it by reference on every pointer move
+	 * (`ChartModel.setHoveredSource` in the library's
+	 * `src/model/chart-model.ts`) and repaints the pane whenever it is another
+	 * object, so a fresh object per call repaints on every pointer move over
+	 * the item. Keep the last one and return it while the item is unchanged,
+	 * or return a primitive, such as the item's index.
+	 */
 	hitTestData?: unknown;
 }
 

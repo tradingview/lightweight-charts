@@ -6,7 +6,7 @@ description: >-
   turning a chart idea ("I want the chart to show/draw X") into a working
   plugin. Covers choosing the plugin type, scaffolding with create-lwc-plugin,
   building on @tradingview/lwc-toolkit instead of hand-rolled helpers, which of
-  the ten official plugin packages to read as the reference implementation,
+  the official plugin packages to read as the reference implementation,
   where the docs are, and the autoscale, whitespace, visible-range, hit-test
   and conflation mistakes every plugin author makes once. Reach for it whenever
   the user mentions a custom series, primitive, renderer, drawing on the chart
@@ -82,8 +82,9 @@ primitive: it draws in a primitive and reacts through `subscribeClick`,
 
 Keep hover and interaction in mind when choosing: primitives get a `hitTest`
 so the chart can report them in crosshair and click events; custom series get
-`hitTest`, `isHovered` and `hitTestData` on their renderer, but only on
-Lightweight Charts™ 5.1 and later.
+a `hitTest` on their renderer only on Lightweight Charts™ 5.2 and later, which
+is what makes the `isHovered` and `hitTestData` arguments of `draw` report a
+hover.
 
 ## Working method
 
@@ -117,7 +118,7 @@ npm create lwc-plugin@latest
 The wizard is interactive. It first offers to install this skill (say no if it
 is already installed, or the user quit the wizard to hand over to you), then
 asks for the type, a name, a one-sentence description, a package name, a class
-name, author, licence, the minimum library version, tags, whether to keep hint
+name, author, license, the minimum library version, tags, whether to keep hint
 comments, and the target folder. Work those answers out with the user before
 anyone runs it — the type decision above is the one that matters — then have
 the user run the wizard in their terminal, unless your environment gives you a
@@ -139,9 +140,9 @@ the release tooling run.
 
 ## Build on the toolkit
 
-`@tradingview/lwc-toolkit` is what the ten official plugins are built from,
+`@tradingview/lwc-toolkit` is what the official plugins are built from,
 extracted from the helpers every example used to copy by hand. Reaching for
-it is not about saving lines; it is that the helpers encode chart behaviour
+it is not about saving lines; it is that the helpers encode chart behavior
 that is easy to get subtly wrong — the exact width the built-in candlestick
 uses at a given bar spacing, pixel-perfect line positions at every device
 pixel ratio, the dash patterns of `LineStyle`, how conflation changes a bar's
@@ -166,7 +167,7 @@ with the shape of each API and the official plugin that uses it.
 | stacked values: band edges and autoscale extremes | `custom-series/stacking` — `stackLevels`, `stackedPlotValues` |
 | columns, candles or lines the same width as the built-ins, pixel-aligned | `dimensions/*` — `calculateColumnPositions`, `candlestickWidth`, `positionsLine`, `positionsBox` |
 | rounded rectangles with an inset border | `canvas/round-rect` |
-| polylines, step lines, the area between two lines, a line whose colour changes | `custom-series/line-paths` |
+| polylines, step lines, the area between two lines, a line whose color changes | `custom-series/line-paths` |
 | a label on the price or time axis | `axis-label-view` (`AxisLabelView`) |
 | a DOM overlay inside the pane | `dom/pane-element` (`paneContentElement`) |
 | a small event, or a `Time` as a timestamp or display string | `delegate`, `time` |
@@ -176,7 +177,7 @@ template is the smallest correct plugin of its type.
 
 ## Read the reference implementations
 
-The ten official packages are the canonical examples: maintained, tested,
+The official packages are the canonical examples: maintained, tested,
 published, and built exactly the way this skill describes. Read the one
 nearest your idea *before* designing — most questions ("how do I get the
 hovered item?", "how do I autoscale a stack?") are answered by a file in
@@ -195,6 +196,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 | a fixed-pixel-height overlay series | `dual-range-histogram-series` (`scaleMode`, `keepPixelSeriesInView`) |
 | a series primitive with an axis label and dragging | `vertical-line` |
 | an image or decoration behind a series or pane | `image-watermark` (both a series and a pane primitive) |
+| a text label anchored to a pane edge or corner | `anchored-text` (the smallest series + pane pair over one core) |
 | a DOM layer on a pane, multi-pane lifecycle | `accessibility` |
 
 `references/official-plugins.md` says what each one demonstrates in detail.
@@ -202,7 +204,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 (`https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples`)
 holds a further set of proof-of-concept plugins — tooltips, drawing tools,
 session highlighting, heatmaps, … — good for breadth and ideas, but they are
-unpublished starting points, not the standard to match. The ten graduated
+unpublished starting points, not the standard to match. The graduated
 plugins' folders there are redirects to the packages.
 
 ## Read the documentation in this order
@@ -218,7 +220,8 @@ every page, `docs_map.md` the same with headings, and
    contract for your type: `attached` / `detached`, `updateAllViews`,
    `paneViews`, `priceAxisViews`, `timeAxisViews`, `hitTest`.
 3. `custom_series` — `ICustomSeriesPaneView`: `priceValueBuilder`,
-   `isWhitespace`, `renderer`, `update`, `defaultOptions`, and the 5.1 hooks.
+   `isWhitespace`, `renderer`, `update`, `defaultOptions`, the 5.1 conflation
+   hooks and the 5.2 `hitTest`.
 4. `canvas-rendering-target` — the `CanvasRenderingTarget2D` you draw on and
    its two coordinate spaces.
 5. `pixel-perfect-rendering` — why widths and positions go through the
@@ -233,7 +236,7 @@ have.
 ## Correctness checklist
 
 Each of these has bitten a shipped plugin. The reasons are here so they can
-be recognised in a new shape, not just avoided in the old one.
+be recognized in a new shape, not just avoided in the old one.
 
 ### Drawing
 
@@ -283,9 +286,14 @@ be recognised in a new shape, not just avoided in the old one.
   `getConflationFactor(data)` as its `minGap` so a whitespace run narrower
   than one conflation bucket is absorbed rather than splitting every bucket
   into a single-point segment.
-- `hitTest`, `isHovered` / `hitTestData`, `conflationReducer` and
-  `conflationFactor` exist from 5.1. Implement them as optional extras, keep
-  the peer range at `^5.0.0` unless you need them, and say so in the README.
+- `conflationReducer` and `conflationFactor` exist from 5.1, and the
+  renderer's `hitTest` from 5.2: series hit testing, which reports a custom
+  series hovered through `isHovered` / `hitTestData` (`draw` arguments since
+  5.0), arrived with it. Implement them as optional extras, keep the peer
+  range at `^5.0.0` unless you need them, and say so in the README.
+- `hitTest` must return the same `hitTestData` object while the same item
+  stays hovered: the chart compares it by reference and repaints the pane on
+  every pointer move when it is a new object.
 - `conflationReducer(a, b)` must return a data item of your own type that
   makes sense as the merge of two: sum for stacks, high/low/last for OHLC,
   the later value for a rate.
@@ -320,7 +328,7 @@ packages have all three under `tests/`; the scaffold sets up the first.
 - **Interactions** (`tests/interactions/*.js`): a page with an async
   `beforeInteractions(container)` that drives the chart and throws on a
   wrong outcome — pixel sampling for "did it paint", DOM checks, hit tests.
-  This is where whitespace, update, `pop` and pointer behaviour are tested.
+  This is where whitespace, update, `pop` and pointer behavior are tested.
 
 Run upstream with `pnpm test`, `pnpm e2e:graphics:plugins` and
 `GREP="lwc-plugin-<name>/" pnpm e2e:interactions`, after `pnpm build:prod`

@@ -7,6 +7,12 @@ already satisfies every item, so this is mostly a list of what not to break.
 The catalog on the docs site lists the official packages today; the same
 contract is what any plugin would need to be listed.
 
+Upstream only: a package under `packages/` also needs its catalog card
+illustration, `website/static/plugin-catalog/assets/previews/<slug>.svg`
+(320×180, TradingView palette colors only). The catalog data README,
+`website/plugins/plugin-catalogue/README.md`, says how to draw it and which
+accent color to pick.
+
 ## `package.json`
 
 | Field | Rule | Why |

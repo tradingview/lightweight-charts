@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
+import type { LineStyle as ChartLineStyle } from 'lightweight-charts';
 
 import {
 	getDashPattern,
@@ -46,6 +47,16 @@ void describe('getDashPattern', () => {
 		expect(getDashPattern(2, 1)).to.deep.equal([2, 2]);
 		expect(getDashPattern(3, 1)).to.deep.equal([6, 6]);
 		expect(getDashPattern(4, 1)).to.deep.equal([1, 4]);
+	});
+
+	void it("takes the library's own LineStyle enum, which has the same values, without a cast", () => {
+		// The enum is declared by the library's typings; its members are the numbers below.
+		const dotted = 1 as ChartLineStyle;
+		const sparse: ChartLineStyle = 4 as ChartLineStyle;
+		expect(getDashPattern(dotted, 2)).to.deep.equal([2, 2]);
+		expect(getDashPattern(sparse, 1)).to.deep.equal([1, 4]);
+		const style: LineStyle = dotted;
+		expect(style).to.equal(LineStyle.Dotted);
 	});
 
 	void it('falls back to a solid line for an unknown style', () => {
