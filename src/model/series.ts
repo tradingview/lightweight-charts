@@ -785,7 +785,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 				break;
 			}
 			case 'percent': {
-				this._formatter = new PercentageFormatter(this._options.priceFormat.precision);
+				this._formatter = new PercentageFormatter(Math.pow(10, this._options.priceFormat.precision));
 				break;
 			}
 			default: {
