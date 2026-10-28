@@ -1,0 +1,39 @@
+---
+title: Line series
+sidebar_label: Line
+sidebar_position: 3
+description: A single value per point joined by a line.
+keywords:
+  - series
+  - line
+pagination_prev: null
+pagination_next: null
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./line.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A line series joins one value per point with a line.
+
+1. [`addSeries`](/docs/api/interfaces/IChartApi#addseries) with `LineSeries` adds the series to the chart. The options set the line's color and width.
+2. [`setData`](/docs/api/interfaces/ISeriesApi#setdata) gives it the data. Each item has a `time` and a `value`.
+3. [`fitContent`](/docs/api/interfaces/ITimeScaleApi#fitcontent) fits all the data into view.
+
+`generateValues` only makes sample data. Replace it with your own.
+
+## Tips
+
+- Set `lineType` to draw [steps or curves](/docs/api/enumerations/LineType) instead of straight segments, and `lineStyle` for a [dashed or dotted](/docs/api/enumerations/LineStyle) line.
+- To update the last point or add a new one as data arrives, use [`update`](/docs/api/interfaces/ISeriesApi#update) instead of calling `setData` again.
+
+## Resources
+
+- [Series types: Line](/docs/series-types#line)
+- [`LineStyleOptions`](/docs/api/interfaces/LineStyleOptions)
+- Related examples: [Area series](./area.mdx), [Compare multiple series](./compare-multiple-series.mdx)

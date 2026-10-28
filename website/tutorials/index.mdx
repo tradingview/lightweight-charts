@@ -78,50 +78,9 @@ or submit your own.
 
 :::
 
-## How To
+## Examples
 
-A collection of code examples showcasing the various capabilities of the library, and how to implement common additional features.
-
-import { useDocsSidebar } from '@docusaurus/plugin-content-docs/client';
-export const HowToList = () => {
-	const examplesCategory = useDocsSidebar().items.find(
-		item => item.type === "category" && item.label === "How To"
-	);
-	const examples = examplesCategory.items.filter(doc => doc.type === "link");
-	return (
-		<ul>
-			{examples.map(docLink => (
-				<li key={docLink.docId}>
-					<a href={docLink.href}>{docLink.label}</a>
-				</li>
-			))}
-		</ul>
-	);
-};
-
-<HowToList />
-
-## Examples / Demos
-
-A collection of demos showcasing the various capabilities of the library.
-
-export const ExamplesList = () => {
-	const examplesCategory = useDocsSidebar().items.find(
-		item => item.type === "category" && item.label === "Examples / Demos"
-	);
-	const examples = examplesCategory.items.filter(doc => doc.type === "link");
-	return (
-		<ul>
-			{examples.map(docLink => (
-				<li key={docLink.docId}>
-					<a href={docLink.href}>{docLink.label}</a>
-				</li>
-			))}
-		</ul>
-	);
-};
-
-<ExamplesList />
+Live code examples of the library's features — series types, scales, tooltips, legends, markers, and more — are in the [Examples](/examples) gallery.
 
 ## Analysis indicators
 

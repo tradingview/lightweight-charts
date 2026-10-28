@@ -1,0 +1,35 @@
+---
+title: Compare multiple series
+sidebar_position: 7
+sidebar_label: Compare multiple series
+description: Several line series on one chart, sharing one price scale.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - compare
+  - series
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./compare-multiple-series.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A chart can hold any number of series. Here three line series share the right price scale, so their values compare directly.
+
+1. [`addSeries`](/docs/api/interfaces/IChartApi#addseries) is called once per series, each with its own color.
+2. [`setData`](/docs/api/interfaces/ISeriesApi#setdata) gives each series its data.
+
+## Tips
+
+- When the series have very different value ranges, give each its own scale. See [Two price scales](../price-scales/two-price-scales.mdx).
+
+## Resources
+
+- [Series types](/docs/series-types)
+- [`IChartApi.addSeries`](/docs/api/interfaces/IChartApi#addseries)
+- Related examples: [Line series](./line.mdx), [Two price scales](../price-scales/two-price-scales.mdx)

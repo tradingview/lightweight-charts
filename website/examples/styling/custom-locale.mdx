@@ -1,0 +1,37 @@
+---
+title: Custom locale
+sidebar_position: 2
+sidebar_label: Custom locale
+description: Dates formatted for different locales, switched with buttons.
+sidebar_custom_props:
+  previewScales: true
+pagination_prev: null
+pagination_next: null
+keywords:
+  - locale
+  - language
+  - international
+  - internationalization
+  - i18n
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./custom-locale.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart formats dates and numbers for a locale. Changing it updates the labels on the scales and the crosshair.
+
+1. The buttons call `setLocale`, which passes the [`localization`](/docs/api/interfaces/ChartOptionsBase#localization) options to [`applyOptions`](/docs/api/interfaces/IChartApi#applyoptions).
+2. `locale` takes a language tag such as `es-ES`, and `dateFormat` sets the order of day, month, and year for it.
+
+The chart starts with `ja-JP`. The call is highlighted in the code.
+
+## Resources
+
+- [`LocalizationOptions`](/docs/api/interfaces/LocalizationOptions)
+- Related examples: [Custom font](./custom-font-family.mdx)

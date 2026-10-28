@@ -1,0 +1,39 @@
+---
+title: Floating tooltip
+sidebar_label: Floating tooltip
+sidebar_position: 1
+description: A tooltip that positions itself next to the data point under the cursor.
+keywords:
+  - tooltip
+  - crosshair
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./floating-tooltip.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+Lightweight Charts™ has no built-in tooltip. This one is an HTML element placed over the chart and updated as the cursor moves.
+
+1. A `div` is created, styled, and added to the chart's container. It starts hidden.
+2. [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove) calls a handler whenever the crosshair moves. Its [`MouseEventParams`](/docs/api/interfaces/MouseEventParams) give the cursor's `point`, the `time`, and the data of each series under the crosshair.
+3. When the cursor is outside the chart or there is no data under it, the handler hides the tooltip. Otherwise it fills in the price and date and shows it.
+4. [`priceToCoordinate`](/docs/api/interfaces/ISeriesApi#pricetocoordinate) turns the price into a vertical position, so the tooltip sits next to the data point rather than the cursor. These lines are highlighted in the code.
+
+The crosshair's horizontal line, its labels, and the grid are hidden in the chart options, so the tooltip is the only readout.
+
+## Tips
+
+- To place the tooltip next to the cursor instead, use `param.point` as is. See the [tracking tooltip](./tracking-tooltip.mdx).
+- `pointer-events: none` on the tooltip keeps it from catching the mouse, so the chart under it still scrolls and zooms.
+
+## Resources
+
+- [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove)
+- [`MouseEventParams`](/docs/api/interfaces/MouseEventParams)
+- [`priceToCoordinate`](/docs/api/interfaces/ISeriesApi#pricetocoordinate)
+- Related examples: [Tracking tooltip](./tracking-tooltip.mdx), [Magnifier tooltip](./magnifier-tooltip.mdx), [Legend](./legend.mdx)

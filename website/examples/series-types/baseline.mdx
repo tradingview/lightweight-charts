@@ -1,0 +1,38 @@
+---
+title: Baseline series
+sidebar_label: Baseline
+sidebar_position: 5
+description: Values above and below a base price drawn in different colors.
+keywords:
+  - series
+  - baseline
+pagination_prev: null
+pagination_next: null
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./baseline.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A baseline series draws the values above a base price in one set of colors and the values below it in another. It suits profit and loss, or a change against a reference.
+
+1. [`addSeries`](/docs/api/interfaces/IChartApi#addseries) with `BaselineSeries` adds the series. `baseValue` sets the base price; the `top*` options color the line and fill above it, and the `bottom*` options below it.
+2. [`setData`](/docs/api/interfaces/ISeriesApi#setdata) gives it the data. Each item has a `time` and a `value`.
+3. [`fitContent`](/docs/api/interfaces/ITimeScaleApi#fitcontent) fits all the data into view.
+
+`generateValues` only makes sample data that crosses the base price. Replace it with your own.
+
+## Tips
+
+- `baseValue` can be changed later with [`applyOptions`](/docs/api/interfaces/ISeriesApi#applyoptions), for example to compare against the first visible value.
+
+## Resources
+
+- [Series types: Baseline](/docs/series-types#baseline)
+- [`BaselineStyleOptions`](/docs/api/interfaces/BaselineStyleOptions)
+- Related examples: [Area series](./area.mdx), [Line series](./line.mdx)

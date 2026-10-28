@@ -1,0 +1,20 @@
+/* The example's chart, code, and prose; as wide as a plugin's README. */
+.body {
+	max-width: 880px;
+}
+
+/* Headings sized like a plugin page's sections and README
+   (src/pages/plugins/styles.module.css: .section h2, .readme h2/h3). */
+.body h2 {
+	margin: 36px 0 12px;
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+.body h3 {
+	margin: 20px 0 8px;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}

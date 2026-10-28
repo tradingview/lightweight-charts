@@ -110,14 +110,14 @@ Use local typings first. The repo paths below exist only in the upstream `lightw
 |---|---|
 | First chart / series | `website/docs/intro.mdx`, `website/tutorials/customization/` |
 | Time / range behavior | `website/docs/time-scale.md`, `website/docs/time-zones.md` |
-| Realtime / history | `website/tutorials/demos/realtime-updates.{mdx,js}`, `website/tutorials/demos/infinite-history.{mdx,js}` |
-| Whitespace / gaps | `website/tutorials/demos/whitespace.{mdx,js}` |
-| Price format / locale | `website/tutorials/customization/price-format.mdx`, `website/tutorials/demos/custom-locale.{mdx,js}` |
-| Two scales / inverted | `website/tutorials/how_to/two-price-scales.{mdx,js}`, `website/tutorials/how_to/inverted-price-scale.{mdx,js}` |
-| Panes / price + volume | `website/docs/panes.md`, `website/tutorials/how_to/panes.{mdx,js}`, `website/tutorials/how_to/price-and-volume.{mdx,js}` |
-| Markers / tooltips / legends | `website/tutorials/how_to/series-markers.{mdx,js}`, `website/tutorials/how_to/tooltips.mdx`, `website/tutorials/how_to/legends.mdx` |
-| Crosshair (programmatic) | `website/tutorials/how_to/set-crosshair-position*.js` |
-| Watermarks | `website/tutorials/how_to/watermark.mdx` |
+| Realtime / history | `website/examples/data/realtime-updates.{mdx,js}`, `website/examples/data/infinite-history.{mdx,js}` |
+| Whitespace / gaps | `website/examples/data/whitespace.{mdx,js}` |
+| Price format / locale | `website/tutorials/customization/price-format.mdx`, `website/examples/styling/custom-locale.{mdx,js}` |
+| Two scales / inverted | `website/examples/price-scales/two-price-scales.{mdx,js}`, `website/examples/price-scales/inverted-price-scale.{mdx,js}` |
+| Panes / price + volume | `website/docs/panes.md`, `website/examples/panes/multiple-panes.{mdx,js}`, `website/examples/price-scales/price-and-volume.{mdx,js}` |
+| Markers / tooltips / legends | `website/examples/markers-and-lines/series-markers.{mdx,js}`, `website/examples/tooltips-and-legends/*-tooltip.{mdx,js}`, `website/examples/tooltips-and-legends/*legend.{mdx,js}` |
+| Crosshair (programmatic) | `website/examples/crosshair/*.{mdx,js}` |
+| Watermarks | `website/examples/styling/*-watermark.{mdx,js}` |
 | Plugins / custom series / primitives | `website/docs/plugins/`, `plugin-examples/src/plugins/` |
 | Coordinate conversion / hit-testing | `dist/typings.d.ts` for `subscribeClick`, `coordinateToPrice`, `timeScale().coordinateToLogical` |
 | Non-time horizontal scales / options chart | `dist/typings.d.ts` for `createOptionsChart`, `createChartEx`, `IHorzScaleBehavior` |
@@ -496,7 +496,7 @@ Working examples live under `plugin-examples/src/plugins/` — copy structure fr
 2. **Suspect:** the code calls `series.setData(...)` on every tick instead of `series.update(...)`. `setData` resets the visible range.
 3. **Verify:** ask whether the call path is `setData` or `update`. If `setData`, ask whether the visible logical range is captured before and restored after — the v4-era workaround.
 4. **Fix:** switch to `series.update(bar)` for incremental ticks; reserve `setData` for full-history replacement; only use `chart.timeScale().scrollToRealTime()` if the user explicitly wants follow-the-latest behavior.
-5. **References:** `website/tutorials/demos/realtime-updates.js`, `website/docs/time-scale.md`.
+5. **References:** `website/examples/data/realtime-updates.js`, `website/docs/time-scale.md`.
 
 ## Code-generation rules
 
