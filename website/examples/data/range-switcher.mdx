@@ -1,0 +1,36 @@
+---
+title: Range switcher
+sidebar_position: 4
+sidebar_label: Range switcher
+description: Buttons that switch the chart between daily, weekly, monthly, and yearly data.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - range
+  - resolution
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./range-switcher.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart holds a data set for each interval and swaps them when a button is clicked.
+
+1. Four data sets are prepared, for daily, weekly, monthly, and yearly values.
+2. Each button calls `setChartInterval`, which passes the chosen set to [`setData`](/docs/api/interfaces/ISeriesApi#setdata), changes the line color with [`applyOptions`](/docs/api/interfaces/ISeriesApi#applyoptions), and calls [`fitContent`](/docs/api/interfaces/ITimeScaleApi#fitcontent).
+3. The chart is created in its own element that fills the space above the buttons. `autoSize: true` keeps the chart the size of that element.
+
+## Tips
+
+- To show a period of the same data instead of different data, set the visible range with [`setVisibleRange`](/docs/api/interfaces/ITimeScaleApi#setvisiblerange).
+
+## Resources
+
+- [`ISeriesApi.setData`](/docs/api/interfaces/ISeriesApi#setdata)
+- [`ITimeScaleApi.fitContent`](/docs/api/interfaces/ITimeScaleApi#fitcontent)
+- Related examples: [Realtime updates](./realtime-updates.mdx), [Infinite history](./infinite-history.mdx)

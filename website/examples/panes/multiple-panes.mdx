@@ -1,0 +1,38 @@
+---
+title: Panes
+sidebar_position: 1
+sidebar_label: Panes
+description: An area series and candlesticks in two separate panes.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - example
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./multiple-panes.js";
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A chart can be split into [panes](/docs/panes), stacked areas that share the time scale. Here an area series and a candlestick series each get their own pane.
+
+1. The third argument of [`addSeries`](/docs/api/interfaces/IChartApi#addseries) is the pane index. The candlesticks go to pane `1`, which is created for them.
+2. [`panes`](/docs/api/interfaces/IChartApi#panes) returns the panes. The candlestick pane is moved to the top with [`moveTo`](/docs/api/interfaces/IPaneApi#moveto) and given a height with [`setHeight`](/docs/api/interfaces/IPaneApi#setheight).
+3. [`layout.panes`](/docs/api/interfaces/LayoutPanesOptions) in the chart options sets the separator colors and turns off resizing by dragging.
+
+These lines are highlighted in the code.
+
+## Tips
+
+- A series can change panes later with [`moveToPane`](/docs/api/interfaces/ISeriesApi#movetopane). A pane left without series is removed.
+- [`removePane`](/docs/api/interfaces/IChartApi#removepane) removes a pane together with its series.
+
+## Resources
+
+- [Panes](/docs/panes)
+- [`IPaneApi`](/docs/api/interfaces/IPaneApi)
+- Related examples: [Price and volume](../price-scales/price-and-volume.mdx), [Sync two charts](../crosshair/sync-crosshairs.mdx)

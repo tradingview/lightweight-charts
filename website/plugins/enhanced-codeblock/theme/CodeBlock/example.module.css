@@ -1,0 +1,113 @@
+/* The chart's frame and caption match a plugin's preview block
+   (src/pages/plugins/styles.module.css: .previewBlock, .previewCaption). */
+.previewBlock {
+	margin-bottom: 36px;
+	border: 1px solid var(--ifm-color-emphasis-200);
+	border-radius: 12px;
+	overflow: hidden;
+	background: var(--ifm-background-surface-color);
+}
+
+.previewBlock iframe {
+	display: block;
+}
+
+.previewCaption {
+	padding: 8px 14px;
+	border-top: 1px solid var(--ifm-color-emphasis-200);
+	font-size: 12px;
+	line-height: 16px;
+	color: var(--ifm-color-emphasis-600);
+}
+
+.codeHeading {
+	margin-bottom: 12px;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.action {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 12px;
+	border: 1px solid var(--ifm-color-emphasis-300);
+	border-radius: 8px;
+	background: var(--ifm-background-surface-color);
+	color: var(--ifm-font-color-base);
+	font: inherit;
+	font-size: 13px;
+	line-height: 20px;
+	cursor: pointer;
+}
+
+.action:hover {
+	border-color: var(--ifm-color-primary);
+	color: var(--ifm-color-primary);
+	text-decoration: none;
+}
+
+.action:focus-visible {
+	outline: 2px solid var(--ifm-color-primary);
+	outline-offset: 1px;
+}
+
+/* The checkbox only carries the state; its label is the "Show all code" action. */
+.toggle {
+	display: none;
+}
+
+.note {
+	margin-top: -8px;
+	font-size: 13px;
+	line-height: 18px;
+	color: var(--ifm-color-emphasis-700);
+}
+
+.labelStack {
+	display: inline-grid;
+	justify-items: center;
+}
+
+.labelStack > span {
+	grid-area: 1 / 1;
+}
+
+.labelHidden {
+	visibility: hidden;
+}
+
+/* A quicker tooltip than the browser's own `title`, on hover and keyboard focus. */
+.action[data-tooltip]::after {
+	position: absolute;
+	bottom: calc(100% + 8px);
+	left: 50%;
+	z-index: 10;
+	width: max-content;
+	max-width: 260px;
+	padding: 6px 10px;
+	border-radius: 6px;
+	background: var(--ifm-color-emphasis-900);
+	color: var(--ifm-color-emphasis-0);
+	font-size: 12px;
+	line-height: 16px;
+	text-align: center;
+	white-space: normal;
+	content: attr(data-tooltip);
+	opacity: 0;
+	pointer-events: none;
+	transform: translate(-50%, 4px);
+	transition: opacity 0.12s ease-out, transform 0.12s ease-out;
+}
+
+.action[data-tooltip]:hover::after,
+.action[data-tooltip]:focus-visible::after {
+	opacity: 1;
+	transform: translate(-50%, 0);
+	transition-delay: 0.15s;
+}

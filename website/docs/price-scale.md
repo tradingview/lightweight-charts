@@ -23,7 +23,7 @@ The chart will create an overlay price scale with the provided ID.
 If a price scale with such ID already exists, a series will be attached to the existing price scale.
 Further, you can use the provided price scale ID to retrieve its API object using the [`IChartApi.priceScale`](/api/interfaces/IChartApi.md#pricescale) method.
 
-See the [Price and Volume](/tutorials/how_to/price-and-volume) article for an example of adding a Volume indicator using an overlay price scale.
+See the [Price and volume](/examples/price-scales/price-and-volume) example for adding a Volume indicator using an overlay price scale.
 
 ## Modify price scale
 
@@ -33,6 +33,8 @@ To change the default settings for an overlay price scale, use the [`overlayPric
 
 You can use the [`IChartApi.priceScale`](/api/interfaces/IChartApi.md#pricescale) method to retrieve the API object for any price scale.
 Similarly, to access the API object for the price scale that a series is attached to, use the [`ISeriesApi.priceScale`](/api/interfaces/ISeriesApi.md#pricescale) method.
+
+See the [Two price scales](/examples/price-scales/two-price-scales) and [Inverted price scale](/examples/price-scales/inverted-price-scale) examples.
 
 ## Remove price scale
 

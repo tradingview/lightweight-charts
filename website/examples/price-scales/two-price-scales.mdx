@@ -1,0 +1,37 @@
+---
+title: Two price scales
+sidebar_position: 1
+sidebar_label: Two price scales
+description: Two series, each with its own price scale on the left and on the right.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - price
+  - scale
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./two-price-scales.js";
+
+<CodeBlock example className="language-js">
+    {code}
+</CodeBlock>
+
+## How it works
+
+A chart has a price scale on each side, but only the right one is visible by default.
+
+1. In the chart options, `visible: true` on both [`leftPriceScale`](/docs/api/interfaces/ChartOptionsBase#leftpricescale) and [`rightPriceScale`](/docs/api/interfaces/ChartOptionsBase#rightpricescale) shows the two scales.
+2. A series is attached to the left scale with [`priceScaleId`](/docs/api/interfaces/SeriesOptionsCommon#pricescaleid) set to `'left'`. A series without `priceScaleId` uses the right scale.
+
+These lines are highlighted in the code.
+
+## Tips
+
+- With two series, the crosshair snaps to the data points of the first one. The example sets the [crosshair mode](/docs/api/enumerations/CrosshairMode) to `Normal`, so the crosshair stays under the cursor.
+
+## Resources
+
+- [Price scale](/docs/price-scale)
+- [`PriceScaleOptions`](/docs/api/interfaces/PriceScaleOptions)
+- Related examples: [Price and volume](./price-and-volume.mdx), [Inverted price scale](./inverted-price-scale.mdx)
