@@ -840,7 +840,8 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this._model.setTimeScaleAnimation({
 			finished: (time: number) => (time - animationStart) / animationDuration >= 1,
 			getPosition: (time: number) => {
-				const animationProgress = (time - animationStart) / animationDuration;
+				// the first frame's timestamp can be earlier than the animation start, so don't move backwards
+				const animationProgress = Math.max(0, (time - animationStart) / animationDuration);
 				const finishAnimation = animationProgress >= 1;
 				return finishAnimation ? offset : source + (offset - source) * animationProgress;
 			},

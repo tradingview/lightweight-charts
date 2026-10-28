@@ -137,7 +137,8 @@ export class KineticAnimation {
 
 	private _progressDuration(time: number): number {
 		const startPosition = ensureNotNull(this._animationStartPosition);
-		const progress = time - startPosition.time;
+		// the first frame's timestamp can be earlier than the animation start, so don't move backwards
+		const progress = Math.max(0, time - startPosition.time);
 		return Math.min(progress, this._durationMsecs);
 	}
 }

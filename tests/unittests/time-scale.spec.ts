@@ -165,5 +165,13 @@ describe('TimeScale', () => {
 			expect(animation.getPosition(start + 400)).to.be.equal(-200);
 			expect(animation.getPosition(start + 100000)).to.be.equal(-200);
 		});
+
+		it('should stay at the source position for frames timestamped before the start', () => {
+			const animation = animationOf(-200, 400);
+
+			expect(animation.finished(start - 1)).to.be.equal(false);
+			expect(animation.getPosition(start - 1)).to.be.equal(0);
+			expect(animation.getPosition(start - 100)).to.be.equal(0);
+		});
 	});
 });

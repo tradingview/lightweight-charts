@@ -49,6 +49,25 @@ describe('KineticAnimation', () => {
 		expect(animation.getPosition(startTime + duration + 100000)).to.be.equal(endPosition);
 	});
 
+	it('stays at its start position for frames timestamped before the start', () => {
+		const startTime = 25;
+		const animation = startedAnimation(startTime);
+
+		expect(animation.finished(startTime - 1)).to.be.equal(false);
+		expect(animation.getPosition(startTime - 1)).to.be.equal(10);
+		expect(animation.getPosition(startTime - 100)).to.be.equal(10);
+	});
+
+	it('is finished right away when it is too slow to travel the minimal distance', () => {
+		const animation = new KineticAnimation(0.0001, 10, 0.997, 0);
+		animation.addPosition(0 as Coordinate, 0);
+		animation.addPosition(0.01 as Coordinate, 10);
+		animation.start(0.01 as Coordinate, 10);
+
+		expect(animation.finished(10)).to.be.equal(true);
+		expect(animation.finished(9)).to.be.equal(true);
+	});
+
 	it('moves in the direction of the gesture', () => {
 		const startTime = 25;
 		const animation = startedAnimation(startTime);
