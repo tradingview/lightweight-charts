@@ -1,0 +1,42 @@
+---
+title: Screenshot
+sidebar_label: Screenshot
+sidebar_position: 5
+description: A button that saves the chart as a PNG image.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - screenshot
+  - image
+  - export
+  - PNG
+  - takeScreenshot
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./screenshot.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart can draw itself on a new canvas, which the page can then save as an image.
+
+1. [`takeScreenshot`](/docs/api/interfaces/IChartApi#takescreenshot) returns a canvas with the chart on it, including the price and time scales.
+2. [`toBlob`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob) turns the canvas into a PNG file.
+3. A temporary link with the `download` attribute saves the file as `chart.png`.
+
+These lines are highlighted in the code.
+
+## Tips
+
+- By default, the screenshot leaves out the chart's top layer, where the crosshair and some plugin drawings are drawn. `takeScreenshot(true)` adds the top layer without the crosshair, and `takeScreenshot(true, true)` adds the crosshair as well.
+- To show the image on the page instead of saving it, set an `img` element's `src` to `canvas.toDataURL()`.
+- Elements you add over the chart, such as a legend or a tooltip, are HTML, not part of the chart canvas, so they are not in the screenshot.
+
+## Resources
+
+- [`IChartApi.takeScreenshot`](/docs/api/interfaces/IChartApi#takescreenshot)
+- Related examples: [Legend](../tooltips-and-legends/legend.mdx), [Text watermark](../styling/text-watermark.mdx)

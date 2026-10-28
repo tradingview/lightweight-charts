@@ -4,6 +4,7 @@ module.exports = {
 		createChart: false,
 		createChartEx: false,
 		createYieldCurveChart: false,
+		createOptionsChart: false,
 		createUpDownMarkers: false,
 		createTextWatermark: false,
 		createImageWatermark: false,
@@ -14,5 +15,8 @@ module.exports = {
 		BaselineSeries: false,
 		CandlestickSeries: false,
 		HistogramSeries: false,
+		CrosshairMode: false,
+		PriceScaleMode: false,
+		TickMarkType: false,
 	},
 };

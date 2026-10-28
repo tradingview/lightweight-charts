@@ -1,0 +1,45 @@
+---
+title: Crosshair modes
+sidebar_label: Crosshair modes
+sidebar_position: 3
+description: A crosshair that moves freely, snaps to prices, or is hidden, switched with buttons.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - crosshair
+  - magnet
+  - snap
+  - CrosshairMode
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./crosshair-modes.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The crosshair mode decides where the horizontal line of the crosshair goes. Hover the chart after each button to see the difference.
+
+1. The buttons call `setMode`, which passes [`crosshair.mode`](/docs/api/interfaces/CrosshairOptions#mode) to the chart's [`applyOptions`](/docs/api/interfaces/IChartApi#applyoptions).
+2. [`CrosshairMode`](/docs/api/enumerations/CrosshairMode) lists the modes:
+   - `Normal` follows the cursor freely;
+   - `Magnet` snaps to the close price of the bar;
+   - `MagnetOHLC` snaps to the open, high, low, or close, whichever is nearest to the cursor;
+   - `Hidden` does not draw the crosshair.
+
+The chart starts in `MagnetOHLC` mode. The call is highlighted in the code.
+
+## Tips
+
+- On a line or area series, both magnet modes snap to the value of the point.
+- `Hidden` only stops the drawing. [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove) still reports the cursor, so a custom tooltip keeps working.
+- To style the lines instead, set `crosshair.vertLine` and `crosshair.horzLine`, for example their `color`, `style`, and `labelVisible`.
+
+## Resources
+
+- [`CrosshairOptions`](/docs/api/interfaces/CrosshairOptions)
+- [`CrosshairMode`](/docs/api/enumerations/CrosshairMode)
+- Related examples: [Sync crosshairs](./sync-crosshairs.mdx), [Floating tooltip](../tooltips-and-legends/floating-tooltip.mdx)
