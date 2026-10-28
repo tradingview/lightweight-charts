@@ -1,0 +1,43 @@
+---
+title: Click to add markers
+sidebar_label: Click to add markers
+sidebar_position: 3
+description: Markers that appear on the bar you click and disappear on a second click.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - click
+  - subscribeClick
+  - markers
+  - interaction
+  - events
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./click-to-add-markers.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart reports every click with the time of the bar under the cursor. Here a click on a bar adds a marker to it, and a second click removes it.
+
+1. [`subscribeClick`](/docs/api/interfaces/IChartApi#subscribeclick) calls the handler on each click. Its [`MouseEventParams`](/docs/api/interfaces/MouseEventParams) carry the `time` of the bar under the cursor.
+2. The handler adds the time to a set of marked times, or removes it when the bar is marked already.
+3. `updateMarkers` turns the set into markers and passes them to `setMarkers` of the [`createSeriesMarkers`](/docs/api/functions/createSeriesMarkers) plugin.
+
+The click handler is highlighted in the code. `generateBars` only makes sample data. Replace it with your own.
+
+## Tips
+
+- The same parameters have `point`, the click position in pixels, and `seriesData`, the values of every series at that time. Use them to show the details of the clicked bar.
+- To tell the price at the click position, pass `param.point.y` to the series' [`coordinateToPrice`](/docs/api/interfaces/ISeriesApi#coordinatetoprice).
+- [`subscribeDblClick`](/docs/api/interfaces/IChartApi#subscribedblclick) works the same way for double clicks.
+
+## Resources
+
+- [`IChartApi.subscribeClick`](/docs/api/interfaces/IChartApi#subscribeclick)
+- [`MouseEventParams`](/docs/api/interfaces/MouseEventParams)
+- Related examples: [Series markers](./series-markers.mdx), [Floating tooltip](../tooltips-and-legends/floating-tooltip.mdx)

@@ -46,6 +46,16 @@ export type LightweightChartsApiGetters = {
 	[K in keyof LightweightChartsApiTypeMap]: (window: Window) => Promise<LightweightChartsApiGetterResult<K>>;
 };
 
+// A chart created with `autoSize` follows its element by itself and warns when
+// it is resized from outside, so the handler below leaves it alone.
+function resizeUnlessAutoSized(chart: { resize(width: number, height: number): void; options(): object }): (width: number, height: number) => void {
+	return (width: number, height: number) => {
+		if (!(chart.options() as { autoSize?: boolean }).autoSize) {
+			chart.resize(width, height);
+		}
+	};
+}
+
 function addResizeHandler(window: Window, container: HTMLElement, resize: (width: number, height: number) => void): void {
 	const resizeListener = () => {
 		const boundingClientRect = (container).getBoundingClientRect();
@@ -61,7 +71,7 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
@@ -72,7 +82,7 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
@@ -83,13 +93,13 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
 			const result = module.createChartEx(container, behaviour, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
@@ -100,13 +110,13 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
 			const result = module.createChartEx(container, behaviour, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
@@ -117,25 +127,25 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
 			const result = module.createChartEx(container, behaviour, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createYieldCurveChart = (container: string | HTMLElement, options?: Parameters<typeof module.createYieldCurveChart>[1]) => {
 			const result = module.createYieldCurveChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createOptionsChart = (container: string | HTMLElement, options?: Parameters<typeof module.createOptionsChart>[1]) => {
 			const result = module.createOptionsChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
@@ -152,25 +162,25 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
 			const result = module.createChartEx(container, behaviour, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createYieldCurveChart = (container: string | HTMLElement, options?: Parameters<typeof module.createYieldCurveChart>[1]) => {
 			const result = module.createYieldCurveChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createOptionsChart = (container: string | HTMLElement, options?: Parameters<typeof module.createOptionsChart>[1]) => {
 			const result = module.createOptionsChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
@@ -187,25 +197,25 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
 			const result = module.createChartEx(container, behaviour, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createYieldCurveChart = (container: string | HTMLElement, options?: Parameters<typeof module.createYieldCurveChart>[1]) => {
 			const result = module.createYieldCurveChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createOptionsChart = (container: string | HTMLElement, options?: Parameters<typeof module.createOptionsChart>[1]) => {
 			const result = module.createOptionsChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
@@ -222,25 +232,25 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
 			const result = module.createChartEx(container, behaviour, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createYieldCurveChart = (container: string | HTMLElement, options?: Parameters<typeof module.createYieldCurveChart>[1]) => {
 			const result = module.createYieldCurveChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 
 		const createOptionsChart = (container: string | HTMLElement, options?: Parameters<typeof module.createOptionsChart>[1]) => {
 			const result = module.createOptionsChart(container, options);
-			addResizeHandler(window, container as HTMLElement, result.resize.bind(result));
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
 			return result;
 		};
 

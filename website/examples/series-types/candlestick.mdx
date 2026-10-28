@@ -1,0 +1,41 @@
+---
+title: Candlestick series
+sidebar_label: Candlestick
+sidebar_position: 1
+description: Price movement drawn as candlesticks colored by direction.
+keywords:
+  - series
+  - candlestick
+pagination_prev: null
+pagination_next: null
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./candlestick.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A candlestick series draws each period as a body between the open and the close, with wicks out to the high and the low.
+
+1. [`addSeries`](/docs/api/interfaces/IChartApi#addseries) with `CandlestickSeries` adds the series. The options set the colors for rising and falling candles, for both bodies and wicks.
+2. [`setData`](/docs/api/interfaces/ISeriesApi#setdata) gives it the data. Each item has a `time`, `open`, `high`, `low`, and `close`.
+3. [`fitContent`](/docs/api/interfaces/ITimeScaleApi#fitcontent) fits all the data into view.
+
+`generateCandles` only makes sample data. Replace it with your own.
+
+## Tips
+
+- A data item can set its own `color`, `borderColor`, and `wickColor` to highlight a single candle.
+- `borderVisible: false` drops the outline, so the body is filled with one color.
+- For candles with rounded bodies, use the [Rounded candles series](/plugins/rounded-candles-series) plugin. It takes the same data and colors as the built-in series, so you can swap one for the other.
+
+## Resources
+
+- [Series types: Candlestick](/docs/series-types#candlestick)
+- [`CandlestickStyleOptions`](/docs/api/interfaces/CandlestickStyleOptions)
+- Related examples: [Bar series](./bar.mdx), [Series markers](../markers-and-lines/series-markers.mdx)
+- Plugin: [Rounded candles series](/plugins/rounded-candles-series)

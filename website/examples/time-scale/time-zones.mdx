@@ -1,0 +1,44 @@
+---
+title: Time zones
+sidebar_label: Time zones
+sidebar_position: 1
+description: One trading session shown in UTC, New York, Berlin, or Tokyo time.
+sidebar_custom_props:
+  previewScales: true
+pagination_prev: null
+pagination_next: null
+keywords:
+  - time zone
+  - timezone
+  - UTC
+  - local time
+  - DST
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./time-zones.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart shows every time in UTC and has no time zone option. To show another time zone, shift the timestamps so that their UTC time reads as the local time of that zone. The bars here are a US stock session, from 14:30 to 21:00 UTC, which is 9:30 to 16:00 in New York.
+
+1. `timeToTz` reads the local date and time of a timestamp with an [`Intl.DateTimeFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat) for the time zone, then builds a UTC timestamp from them with `Date.UTC`.
+2. The buttons call `setTimeZone`. It creates the format once, shifts a copy of the data, and passes the copy to [`setData`](/docs/api/interfaces/ISeriesApi#setdata). The original UTC data stays unchanged, so the zone can be switched again.
+
+These lines are highlighted in the code. `generateBars` only makes sample data. Replace it with your own.
+
+## Tips
+
+- `Intl.DateTimeFormat` knows daylight saving time, so each timestamp gets the offset that applied on its own date.
+- Formatting each timestamp is slow for large data sets. For 100,000 points or more, see the faster approaches in [Time zones](/docs/time-zones).
+- Shift the data you pass to [`update`](/docs/api/interfaces/ISeriesApi#update) too, or new bars land in the wrong place.
+
+## Resources
+
+- [Time zones](/docs/time-zones)
+- [`timeScale.timeVisible`](/docs/api/interfaces/TimeScaleOptions#timevisible)
+- Related examples: [Custom date format](./custom-date-format.mdx), [Custom locale](../styling/custom-locale.mdx)

@@ -288,3 +288,11 @@ button.navbar__toggle {
 .standalone-iframe.h400 {
 	height: 400px;
 }
+
+/* Set for the frames of a theme switch (src/client-modules/theme-switch-without-transitions.ts),
+   so that elements with color transitions change theme together with the rest of the page. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+	transition: none !important;
+}

@@ -1,0 +1,45 @@
+---
+title: Visible range
+sidebar_label: Visible range
+sidebar_position: 2
+description: Buttons that show the last week, month, quarter, or year of the same data.
+sidebar_custom_props:
+  previewScales: true
+pagination_prev: null
+pagination_next: null
+keywords:
+  - visible range
+  - zoom
+  - period
+  - fixLeftEdge
+  - time scale
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./visible-range.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart has two years of data, and the buttons choose which part of it is in view.
+
+1. `showLast` passes a range of timestamps, from a number of days before the last bar to the last bar, to [`setVisibleRange`](/docs/api/interfaces/ITimeScaleApi#setvisiblerange).
+2. The All button calls [`fitContent`](/docs/api/interfaces/ITimeScaleApi#fitcontent), which fits all the data into view.
+3. [`fixLeftEdge`](/docs/api/interfaces/TimeScaleOptions#fixleftedge) and [`fixRightEdge`](/docs/api/interfaces/TimeScaleOptions#fixrightedge) stop the user from scrolling past the first and the last bar.
+
+The chart starts with the last three months. These lines are highlighted in the code.
+
+## Tips
+
+- `setVisibleRange` stays within the data: a range that starts before the first bar starts at the first bar. To leave empty space at the edges, turn `fixLeftEdge` and `fixRightEdge` off and use [`setVisibleLogicalRange`](/docs/api/interfaces/ITimeScaleApi#setvisiblelogicalrange), which counts in bars.
+- To jump to a date and keep the current zoom, find its bar with [`timeToIndex`](/docs/api/interfaces/ITimeScaleApi#timetoindex). Then pass a logical range of the current width around that bar to `setVisibleLogicalRange`.
+- To keep the view on the latest bar as new data arrives, see [Realtime updates](../data/realtime-updates.mdx).
+
+## Resources
+
+- [Time scale: Visible range](/docs/time-scale#visible-range)
+- [`ITimeScaleApi`](/docs/api/interfaces/ITimeScaleApi)
+- Related examples: [Range switcher](../data/range-switcher.mdx), [Infinite history](../data/infinite-history.mdx)

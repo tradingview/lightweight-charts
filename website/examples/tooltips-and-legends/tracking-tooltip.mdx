@@ -1,0 +1,31 @@
+---
+title: Tracking tooltip
+sidebar_label: Tracking tooltip
+sidebar_position: 2
+description: A tooltip that follows the cursor.
+keywords:
+  - tooltip
+  - crosshair
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./tracking-tooltip.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+This tooltip follows the cursor. Like the [floating tooltip](./floating-tooltip.mdx), it is an HTML element over the chart, updated from a [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove) handler.
+
+1. The handler hides the tooltip when the cursor is outside the chart or not over data. Otherwise it fills in the price and date.
+2. The tooltip is placed at `param.point`, the cursor position, with a margin. Near the right or bottom edge it moves to the other side of the cursor, so it stays inside the chart.
+
+These lines are highlighted in the code.
+
+## Resources
+
+- [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove)
+- [`MouseEventParams`](/docs/api/interfaces/MouseEventParams)
+- Related examples: [Floating tooltip](./floating-tooltip.mdx), [Magnifier tooltip](./magnifier-tooltip.mdx)

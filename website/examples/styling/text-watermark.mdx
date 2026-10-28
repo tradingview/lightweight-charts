@@ -1,0 +1,33 @@
+---
+title: Text watermark
+sidebar_label: Text watermark
+sidebar_position: 3
+description: A text watermark drawn behind the series.
+keywords:
+  - watermark
+  - text
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./text-watermark.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A text watermark is one or more lines of text drawn behind the series in a pane.
+
+[`createTextWatermark`](/docs/api/functions/createTextWatermark) adds the watermark to the first pane, from [`panes`](/docs/api/interfaces/IChartApi#panes). The options set its alignment and, for each line, the text, color, and font size. The call is highlighted in the code.
+
+## Tips
+
+- The function returns the watermark. Call its `applyOptions` to change the text later.
+- For an image instead of text, see [Image watermark](./image-watermark.mdx).
+
+## Resources
+
+- [`createTextWatermark`](/docs/api/functions/createTextWatermark)
+- [`TextWatermarkOptions`](/docs/api/interfaces/TextWatermarkOptions)
+- Related examples: [Image watermark](./image-watermark.mdx)

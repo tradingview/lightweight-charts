@@ -1,0 +1,36 @@
+---
+title: Hidden time scale
+sidebar_position: 5
+sidebar_label: Hidden time scale
+description: A line chart without the time axis at the bottom.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - time scale
+  - hide
+  - example
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./hidden-time-scale.js";
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The time scale is the axis with dates under the chart. Hiding it gives the series that space, which suits sparklines and charts stacked under each other.
+
+Set [`visible: false`](/docs/api/interfaces/HorzScaleOptions#visible) in the time scale options. The example passes it to [`applyOptions`](/docs/api/interfaces/IChartApi#applyoptions); the call is highlighted in the code.
+
+## Tips
+
+- The chart can still be scrolled and zoomed with the time scale hidden.
+- To hide the price scale as well, set `rightPriceScale: { visible: false }`.
+
+## Resources
+
+- [Time scale](/docs/time-scale)
+- [`HorzScaleOptions.visible`](/docs/api/interfaces/HorzScaleOptions#visible)
+- Related examples: [Sync crosshairs between two charts](../crosshair/sync-crosshairs.mdx), [Inverted price scale](../price-scales/inverted-price-scale.mdx)
