@@ -1,0 +1,38 @@
+---
+title: Sync crosshairs between two charts
+sidebar_label: Sync two charts
+sidebar_position: 1
+description: Two charts whose crosshairs and visible ranges move together.
+keywords:
+  - crosshair
+  - sync
+  - tracking
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./sync-crosshairs.js';
+
+<CodeBlock example className="language-js" iframeStyle={{ height: '500px' }}>
+	{code}
+</CodeBlock>
+
+## How it works
+
+Two separate charts are kept in step: scrolling or zooming one moves the other, and the crosshair of one is mirrored on the other.
+
+1. Each chart's [`subscribeVisibleLogicalRangeChange`](/docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange) handler passes the range to the other chart's [`setVisibleLogicalRange`](/docs/api/interfaces/ITimeScaleApi#setvisiblelogicalrange).
+2. Each chart's [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove) handler reads the data point under the crosshair.
+3. [`setCrosshairPosition`](/docs/api/interfaces/IChartApi#setcrosshairposition) puts the other chart's crosshair on the same time. When there is no data point, [`clearCrosshairPosition`](/docs/api/interfaces/IChartApi#clearcrosshairposition) removes it.
+
+The upper chart hides its time scale, so the two read as one.
+
+## Tips
+
+- Syncing by logical range keeps the charts aligned bar for bar. It works when both series have a point at the same times.
+
+## Resources
+
+- [`setCrosshairPosition`](/docs/api/interfaces/IChartApi#setcrosshairposition)
+- [`subscribeVisibleLogicalRangeChange`](/docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange)
+- [Time scale: Logical range](/docs/time-scale#logical-range)
+- Related examples: [Tracking on mobile](./tracking-without-long-press.mdx), [Panes](../panes/multiple-panes.mdx)

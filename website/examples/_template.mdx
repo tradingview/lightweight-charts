@@ -1,0 +1,76 @@
+---
+title: My example
+sidebar_label: My example
+sidebar_position: 1
+description: One sentence about what the chart shows.
+keywords:
+  - keyword
+---
+
+{/*
+Template for an example page. Copy this file next to the example's code,
+give both the same name (`my-example.mdx` and `my-example.js`), fill it in,
+and delete this comment. Files whose name starts with an underscore are not
+published.
+
+The folder is the gallery category; its `_category_.yml` sets the label and
+the order. A page named like its folder becomes the category index instead of
+an example, so give it another name.
+
+Front matter
+- title: sentence case, capital letter only for the first word and names.
+- sidebar_label: the shorter name shown on the gallery card.
+- description: one sentence about what the chart shows, ending with a period,
+  under 90 characters. Not "An example of how to…" or "How to…".
+  It is shown on the card and under the page title.
+- sidebar_custom_props: previewScales: true keeps the price and time scales
+  on the gallery card, for an example that is about their labels.
+
+Body
+- The page opens with the example block. Do not put text above it.
+- "How it works": one sentence on what it is, then 1–4 numbered steps, one per
+  key API call, each linking to the API reference. With a single step, write
+  it as a paragraph instead of a one-item list. Point to the highlighted
+  lines instead of repeating the code; the code is right above.
+- "Tips" (optional): 1–3 things worth changing or knowing. Mention a published
+  plugin when it does what the example does with more options, or covers a
+  related case a reader of the example may be looking for. Say what it adds
+  and link its catalog page, `/plugins/<slug>`. Skip a plugin that needs
+  different data or solves another problem.
+- "Resources": the docs page, 1–3 API links, related examples, and the plugin
+  from Tips, if any.
+- US English, present tense, short sentences.
+
+Code file
+- Use the theme constants (CHART_TEXT_COLOR, BUTTON_COLOR, …) from
+  website/theme-colors.js for colors, so the example follows the site theme.
+- Generate sample data in a function at the end of the file, or mark long data
+  with `// hide-start` and `// hide-end`. Mark the lines that matter with
+  `// highlight-start` and `// highlight-end`.
+*/}
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./my-example.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+One sentence about what this is.
+
+1. [`apiCall`](/docs/api/interfaces/IChartApi#apicall) does the first thing.
+2. [`otherCall`](/docs/api/interfaces/ISeriesApi#othercall) does the next.
+
+These lines are highlighted in the code.
+
+## Tips
+
+- Something worth changing or knowing.
+
+## Resources
+
+- [Docs page](/docs/series-types)
+- [`ApiOptions`](/docs/api/interfaces/SeriesOptionsCommon)
+- Related examples: [Other example](../series-types/line.mdx)

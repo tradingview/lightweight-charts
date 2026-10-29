@@ -1,0 +1,37 @@
+---
+title: Image watermark
+sidebar_label: Image watermark
+sidebar_position: 4
+description: An image watermark drawn behind the series.
+keywords:
+  - watermark
+  - image
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./image-watermark.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+An image watermark is a picture drawn behind the series in a pane.
+
+1. [`createImageWatermark`](/docs/api/functions/createImageWatermark) adds the image to the first pane, from [`panes`](/docs/api/interfaces/IChartApi#panes). The options set its opacity and padding.
+2. The image here is embedded in the code as a data URL. Usually it is the URL of an image file.
+
+The call is highlighted in the code.
+
+## Tips
+
+- The image in this example is black on a transparent background, so it is hard to see in dark mode. Use an image that works on both backgrounds, or switch it with the theme.
+- `createImageWatermark` centers the image and scales it to fit. For more control, use the [Image watermark](/plugins/image-watermark) plugin. It can anchor the image to a corner, fill the pane, or draw it behind one series instead of the whole pane. You can also replace the image after it is added.
+
+## Resources
+
+- [`createImageWatermark`](/docs/api/functions/createImageWatermark)
+- [`ImageWatermarkOptions`](/docs/api/interfaces/ImageWatermarkOptions)
+- Plugin: [Image watermark](/plugins/image-watermark)
+- Related examples: [Text watermark](./text-watermark.mdx)

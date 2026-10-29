@@ -49,6 +49,12 @@ const EXPORTED_SECTIONS = [
 		heading: 'Tutorials',
 		pickVersion: version => version.versionName === 'current',
 	},
+	{
+		pluginId: 'examples',
+		sidebar: 'examplesSidebar',
+		heading: 'Examples',
+		pickVersion: version => version.versionName === 'current',
+	},
 ];
 
 // The API reference is generated from the type definitions by TypeDoc, page per

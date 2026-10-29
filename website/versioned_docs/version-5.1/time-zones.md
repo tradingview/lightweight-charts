@@ -33,7 +33,14 @@ For more information on this approach, refer to [StackOverflow](https://stackove
 ```js
 function timeToTz(originalTime, timeZone) {
     const zonedDate = new Date(new Date(originalTime * 1000).toLocaleString('en-US', { timeZone }));
-    return zonedDate.getTime() / 1000;
+    return Date.UTC(
+        zonedDate.getFullYear(),
+        zonedDate.getMonth(),
+        zonedDate.getDate(),
+        zonedDate.getHours(),
+        zonedDate.getMinutes(),
+        zonedDate.getSeconds()
+    ) / 1000;
 }
 ```
 
@@ -55,7 +62,14 @@ import { utcToZonedTime } from 'date-fns-tz';
 
 function timeToTz(originalTime, timeZone) {
     const zonedDate = utcToZonedTime(new Date(originalTime * 1000), timeZone);
-    return zonedDate.getTime() / 1000;
+    return Date.UTC(
+        zonedDate.getFullYear(),
+        zonedDate.getMonth(),
+        zonedDate.getDate(),
+        zonedDate.getHours(),
+        zonedDate.getMinutes(),
+        zonedDate.getSeconds()
+    ) / 1000;
 }
 ```
 

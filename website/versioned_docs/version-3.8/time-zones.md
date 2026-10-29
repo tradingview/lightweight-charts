@@ -63,7 +63,14 @@ One of possible solutions (and looks like the most simplest one) is to use appro
 // you could use this function to convert all your times to required time zone
 function timeToTz(originalTime, timeZone) {
     const zonedDate = new Date(new Date(originalTime * 1000).toLocaleString('en-US', { timeZone }));
-    return zonedDate.getTime() / 1000;
+    return Date.UTC(
+        zonedDate.getFullYear(),
+        zonedDate.getMonth(),
+        zonedDate.getDate(),
+        zonedDate.getHours(),
+        zonedDate.getMinutes(),
+        zonedDate.getSeconds()
+    ) / 1000;
 }
 ```
 
@@ -87,7 +94,14 @@ import { utcToZonedTime } from 'date-fns-tz';
 
 function timeToTz(originalTime, timeZone) {
     const zonedDate = utcToZonedTime(new Date(originalTime * 1000), timeZone);
-    return zonedDate.getTime() / 1000;
+    return Date.UTC(
+        zonedDate.getFullYear(),
+        zonedDate.getMonth(),
+        zonedDate.getDate(),
+        zonedDate.getHours(),
+        zonedDate.getMinutes(),
+        zonedDate.getSeconds()
+    ) / 1000;
 }
 ```
 

@@ -1,0 +1,45 @@
+---
+title: Custom date format
+sidebar_label: Custom date format
+sidebar_position: 3
+description: Your own date and time labels on the time scale and the crosshair.
+sidebar_custom_props:
+  previewScales: true
+pagination_prev: null
+pagination_next: null
+keywords:
+  - date format
+  - time format
+  - tickMarkFormatter
+  - timeFormatter
+  - time scale
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./custom-date-format.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart turns times into labels with functions you give it: one for the marks on the time scale, one for the crosshair label.
+
+1. [`tickMarkFormatter`](/docs/api/interfaces/TimeScaleOptions#tickmarkformatter) formats the marks under the chart. Its second argument, a [`TickMarkType`](/docs/api/enumerations/TickMarkType), says whether a mark starts a new year, month, day, or is a time within a day. Here each kind gets its own format, such as `Feb` for a new month and `Sun 28` for a new day.
+2. [`localization.timeFormatter`](/docs/api/interfaces/LocalizationOptions#timeformatter) formats the time in the crosshair label, here as `Jan 29, 2024, 14:00`.
+3. The formats come from [`Intl.DateTimeFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat) with `timeZone: 'UTC'`, because the chart keeps every time in UTC.
+
+These lines are highlighted in the code. `generateValues` only makes sample data. Replace it with your own.
+
+## Tips
+
+- `tickMarkFormatter` can return `null` for a mark. The chart then uses its default label for it.
+- The functions get `time` in the form you passed it in. For dates given as strings, such as `'2024-01-29'`, or as objects, handle those forms too.
+- To show times in a time zone other than UTC, shift the data instead. See [Time zones](./time-zones.mdx).
+
+## Resources
+
+- [`TimeScaleOptions.tickMarkFormatter`](/docs/api/interfaces/TimeScaleOptions#tickmarkformatter)
+- [`LocalizationOptions.timeFormatter`](/docs/api/interfaces/LocalizationOptions#timeformatter)
+- Related examples: [Custom locale](../styling/custom-locale.mdx), [Time zones](./time-zones.mdx)

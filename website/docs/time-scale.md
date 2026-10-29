@@ -17,6 +17,8 @@ Use [`TimeScaleOptions`](/api/interfaces/TimeScaleOptions.md) to adjust the time
 - On chart initialization. To do this, provide the desired options as a [`timeScale`](api/interfaces/ChartOptionsBase#timescale) parameter when calling [`createChart`](/api/functions/createChart.md).
 - On the fly using either the [`ITimeScaleApi.applyOptions`](/api/interfaces/ITimeScaleApi.md#applyoptions) or [`IChartApi.applyOptions`](/api/interfaces/IChartApi.md#applyoptions) method. Both methods produce the same result.
 
+See the [Hidden time scale](/examples/styling/hidden-time-scale) and [Custom date format](/examples/time-scale/custom-date-format) examples.
+
 ## Time scale API
 
 Call the [`IChartApi.timeScale`](/api/interfaces/IChartApi.md#timescale) method to get an instance of the [`ITimeScaleApi`](/api/interfaces/ITimeScaleApi.md) interface. This interface provides an extensive API for controlling the time scale. For example, you can adjust the visible range, convert a time point or [index](/api/type-aliases/Logical.md) to a coordinate, and subscribe to events.
@@ -36,6 +38,8 @@ You can adjust the visible range using the following methods:
 - [`getVisibleRange`]
 - [`setVisibleLogicalRange`]
 - [`getVisibleLogicalRange`]
+
+See the [Visible range](/examples/time-scale/visible-range) and [Range switcher](/examples/data/range-switcher) examples.
 
 ## Data range
 
@@ -87,7 +91,7 @@ Note the following:
 Use the [`getVisibleLogicalRange`] method to get the size of the visible logical range as the difference between `to` and `from`. Note that this range can include empty space before the first bar or after the last one.
 
 To check how many bars of a series are outside the visible range, use [`barsInLogicalRange`](/api/interfaces/ISeriesApi.md#barsinlogicalrange).
-To load more data while the user scrolls, subscribe to range changes with [`subscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi.md#subscribevisiblelogicalrangechange) as shown in the [Infinite history](/tutorials/demos/infinite-history) tutorial.
+To load more data while the user scrolls, subscribe to range changes with [`subscribeVisibleLogicalRangeChange`](/api/interfaces/ITimeScaleApi.md#subscribevisiblelogicalrangechange) as shown in the [Infinite history](/examples/data/infinite-history) example.
 
 ## Chart margin
 

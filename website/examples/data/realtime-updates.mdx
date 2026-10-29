@@ -1,0 +1,37 @@
+---
+title: Realtime updates
+sidebar_position: 2
+sidebar_label: Realtime updates
+description: A candlestick chart that receives new prices in real time.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - realtime updates
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./realtime-updates.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart starts with historical candles and then receives a new price every 100 ms, as from a live feed.
+
+1. [`setData`](/docs/api/interfaces/ISeriesApi#setdata) sets the initial candles.
+2. A timer passes each new price to [`update`](/docs/api/interfaces/ISeriesApi#update). An item with the time of the last candle changes that candle; an item with a later time adds a new one.
+3. The **Go to realtime** button calls [`scrollToRealTime`](/docs/api/interfaces/ITimeScaleApi#scrolltorealtime), which brings the latest candle back into view after you scroll away.
+
+`generateData` only makes sample data. In your project the updates come from your data source.
+
+## Tips
+
+- Use `update` for live data. Calling `setData` on every tick redraws the whole series and resets the user's scroll.
+
+## Resources
+
+- [`ISeriesApi.update`](/docs/api/interfaces/ISeriesApi#update)
+- [`ITimeScaleApi.scrollToRealTime`](/docs/api/interfaces/ITimeScaleApi#scrolltorealtime)
+- Related examples: [Infinite history](./infinite-history.mdx), [Yield curve with updates](../chart-types/yield-curve-with-update-markers.mdx)
