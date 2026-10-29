@@ -630,12 +630,18 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		const spacing = this._barSpacing;
 		const fontSize = this._model.options()['layout'].fontSize;
 
+		const visibleBars = ensureNotNull(this.visibleStrictRange());
+
 		const pixelsPer8Characters = (fontSize + 4) * 5;
 		const pixelsPerCharacter = pixelsPer8Characters / defaultTickMarkMaxCharacterLength;
-		const maxLabelWidth = pixelsPerCharacter * (this._options.tickMarkMaxCharacterLength || defaultTickMarkMaxCharacterLength);
-		const indexPerLabel = Math.round(maxLabelWidth / spacing);
 
-		const visibleBars = ensureNotNull(this.visibleStrictRange());
+		// a horizontal scale behavior may need more room than the configured budget (e.g. sub-second
+		// labels on a nanosecond chart); the wider budget lowers the label density instead of letting
+		// the labels overlap, and it is used for the edge alignment below as well
+		const configuredMaxCharacters = this._options.tickMarkMaxCharacterLength || defaultTickMarkMaxCharacterLength;
+		const behaviorMaxCharacters = this._horzScaleBehavior.maxTickMarkCharacterLength?.(this._points, visibleBars.left(), visibleBars.right());
+		const maxLabelWidth = pixelsPerCharacter * Math.max(configuredMaxCharacters, behaviorMaxCharacters ?? 0);
+		const indexPerLabel = Math.round(maxLabelWidth / spacing);
 
 		const firstBar = Math.max(visibleBars.left(), visibleBars.left() - indexPerLabel);
 		const lastBar = Math.max(visibleBars.right(), visibleBars.right() - indexPerLabel);

@@ -1,6 +1,22 @@
 import { ensureNever } from '../../helpers/assertions';
 
-import { TickMarkType, TimePoint } from './types';
+import { formatNanosFraction, TickMarkType, TimePoint } from './types';
+
+function fractionalDigitsForTickMarkType(tickMarkType: TickMarkType): number {
+	switch (tickMarkType) {
+		case TickMarkType.TimeWithMilliseconds:
+			return 3;
+
+		case TickMarkType.TimeWithMicroseconds:
+			return 6;
+
+		case TickMarkType.TimeWithNanoseconds:
+			return 9;
+
+		default:
+			return 0;
+	}
+}
 
 export function defaultTickMarkFormatter(timePoint: TimePoint, tickMarkType: TickMarkType, locale: string): string {
 	const formatOptions: Intl.DateTimeFormatOptions = {};
@@ -25,6 +41,9 @@ export function defaultTickMarkFormatter(timePoint: TimePoint, tickMarkType: Tic
 			break;
 
 		case TickMarkType.TimeWithSeconds:
+		case TickMarkType.TimeWithMilliseconds:
+		case TickMarkType.TimeWithMicroseconds:
+		case TickMarkType.TimeWithNanoseconds:
 			formatOptions.hour12 = false;
 			formatOptions.hour = '2-digit';
 			formatOptions.minute = '2-digit';
@@ -51,5 +70,11 @@ export function defaultTickMarkFormatter(timePoint: TimePoint, tickMarkType: Tic
 		date.getUTCMilliseconds()
 	);
 
-	return localDateFromUtc.toLocaleString(locale, formatOptions);
+	const formatted = localDateFromUtc.toLocaleString(locale, formatOptions);
+
+	// `Intl` supports at most three fractional digits, so microseconds and nanoseconds are
+	// appended from the nanosecond value itself.
+	const fraction = formatNanosFraction(timePoint.nanos, fractionalDigitsForTickMarkType(tickMarkType));
+
+	return fraction.length === 0 ? formatted : `${formatted}.${fraction}`;
 }

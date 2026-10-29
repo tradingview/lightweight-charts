@@ -10,13 +10,13 @@ import { DataItem, HorzScaleItemConverterToInternalObj, IHorzScaleBehavior, Inte
 import { LocalizationOptions } from '../localization-options';
 import { SeriesType } from '../series-options';
 import { TickMark } from '../tick-marks';
-import { TickMarkWeightValue, TimeScalePoint } from '../time-data';
+import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from '../time-data';
 import { markWithGreaterWeight, TimeMark } from '../time-scale';
 import { defaultTickMarkFormatter } from './default-tick-mark-formatter';
 import { TimeChartOptions } from './time-based-chart-options';
 import { fillWeightsForPoints } from './time-scale-point-weight-generator';
 import { convertStringsToBusinessDays, convertStringToBusinessDay, convertTime, selectTimeConverter } from './time-utils';
-import { TickMarkType, TickMarkWeight, Time, TimePoint } from './types';
+import { fractionalDigitsForWeight, TickMarkType, TickMarkWeight, Time, TimePoint } from './types';
 
 /**
  * Represents options for formatting dates, times, and prices according to a locale.
@@ -51,6 +51,17 @@ export type TickMarkFormatter = (time: Time, tickMarkType: TickMarkType, locale:
 // eslint-disable-next-line complexity
 function weightToTickMarkType(weight: TickMarkWeight, timeVisible: boolean, secondsVisible: boolean): TickMarkType {
 	switch (weight) {
+		case TickMarkWeight.Milli:
+		case TickMarkWeight.Micro:
+		case TickMarkWeight.Nano:
+			if (!timeVisible) {
+				return TickMarkType.DayOfMonth;
+			}
+
+			return weight === TickMarkWeight.Milli
+				? TickMarkType.TimeWithMilliseconds
+				: (weight === TickMarkWeight.Micro ? TickMarkType.TimeWithMicroseconds : TickMarkType.TimeWithNanoseconds);
+
 		case TickMarkWeight.LessThanSecond:
 		case TickMarkWeight.Second:
 			return timeVisible
@@ -79,6 +90,7 @@ function weightToTickMarkType(weight: TickMarkWeight, timeVisible: boolean, seco
 
 export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 	private _dateTimeFormatter!: DateFormatter | DateTimeFormatter;
+	private readonly _keys: WeakMap<TimePoint, InternalHorzScaleItemKey> = new WeakMap();
 	private _options!: TimeChartOptions;
 
 	public options(): TimeChartOptions {
@@ -103,19 +115,54 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 	}
 
 	public key(item: InternalHorzScaleItem | Time): InternalHorzScaleItemKey {
-		// eslint-disable-next-line no-restricted-syntax
-		if (typeof item === 'object' && 'timestamp' in item) {
-			return (item as unknown as TimePoint).timestamp as unknown as InternalHorzScaleItemKey;
-		} else {
-			return this.key(this.convertHorzItemToInternal(item as Time));
+		const timePoint = this._asTimePoint(item);
+		const cachedKey = this._keys.get(timePoint);
+		if (cachedKey !== undefined) {
+			return cachedKey;
 		}
+
+		const key = this._computeKey(timePoint);
+		this._keys.set(timePoint, key);
+		return key;
 	}
 
-	public cacheKey(item: InternalHorzScaleItem): number {
-		const time = item as unknown as TimePoint;
-		return time.businessDay === undefined
-			? new Date(time.timestamp * 1000).getTime()
-			: new Date(Date.UTC(time.businessDay.year, time.businessDay.month - 1, time.businessDay.day)).getTime();
+	/**
+	 * The key of a time point is what makes it unique on the horizontal scale.
+	 *
+	 * It stays a `number` (seconds) whenever the value fits in a double exactly, and becomes a
+	 * `bigint` (nanoseconds) as soon as a nanosecond part is present: epoch nanoseconds need ~61
+	 * bits, so a double would silently merge timestamps which differ in the last ~200 nanoseconds.
+	 */
+	private _computeKey(timePoint: TimePoint): InternalHorzScaleItemKey {
+		if (timePoint.businessDay !== undefined) {
+			const seconds = Math.round(Date.UTC(
+				timePoint.businessDay.year,
+				timePoint.businessDay.month - 1,
+				timePoint.businessDay.day
+			) / 1000);
+			return seconds as unknown as InternalHorzScaleItemKey;
+		}
+
+		if (timePoint.nanos !== undefined) {
+			return (BigInt(Math.floor(timePoint.timestamp)) * 1_000_000_000n + BigInt(timePoint.nanos)) as unknown as InternalHorzScaleItemKey;
+		}
+
+		return timePoint.timestamp as unknown as InternalHorzScaleItemKey;
+	}
+
+	private _asTimePoint(item: InternalHorzScaleItem | Time): TimePoint {
+		// eslint-disable-next-line no-restricted-syntax
+		if (typeof item === 'object' && 'timestamp' in item) {
+			return item as unknown as TimePoint;
+		}
+
+		return this.convertHorzItemToInternal(item as Time) as unknown as TimePoint;
+	}
+
+	public cacheKey(item: InternalHorzScaleItem): number | bigint {
+		// the key is already exact and unique per point, and labels are cached per weight,
+		// so it is the natural cache key (milliseconds would collapse sub-millisecond labels)
+		return this.key(item) as unknown as number | bigint;
 	}
 
 	public convertHorzItemToInternal(item: Time): InternalHorzScaleItem {
@@ -131,7 +178,7 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 		if (this._options.timeScale.timeVisible) {
 			this._dateTimeFormatter = new DateTimeFormatter({
 				dateFormat: dateFormat,
-				timeFormat: this._options.timeScale.secondsVisible ? '%h:%m:%s' : '%h:%m',
+				timeFormat: this._options.timeScale.secondsVisible ? '%h:%m:%s%f' : '%h:%m',
 				dateTimeSeparator: '   ',
 				locale: options.locale,
 			});
@@ -142,7 +189,32 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 
 	public formatHorzItem(item: InternalHorzScaleItem): string {
 		const tp = item as unknown as TimePoint;
-		return this._dateTimeFormatter.format(new Date(tp.timestamp * 1000));
+		return this._dateTimeFormatter.format(new Date(tp.timestamp * 1000), tp.nanos);
+	}
+
+	/**
+	 * Extra characters the tick mark labels need on top of the configured budget, so that
+	 * second and sub-second labels use as much room as they actually need (the time scale turns
+	 * that into a lower label density instead of overlapping labels).
+	 */
+	public maxTickMarkCharacterLength(points: readonly TimeScalePoint[], from: TimePointIndex, to: TimePointIndex): number | undefined {
+		if (!this._options.timeScale.timeVisible) {
+			return undefined;
+		}
+
+		let digits = 0;
+		const lastPointIndex = Math.min(to, points.length - 1);
+		for (let index = Math.max(from, 0); index <= lastPointIndex; ++index) {
+			digits = Math.max(digits, fractionalDigitsForWeight(points[index].timeWeight));
+		}
+
+		if (digits === 0) {
+			return undefined;
+		}
+
+		// `hh:mm:ss` (or `hh:mm`), a dot, and the fractional digits
+		const coreLength = this._options.timeScale.secondsVisible ? 8 : 5;
+		return coreLength + 1 + digits;
 	}
 
 	public formatTickmark(tickMark: TickMark, localizationOptions: LocalizationOptions<Time>): string {

@@ -114,11 +114,9 @@ every later index and triggers a full reindex of all series, exactly like callin
    `accessibility`, `scatter-series`, `lwc-toolkit` custom series, and the public
    `ITimeScaleApi.timeToCoordinate` — always addresses slot 0 of a duplicated
    time. Slots beyond the first are reachable only by logical index.
-2. **No sub-second labels.** `UTCTimestamp` is a number of seconds (fractional
-   values are accepted, so millisecond data can use unique keys instead of
-   duplicates). The default tick-mark formatter stops at seconds, so ticks within
-   one second share a label. Sub-second formatting would be a separate change to
-   `date-time-formatter.ts` / the tick-mark formatter.
+2. **Sub-second axis labels** are a separate feature and are now implemented: see
+   [nanosecond-timestamps.md](./nanosecond-timestamps.md). Duplicate handling
+   itself is independent of the time resolution.
 3. **Memory.** One small `Map` per slot instead of one per distinct time, i.e. a
    constant-factor increase proportional to the number of rows.
 4. **Pre-existing, unrelated:** `pop()` removing the last remaining row returns

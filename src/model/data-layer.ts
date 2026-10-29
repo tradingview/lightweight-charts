@@ -248,7 +248,11 @@ export class DataLayer<HorzScaleItem> {
 				}
 			});
 
-			newTimeScalePoints.sort((t1: InternalTimeScalePoint, t2: InternalTimeScalePoint) => this._horzScaleBehavior.key(t1.time) - this._horzScaleBehavior.key(t2.time));
+			// a stable sort keeps the slots of the same time in their original (occurrence) order
+			newTimeScalePoints.sort((t1: InternalTimeScalePoint, t2: InternalTimeScalePoint) => compareKeys(
+				this._horzScaleBehavior.key(t1.time),
+				this._horzScaleBehavior.key(t2.time)
+			));
 
 			firstChangedPointIndex = this._replaceTimeScalePoints(newTimeScalePoints);
 		}
@@ -373,7 +377,7 @@ export class DataLayer<HorzScaleItem> {
 		};
 
 		// `upperBound` (not `lowerBound`) so that a new occurrence is inserted after the existing ones of the same time
-		const insertIndex = upperBound(this._sortedTimePoints, this._horzScaleBehavior.key(newPoint.time), (a: InternalTimeScalePoint, b: number) => this._horzScaleBehavior.key(a.time) > b);
+		const insertIndex = upperBound(this._sortedTimePoints, this._horzScaleBehavior.key(newPoint.time), (a: InternalTimeScalePoint, b: InternalHorzScaleItemKey) => this._horzScaleBehavior.key(a.time) > b);
 
 		// yes, I know that this array is readonly and this change is intended to make it performative
 		// we marked _sortedTimePoints array as readonly to avoid modifying this array anywhere else
@@ -660,6 +664,14 @@ function findLastSeriesSlot(slots: readonly TimePointData[] | undefined, series:
 	}
 
 	return -1;
+}
+
+function compareKeys(a: InternalHorzScaleItemKey, b: InternalHorzScaleItemKey): number {
+	if (a < b) {
+		return -1;
+	}
+
+	return a > b ? 1 : 0;
 }
 
 function assignIndexToPointData<HorzScaleItem>(pointData: TimePointData, index: TimePointIndex): void {

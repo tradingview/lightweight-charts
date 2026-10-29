@@ -27,7 +27,7 @@ export class DateTimeFormatter {
 		this._separator = formatterParams.dateTimeSeparator;
 	}
 
-	public format(dateTime: Date): string {
-		return `${this._dateFormatter.format(dateTime)}${this._separator}${this._timeFormatter.format(dateTime)}`;
+	public format(dateTime: Date, nanos?: number): string {
+		return `${this._dateFormatter.format(dateTime)}${this._separator}${this._timeFormatter.format(dateTime, nanos)}`;
 	}
 }
