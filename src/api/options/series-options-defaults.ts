@@ -13,6 +13,7 @@ export const seriesOptionsDefaults: SeriesOptionsCommon = {
 	title: '',
 	visible: true,
 	hitTestTolerance: 3,
+	allowDuplicateTimes: false,
 	lastValueVisible: true,
 	priceLineVisible: true,
 	priceLineSource: PriceLineSource.LastBar,

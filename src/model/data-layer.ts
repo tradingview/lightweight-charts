@@ -1,10 +1,10 @@
 /// <reference types="_build-time-constants" />
 
-import { lowerBound } from '../helpers/algorithms';
+import { lowerBound, upperBound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 import { Mutable } from '../helpers/mutable';
 
-import { SeriesDataItemTypeMap } from './data-consumer';
+import { SeriesDataItemTypeMap, isWhitespaceData } from './data-consumer';
 import { getSeriesPlotRowCreator, isSeriesPlotRow, WhitespacePlotRow } from './get-series-plot-row-creator';
 import { IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from './ihorz-scale-behavior';
 import { Series, SeriesUpdateInfo } from './series';
@@ -130,7 +130,11 @@ type SeriesDataItemWithOriginalTime<TSeriesType extends SeriesType, HorzScaleIte
 export class DataLayer<HorzScaleItem> {
 	// note that _pointDataByTimePoint and _seriesRowsBySeries shares THE SAME objects in their values between each other
 	// it's just different kind of maps to make usages/perf better
-	private _pointDataByTimePoint: Map<InternalHorzScaleItemKey, TimePointData> = new Map();
+	//
+	// every value is an array of time points ("slots") for one time key: slot `k` is the `k`-th data item with that
+	// time across all series. A series occupies at most one slot per occurrence, so the time point index stays a
+	// unique, strictly increasing identity for every data item even when several items share the same time.
+	private _pointDataByTimePoint: Map<InternalHorzScaleItemKey, TimePointData[]> = new Map();
 	private _seriesRowsBySeries: Map<Series<SeriesType>, SeriesPlotRow<SeriesType>[]> = new Map();
 	private _seriesLastTimePoint: Map<Series<SeriesType>, InternalHorzScaleItem> = new Map();
 
@@ -186,19 +190,34 @@ export class DataLayer<HorzScaleItem> {
 			const dataToPlotRow = series.customSeriesPlotValuesBuilder();
 			const customWhitespaceChecker = series.customSeriesWhitespaceCheck<HorzScaleItem>();
 
+			// the number of already processed data items per time key - it is the slot an item goes to
+			const occurrences: Map<InternalHorzScaleItemKey, number> = new Map();
+
 			seriesRows = data.map((item: SeriesDataItemTypeMap<HorzScaleItem>[TSeriesType], index: number) => {
 				const time = timeConverter(item.time);
 
 				const horzItemKey = this._horzScaleBehavior.key(time);
 
-				let timePointData = this._pointDataByTimePoint.get(horzItemKey);
-				if (timePointData === undefined) {
-					// the indexes will be sync later
-					timePointData = createEmptyTimePointData(time);
-					this._pointDataByTimePoint.set(horzItemKey, timePointData);
+				let slots = this._pointDataByTimePoint.get(horzItemKey);
+				if (slots === undefined) {
+					slots = [];
+					this._pointDataByTimePoint.set(horzItemKey, slots);
 					isTimeScaleAffected = true;
 				}
 
+				const occurrence = occurrences.get(horzItemKey) ?? 0;
+				occurrences.set(horzItemKey, occurrence + 1);
+
+				if (slots.length <= occurrence) {
+					// the indexes will be sync later
+					while (slots.length <= occurrence) {
+						slots.push(createEmptyTimePointData(time));
+					}
+
+					isTimeScaleAffected = true;
+				}
+
+				const timePointData = slots[occurrence];
 				const row = createPlotRow(time, timePointData.index, item, originalTimes[index], dataToPlotRow, customWhitespaceChecker);
 				timePointData.mapping.set(series, row);
 				return row;
@@ -218,13 +237,15 @@ export class DataLayer<HorzScaleItem> {
 			// then generate the time scale points
 			// timeWeight will be updates in _updateTimeScalePoints later
 			const newTimeScalePoints: InternalTimeScalePoint[] = [];
-			this._pointDataByTimePoint.forEach((pointData: TimePointData) => {
-				newTimeScalePoints.push({
-					timeWeight: 0 as TickMarkWeightValue,
-					time: pointData.timePoint,
-					pointData,
-					originalTime: timeScalePointTime(pointData.mapping),
-				});
+			this._pointDataByTimePoint.forEach((slots: TimePointData[]) => {
+				for (const pointData of slots) {
+					newTimeScalePoints.push({
+						timeWeight: 0 as TickMarkWeightValue,
+						time: pointData.timePoint,
+						pointData,
+						originalTime: timeScalePointTime(pointData.mapping),
+					});
+				}
 			});
 
 			newTimeScalePoints.sort((t1: InternalTimeScalePoint, t2: InternalTimeScalePoint) => this._horzScaleBehavior.key(t1.time) - this._horzScaleBehavior.key(t2.time));
@@ -257,39 +278,71 @@ export class DataLayer<HorzScaleItem> {
 		const timeConverter = this._horzScaleBehavior.createConverterToInternalObj([data]);
 
 		const time = timeConverter(data.time);
+		const timeKey = this._horzScaleBehavior.key(time);
 
 		const lastSeriesTime = this._seriesLastTimePoint.get(series);
-		if (!historicalUpdate && lastSeriesTime !== undefined && this._horzScaleBehavior.key(time) < this._horzScaleBehavior.key(lastSeriesTime)) {
+		if (!historicalUpdate && lastSeriesTime !== undefined && timeKey < this._horzScaleBehavior.key(lastSeriesTime)) {
 			// eslint-disable-next-line @typescript-eslint/no-base-to-string
 			throw new Error(`Cannot update oldest data, last time=${lastSeriesTime}, new time=${time}`);
 		}
 
-		let pointDataAtTime = this._pointDataByTimePoint.get(this._horzScaleBehavior.key(time));
+		let slots = this._pointDataByTimePoint.get(timeKey);
 
-		if (historicalUpdate && pointDataAtTime === undefined) {
+		if (historicalUpdate && slots === undefined) {
 			throw new Error('Cannot update non-existing data point when historicalUpdate is true');
 		}
 
-		// if no point data found for the new data item
-		// that means that we need to update scale
-		const affectsTimeScale = pointDataAtTime === undefined;
+		// where the update goes:
+		// - with `allowDuplicateTimes` enabled, an update of the last bar's time appends a new occurrence of it
+		// - otherwise the last occurrence of this series at that time is replaced
+		// - a series which has no data at that time joins the first slot, so it stays aligned with the other series
+		// a whitespace item carries no value, so it can never be an additional occurrence of a time
+		const customWhitespaceChecker = series.customSeriesWhitespaceCheck<HorzScaleItem>();
+		const isWhitespaceItem = customWhitespaceChecker !== undefined ? customWhitespaceChecker(data) : isWhitespaceData(data);
 
-		if (pointDataAtTime === undefined) {
-			// the indexes will be sync later
-			pointDataAtTime = createEmptyTimePointData(time);
-			this._pointDataByTimePoint.set(this._horzScaleBehavior.key(time), pointDataAtTime);
+		const appendOccurrence = !historicalUpdate &&
+			!isWhitespaceItem &&
+			series.allowDuplicateTimes() &&
+			slots !== undefined &&
+			lastSeriesTime !== undefined &&
+			timeKey === this._horzScaleBehavior.key(lastSeriesTime);
+
+		const existingSlots = slots;
+		if (slots === undefined) {
+			slots = [];
+			this._pointDataByTimePoint.set(timeKey, slots);
 		}
+
+		// `Math.max` with the last occupied slot keeps the row index strictly greater than the series' previous
+		// row even if the slots of this time are not a dense prefix for this series
+		const slotIndex = appendOccurrence
+			? Math.max(countSeriesSlots(existingSlots, series), findLastSeriesSlot(existingSlots, series) + 1)
+			: Math.max(0, findLastSeriesSlot(existingSlots, series));
+		const allocatesSlot = slots.length <= slotIndex;
+
+		if (allocatesSlot) {
+			// the indexes will be sync later
+			while (slots.length <= slotIndex) {
+				slots.push(createEmptyTimePointData(time));
+			}
+		}
+
+		const pointDataAtTime = slots[slotIndex];
 
 		const createPlotRow = getSeriesPlotRowCreator<SeriesType, HorzScaleItem>(series.seriesType());
 		const dataToPlotRow = series.customSeriesPlotValuesBuilder();
-		const customWhitespaceChecker = series.customSeriesWhitespaceCheck<HorzScaleItem>();
 		const plotRow = createPlotRow(time, pointDataAtTime.index, data, extendedData.originalTime, dataToPlotRow, customWhitespaceChecker);
+
+		// if no point data found for the new data item (or a slot was allocated for the appended occurrence)
+		// that means that we need to update scale
+		const affectsTimeScale = existingSlots === undefined || (allocatesSlot && appendOccurrence);
 
 		// For efficient conflation updates, check if this is just updating the last bar
 		const isLastBarUpdate = !historicalUpdate &&
+			!appendOccurrence &&
 			!affectsTimeScale &&
 			lastSeriesTime !== undefined &&
-			this._horzScaleBehavior.key(time) === this._horzScaleBehavior.key(lastSeriesTime);
+			timeKey === this._horzScaleBehavior.key(lastSeriesTime);
 
 		pointDataAtTime.mapping.set(series, plotRow);
 
@@ -297,9 +350,9 @@ export class DataLayer<HorzScaleItem> {
 			this._updateHistoricalSeriesRow(series, plotRow, pointDataAtTime.index);
 		} else if (isLastBarUpdate && series.isConflationEnabled() && isSeriesPlotRow(plotRow)) {
 			series.updateLastConflatedChunk(plotRow as SeriesPlotRow<TSeriesType>);
-			this._updateLastSeriesRow(series, plotRow);
+			this._updateLastSeriesRow(series, plotRow, false);
 		} else {
-			this._updateLastSeriesRow(series, plotRow);
+			this._updateLastSeriesRow(series, plotRow, appendOccurrence);
 		}
 
 		const info: SeriesUpdateInfo = {
@@ -319,7 +372,8 @@ export class DataLayer<HorzScaleItem> {
 			originalTime: timeScalePointTime(pointDataAtTime.mapping),
 		};
 
-		const insertIndex = lowerBound(this._sortedTimePoints, this._horzScaleBehavior.key(newPoint.time), (a: InternalTimeScalePoint, b: number) => this._horzScaleBehavior.key(a.time) < b);
+		// `upperBound` (not `lowerBound`) so that a new occurrence is inserted after the existing ones of the same time
+		const insertIndex = upperBound(this._sortedTimePoints, this._horzScaleBehavior.key(newPoint.time), (a: InternalTimeScalePoint, b: number) => this._horzScaleBehavior.key(a.time) > b);
 
 		// yes, I know that this array is readonly and this change is intended to make it performative
 		// we marked _sortedTimePoints array as readonly to avoid modifying this array anywhere else
@@ -351,12 +405,20 @@ export class DataLayer<HorzScaleItem> {
 		}
 
 		for (const data of poppedData) {
-			const pointData = this._pointDataByTimePoint.get(this._horzScaleBehavior.key(data.time));
+			const timeKey = this._horzScaleBehavior.key(data.time);
+			const slots = this._pointDataByTimePoint.get(timeKey);
 
-			if (!pointData) {
+			if (slots === undefined) {
 				continue;
 			}
 
+			// the row identifies its slot by index, which stays unique even when several rows share a time
+			const slotIndex = slots.findIndex((slot: TimePointData) => slot.index === data.index);
+			if (slotIndex === -1) {
+				continue;
+			}
+
+			const pointData = slots[slotIndex];
 			pointData.mapping.delete(series);
 
 			if (pointData.mapping.size !== 0) {
@@ -365,7 +427,12 @@ export class DataLayer<HorzScaleItem> {
 
 			// No remaining data at this timepoint therefore we need to remove the internal
 			// timescale point and update the indices.
-			this._pointDataByTimePoint.delete(this._horzScaleBehavior.key(pointData.timePoint));
+			// `poppedData` is reversed, so the removed point is always the last one in use and the
+			// remaining (earlier) rows keep their indices.
+			slots.splice(slotIndex, 1);
+			if (slots.length === 0) {
+				this._pointDataByTimePoint.delete(timeKey);
+			}
 
 			(this._sortedTimePoints as InternalTimeScalePoint[]).splice(pointData.index, 1);
 
@@ -382,7 +449,7 @@ export class DataLayer<HorzScaleItem> {
 		return [poppedData, this._getUpdateResponse(series, this._sortedTimePoints.length - 1, info)];
 	}
 
-	private _updateLastSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow): void {
+	private _updateLastSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow, append: boolean): void {
 		let seriesData = this._seriesRowsBySeries.get(series);
 		if (seriesData === undefined) {
 			seriesData = [];
@@ -391,7 +458,7 @@ export class DataLayer<HorzScaleItem> {
 
 		const lastSeriesRow = seriesData.length !== 0 ? seriesData[seriesData.length - 1] : null;
 
-		if (lastSeriesRow === null || this._horzScaleBehavior.key(plotRow.time) > this._horzScaleBehavior.key(lastSeriesRow.time)) {
+		if (lastSeriesRow === null || this._horzScaleBehavior.key(plotRow.time) > this._horzScaleBehavior.key(lastSeriesRow.time) || append) {
 			if (isSeriesPlotRow(plotRow)) {
 				seriesData.push(plotRow);
 			}
@@ -433,15 +500,20 @@ export class DataLayer<HorzScaleItem> {
 	}
 
 	private _cleanupPointsData(): void {
-		// let's treat all current points as "potentially removed"
-		// we could create an array with actually potentially removed points
-		// but most likely this array will be similar to _sortedTimePoints so let's avoid using additional memory
-		// note that we can use _sortedTimePoints here since a point might be removed only it was here previously
-		for (const point of this._sortedTimePoints) {
-			if (point.pointData.mapping.size === 0) {
-				this._pointDataByTimePoint.delete(this._horzScaleBehavior.key(point.time));
+		// drop the slots which no series has data in anymore, and the time keys left without any slot
+		this._pointDataByTimePoint.forEach((slots: TimePointData[], timeKey: InternalHorzScaleItemKey) => {
+			let writeIndex = 0;
+			for (let readIndex = 0; readIndex < slots.length; ++readIndex) {
+				if (slots[readIndex].mapping.size !== 0) {
+					slots[writeIndex++] = slots[readIndex];
+				}
 			}
-		}
+
+			slots.length = writeIndex;
+			if (writeIndex === 0) {
+				this._pointDataByTimePoint.delete(timeKey);
+			}
+		});
 	}
 
 	/**
@@ -553,6 +625,41 @@ export class DataLayer<HorzScaleItem> {
 			},
 		};
 	}
+}
+
+/**
+ * Number of data items the series already has at this time - the slot its next item goes to.
+ */
+function countSeriesSlots(slots: readonly TimePointData[] | undefined, series: Series<SeriesType>): number {
+	if (slots === undefined) {
+		return 0;
+	}
+
+	let count = 0;
+	for (const slot of slots) {
+		if (slot.mapping.has(series)) {
+			++count;
+		}
+	}
+
+	return count;
+}
+
+/**
+ * Index of the last slot holding the series' data at this time, or `-1`.
+ */
+function findLastSeriesSlot(slots: readonly TimePointData[] | undefined, series: Series<SeriesType>): number {
+	if (slots === undefined) {
+		return -1;
+	}
+
+	for (let index = slots.length - 1; index >= 0; --index) {
+		if (slots[index].mapping.has(series)) {
+			return index;
+		}
+	}
+
+	return -1;
 }
 
 function assignIndexToPointData<HorzScaleItem>(pointData: TimePointData, index: TimePointIndex): void {

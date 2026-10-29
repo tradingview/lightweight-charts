@@ -734,6 +734,24 @@ export interface SeriesOptionsCommon {
 	hitTestTolerance: number;
 
 	/**
+	 * Allow several data items with the same `time` in this series.
+	 *
+	 * Every item gets its own slot on the time scale, in the order it appears in the data, so
+	 * `N` items with the same `time` are drawn side by side as `N` separate bars instead of
+	 * overwriting each other. Nothing is merged or dropped, which makes this suitable for
+	 * tick-by-tick data where several ticks share a timestamp.
+	 *
+	 * The time scale shows the same time label for all the slots of one timestamp.
+	 *
+	 * When enabled, `update` with the same `time` as the last bar appends a new item instead of
+	 * replacing the last one. When disabled, data must be strictly ordered by time and duplicates
+	 * are rejected in development builds.
+	 *
+	 * @defaultValue `false`
+	 */
+	allowDuplicateTimes: boolean;
+
+	/**
 	 * Show the price line. Price line is a horizontal line indicating the last price of the series.
 	 *
 	 * @defaultValue `true`, `false` for yield curve charts

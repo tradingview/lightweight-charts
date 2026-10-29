@@ -659,8 +659,16 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		const isRightEdgeFixed = this._options.fixRightEdge || isAllScalingAndScrollingDisabled;
 
 		let targetIndex = 0;
+		let previousMarkTimeKey: InternalHorzScaleItemKey | null = null;
 		for (const tm of items) {
 			if (!(firstBar <= tm.index && tm.index <= lastBar)) {
+				continue;
+			}
+
+			// several data items can share a time (duplicate times are allowed), and all of them would produce
+			// the same label - so only the first visible item of such a group is labelled
+			const markTimeKey = this._horzScaleBehavior.key(tm.time);
+			if (previousMarkTimeKey !== null && markTimeKey === previousMarkTimeKey) {
 				continue;
 			}
 
@@ -691,6 +699,7 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 			}
 
 			targetIndex++;
+			previousMarkTimeKey = markTimeKey;
 		}
 		this._labels.length = targetIndex;
 

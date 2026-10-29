@@ -8,6 +8,7 @@ import { LastValueDataResult } from '../model/iseries';
 import { MismatchDirection } from '../model/plot-list';
 import { CreatePriceLineOptions } from '../model/price-line-options';
 import {
+	SeriesOptionsCommon,
 	SeriesOptionsMap,
 	SeriesPartialOptionsMap,
 	SeriesType,
@@ -145,6 +146,9 @@ export interface ISeriesApi<
 	 * Sets or replaces series data.
 	 *
 	 * @param data - Ordered (earlier time point goes first) array of data items. Old data is fully replaced with the new one.
+	 * Times must be unique unless the series was created with
+	 * {@link SeriesOptionsCommon.allowDuplicateTimes}, in which case items sharing a time keep their order and are
+	 * rendered next to each other (one bar per item).
 	 * @example Setting data to a line series
 	 * ```js
 	 * lineSeries.setData([
@@ -166,7 +170,9 @@ export interface ISeriesApi<
 	 * Adds new data item to the existing set (or updates the latest item if times of the passed/latest items are equal).
 	 *
 	 * @param bar - A single data item to be added. Time of the new item must be greater or equal to the latest existing time point.
-	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one.
+	 * If the new item's time is equal to the last existing item's time, then the existing item is replaced with the new one,
+	 * unless the series was created with {@link SeriesOptionsCommon.allowDuplicateTimes} - then the new item is appended
+	 * as another occurrence of that time instead.
 	 * @param historicalUpdate - If true, allows updating an existing data point that is not the latest bar. Default is false.
 	 * Updating older data using `historicalUpdate` will be slower than updating the most recent data point.
 	 * @example Updating line series data
