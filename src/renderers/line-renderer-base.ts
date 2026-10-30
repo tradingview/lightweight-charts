@@ -23,6 +23,8 @@ export interface PaneRendererLineDataBase<TItem extends LineItemBase = LineItemB
 	visibleRange: SeriesItemsIndexesRange | null;
 
 	pointMarkersRadius?: number;
+
+	connectGaps: boolean;
 }
 
 function finishStyledArea(scope: BitmapCoordinatesRenderingScope, style: CanvasRenderingContext2D['strokeStyle']): void {
@@ -43,7 +45,7 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 			return;
 		}
 
-		const { items, visibleRange, barWidth, lineType, lineWidth, lineStyle, pointMarkersRadius } = this._data;
+		const { items, visibleRange, barWidth, lineType, lineWidth, lineStyle, pointMarkersRadius, connectGaps } = this._data;
 
 		if (visibleRange === null) {
 			return;
@@ -63,7 +65,7 @@ export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBas
 		const dashPatternLength = getDashPatternLength(dashPattern);
 
 		if (lineType !== undefined) {
-			walkLine(renderingScope, items, lineType, visibleRange, barWidth, styleGetter, finishStyledArea, dashPatternLength);
+			walkLine(renderingScope, items, lineType, visibleRange, barWidth, styleGetter, finishStyledArea, dashPatternLength, connectGaps);
 		}
 
 		if (pointMarkersRadius) {
