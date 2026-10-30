@@ -533,10 +533,13 @@
 /* Code fences are @theme/CodeBlock now, styled by the theme like every other
    code block on the site, so the README body adds nothing of its own. */
 /* Reference tables wrap instead of hiding columns behind an (invisible on
-   macOS) horizontal scrollbar; smaller type keeps four columns readable. */
+   macOS) horizontal scrollbar; smaller type keeps four columns readable.
+   `anywhere` lets long identifiers break so the table cannot run under the
+   TOC; the first column keeps its names whole. */
 .readme table { display: table; width: 100%; font-size: 14px; line-height: 20px; }
 .readme table code { white-space: normal; }
-.readme th, .readme td { padding: 8px 10px; }
+.readme th, .readme td { padding: 8px 10px; overflow-wrap: anywhere; }
+.readme th:first-child, .readme td:first-child { overflow-wrap: break-word; }
 
 /* Fixture/offline data marker: shown only when the catalogue was built
    without a registry (registry === null), never with real published data. */
