@@ -101,7 +101,6 @@ export function isBusinessDay(time: Time): time is BusinessDay {
  * @returns `true` if the time is a {@link UTCTimestampNanoseconds}, false otherwise.
  */
 export function isUTCTimestampNanoseconds(time: Time): time is UTCTimestampNanoseconds {
-	// eslint-disable-next-line no-restricted-syntax
 	return typeof time === 'bigint';
 }
 

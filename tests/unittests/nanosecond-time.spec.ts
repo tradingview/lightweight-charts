@@ -30,13 +30,14 @@ import {
 import { InternalHorzScaleItemKey } from '../../src/model/ihorz-scale-behavior';
 import { PlotList } from '../../src/model/plot-list';
 import { Series } from '../../src/model/series';
+import { SeriesPlotRow } from '../../src/model/series-data';
 import { SeriesType } from '../../src/model/series-options';
 import { TimePointIndex, TimeScalePoint } from '../../src/model/time-data';
 
 const NS = 1_000_000_000n;
 
 function asTimePoint(item: unknown): TimePoint {
-	return item as unknown as TimePoint;
+	return item as TimePoint;
 }
 
 function nsTime(value: bigint): UTCTimestampNanoseconds {
@@ -172,13 +173,15 @@ describe('nanosecond time values', () => {
 
 			convertStringsToBusinessDays(data);
 
-			expect(data[0].time).to.deep.equal({ year: 2024, month: 5, day: 1 } as BusinessDay);
+			const businessDay: BusinessDay = { year: 2024, month: 5, day: 1 };
+			expect(data[0].time).to.deep.equal(businessDay);
 			expect(data[1].time).to.equal('2024-05-02T00:00:00Z');
 		});
 
 		it('should keep the second-resolution conversions unchanged', () => {
 			expect(convertTime(1554792010 as UTCTimestamp)).to.deep.equal({ timestamp: 1554792010 });
-			expect(convertTime({ day: 1, month: 10, year: 2018 } as BusinessDay))
+			const businessDay: BusinessDay = { day: 1, month: 10, year: 2018 };
+			expect(convertTime(businessDay))
 				.to.deep.equal({ timestamp: 1538352000, businessDay: { day: 1, month: 10, year: 2018 } });
 		});
 	});
@@ -186,9 +189,7 @@ describe('nanosecond time values', () => {
 	describe('keys', () => {
 		const behavior = createBehavior();
 
-		function keyOf(time: Time): InternalHorzScaleItemKey {
-			return behavior.key(convertTime(time));
-		}
+		const keyOf = (time: Time): InternalHorzScaleItemKey => behavior.key(convertTime(time));
 
 		it('should produce distinct, ordered keys for adjacent nanoseconds', () => {
 			const first = keyOf(nsTime(1700000000000000001n));
@@ -222,14 +223,14 @@ describe('nanosecond time values', () => {
 
 	describe('tick mark weights', () => {
 		function weightsFor(times: Time[]): number[] {
-			const points = times.map(time => ({
+			const points = times.map((time: Time) => ({
 				time: convertTime(time),
 				timeWeight: 0,
 				originalTime: time,
 			})) as unknown as TimeScalePoint[];
 
 			fillWeightsForPoints(points as unknown as TimeScalePoint[], 0);
-			return points.map(point => point.timeWeight);
+			return points.map((point: TimeScalePoint) => point.timeWeight);
 		}
 
 		it('should classify sub-second differences', () => {
@@ -259,9 +260,7 @@ describe('nanosecond time values', () => {
 	});
 
 	describe('formatting', () => {
-		function pointAt(timestamp: number, nanos: number): TimePoint {
-			return { timestamp: timestamp as UTCTimestamp, nanos };
-		}
+		const pointAt = (timestamp: number, nanos: number): TimePoint => ({ timestamp: timestamp as UTCTimestamp, nanos });
 
 		it('should append the fractional part at the precision of the tick mark type', () => {
 			const point = pointAt(1714564800, 123456789);
@@ -306,13 +305,11 @@ describe('nanosecond time values', () => {
 	});
 
 	describe('label width budget', () => {
-		function pointsWithWeights(weights: number[]): TimeScalePoint[] {
-			return weights.map(weight => ({
-				time: convertTime(nsTime(1714564800000000000n)),
-				timeWeight: weight,
-				originalTime: undefined,
-			})) as unknown as TimeScalePoint[];
-		}
+		const pointsWithWeights = (weights: number[]): TimeScalePoint[] => weights.map((weight: number) => ({
+			time: convertTime(nsTime(1714564800000000000n)),
+			timeWeight: weight,
+			originalTime: undefined,
+		})) as unknown as TimeScalePoint[];
 
 		const first = 0 as TimePointIndex;
 
@@ -355,7 +352,7 @@ describe('nanosecond time values', () => {
 			]);
 
 			expect(update.timeScale.points).to.have.length(2);
-			expect((update.series.get(series)?.data ?? []).map(row => row.index)).to.deep.equal([0, 1]);
+			expect((update.series.get(series)?.data ?? []).map((row: SeriesPlotRow) => row.index)).to.deep.equal([0, 1]);
 		});
 
 		it('should treat identical nanosecond timestamps as duplicates', () => {
@@ -373,7 +370,7 @@ describe('nanosecond time values', () => {
 			expect(points[0].originalTime).to.equal(time);
 			// both slots keep the same original time, which is what the crosshair reports
 			expect(points[1].originalTime).to.equal(time);
-			expect((update.series.get(series)?.data ?? []).map(row => row.index)).to.deep.equal([0, 1]);
+			expect((update.series.get(series)?.data ?? []).map((row: SeriesPlotRow) => row.index)).to.deep.equal([0, 1]);
 		});
 
 		it('should accept nanosecond data with several occurrences of one timestamp', () => {
@@ -385,7 +382,7 @@ describe('nanosecond time values', () => {
 			const update = dataLayer.updateSeriesData(series, { time, value: 2 }, false);
 
 			expect(update.timeScale.points).to.have.length(2);
-			expect((update.series.get(series)?.data ?? []).map(row => row.value[0])).to.deep.equal([1, 2]);
+			expect((update.series.get(series)?.data ?? []).map((row: SeriesPlotRow) => row.value[0])).to.deep.equal([1, 2]);
 		});
 	});
 });

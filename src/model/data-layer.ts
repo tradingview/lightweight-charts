@@ -4,7 +4,7 @@ import { lowerBound, upperBound } from '../helpers/algorithms';
 import { ensureDefined } from '../helpers/assertions';
 import { Mutable } from '../helpers/mutable';
 
-import { SeriesDataItemTypeMap, isWhitespaceData } from './data-consumer';
+import { isWhitespaceData, SeriesDataItemTypeMap } from './data-consumer';
 import { getSeriesPlotRowCreator, isSeriesPlotRow, WhitespacePlotRow } from './get-series-plot-row-creator';
 import { IHorzScaleBehavior, InternalHorzScaleItem, InternalHorzScaleItemKey } from './ihorz-scale-behavior';
 import { Series, SeriesUpdateInfo } from './series';

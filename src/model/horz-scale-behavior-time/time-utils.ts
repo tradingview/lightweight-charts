@@ -2,7 +2,6 @@ import { isString } from '../../helpers/strict-type-checks';
 
 import { TimedData } from '../data-layer';
 import { InternalHorzScaleItem } from '../ihorz-scale-behavior';
-
 import { BusinessDay, isBusinessDay, isUTCTimestampNanoseconds, Time, TimePoint, UTCTimestamp } from './types';
 
 export type TimeConverter = (time: Time) => InternalHorzScaleItem;
