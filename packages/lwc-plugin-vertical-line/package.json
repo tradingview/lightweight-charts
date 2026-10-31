@@ -1,6 +1,6 @@
 {
 	"name": "@bishopbot/lwc-plugin-vertical-line",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Full-height vertical line at a given time, with an optional label on the time axis, for marking events, trades, and session boundaries.",
 	"author": "bishop-bot",
 	"license": "Apache-2.0",
@@ -45,6 +45,11 @@
 	"peerDependencies": {
 		"@bishopbot/lightweight-charts": "^6.0.0",
 		"lightweight-charts": "^5.0.0"
+	},
+	"peerDependenciesMeta": {
+		"lightweight-charts": {
+			"optional": true
+		}
 	},
 	"dependencies": {
 		"fancy-canvas": "~2.1.0"

@@ -5,6 +5,14 @@ All notable changes to this package are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.2.1 - 2026-10-31
+
+### Fixed
+
+- The upstream `lightweight-charts` peer dependency is marked optional again
+  (`peerDependenciesMeta`). Without it, npm treats it as required and installs
+  the upstream 5.x library next to the fork's, which the package does not use.
+
 ## 1.2.0 - 2026-10-31
 
 ### Changed

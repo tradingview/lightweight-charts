@@ -1,6 +1,6 @@
 {
 	"name": "@bishopbot/lwc-toolkit",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "Helpers for authoring Lightweight Charts plugins: pixel-perfect dimension calculations, a plugin base class, and time conversion.",
 	"license": "Apache-2.0",
 	"author": "bishop-bot",
@@ -168,6 +168,11 @@
 	"peerDependencies": {
 		"@bishopbot/lightweight-charts": "^6.0.0",
 		"lightweight-charts": "^5.0.0"
+	},
+	"peerDependenciesMeta": {
+		"lightweight-charts": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@types/chai": "5.2.1",

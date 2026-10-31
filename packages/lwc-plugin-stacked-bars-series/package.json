@@ -1,6 +1,6 @@
 {
 	"name": "@bishopbot/lwc-plugin-stacked-bars-series",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Bar series that draws several values per time point as stacked segments summing to a total.",
 	"author": "bishop-bot",
 	"license": "Apache-2.0",
@@ -45,6 +45,11 @@
 	"peerDependencies": {
 		"@bishopbot/lightweight-charts": "^6.0.0",
 		"lightweight-charts": "^5.0.0"
+	},
+	"peerDependenciesMeta": {
+		"lightweight-charts": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.5",
