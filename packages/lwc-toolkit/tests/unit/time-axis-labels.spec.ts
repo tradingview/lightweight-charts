@@ -53,6 +53,14 @@ void describe('tick mark label spacing', () => {
 		expect(source).to.include(`const defaultTickMarkMaxCharacterLength = ${DEFAULT_TICK_MARK_MAX_CHARACTER_LENGTH};`);
 		expect(source).to.include('const pixelsPer8Characters = (fontSize + 4) * 5;');
 		expect(source).to.include('const pixelsPerCharacter = pixelsPer8Characters / defaultTickMarkMaxCharacterLength;');
-		expect(source).to.include('pixelsPerCharacter * (this._options.tickMarkMaxCharacterLength || defaultTickMarkMaxCharacterLength)');
+		expect(source).to.include('const configuredMaxCharacters = this._options.tickMarkMaxCharacterLength || defaultTickMarkMaxCharacterLength;');
+		expect(source).to.include('pixelsPerCharacter * Math.max(configuredMaxCharacters, behaviorMaxCharacters ?? 0)');
+	});
+
+	void it('takes the wider of the configured budget and the behavior budget', () => {
+		expect(tickMarkMaxLabelWidth(4, 12)).to.equal(40);
+		expect(tickMarkMaxLabelWidth(4, 12, 10)).to.equal(100);
+		expect(tickMarkMaxLabelWidth(undefined, 12, 10)).to.equal(100);
+		expect(tickMarkCharactersForWidth(25, 12, 10)).to.equal(10);
 	});
 });

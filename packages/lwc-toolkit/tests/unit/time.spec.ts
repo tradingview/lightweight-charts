@@ -55,9 +55,9 @@ void describe('convertTime', () => {
 		expect(convertTime('2021-5-2')).to.equal(convertTime('2021-05-02'));
 	});
 
-	void it('ignores anything after the day in a date string', () => {
+	void it('keeps the time of day in a date-time string', () => {
 		expect(convertTime('2021-05-12T12:34:56Z')).to.equal(
-			convertTime('2021-05-12')
+			convertTime('2021-05-12T00:00:00Z') + 12 * 3_600_000 + 34 * 60_000 + 56 * 1000
 		);
 	});
 });
@@ -110,9 +110,9 @@ void describe('convertTimeUTC', () => {
 		expect(convertTimeUTC('2021-5-2')).to.equal(convertTimeUTC('2021-05-02'));
 	});
 
-	void it('ignores anything after the day in a date string', () => {
+	void it('keeps the time of day in a date-time string', () => {
 		expect(convertTimeUTC('2021-05-12T12:34:56Z')).to.equal(
-			convertTimeUTC('2021-05-12')
+			convertTimeUTC('2021-05-12T00:00:00Z') + 12 * 3_600_000 + 34 * 60_000 + 56 * 1000
 		);
 	});
 
