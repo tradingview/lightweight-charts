@@ -3,6 +3,7 @@ import {
 	Coordinate,
 	IChartApi,
 	isBusinessDay,
+	isUTCTimestampNanoseconds,
 	ISeriesApi,
 	ISeriesPrimitiveAxisView,
 	IPrimitivePaneRenderer,
@@ -12,9 +13,9 @@ import {
 	SeriesType,
 	Time,
 } from '@bishopbot/lightweight-charts';
-import { ensureDefined } from '@tradingview/lwc-toolkit/assertions';
-import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
-import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
+import { ensureDefined } from '@bishopbot/lwc-toolkit/assertions';
+import { positionsBox } from '@bishopbot/lwc-toolkit/dimensions/positions';
+import { PluginBase } from '@bishopbot/lwc-toolkit/plugin-base';
 
 class RectanglePaneRenderer implements IPrimitivePaneRenderer {
 	_p1: ViewPoint;
@@ -257,10 +258,14 @@ const defaultOptions: RectangleDrawingToolOptions = {
 	priceLabelFormatter: (price: number) => price.toFixed(2),
 	timeLabelFormatter: (time: Time) => {
 		if (typeof time == 'string') return time;
-		const date = isBusinessDay(time)
-			? new Date(time.year, time.month, time.day)
-			: new Date(time * 1000);
-		return date.toLocaleDateString();
+		if (isBusinessDay(time)) {
+			return new Date(time.year, time.month, time.day).toLocaleDateString();
+		}
+		if (isUTCTimestampNanoseconds(time)) {
+			// `Date` holds milliseconds; the sub-millisecond part is dropped.
+			return new Date(Number(time / 1_000_000n)).toLocaleDateString();
+		}
+		return new Date(time * 1000).toLocaleDateString();
 	},
 };
 
