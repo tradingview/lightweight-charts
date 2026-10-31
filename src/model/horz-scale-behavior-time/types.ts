@@ -1,5 +1,8 @@
+import { fractionalDigitsForNanos } from '../../helpers/nanos';
 import { Nominal } from '../../helpers/nominal';
 import { isNumber, isString } from '../../helpers/strict-type-checks';
+
+export { fractionalDigitsForNanos };
 
 /**
  * Represents a time as a UNIX timestamp.
@@ -189,7 +192,10 @@ export const enum TickMarkWeight {
  * Returns 0 for weights which do not display a fractional part.
  */
 export function fractionalDigitsForWeight(weight: number): number {
-	switch (weight) {
+	// The weight is a nominal number at the call site; the tick mark weights are
+	// the only values it takes.
+	const tickMarkWeight = weight as TickMarkWeight;
+	switch (tickMarkWeight) {
 		case TickMarkWeight.Milli:
 			return 3;
 
@@ -202,26 +208,6 @@ export function fractionalDigitsForWeight(weight: number): number {
 		default:
 			return 0;
 	}
-}
-
-/**
- * Number of fractional second digits needed to represent a nanosecond value without loss.
- * `0` for a zero nanosecond part, otherwise 3, 6 or 9 digits.
- */
-export function fractionalDigitsForNanos(nanos: number | undefined): number {
-	if (nanos === undefined || nanos === 0) {
-		return 0;
-	}
-
-	if (nanos % 1_000_000 === 0) {
-		return 3;
-	}
-
-	if (nanos % 1_000 === 0) {
-		return 6;
-	}
-
-	return 9;
 }
 
 /**

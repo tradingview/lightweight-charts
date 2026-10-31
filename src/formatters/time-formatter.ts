@@ -1,6 +1,6 @@
-import { numberToStringWithLeadingZero } from './price-formatter';
+import { fractionalDigitsForNanos } from '../helpers/nanos';
 
-import { fractionalDigitsForNanos } from '../model/horz-scale-behavior-time/types';
+import { numberToStringWithLeadingZero } from './price-formatter';
 
 export class TimeFormatter {
 	private _formatStr: string;
