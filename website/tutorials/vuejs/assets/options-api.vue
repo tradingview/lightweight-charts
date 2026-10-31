@@ -7,7 +7,7 @@ import {
 	CandlestickSeries,
 	HistogramSeries,
 	BaselineSeries,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 // Lightweight Chart instances are stored as normal JS variables
 // If you need to use a ref then it is recommended that you use `shallowRef` instead

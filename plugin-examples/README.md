@@ -21,7 +21,7 @@ a `CHANGELOG.md`, unlike the example plugins below.
 Install one from npm, as directed on its catalog page, for example:
 
 ```shell
-npm install @tradingview/lwc-plugin-accessibility
+npm install @bishopbot/lwc-plugin-accessibility
 ```
 
 ## Example plugins
@@ -41,7 +41,7 @@ hesitate to get in touch.
 
 📦 Some plugins have graduated to published packages under
 [`packages/lwc-plugin-*`](../packages) and are released to npm as
-`@tradingview/lwc-plugin-<name>`. Their folders here keep only the gallery
+`@bishopbot/lwc-plugin-<name>`. Their folders here keep only the gallery
 page, which imports the published package; the source lives in the package.
 
 🚀 Need a starting point for your plugin idea? Check out

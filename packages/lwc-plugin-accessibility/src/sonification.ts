@@ -1,4 +1,4 @@
-import { Time } from 'lightweight-charts';
+import { Time } from '@bishopbot/lightweight-charts';
 
 /** Everything a sonification needs about the point the keyboard just landed on. */
 export interface SonificationNote {

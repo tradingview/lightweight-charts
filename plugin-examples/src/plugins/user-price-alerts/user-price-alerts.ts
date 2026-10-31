@@ -7,7 +7,7 @@ import {
 	SeriesAttachedParameter,
 	SeriesType,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import {
 	averageWidthPerCharacter,
 	buttonWidth,

@@ -1,4 +1,4 @@
-import { IRange } from 'lightweight-charts';
+import { IRange } from '@bishopbot/lightweight-charts';
 
 import { SeriesDataPoint } from './types';
 

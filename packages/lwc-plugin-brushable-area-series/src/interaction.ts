@@ -7,9 +7,9 @@ import {
 	SeriesAttachedParameter,
 	Time,
 	WhitespaceData,
-} from 'lightweight-charts';
-import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
-import { Delegate, ISubscription } from '@tradingview/lwc-toolkit/delegate';
+} from '@bishopbot/lightweight-charts';
+import { PluginBase } from '@bishopbot/lwc-toolkit/plugin-base';
+import { Delegate, ISubscription } from '@bishopbot/lwc-toolkit/delegate';
 import { BrushableAreaSeriesOptions, BrushableAreaStyle } from './options';
 import { MultiTouchChartEvents, MultiTouchInteraction } from './multi-touch';
 

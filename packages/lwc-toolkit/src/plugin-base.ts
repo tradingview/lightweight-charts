@@ -6,7 +6,7 @@ import {
 	SeriesAttachedParameter,
 	SeriesOptionsMap,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { ensureDefined } from './assertions.js';
 
 export abstract class PluginBase implements ISeriesPrimitive<Time> {

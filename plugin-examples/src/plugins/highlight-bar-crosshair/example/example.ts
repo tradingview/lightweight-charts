@@ -1,4 +1,4 @@
-import { CandlestickSeries, createChart } from 'lightweight-charts';
+import { CandlestickSeries, createChart } from '@bishopbot/lightweight-charts';
 import { generateAlternativeCandleData } from '../../../sample-data';
 import { CrosshairHighlightPrimitive } from '../highlight-bar-crosshair';
 

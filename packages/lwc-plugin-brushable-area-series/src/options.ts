@@ -6,7 +6,7 @@ import {
 	LineType,
 	LineWidth,
 	Logical,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 export interface BrushRange {
 	range: IRange<Logical>;

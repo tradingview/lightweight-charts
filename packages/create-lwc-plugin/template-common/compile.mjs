@@ -87,7 +87,7 @@ for (const file of pluginsToBuild) {
 				 declaration nor an import — leaving a .d.ts that references types it
 				 never declares. `skipLibCheck` hides that from consumers.
 				 */
-				inlinedLibraries: ['@tradingview/lwc-toolkit'],
+				inlinedLibraries: ['@bishopbot/lwc-toolkit'],
 			},
 		},
 	], {

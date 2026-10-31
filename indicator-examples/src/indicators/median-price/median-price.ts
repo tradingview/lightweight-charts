@@ -7,7 +7,7 @@ import {
 	Time,
 	IChartApi,
 	LineSeries,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import {
 	calculateMedianPriceIndicatorValues,
 	MedianPriceCalculationOptions,

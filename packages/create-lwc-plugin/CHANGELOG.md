@@ -5,6 +5,16 @@ All notable changes to this package are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.2.1 - 2026-10-31
+
+### Changed
+
+- The package is published as `@bishopbot/create-lwc-plugin`, and its metadata
+  points at `https://github.com/bishop-bot/lightweight-charts`.
+- Scaffolded plugins are scoped to `@bishopbot/`, depend on
+  `@bishopbot/lwc-toolkit` and declare `@bishopbot/lightweight-charts` as
+  their library peer dependency.
+
 ## 0.2.0 - 2026-09-16
 
 ### Added

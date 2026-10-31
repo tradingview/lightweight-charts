@@ -1,4 +1,4 @@
-import { createOptionsAwareSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
+import { createOptionsAwareSeries, OptionsAwareSeries } from '@bishopbot/lwc-toolkit/custom-series/options-aware-series';
 import {
 	DeepPartial,
 	IChartApiBase,
@@ -8,7 +8,7 @@ import {
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
 	Time
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { defaultOptions, PrettyHistogramSeriesOptions } from './options';
 import { PrettyHistogramSeriesRenderer } from './renderer';
 import { PrettyHistogramData } from './data';

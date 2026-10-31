@@ -7,7 +7,7 @@ import {
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_Data } from './data';
 import { _CLASSNAME_Options } from './options';
 

@@ -4,7 +4,7 @@ import {
 	PaneRendererCustomData,
 	WhitespaceData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { HeatMapSeriesOptions, defaultOptions } from './options';
 import { HeatMapSeriesRenderer } from './renderer';
 import { HeatMapData } from './data';

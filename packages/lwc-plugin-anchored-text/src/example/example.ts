@@ -3,7 +3,7 @@ import {
 	LineSeries,
 	PrimitivePaneViewZOrder,
 	createChart,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { generateLineData } from './sample-data';
 
 import {

@@ -4,7 +4,7 @@ import {
 	PaneRendererCustomData,
 	WhitespaceData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { GroupedBarsSeriesOptions, defaultOptions } from './options';
 import { GroupedBarsSeriesRenderer } from './renderer';
 import { GroupedBarsData } from './data';

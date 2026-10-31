@@ -4,7 +4,7 @@ import {
 	CustomSeriesWhitespaceData,
 	IRange,
 	PaneRendererCustomData,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 /**
  * The minimum a bar has to provide for {@link visibleSegments}: the logical

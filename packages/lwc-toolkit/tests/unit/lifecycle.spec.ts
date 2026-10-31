@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
-import type { IChartApiBase, ISeriesApi, SeriesType, Time } from 'lightweight-charts';
+import type { IChartApiBase, ISeriesApi, SeriesType, Time } from '@bishopbot/lightweight-charts';
 
 import { isChartRemoved, isSeriesAttached } from '../../src/chart/lifecycle.js';
 

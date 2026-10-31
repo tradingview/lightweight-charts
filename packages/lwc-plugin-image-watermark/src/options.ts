@@ -1,4 +1,4 @@
-import { PrimitivePaneViewZOrder } from 'lightweight-charts';
+import { PrimitivePaneViewZOrder } from '@bishopbot/lightweight-charts';
 
 /** Named anchor for the watermark: the centre of the pane, or one of its corners. */
 export type WatermarkAnchor =

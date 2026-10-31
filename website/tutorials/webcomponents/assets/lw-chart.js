@@ -1,5 +1,5 @@
 // if using esm version (installed via npm):
-import { createChart, LineSeries, AreaSeries, CandlestickSeries, BaselineSeries, HistogramSeries, BarSeries } from 'lightweight-charts';
+import { createChart, LineSeries, AreaSeries, CandlestickSeries, BaselineSeries, HistogramSeries, BarSeries } from '@bishopbot/lightweight-charts';
 
 // If using standalone version (loaded via a script tag):
 // const { createChart } = LightweightCharts;

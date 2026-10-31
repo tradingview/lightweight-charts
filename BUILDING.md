@@ -49,13 +49,13 @@ Run it from the repository root, or add `-w` (`pnpm -w scaffold-plugin`) when ru
 
 The script builds the local copy of the tool and runs it, so it always reflects your working tree. Note that `pnpm create lwc-plugin` does download the published package from npm and will not pick up any local changes to the templates or the wizard.
 
-Workspace mode differs from the standalone mode community authors use: it scopes the package name to `@tradingview/`, depends on the library and the shared plugin utilities through `workspace:*`, marks the plugin as an official catalog entry, pins the devDependencies to exact versions like the rest of the repository, seeds a `CHANGELOG.md` and `NOTICE`, and adds the catalog preview page (`src/example/preview.html`, declared as `lwcPlugin.preview`) with the private `@tradingview/lwc-plugin-preview-kit` it is built from — a standalone project gets neither, since the kit is never published. The package has no `LICENSE` of its own: the repository's is copied in by a `prepack` script (npm drops symlinks when packing) and removed again by `postpack`, so every tarball carries it. The folder path the wizard asks for is relative to the repository root regardless of where it was started from.
+Workspace mode differs from the standalone mode community authors use: it scopes the package name to `@bishopbot/`, depends on the library and the shared plugin utilities through `workspace:*`, marks the plugin as an official catalog entry, pins the devDependencies to exact versions like the rest of the repository, seeds a `CHANGELOG.md` and `NOTICE`, and adds the catalog preview page (`src/example/preview.html`, declared as `lwcPlugin.preview`) with the private `@bishopbot/lwc-plugin-preview-kit` it is built from — a standalone project gets neither, since the kit is never published. The package has no `LICENSE` of its own: the repository's is copied in by a `prepack` script (npm drops symlinks when packing) and removed again by `postpack`, so every tarball carries it. The folder path the wizard asks for is relative to the repository root regardless of where it was started from.
 
 After scaffolding, install the new package's dependencies and check that it builds:
 
 ```bash
 pnpm install
-pnpm --filter @tradingview/lwc-plugin-<name> build
+pnpm --filter @bishopbot/lwc-plugin-<name> build
 ```
 
 Two further notes:
@@ -67,7 +67,7 @@ Two further notes:
 
 The scripts in `scripts/plugins/` check and publish the official plugin packages under `packages/lwc-plugin-*` (private packages are skipped). Each accepts `--filter <name>` to target one package, `--path <dir>` to target any directory, and `--help`.
 
-- `pnpm plugins:validate` - checks each package against the package contract: the `@tradingview/lwc-plugin-` name, a valid `version`, a `description`, a license, public `publishConfig`, a `lightweight-charts` peer range, the `lightweight-charts-plugin` keyword, the `lwcPlugin` block against `scripts/plugins/lwc-plugin-metadata.schema.json`, no leftover scaffold placeholders, and the parts the plugin catalog renders: a README with a description, `### npm` and `### CDN` tabs under Installation and a usage example, plus the pages declared in `lwcPlugin.demo` and `lwcPlugin.preview`, which both have to exist
+- `pnpm plugins:validate` - checks each package against the package contract: the `@bishopbot/lwc-plugin-` name, a valid `version`, a `description`, a license, public `publishConfig`, an `@bishopbot/lightweight-charts` peer range, the `lightweight-charts-plugin` keyword, the `lwcPlugin` block against `scripts/plugins/lwc-plugin-metadata.schema.json`, no leftover scaffold placeholders, and the parts the plugin catalog renders: a README with a description, `### npm` and `### CDN` tabs under Installation and a usage example, plus the pages declared in `lwcPlugin.demo` and `lwcPlugin.preview`, which both have to exist
 - `pnpm plugins:check-compat` - builds the library and the toolkit from the workspace, then runs every plugin's own typecheck and build against them. `--floor` instead installs each plugin's minimum declared peer version from npm into a temporary project and typechecks the plugin sources (not `src/example`) against that
 - `pnpm plugins:check-stale` - rebuilds every published plugin against the workspace toolkit and compares its `dist/` byte for byte with the version on npm. A plugin whose output changed without a version bump fails the check; see "Releasing the toolkit" below for why
 - `pnpm plugins:smoke` - packs each plugin, installs the tarball together with the published library into a temporary Vite project, compiles the README integration snippet, and checks that the bundle contains the plugin but not the library or any other plugin
@@ -80,22 +80,22 @@ CI runs three gates on every pull request, in the CircleCI `plugins` job: `plugi
 
 Each package's `compile.mjs` is a few lines that hand the package's own Vite and dts-bundle-generator to `scripts/plugins/compile-plugin.mjs`, which holds the build shared by every official plugin (the standalone template that community authors get keeps a full copy). A graduated plugin owns both of its pages, and there is only one copy of each: the demo (`src/example/index.html`, the page a developer opens on its own, with the edge cases) and the catalog preview (`src/example/preview.html`, what the docs site frames next to the README). `pnpm plugins:build-demos` builds both. What is left under `plugin-examples/src/plugins/<name>/example/` is a redirect stub to the built demo, so old gallery links keep working; the gallery's `build:deps` script builds only the toolkit and the plugin packages it still imports itself.
 
-Plugin and toolkit releases are tagged with their npm identifier, `@tradingview/lwc-plugin-<name>@X.Y.Z` and `@tradingview/lwc-toolkit@X.Y.Z`, next to the library's `vX.Y.Z` tags.
+Plugin and toolkit releases are tagged with their npm identifier, `@bishopbot/lwc-plugin-<name>@X.Y.Z` and `@bishopbot/lwc-toolkit@X.Y.Z`, next to the library's `vX.Y.Z` tags.
 
-The GitHub Releases page stays focused on the library. Package releases do not get an entry each; instead every publishing round, whatever mix of toolkit and plugins it ships, gets one grouped release on a lightweight `plugins-YYYY-MM-DD` tag on the published commit. Create it with "Set as the latest release" unticked, so the library's `vX.Y.Z` release keeps the Latest label, the `/releases/latest` URL and the sidebar. The body is a sentence on what the round was, then a table of package and version with each row linking to that package's `CHANGELOG.md` at its own tag (`blob/@tradingview/lwc-toolkit@X.Y.Z/packages/lwc-toolkit/CHANGELOG.md`), not on `master`, so the link still describes that version after the next bump. For a toolkit-driven round, say that the plugins were rebuilt for the toolkit change.
+The GitHub Releases page stays focused on the library. Package releases do not get an entry each; instead every publishing round, whatever mix of toolkit and plugins it ships, gets one grouped release on a lightweight `plugins-YYYY-MM-DD` tag on the published commit. Create it with "Set as the latest release" unticked, so the library's `vX.Y.Z` release keeps the Latest label, the `/releases/latest` URL and the sidebar. The body is a sentence on what the round was, then a table of package and version with each row linking to that package's `CHANGELOG.md` at its own tag (`blob/@bishopbot/lwc-toolkit@X.Y.Z/packages/lwc-toolkit/CHANGELOG.md`), not on `master`, so the link still describes that version after the next bump. For a toolkit-driven round, say that the plugins were rebuilt for the toolkit change.
 
 ### Releasing a plugin package
 
-1. Prerequisites: Node 22 or later, publish rights for the `@tradingview` scope (`npm whoami` shows the account), and a clean checkout of `master`. `pnpm publish` refuses to run from another branch or with uncommitted changes.
+1. Prerequisites: Node 22 or later, publish rights for the `@bishopbot` scope (`npm whoami` shows the account), and a clean checkout of `master`. `pnpm publish` refuses to run from another branch or with uncommitted changes.
 1. Bump `version` in the package's `package.json` and add a `## X.Y.Z` entry to its `CHANGELOG.md`. Land this through a normal pull request: CI validates the metadata and the changelog entry, and the publish happens from `master` after the merge.
-1. Build the library and the toolkit: `pnpm build`, then `pnpm --filter @tradingview/lwc-toolkit build`. Plugin builds resolve both through the workspace, with entry points in `dist/` folders that do not exist on a clean checkout. Every script that builds a plugin does this itself as well; running it first surfaces a library build problem before anything else.
+1. Build the library and the toolkit: `pnpm build`, then `pnpm --filter @bishopbot/lwc-toolkit build`. Plugin builds resolve both through the workspace, with entry points in `dist/` folders that do not exist on a clean checkout. Every script that builds a plugin does this itself as well; running it first surfaces a library build problem before anything else.
 1. Run the checks: `pnpm plugins:validate`, `pnpm plugins:check-compat` and `pnpm plugins:smoke`. Add `--filter <name>` to limit them to the package being released. The smoke test can also be started from the Actions tab, as the `smoke` check of the "Plugin packages" workflow.
 1. Dry run: `pnpm plugins:release --dry-run`. It reports every package whose version is newer than the one on npm, builds, packs and verifies each of them, and publishes nothing.
 1. Publish: `pnpm plugins:release`. Confirm each package at its prompt. A package that fails is reported at the end and does not stop the others.
 1. Tag each published package and push the tags:
 
     ```bash
-    git tag @tradingview/lwc-plugin-<name>@X.Y.Z
+    git tag @bishopbot/lwc-plugin-<name>@X.Y.Z
     git push origin --tags
     ```
 
@@ -103,15 +103,15 @@ The GitHub Releases page stays focused on the library. Package releases do not g
 
 ### Releasing the toolkit
 
-Plugins bundle `@tradingview/lwc-toolkit` into their own `dist/` when they are built, so a toolkit change only reaches users once every affected plugin is rebuilt and published. `pnpm plugins:check-stale` tells you which plugins those are, by comparing a fresh build of each published plugin with the version on npm. The comparison is byte for byte, which the template build makes reliable: fixed file names, no sourcemaps, no timestamps. Keep it that way. Upgrading Vite, TypeScript or dts-bundle-generator changes the output of every plugin and rightly forces a round of releases.
+Plugins bundle `@bishopbot/lwc-toolkit` into their own `dist/` when they are built, so a toolkit change only reaches users once every affected plugin is rebuilt and published. `pnpm plugins:check-stale` tells you which plugins those are, by comparing a fresh build of each published plugin with the version on npm. The comparison is byte for byte, which the template build makes reliable: fixed file names, no sourcemaps, no timestamps. Keep it that way. Upgrading Vite, TypeScript or dts-bundle-generator changes the output of every plugin and rightly forces a round of releases.
 
 1. Prerequisites as above.
 1. Run `pnpm plugins:check-stale`. It builds the library and the toolkit from your working tree, rebuilds every published plugin against them, and compares the output with npm. For every plugin it reports as changed, bump its `version` and add a `CHANGELOG.md` entry describing the toolkit change. A plugin whose output it reports as identical does not need a release.
 1. Bump `version` in `packages/lwc-toolkit/package.json` and add its `CHANGELOG.md` entry. Land the toolkit and plugin bumps together through a pull request.
-1. From `master`, build what will be published: `pnpm build`, then `pnpm --filter @tradingview/lwc-toolkit typecheck` and `pnpm --filter @tradingview/lwc-toolkit build`. `pnpm publish` ships the `dist/` that is on disk and does not rebuild it, so this step has to run on the merged commit.
+1. From `master`, build what will be published: `pnpm build`, then `pnpm --filter @bishopbot/lwc-toolkit typecheck` and `pnpm --filter @bishopbot/lwc-toolkit build`. `pnpm publish` ships the `dist/` that is on disk and does not rebuild it, so this step has to run on the merged commit.
 1. Check the package the way CI does, in `packages/lwc-toolkit`: `pnpm dlx publint@0.3.14 --strict` and `pnpm dlx @arethetypeswrong/cli@0.18.5 --pack . --ignore-rules no-resolution cjs-resolves-to-esm`.
-1. Dry run, then publish: `pnpm --filter @tradingview/lwc-toolkit publish --access public --dry-run`, then the same command without `--dry-run`.
-1. Tag it, `git tag @tradingview/lwc-toolkit@X.Y.Z`, and push the tags.
+1. Dry run, then publish: `pnpm --filter @bishopbot/lwc-toolkit publish --access public --dry-run`, then the same command without `--dry-run`.
+1. Tag it, `git tag @bishopbot/lwc-toolkit@X.Y.Z`, and push the tags.
 1. Release the plugins bumped in step 2 by following "Releasing a plugin package" from its build step onward. Their bundled toolkit changed, so the checks step applies to them in full. The toolkit and those plugins share one grouped GitHub release, created at the end of that procedure.
 
 ## Tips

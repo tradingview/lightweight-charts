@@ -6,7 +6,7 @@
 //* The whole layout — one compact control row above a chart that fills the rest
 //* of the frame — comes from the repository's private preview kit. For a
 //* control row, add
-//*   import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
+//*   import { mountControls } from '@bishopbot/lwc-plugin-preview-kit/preview-controls';
 //* and call `mountControls([...])` with the two or three options worth showing.
-import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import '@bishopbot/lwc-plugin-preview-kit/preview.css';
 _PREVIEW_SNIPPET_

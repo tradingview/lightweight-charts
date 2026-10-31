@@ -1,17 +1,20 @@
 {
   "private": true,
-  "version": "5.2.1",
-  "name": "lightweight-charts",
-  "author": "TradingView, Inc.",
+  "version": "6.0.0",
+  "name": "@bishopbot/lightweight-charts",
+  "author": "bishop-bot",
   "license": "Apache-2.0",
   "description": "Performant financial charts built with HTML5 canvas",
-  "homepage": "https://www.tradingview.com/lightweight-charts/",
+  "homepage": "https://github.com/bishop-bot/lightweight-charts#readme",
   "bugs": {
-    "url": "https://github.com/tradingview/lightweight-charts/issues"
+    "url": "https://github.com/bishop-bot/lightweight-charts/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tradingview/lightweight-charts.git"
+    "url": "git+https://github.com/bishop-bot/lightweight-charts.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "type": "module",
   "module": "dist/lightweight-charts.production.mjs",
@@ -35,7 +38,10 @@
     }
   },
   "files": [
-    "dist/**"
+    "dist/**",
+    "LICENSE",
+    "NOTICE",
+    "CHANGELOG.md"
   ],
   "keywords": [
     "financial-charting-library",
@@ -45,7 +51,7 @@
     "typescript",
     "charting",
     "charts",
-    "tradingview",
+    "bishopbot",
     "candlestick"
   ],
   "engines": {
@@ -150,13 +156,13 @@
     "build:watch": "npm-run-all tsc-incremental -p tsc-watch rollup-watch",
     "build:prod": "cross-env NODE_ENV=production pnpm build",
     "build:release": "cross-env BUILD_TAG=release pnpm build:prod",
-    "build:toolkit": "pnpm --filter @tradingview/lwc-toolkit build",
+    "build:toolkit": "pnpm --filter @bishopbot/lwc-toolkit build",
     "prepare-release": "npm-run-all clean build:release && pnpm prepare-package-json-for-release",
     "prepare-package-json-for-release": "node ./scripts/clean-package-json.js",
     "size-limit": "size-limit",
     "verify": "npm-run-all clean -p build:prod check-markdown-links -p build:toolkit lint check-dts-docs check-bundle-host-names tsc-verify test size-limit -p type-tests",
     "test": "esno --import ./tests/unittests/setup.units.mjs --test './tests/unittests/**/*.spec.ts' './packages/*/tests/unit/**/*.spec.ts'",
-    "type-tests": "tsc -b ./src/tsconfig.composite.json && tsc -p ./tests/type-checks/tsconfig.composite.json --noEmit && pnpm build:prod && pnpm --filter @tradingview/lwc-toolkit --filter \"@tradingview/lwc-plugin-*\" build && node scripts/plugins/type-tests.mjs",
+    "type-tests": "tsc -b ./src/tsconfig.composite.json && tsc -p ./tests/type-checks/tsconfig.composite.json --noEmit && pnpm build:prod && pnpm --filter @bishopbot/lwc-toolkit --filter \"@bishopbot/lwc-plugin-*\" build && node scripts/plugins/type-tests.mjs",
     "e2e:coverage": "esno ./tests/e2e/coverage/runner.ts ./dist/lightweight-charts.standalone.development.js",
     "e2e:graphics:plugins": "esno ./tests/e2e/graphics/plugins-runner.ts ./dist/lightweight-charts.standalone.development.mjs ./dist/lightweight-charts.standalone.development.mjs --golden-plugins-dir ./packages",
     "e2e:interactions": "esno ./tests/e2e/interactions/runner.ts ./dist/lightweight-charts.standalone.development.js",

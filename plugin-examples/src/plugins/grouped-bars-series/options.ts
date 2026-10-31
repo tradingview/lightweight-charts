@@ -1,7 +1,7 @@
 import {
 	CustomSeriesOptions,
 	customSeriesDefaultOptions,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 export interface GroupedBarsSeriesOptions extends CustomSeriesOptions {
 	colors: readonly string[];

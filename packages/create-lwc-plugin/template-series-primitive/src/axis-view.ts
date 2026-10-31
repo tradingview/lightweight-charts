@@ -1,5 +1,5 @@
-import { Coordinate } from 'lightweight-charts';
-import { AxisLabelSource } from '@tradingview/lwc-toolkit/axis-label-view';
+import { Coordinate } from '@bishopbot/lightweight-charts';
+import { AxisLabelSource } from '@bishopbot/lwc-toolkit/axis-label-view';
 import { Point, _CLASSNAME_DataSource } from './data-source';
 
 /**

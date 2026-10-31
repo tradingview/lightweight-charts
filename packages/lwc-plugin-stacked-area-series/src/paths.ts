@@ -1,4 +1,4 @@
-import { LinePathData, Position } from '@tradingview/lwc-toolkit/custom-series/line-paths';
+import { LinePathData, Position } from '@bishopbot/lwc-toolkit/custom-series/line-paths';
 import { StackedAreaLineType } from './options';
 
 /**

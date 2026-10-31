@@ -1,4 +1,4 @@
-import type { HandleScaleOptions, HandleScrollOptions } from 'lightweight-charts';
+import type { HandleScaleOptions, HandleScrollOptions } from '@bishopbot/lightweight-charts';
 
 /** The chart options {@link canUserMoveTimeScale} reads. */
 export interface TimeScaleInteractionOptions {

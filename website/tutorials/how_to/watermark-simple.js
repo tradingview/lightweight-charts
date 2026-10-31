@@ -10,11 +10,11 @@ const chartOptions = {
 	},
 };
 // remove-line
-/** @type {import('lightweight-charts').IChartApi} */
+/** @type {import('@bishopbot/lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
 // remove-line
-/** @type {import('lightweight-charts').createTextWatermark} */
+/** @type {import('@bishopbot/lightweight-charts').createTextWatermark} */
 // highlight-start
 createTextWatermark(chart.panes()[0], {
 	horzAlign: 'center',

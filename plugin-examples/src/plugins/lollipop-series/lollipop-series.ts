@@ -4,7 +4,7 @@ import {
 	PaneRendererCustomData,
 	WhitespaceData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { LollipopSeriesOptions, defaultOptions } from './options';
 import { LollipopSeriesRenderer } from './renderer';
 import { LollipopData } from './data';

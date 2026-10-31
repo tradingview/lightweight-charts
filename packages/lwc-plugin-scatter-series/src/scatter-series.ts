@@ -1,4 +1,4 @@
-import type { IChartApiBase } from 'lightweight-charts';
+import type { IChartApiBase } from '@bishopbot/lightweight-charts';
 
 import type { ScatterPoint } from './data';
 import type { ScatterSeriesPartialOptions } from './options';

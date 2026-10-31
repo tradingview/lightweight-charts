@@ -43,7 +43,7 @@ The official plugin packages under `packages/lwc-plugin-*` have their own suite,
 - A file whose name starts with a dot is not discovered, like in the library suite. That is how a case for a known bug is parked until the fix lands: keep it dotted, say why in a comment at the top, and un-dot it in the fix PR.
 - Golden is the merge-base build of the package _and_ of the library; test is HEAD of both. A package with no golden build (a new package, or a merge-base that predates it) fails its cases, with the test screenshot kept in the job's artifacts: like an intentional rendering change, a new case is something the reviewer looks at rather than something that passes silently.
 
-Locally, with the library (`pnpm build`) and the packages (`pnpm --filter "@tradingview/lwc-plugin-*" build`) built:
+Locally, with the library (`pnpm build`) and the packages (`pnpm --filter "@bishopbot/lwc-plugin-*" build`) built:
 
 ```bash
 pnpm e2e:graphics:plugins --grep "lwc-plugin-vertical-line/"

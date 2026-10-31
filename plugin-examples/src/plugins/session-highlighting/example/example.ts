@@ -1,4 +1,4 @@
-import { Time, createChart, isBusinessDay, isUTCTimestamp, CandlestickSeries } from 'lightweight-charts';
+import { Time, createChart, isBusinessDay, isUTCTimestamp, CandlestickSeries } from '@bishopbot/lightweight-charts';
 import { generateAlternativeCandleData } from '../../../sample-data';
 import { SessionHighlighting } from '../session-highlighting';
 

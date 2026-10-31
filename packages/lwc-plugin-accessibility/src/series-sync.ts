@@ -1,4 +1,4 @@
-import { DataChangedScope, IPaneApi, IRange, Time } from 'lightweight-charts';
+import { DataChangedScope, IPaneApi, IRange, Time } from '@bishopbot/lightweight-charts';
 
 import { DescribeEnv, describeSeriesUpdate } from './describe';
 import { AccessibilityPaneOptions } from './options';

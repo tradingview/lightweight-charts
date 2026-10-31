@@ -1,7 +1,7 @@
 // Resolve the built exports map, as an npm consumer does; no src aliases.
-import { createChart, type IChartApiBase, type Time, type CustomSeriesWhitespaceData } from 'lightweight-charts';
-import { createStackedBarsSeries, StackedBarsSeries, type StackedBarsData, type StackedBarsSeriesOptions } from '@tradingview/lwc-plugin-stacked-bars-series';
-import { StackedBarsSeries as Standalone, createStackedBarsSeries as createStandalone } from '@tradingview/lwc-plugin-stacked-bars-series/standalone';
+import { createChart, type IChartApiBase, type Time, type CustomSeriesWhitespaceData } from '@bishopbot/lightweight-charts';
+import { createStackedBarsSeries, StackedBarsSeries, type StackedBarsData, type StackedBarsSeriesOptions } from '@bishopbot/lwc-plugin-stacked-bars-series';
+import { StackedBarsSeries as Standalone, createStackedBarsSeries as createStandalone } from '@bishopbot/lwc-plugin-stacked-bars-series/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof StackedBarsSeries, typeof Standalone>>();

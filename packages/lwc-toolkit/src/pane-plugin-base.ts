@@ -3,7 +3,7 @@ import {
 	IPanePrimitive,
 	PaneAttachedParameter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import { ensureDefined } from './assertions.js';
 

@@ -199,6 +199,9 @@ importers:
 
   indicator-examples:
     dependencies:
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:..
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
@@ -208,9 +211,6 @@ importers:
       globby:
         specifier: 14.1.0
         version: 14.1.0
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:..
     devDependencies:
       typescript:
         specifier: 5.9.3
@@ -235,14 +235,21 @@ importers:
         version: 3.6.1(typescript@5.9.3)
 
   packages/lwc-plugin-accessibility:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       '@types/chai':
@@ -257,9 +264,6 @@ importers:
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -275,14 +279,20 @@ importers:
       fancy-canvas:
         specifier: ~2.1.0
         version: 2.1.0
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       '@types/chai':
@@ -297,9 +307,6 @@ importers:
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -311,14 +318,21 @@ importers:
         version: 8.2.2(@types/node@22.13.14)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-plugin-brushable-area-series:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       '@types/chai':
@@ -333,9 +347,6 @@ importers:
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -347,22 +358,26 @@ importers:
         version: 8.2.2(@types/node@22.13.14)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-plugin-dual-range-histogram-series:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -374,22 +389,26 @@ importers:
         version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-plugin-hlc-area-series:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -405,14 +424,20 @@ importers:
       fancy-canvas:
         specifier: ~2.1.0
         version: 2.1.0
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       '@types/chai':
@@ -427,9 +452,6 @@ importers:
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -441,22 +463,26 @@ importers:
         version: 8.2.2(@types/node@22.13.14)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-plugin-pretty-histogram-series:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -474,14 +500,21 @@ importers:
         version: 5.9.3
 
   packages/lwc-plugin-rounded-candles-series:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       '@types/chai':
@@ -496,9 +529,6 @@ importers:
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -510,14 +540,21 @@ importers:
         version: 8.2.2(@types/node@22.13.14)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-plugin-scatter-series:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       '@types/chai':
@@ -532,9 +569,6 @@ importers:
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -546,14 +580,21 @@ importers:
         version: 8.2.2(@types/node@22.13.14)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-plugin-stacked-area-series:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       '@types/chai':
@@ -568,9 +609,6 @@ importers:
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -582,14 +620,21 @@ importers:
         version: 8.2.2(@types/node@22.13.14)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-plugin-stacked-bars-series:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       '@types/chai':
@@ -604,9 +649,6 @@ importers:
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -622,22 +664,25 @@ importers:
       fancy-canvas:
         specifier: ~2.1.0
         version: 2.1.0
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
         version: 0.18.5
-      '@tradingview/lwc-plugin-preview-kit':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
+      '@bishopbot/lwc-plugin-preview-kit':
         specifier: workspace:*
         version: link:../lwc-plugin-preview-kit
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../lwc-toolkit
       dts-bundle-generator:
         specifier: 9.5.1
         version: 9.5.1
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       publint:
         specifier: 0.3.14
         version: 0.3.14
@@ -649,7 +694,14 @@ importers:
         version: 8.2.2(@types/node@22.20.1)(jiti@2.7.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.9.0)
 
   packages/lwc-toolkit:
+    dependencies:
+      lightweight-charts:
+        specifier: ^5.0.0
+        version: 5.2.1
     devDependencies:
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:../..
       '@types/chai':
         specifier: 5.2.1
         version: 5.2.1
@@ -659,19 +711,19 @@ importers:
       chai:
         specifier: 5.2.0
         version: 5.2.0
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:../..
       typescript:
         specifier: 5.9.3
         version: 5.9.3
 
   plugin-examples:
     dependencies:
-      '@tradingview/lwc-plugin-brushable-area-series':
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:..
+      '@bishopbot/lwc-plugin-brushable-area-series':
         specifier: workspace:*
         version: link:../packages/lwc-plugin-brushable-area-series
-      '@tradingview/lwc-toolkit':
+      '@bishopbot/lwc-toolkit':
         specifier: workspace:*
         version: link:../packages/lwc-toolkit
       dts-bundle-generator:
@@ -683,9 +735,6 @@ importers:
       globby:
         specifier: 14.1.0
         version: 14.1.0
-      lightweight-charts:
-        specifier: workspace:*
-        version: link:..
     devDependencies:
       typescript:
         specifier: 5.9.3
@@ -696,6 +745,9 @@ importers:
 
   website:
     dependencies:
+      '@bishopbot/lightweight-charts':
+        specifier: workspace:*
+        version: link:..
       '@docusaurus/core':
         specifier: 3.7.0
         version: 3.7.0(@docusaurus/faster@3.7.0(@docusaurus/types@3.7.0(@swc/core@1.16.1)(postcss@8.5.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(postcss@8.5.26))(@mdx-js/react@3.1.1(@types/react@18.3.31)(react@18.3.1))(@swc/core@1.16.1)(eslint@8.57.1)(postcss@8.5.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.4.5)
@@ -738,9 +790,6 @@ importers:
       github-slugger:
         specifier: 1.5.0
         version: 1.5.0
-      lightweight-charts:
-        specifier: 5.2.1
-        version: 5.2.1
       lightweight-charts-3.8:
         specifier: npm:lightweight-charts@~3.8.0
         version: lightweight-charts@3.8.0
@@ -763,7 +812,7 @@ importers:
         specifier: npm:lightweight-charts@5.2.1
         version: lightweight-charts@5.2.1
       lightweight-charts-local:
-        specifier: workspace:lightweight-charts@*
+        specifier: workspace:@bishopbot/lightweight-charts@*
         version: link:..
       prism-react-renderer:
         specifier: 2.4.1

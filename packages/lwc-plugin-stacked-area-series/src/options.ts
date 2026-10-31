@@ -3,7 +3,7 @@ import {
 	LineStyle,
 	LineWidth,
 	customSeriesDefaultOptions,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 /**
  * How the points of a band are joined.

@@ -1,6 +1,6 @@
-import { createChart } from 'lightweight-charts';
-import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
-import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { createChart } from '@bishopbot/lightweight-charts';
+import { mountControls } from '@bishopbot/lwc-plugin-preview-kit/preview-controls';
+import '@bishopbot/lwc-plugin-preview-kit/preview.css';
 import { StackedAreaGapHandling, StackedAreaLineType } from '../options';
 import { createStackedAreaSeries } from '../stacked-area-series';
 import { multipleBarData } from './sample-data';

@@ -24,7 +24,7 @@ export interface LwcPluginMetadata {
  * curate the entry come from the workspace.
  */
 export interface CatalogueEntry {
-	/** npm package name, e.g. `@tradingview/lwc-plugin-vertical-line`. */
+	/** npm package name, e.g. `@bishopbot/lwc-plugin-vertical-line`. */
 	name: string;
 	/** Unscoped name without the `lwc-plugin-` prefix, e.g. `vertical-line`; unique, the URL segment. */
 	slug: string;
@@ -40,7 +40,7 @@ export interface CatalogueEntry {
 	pendingVersion: string | null;
 	/** ISO timestamp of the published version, from the registry. */
 	publishedAt: string | null;
-	/** `peerDependencies["lightweight-charts"]` of the published version; null if it declares none. */
+	/** `peerDependencies["@bishopbot/lightweight-charts"]` of the published version; null if it declares none. */
 	peerRange: string | null;
 	/** The `npm deprecate` message of the published version, or null. */
 	deprecated: string | null;

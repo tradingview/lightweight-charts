@@ -5,6 +5,19 @@ All notable changes to this package are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.1.0 - 2026-10-31
+
+### Changed
+
+- The package is published under the `@bishopbot` scope instead of
+  `@tradingview`, and its metadata points at
+  `https://github.com/bishop-bot/lightweight-charts`.
+- The library peer dependency is `@bishopbot/lightweight-charts` (`^6.0.0`).
+  The upstream `lightweight-charts` stays an optional peer dependency, so a
+  project that already depends on the upstream 5.x line does not have to
+  change it.
+- The sources import the library and the toolkit under their new names.
+
 ## 1.0.0 - 2026-10-08
 
 First release.

@@ -1,4 +1,4 @@
-import { isFiniteNumber } from '@tradingview/lwc-toolkit/numbers';
+import { isFiniteNumber } from '@bishopbot/lwc-toolkit/numbers';
 
 import type { ScatterSizeMapping } from './data';
 import type { ScatterRange, ScatterSizeLimits, ScatterSizeRange, ScatterSizeScale } from './options';

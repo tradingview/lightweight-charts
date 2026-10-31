@@ -9,7 +9,7 @@ import {
 	SeriesType,
 	Time,
 	UTCTimestamp,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import {
 	calculateCorrelationIndicatorValues,
 	CorrelationCalculationOptions,

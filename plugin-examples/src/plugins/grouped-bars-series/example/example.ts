@@ -1,4 +1,4 @@
-import { WhitespaceData, createChart } from 'lightweight-charts';
+import { WhitespaceData, createChart } from '@bishopbot/lightweight-charts';
 import { GroupedBarsSeries } from '../grouped-bars-series';
 import { GroupedBarsData } from '../data';
 import { multipleBarData } from '../../../sample-data';

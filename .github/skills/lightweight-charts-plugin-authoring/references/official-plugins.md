@@ -1,11 +1,11 @@
 # The official plugins, and what each one teaches
 
-Upstream: `packages/lwc-plugin-<name>/`. Published: `@tradingview/lwc-plugin-<name>`,
+Upstream: `packages/lwc-plugin-<name>/`. Published: `@bishopbot/lwc-plugin-<name>`,
 which ships the README and `dist/` (`.js` + `.d.ts`) but not the source. From
 a repository that is not the upstream checkout, read the source on GitHub —
-`https://github.com/tradingview/lightweight-charts/tree/master/packages/lwc-plugin-<name>/src`,
-or the raw file URL under `raw.githubusercontent.com/tradingview/lightweight-charts/master/…` —
-or clone once: `git clone --depth 1 https://github.com/tradingview/lightweight-charts /tmp/lightweight-charts`.
+`https://github.com/bishop-bot/lightweight-charts/tree/master/packages/lwc-plugin-<name>/src`,
+or the raw file URL under `raw.githubusercontent.com/bishop-bot/lightweight-charts/master/…` —
+or clone once: `git clone --depth 1 https://github.com/bishop-bot/lightweight-charts /tmp/lightweight-charts`.
 
 Each package has `src/`, a dev demo (`src/example/index.html`), a catalog
 preview (`src/example/preview.html`), `tests/{unit,graphics,interactions}`, a

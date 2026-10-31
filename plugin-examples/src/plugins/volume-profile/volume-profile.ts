@@ -11,8 +11,8 @@ import {
 	SeriesOptionsMap,
 	SeriesType,
 	Time,
-} from 'lightweight-charts';
-import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
+} from '@bishopbot/lightweight-charts';
+import { positionsBox } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 interface VolumeProfileItem {
 	y: Coordinate | null;

@@ -1,4 +1,4 @@
-import type { Time } from 'lightweight-charts';
+import type { Time } from '@bishopbot/lightweight-charts';
 
 type LineData = {
 	time: Time;

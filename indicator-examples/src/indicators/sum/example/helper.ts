@@ -4,7 +4,7 @@ import {
 	createChart,
 	DeepPartial,
 	LineStyle,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import {
 	convertToLineData,
 	generateAlternativeCandleData,

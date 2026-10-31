@@ -1,4 +1,4 @@
-import { createChart, AreaSeries } from 'lightweight-charts';
+import { createChart, AreaSeries } from '@bishopbot/lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { DeltaTooltipPrimitive } from '../delta-tooltip';
 

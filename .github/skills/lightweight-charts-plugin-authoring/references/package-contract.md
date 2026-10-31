@@ -17,12 +17,12 @@ accent color to pick.
 
 | Field | Rule | Why |
 | --- | --- | --- |
-| `name` | starts with `lwc-plugin-` (unscoped), or `@tradingview/lwc-plugin-` for an official package | the unscoped remainder is the catalog's URL segment and the entry file name |
+| `name` | starts with `lwc-plugin-` (unscoped), or `@bishopbot/lwc-plugin-` for an official package | the unscoped remainder is the catalog's URL segment and the entry file name |
 | `version` | valid semver | the release script compares it with npm |
 | `description` | non-empty | shown on the catalog card |
 | `license` | non-empty SPDX id | shown on the detail page |
 | `publishConfig.access` | `"public"` | scoped packages default to restricted |
-| `peerDependencies.lightweight-charts` | a valid range, `^5.0.0` unless a 5.1 hook is required | the catalog shows "works with"; consumers install the library themselves |
+| `peerDependencies.@bishopbot/lightweight-charts` | a valid range, `^6.0.0` unless a later hook is required | the catalog shows "works with"; consumers install the library themselves |
 | `keywords` | includes `lightweight-charts-plugin` | how npm search and the registry find plugins |
 | `files` | `dist` (+ `CHANGELOG.md`, `NOTICE` for official) | ship built output only |
 | `exports` | `.` and `./standalone`, each with `types` + `default` | the standalone build inlines everything but the library, for CDN import maps |
@@ -56,7 +56,7 @@ unknown keys are errors.
   what the catalog frames next to the README, in a frame ~330 px tall. Show
   the plugin at its best: clean data, two or three controls, no explanatory
   text. Official packages build it with the private
-  `@tradingview/lwc-plugin-preview-kit` (layout + `mountControls` /
+  `@bishopbot/lwc-plugin-preview-kit` (layout + `mountControls` /
   `addRefreshButton`); a standalone project has no preview by default.
 
 Neither page is the plugin's tests. Keep them free of assertions.
@@ -69,7 +69,7 @@ an npm/CDN tab switcher. So:
 
 1. `# <Title>` then a description paragraph.
 2. `## Installation` with `### npm` (install command + import example) and
-   `### CDN` (an import map pointing `lightweight-charts` and the package at
+   `### CDN` (an import map pointing `@bishopbot/lightweight-charts` and the package at
    their standalone builds, then the same import by name).
 3. `## Usage` with at least one `js`/`ts` code block — the release smoke test
    compiles the first snippet after `### npm`, so it must be complete and

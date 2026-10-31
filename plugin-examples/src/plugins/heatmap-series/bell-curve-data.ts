@@ -1,4 +1,4 @@
-import { LineData } from 'lightweight-charts';
+import { LineData } from '@bishopbot/lightweight-charts';
 import { HeatMapData } from './data';
 
 export function generateBellCurve(

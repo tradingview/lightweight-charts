@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { MismatchDirection, type Time } from 'lightweight-charts';
+import { MismatchDirection, type Time } from '@bishopbot/lightweight-charts';
 import { describe, it } from 'node:test';
 
 import { SeriesStats, timeKey } from '../../src/series-data';

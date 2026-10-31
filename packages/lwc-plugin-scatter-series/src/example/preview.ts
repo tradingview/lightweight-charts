@@ -1,5 +1,5 @@
-import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
-import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { mountControls } from '@bishopbot/lwc-plugin-preview-kit/preview-controls';
+import '@bishopbot/lwc-plugin-preview-kit/preview.css';
 import { createScatterChart } from '../chart';
 import type { ScatterShape } from '../options';
 import { createScatterSeries } from '../scatter-series';

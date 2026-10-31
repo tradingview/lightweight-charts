@@ -1,6 +1,6 @@
-import { LineStyle, createChart } from 'lightweight-charts';
-import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
-import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { LineStyle, createChart } from '@bishopbot/lightweight-charts';
+import { mountControls } from '@bishopbot/lwc-plugin-preview-kit/preview-controls';
+import '@bishopbot/lwc-plugin-preview-kit/preview.css';
 import { createHLCAreaSeries } from '../hlc-area-series';
 import { HLCAreaLineType } from '../options';
 import { generateAlternativeCandleData } from './sample-data';

@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { LIBRARY_PACKAGE, TOOLKIT_PACKAGE } from './scope.mjs';
 
 /*
  A plugin is published as ESM only. Two bundles are produced:
@@ -9,7 +10,7 @@ import { fileURLToPath } from 'node:url';
                            external, so a bundler in the consuming project can
                            deduplicate them.
  - `<name>.standalone.js`  for use straight from a CDN. Everything except
-                           `lightweight-charts` itself is inlined and the result
+                           the library itself is inlined and the result
                            is minified, so the file can be imported on its own
                            with no install step. The entry point is left
                            unminified: whatever bundles it will minify it in turn.
@@ -61,8 +62,8 @@ export async function compilePlugin(packageModuleUrl, { build, defineConfig, gen
 			},
 			rollupOptions: {
 				external: standalone
-					? ['lightweight-charts']
-					: ['lightweight-charts', 'fancy-canvas'],
+					? [LIBRARY_PACKAGE]
+					: [LIBRARY_PACKAGE, 'fancy-canvas'],
 			},
 		},
 	});
@@ -80,7 +81,7 @@ export async function compilePlugin(packageModuleUrl, { build, defineConfig, gen
 		{
 			filePath: resolve(packageDir, 'typings', `${entryName}.d.ts`),
 			libraries: {
-				importedLibraries: ['lightweight-charts', 'fancy-canvas'],
+				importedLibraries: [LIBRARY_PACKAGE, 'fancy-canvas'],
 				/*
 				 The toolkit is a devDependency that the bundler inlines into the
 				 plugin's own output, so its types have to be inlined into the
@@ -90,7 +91,7 @@ export async function compilePlugin(packageModuleUrl, { build, defineConfig, gen
 				 declaration nor an import, leaving a .d.ts that references types it
 				 never declares.
 				 */
-				inlinedLibraries: ['@tradingview/lwc-toolkit'],
+				inlinedLibraries: [TOOLKIT_PACKAGE],
 			},
 		},
 	], {

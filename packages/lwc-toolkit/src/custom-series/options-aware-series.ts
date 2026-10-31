@@ -1,7 +1,7 @@
 import {
 	CustomData, CustomSeriesOptions, CustomSeriesWhitespaceData, DeepPartial,
 	IChartApiBase, ICustomSeriesPaneView, ISeriesApi,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import { AcceptedInput, GapCheck, whitespaceGapCheck } from './visible-bars.js';
 

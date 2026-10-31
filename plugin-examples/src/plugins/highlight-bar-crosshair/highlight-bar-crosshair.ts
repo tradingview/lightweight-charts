@@ -8,8 +8,8 @@ import {
 	ISeriesPrimitive,
 	SeriesAttachedParameter,
 	Time,
-} from 'lightweight-charts';
-import { positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
+} from '@bishopbot/lightweight-charts';
+import { positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 class CrosshairHighlightPaneRenderer implements IPrimitivePaneRenderer {
 	_data: CrosshairHighlightData;

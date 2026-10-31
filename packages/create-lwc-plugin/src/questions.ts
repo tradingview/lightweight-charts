@@ -23,9 +23,9 @@ export const categoryTemplates: Record<PluginCategory, string> = {
 	'pane-primitive': 'template-pane-primitive',
 };
 
-const WORKSPACE_SCOPE = '@tradingview/';
+const WORKSPACE_SCOPE = '@bishopbot/';
 const WORKSPACE_LICENSE = 'Apache-2.0';
-const WORKSPACE_AUTHOR = 'TradingView';
+const WORKSPACE_AUTHOR = 'bishop-bot';
 
 export interface Answers {
 	category: PluginCategory;

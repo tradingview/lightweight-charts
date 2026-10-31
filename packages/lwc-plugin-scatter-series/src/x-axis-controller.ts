@@ -1,12 +1,12 @@
-import type { IChartApiBase, Logical, LogicalRange, WhitespaceData } from 'lightweight-charts';
-import { canUserMoveTimeScale } from '@tradingview/lwc-toolkit/chart/interaction-flags';
+import type { IChartApiBase, Logical, LogicalRange, WhitespaceData } from '@bishopbot/lightweight-charts';
+import { canUserMoveTimeScale } from '@bishopbot/lwc-toolkit/chart/interaction-flags';
 import {
 	tickMarkCharactersForWidth,
 	tickMarkPixelsPerCharacter,
 	timeAxisLabelFont,
-} from '@tradingview/lwc-toolkit/chart/time-axis-labels';
-import type { CoalescedTask, createCoalescedTask } from '@tradingview/lwc-toolkit/scheduling/coalesced-task';
-import { TextWidthCache, createTextWidthCache } from '@tradingview/lwc-toolkit/text/measure';
+} from '@bishopbot/lwc-toolkit/chart/time-axis-labels';
+import type { CoalescedTask, createCoalescedTask } from '@bishopbot/lwc-toolkit/scheduling/coalesced-task';
+import { TextWidthCache, createTextWidthCache } from '@bishopbot/lwc-toolkit/text/measure';
 
 import type { ScatterSlotData } from './data';
 import type { XMapping } from './geometry';

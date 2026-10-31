@@ -1,6 +1,6 @@
-import { ISeriesApi, LineSeries, LineStyle, Time, createChart } from 'lightweight-charts';
-import { addRefreshButton, mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
-import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { ISeriesApi, LineSeries, LineStyle, Time, createChart } from '@bishopbot/lightweight-charts';
+import { addRefreshButton, mountControls } from '@bishopbot/lwc-plugin-preview-kit/preview-controls';
+import '@bishopbot/lwc-plugin-preview-kit/preview.css';
 import { VerticalLine } from '../vertical-line';
 import { VerticalLineSnap } from '../options';
 import { generateLineData } from './sample-data';

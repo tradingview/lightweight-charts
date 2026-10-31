@@ -7,12 +7,12 @@ import {
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { WhiskerData } from './sample-data';
 import { WhiskerBoxSeriesOptions } from './options';
-import { candlestickWidth } from '@tradingview/lwc-toolkit/dimensions/candles';
-import { gridAndCrosshairMediaWidth } from '@tradingview/lwc-toolkit/dimensions/crosshair-width';
-import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
+import { candlestickWidth } from '@bishopbot/lwc-toolkit/dimensions/candles';
+import { gridAndCrosshairMediaWidth } from '@bishopbot/lwc-toolkit/dimensions/crosshair-width';
+import { positionsBox, positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 interface DesiredWidths {
 	body: number;

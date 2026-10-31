@@ -3,8 +3,8 @@ import {
 	DeepPartial,
 	LineStyle,
 	customSeriesDefaultOptions,
-} from 'lightweight-charts';
-import { cloneOptions, freezeOptions } from '@tradingview/lwc-toolkit/options/merge';
+} from '@bishopbot/lightweight-charts';
+import { cloneOptions, freezeOptions } from '@bishopbot/lwc-toolkit/options/merge';
 
 import { DEFAULT_POINT_SIZE_LIMITS } from './size';
 

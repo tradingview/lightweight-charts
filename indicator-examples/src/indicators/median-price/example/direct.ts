@@ -5,7 +5,7 @@ import {
 	DeepPartial,
 	LineStyle,
 	CandlestickSeries,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { generateAlternativeCandleData } from '../../../sample-data';
 import { calculateMedianPriceIndicatorValues } from '../median-price-calculation';
 

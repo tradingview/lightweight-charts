@@ -11,7 +11,7 @@ import {
 	SeriesAttachedParameter,
 	SeriesType,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 /*
 	TODO: This is just a simple price scale which

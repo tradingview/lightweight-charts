@@ -1,4 +1,4 @@
-import { WhitespaceData, createChart } from 'lightweight-charts';
+import { WhitespaceData, createChart } from '@bishopbot/lightweight-charts';
 import { generateLineData, shuffleValuesWithLimit } from '../../../sample-data';
 import { LollipopSeries } from '../lollipop-series';
 import { LollipopData } from '../data';

@@ -23,14 +23,14 @@ Install the package. It requires `lightweight-charts` `^5.0.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-brushable-area-series
+npm install @bishopbot/lwc-plugin-brushable-area-series
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { createBrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-series';
+import { createBrushableAreaSeries } from '@bishopbot/lwc-plugin-brushable-area-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = createBrushableAreaSeries(chart, {
@@ -52,7 +52,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-brushable-area-series": "https://unpkg.com/@tradingview/lwc-plugin-brushable-area-series/dist/brushable-area-series.standalone.js"
+    "@bishopbot/lwc-plugin-brushable-area-series": "https://unpkg.com/@bishopbot/lwc-plugin-brushable-area-series/dist/brushable-area-series.standalone.js"
   }
 }
 </script>
@@ -63,7 +63,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { createBrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-series';
+import { createBrushableAreaSeries } from '@bishopbot/lwc-plugin-brushable-area-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = createBrushableAreaSeries(chart, {
@@ -83,7 +83,7 @@ Add the [custom series](https://tradingview.github.io/lightweight-charts/docs/pl
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { createBrushableAreaSeries } from '@tradingview/lwc-plugin-brushable-area-series';
+import { createBrushableAreaSeries } from '@bishopbot/lwc-plugin-brushable-area-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = createBrushableAreaSeries(chart, {
@@ -140,7 +140,7 @@ application:
 ```js
 import {
     BrushableAreaInteraction,
-} from '@tradingview/lwc-plugin-brushable-area-series';
+} from '@bishopbot/lwc-plugin-brushable-area-series';
 
 const brush = new BrushableAreaInteraction({
     style: { lineColor: '#089981', topColor: 'rgba(8, 153, 129, 0.4)' },

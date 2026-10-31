@@ -20,7 +20,7 @@ function snippets(
 	usageBody: string
 ): ReadmeSnippets {
 	const chart = `const chart = createChart(document.getElementById('container'));`;
-	const libImport = `import { ${libraryImports} } from 'lightweight-charts';`;
+	const libImport = `import { ${libraryImports} } from '@bishopbot/lightweight-charts';`;
 	return {
 		attach: [libImport, PLUGIN_IMPORT, '', chart, body].join('\n'),
 		usage: [libImport, PLUGIN_IMPORT, '', chart, usageBody].join('\n'),
@@ -77,7 +77,7 @@ chart.panes()[0].attachPrimitive(plugin);`
  package next to the source it renders.
 */
 export const previewSnippets: Record<PluginCategory, string> = {
-	'custom-series': `import { createChart } from 'lightweight-charts';
+	'custom-series': `import { createChart } from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_ } from '../_ENTRYNAME_';
 import { generateSampleData } from '../sample-data';
 
@@ -89,7 +89,7 @@ const series = chart.addCustomSeries(new _CLASSNAME_(), {
 series.setData(generateSampleData(200, 50));
 chart.timeScale().fitContent();
 `,
-	'series-primitive': `import { LineSeries, createChart } from 'lightweight-charts';
+	'series-primitive': `import { LineSeries, createChart } from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_ } from '../_ENTRYNAME_';
 import { generateLineData } from '../sample-data';
 
@@ -107,7 +107,7 @@ series.attachPrimitive(
 );
 chart.timeScale().fitContent();
 `,
-	'pane-primitive': `import { LineSeries, createChart } from 'lightweight-charts';
+	'pane-primitive': `import { LineSeries, createChart } from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_ } from '../_ENTRYNAME_';
 import { generateLineData } from '../sample-data';
 

@@ -1,6 +1,6 @@
-import { cloneReadonly } from '@tradingview/lwc-toolkit/simple-clone';
-import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
-import { paneContentElement } from '@tradingview/lwc-toolkit/dom/pane-element';
+import { cloneReadonly } from '@bishopbot/lwc-toolkit/simple-clone';
+import { convertTimeUTC } from '@bishopbot/lwc-toolkit/time';
+import { paneContentElement } from '@bishopbot/lwc-toolkit/dom/pane-element';
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import {
 	Coordinate,
@@ -15,15 +15,15 @@ import {
 	SeriesAttachedParameter,
 	SeriesType,
 	Time,
-} from 'lightweight-charts';
-import { positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
-import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
-import { AxisLabelView } from '@tradingview/lwc-toolkit/axis-label-view';
+} from '@bishopbot/lightweight-charts';
+import { positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
+import { PluginBase } from '@bishopbot/lwc-toolkit/plugin-base';
+import { AxisLabelView } from '@bishopbot/lwc-toolkit/axis-label-view';
 import {
 	setLineStyle,
 	type LineStyle as ToolkitLineStyle,
-} from '@tradingview/lwc-toolkit/line-style';
-import { Delegate, ISubscription } from '@tradingview/lwc-toolkit/delegate';
+} from '@bishopbot/lwc-toolkit/line-style';
+import { Delegate, ISubscription } from '@bishopbot/lwc-toolkit/delegate';
 import {
 	VerticalLineBadgeOptions,
 	VerticalLineOptions,

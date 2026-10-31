@@ -1,4 +1,4 @@
-import { createChart, LineSeries, type PrimitivePaneViewZOrder } from 'lightweight-charts';
+import { createChart, LineSeries, type PrimitivePaneViewZOrder } from '@bishopbot/lightweight-charts';
 import {
 	AnchoredText,
 	AnchoredTextPane,
@@ -6,8 +6,8 @@ import {
 	type AnchoredTextHorzAlign,
 	type AnchoredTextInputOptions,
 	type AnchoredTextOptions,
-} from '@tradingview/lwc-plugin-anchored-text';
-import { AnchoredText as Standalone, AnchoredTextPane as StandalonePane } from '@tradingview/lwc-plugin-anchored-text/standalone';
+} from '@bishopbot/lwc-plugin-anchored-text';
+import { AnchoredText as Standalone, AnchoredTextPane as StandalonePane } from '@bishopbot/lwc-plugin-anchored-text/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof AnchoredText, typeof Standalone>>();

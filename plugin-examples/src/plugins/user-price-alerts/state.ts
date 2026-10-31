@@ -1,4 +1,4 @@
-import { Delegate } from '@tradingview/lwc-toolkit/delegate';
+import { Delegate } from '@bishopbot/lwc-toolkit/delegate';
 
 export interface UserAlertInfo {
 	id: string;

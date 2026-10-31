@@ -13,7 +13,7 @@ conventions used by the Lightweight Charts™ plugin catalog, so the plugin can
 be listed there once it is published to npm.
 
 ✨ Need some examples for inspiration? Check out the
-[plugin-examples](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples)
+[plugin-examples](https://github.com/bishop-bot/lightweight-charts/tree/master/plugin-examples)
 folder in the Lightweight Charts™ repo.
 
 ## Scaffold your first Lightweight Charts™ plugin
@@ -42,9 +42,9 @@ answers populate the generated `package.json`, including the `lwcPlugin` block
 read by the plugin catalog.
 
 Before any of that, the wizard offers to install the
-[plugin-authoring Agent Skill](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md)
+[plugin-authoring Agent Skill](https://github.com/bishop-bot/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md)
 for AI coding assistants such as Claude Code, Codex, and Cursor. The skill helps
-choose the plugin type, build on `@tradingview/lwc-toolkit`, and pick the right
+choose the plugin type, build on `@bishopbot/lwc-toolkit`, and pick the right
 official plugin as the reference for your idea. It also points to the docs and
 warns about the autoscale, whitespace, and hit-test mistakes a first plugin
 tends to make.
@@ -59,7 +59,7 @@ The CLI asks which assistants to set it up for. You can also run it yourself at
 any time:
 
 ```bash
-npx skills add tradingview/lightweight-charts --skill lightweight-charts-plugin-authoring
+npx skills add bishop-bot/lightweight-charts --skill lightweight-charts-plugin-authoring
 ```
 
 ## The generated project
@@ -107,7 +107,7 @@ workspace package instead of a standalone project:
 pnpm create lwc-plugin --workspace
 ```
 
-Workspace mode targets `packages/`, scopes the package name to `@tradingview/`,
+Workspace mode targets `packages/`, scopes the package name to `@bishopbot/`,
 depends on the library and the shared plugin utilities through `workspace:*`,
 seeds a `CHANGELOG.md`, `LICENSE` and `NOTICE`, and marks the plugin as an
 official catalog entry.

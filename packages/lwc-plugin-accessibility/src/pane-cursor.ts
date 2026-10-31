@@ -1,4 +1,4 @@
-import { DataChangedScope, IChartApiBase, IRange, Time } from 'lightweight-charts';
+import { DataChangedScope, IChartApiBase, IRange, Time } from '@bishopbot/lightweight-charts';
 
 import { markerNote, priceLineNote } from './annotations';
 import { DataTableModel, buildTableModel } from './data-table';

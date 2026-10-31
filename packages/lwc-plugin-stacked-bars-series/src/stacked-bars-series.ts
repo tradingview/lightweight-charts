@@ -1,4 +1,4 @@
-import { createOptionsAwareSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
+import { createOptionsAwareSeries, OptionsAwareSeries } from '@bishopbot/lwc-toolkit/custom-series/options-aware-series';
 import {
 	DeepPartial,
 	IChartApiBase,
@@ -8,8 +8,8 @@ import {
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
 	Time,
-} from 'lightweight-charts';
-import { stackedPlotValues } from '@tradingview/lwc-toolkit/custom-series/stacking';
+} from '@bishopbot/lightweight-charts';
+import { stackedPlotValues } from '@bishopbot/lwc-toolkit/custom-series/stacking';
 
 import { StackedBarsConflationContext } from './compat';
 import { StackedBarsSeriesOptions, defaultOptions } from './options';

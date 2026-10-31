@@ -1,4 +1,4 @@
-import type { IChartApiBase, IPaneApi, ISeriesApi, SeriesType } from 'lightweight-charts';
+import type { IChartApiBase, IPaneApi, ISeriesApi, SeriesType } from '@bishopbot/lightweight-charts';
 
 /*
  A plugin that wraps a series or a chart behind an API of its own outlives

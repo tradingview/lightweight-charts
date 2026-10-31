@@ -1,5 +1,5 @@
-import type { WhitespaceData } from 'lightweight-charts';
-import { isFiniteNumber } from '@tradingview/lwc-toolkit/numbers';
+import type { WhitespaceData } from '@bishopbot/lightweight-charts';
+import { isFiniteNumber } from '@bishopbot/lwc-toolkit/numbers';
 
 import { pinnedYRange } from './autoscale';
 import type { ScatterPoint, ScatterSlotData } from './data';

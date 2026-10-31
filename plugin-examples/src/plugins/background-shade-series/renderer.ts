@@ -7,9 +7,9 @@ import {
 	LineData,
 	PaneRendererCustomData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { BackgroundShadeSeriesOptions } from './options';
-import { fullBarWidth } from '@tradingview/lwc-toolkit/dimensions/full-width';
+import { fullBarWidth } from '@bishopbot/lwc-toolkit/dimensions/full-width';
 
 type RGBColor = [number, number, number];
 

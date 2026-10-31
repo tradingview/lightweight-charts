@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
-import { customSeriesDefaultOptions, CustomData, CustomSeriesOptions, CustomSeriesWhitespaceData, DataChangedHandler, DeepPartial, IChartApiBase, ICustomSeriesPaneView, Time } from 'lightweight-charts';
+import { customSeriesDefaultOptions, CustomData, CustomSeriesOptions, CustomSeriesWhitespaceData, DataChangedHandler, DeepPartial, IChartApiBase, ICustomSeriesPaneView, Time } from '@bishopbot/lightweight-charts';
 import { createOptionsAwareSeries, OptionsAwareSeries } from '../../src/custom-series/options-aware-series.js';
 import { AcceptedInput } from '../../src/custom-series/visible-bars.js';
 import { convertTimeUTC } from '../../src/time.js';

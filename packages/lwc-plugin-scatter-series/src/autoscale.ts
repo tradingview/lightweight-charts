@@ -1,5 +1,5 @@
-import type { AutoscaleInfo } from 'lightweight-charts';
-import { isFiniteNumber } from '@tradingview/lwc-toolkit/numbers';
+import type { AutoscaleInfo } from '@bishopbot/lightweight-charts';
+import { isFiniteNumber } from '@bishopbot/lwc-toolkit/numbers';
 
 import type { ScatterBaseline, ScatterRange } from './options';
 import type { ScatterRenderOptions } from './renderer';

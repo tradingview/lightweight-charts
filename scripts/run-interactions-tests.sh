@@ -3,7 +3,7 @@ set -e
 echo "Preparing"
 
 pnpm build
-pnpm --filter @tradingview/lwc-toolkit --filter "@tradingview/lwc-plugin-*" build
+pnpm --filter @bishopbot/lwc-toolkit --filter "@bishopbot/lwc-plugin-*" build
 
 echo "Interactions tests"
 pnpm e2e:interactions

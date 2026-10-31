@@ -4,8 +4,8 @@
 // checks what it draws) the same. The demo (src/example/region-shading.ts) and the
 // x-coordinates interaction test carry a fuller version of it: a class with
 // setRegions, to replace the regions in place.
-import type { IPrimitivePaneView, ISeriesPrimitive } from 'lightweight-charts';
-import type { ScatterSeriesApi } from '@tradingview/lwc-plugin-scatter-series';
+import type { IPrimitivePaneView, ISeriesPrimitive } from '@bishopbot/lightweight-charts';
+import type { ScatterSeriesApi } from '@bishopbot/lwc-plugin-scatter-series';
 
 /** A rectangle in data units. An open end (`null`) runs to the edge of the pane. */
 interface ShadedRegion {
@@ -63,7 +63,7 @@ function regionShading(scatter: ScatterSeriesApi, regions: readonly ShadedRegion
 }
 
 // Usage, as in the README: a relative rotation graph's quadrants.
-import { createScatterChart, createScatterSeries, type ScatterPoint } from '@tradingview/lwc-plugin-scatter-series';
+import { createScatterChart, createScatterSeries, type ScatterPoint } from '@bishopbot/lwc-plugin-scatter-series';
 
 const chart = createScatterChart(document.createElement('div'), { autoSize: true });
 const series = createScatterSeries(chart, { xRange: { min: 96, max: 104 }, yRange: { min: 96, max: 104 } });

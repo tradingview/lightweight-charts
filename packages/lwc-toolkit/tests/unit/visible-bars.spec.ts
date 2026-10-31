@@ -6,7 +6,7 @@ import {
 	IRange,
 	PaneRendererCustomData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import {
 	barCoordinate,

@@ -1,9 +1,9 @@
 {
-	"name": "@tradingview/lwc-toolkit",
-	"version": "1.1.0",
-	"description": "Helpers for authoring Lightweight Charts\u2122 plugins: pixel-perfect dimension calculations, a plugin base class, and time conversion.",
+	"name": "@bishopbot/lwc-toolkit",
+	"version": "1.2.0",
+	"description": "Helpers for authoring Lightweight Charts plugins: pixel-perfect dimension calculations, a plugin base class, and time conversion.",
 	"license": "Apache-2.0",
-	"author": "TradingView, Inc.",
+	"author": "bishop-bot",
 	"type": "module",
 	"sideEffects": false,
 	"keywords": [
@@ -151,13 +151,13 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/tradingview/lightweight-charts.git",
+		"url": "git+https://github.com/bishop-bot/lightweight-charts.git",
 		"directory": "packages/lwc-toolkit"
 	},
 	"bugs": {
-		"url": "https://github.com/tradingview/lightweight-charts/issues"
+		"url": "https://github.com/bishop-bot/lightweight-charts/issues"
 	},
-	"homepage": "https://www.tradingview.com/lightweight-charts/",
+	"homepage": "https://github.com/bishop-bot/lightweight-charts#readme",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -166,13 +166,14 @@
 		"typecheck": "tsc --noEmit && tsc -p tsconfig.tests.json"
 	},
 	"peerDependencies": {
+		"@bishopbot/lightweight-charts": "^6.0.0",
 		"lightweight-charts": "^5.0.0"
 	},
 	"devDependencies": {
 		"@types/chai": "5.2.1",
 		"@types/node": "22.13.14",
 		"chai": "5.2.0",
-		"lightweight-charts": "workspace:*",
+		"@bishopbot/lightweight-charts": "workspace:*",
 		"typescript": "5.9.3"
 	}
 }

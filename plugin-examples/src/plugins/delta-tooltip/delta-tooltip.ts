@@ -10,9 +10,9 @@ import {
 	AreaStyleOptions,
 	IPrimitivePaneView,
 	Time,
-} from 'lightweight-charts';
-import { Delegate, ISubscription } from '@tradingview/lwc-toolkit/delegate';
-import { convertTime, formattedDateAndTime } from '@tradingview/lwc-toolkit/time';
+} from '@bishopbot/lightweight-charts';
+import { Delegate, ISubscription } from '@bishopbot/lwc-toolkit/delegate';
+import { convertTime, formattedDateAndTime } from '@bishopbot/lwc-toolkit/time';
 import {
 	MultiTouchCrosshairPaneView,
 	TooltipCrosshairLineData,

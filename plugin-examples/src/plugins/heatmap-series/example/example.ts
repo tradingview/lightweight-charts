@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { createChart } from '@bishopbot/lightweight-charts';
 import { HeatMapSeries } from '../heatmap-series';
 import { HeatMapData } from '../data';
 import { generateHeatmapData } from '../sample-heatmap-data';

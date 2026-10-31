@@ -17,14 +17,14 @@ Install the package. It requires `lightweight-charts` `^5.0.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-rounded-candles-series
+npm install @bishopbot/lwc-plugin-rounded-candles-series
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { RoundedCandleSeries } from '@tradingview/lwc-plugin-rounded-candles-series';
+import { RoundedCandleSeries } from '@bishopbot/lwc-plugin-rounded-candles-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addCustomSeries(new RoundedCandleSeries(), {
@@ -51,7 +51,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-rounded-candles-series": "https://unpkg.com/@tradingview/lwc-plugin-rounded-candles-series/dist/rounded-candles-series.standalone.js"
+    "@bishopbot/lwc-plugin-rounded-candles-series": "https://unpkg.com/@bishopbot/lwc-plugin-rounded-candles-series/dist/rounded-candles-series.standalone.js"
   }
 }
 </script>
@@ -62,7 +62,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { RoundedCandleSeries } from '@tradingview/lwc-plugin-rounded-candles-series';
+import { RoundedCandleSeries } from '@bishopbot/lwc-plugin-rounded-candles-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addCustomSeries(new RoundedCandleSeries(), {
@@ -86,7 +86,7 @@ Add the series with `addCustomSeries`, then set candlestick data:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { RoundedCandleSeries } from '@tradingview/lwc-plugin-rounded-candles-series';
+import { RoundedCandleSeries } from '@bishopbot/lwc-plugin-rounded-candles-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addCustomSeries(new RoundedCandleSeries(), {

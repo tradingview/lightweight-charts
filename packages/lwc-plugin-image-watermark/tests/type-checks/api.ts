@@ -1,6 +1,6 @@
-import { createChart, LineSeries } from 'lightweight-charts';
-import { ImageWatermark, ImageWatermarkPane, type ImageWatermarkOptions, type ImageWatermarkPluginOptions } from '@tradingview/lwc-plugin-image-watermark';
-import { ImageWatermark as Standalone, ImageWatermarkPane as StandalonePane } from '@tradingview/lwc-plugin-image-watermark/standalone';
+import { createChart, LineSeries } from '@bishopbot/lightweight-charts';
+import { ImageWatermark, ImageWatermarkPane, type ImageWatermarkOptions, type ImageWatermarkPluginOptions } from '@bishopbot/lwc-plugin-image-watermark';
+import { ImageWatermark as Standalone, ImageWatermarkPane as StandalonePane } from '@bishopbot/lwc-plugin-image-watermark/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof ImageWatermark, typeof Standalone>>();

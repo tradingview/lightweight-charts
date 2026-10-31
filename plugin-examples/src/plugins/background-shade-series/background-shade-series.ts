@@ -5,7 +5,7 @@ import {
 	PaneRendererCustomData,
 	WhitespaceData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { BackgroundShadeSeriesOptions, defaultOptions } from './options';
 import { BackgroundShadeSeriesRenderer } from './renderer';
 

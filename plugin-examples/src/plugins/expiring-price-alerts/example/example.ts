@@ -4,7 +4,7 @@ import {
 	Time,
 	createChart,
 	LineSeries,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { ExpiringPriceAlerts } from '../expiring-price-alerts';
 import { sampleAlertLineData } from '../sample-data';
 

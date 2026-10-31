@@ -1,6 +1,6 @@
-import { LineSeries, createChart } from 'lightweight-charts';
-import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
-import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { LineSeries, createChart } from '@bishopbot/lightweight-charts';
+import { mountControls } from '@bishopbot/lwc-plugin-preview-kit/preview-controls';
+import '@bishopbot/lwc-plugin-preview-kit/preview.css';
 import imgUrl from './image.svg';
 import {
 	ImageWatermark,

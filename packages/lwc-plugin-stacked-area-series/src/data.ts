@@ -1,4 +1,4 @@
-import { CustomData, Time } from 'lightweight-charts';
+import { CustomData, Time } from '@bishopbot/lightweight-charts';
 import { StackedAreaPointColor } from './options';
 
 /**

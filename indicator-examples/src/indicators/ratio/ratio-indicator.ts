@@ -7,7 +7,7 @@ import {
 	SeriesType,
 	Time,
 	UTCTimestamp,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import { ClosestTimeIndexFinder } from '../../helpers/closest-index';
 import { merge } from '../../helpers/merge';

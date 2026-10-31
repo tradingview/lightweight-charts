@@ -3,7 +3,7 @@ import {
 	IPrimitivePaneRenderer,
 	IPrimitivePaneView,
 	PrimitivePaneViewZOrder,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import { fitRect } from './fit-rect.js';
 import { ResolvedOptions } from './options.js';

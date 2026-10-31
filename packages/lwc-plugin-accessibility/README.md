@@ -25,14 +25,14 @@ Install the package. It requires `lightweight-charts` `^5.0.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-accessibility
+npm install @bishopbot/lwc-plugin-accessibility
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { addAccessibilityPlugin } from '@tradingview/lwc-plugin-accessibility';
+import { addAccessibilityPlugin } from '@bishopbot/lwc-plugin-accessibility';
 
 const chart = createChart(document.getElementById('chart'));
 const series = chart.addSeries(LineSeries);
@@ -53,7 +53,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-accessibility": "https://unpkg.com/@tradingview/lwc-plugin-accessibility/dist/accessibility.standalone.js"
+    "@bishopbot/lwc-plugin-accessibility": "https://unpkg.com/@bishopbot/lwc-plugin-accessibility/dist/accessibility.standalone.js"
   }
 }
 </script>
@@ -64,7 +64,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart, LineSeries } from 'lightweight-charts';
-import { addAccessibilityPlugin } from '@tradingview/lwc-plugin-accessibility';
+import { addAccessibilityPlugin } from '@bishopbot/lwc-plugin-accessibility';
 
 const chart = createChart(document.getElementById('chart'));
 const series = chart.addSeries(LineSeries);
@@ -82,7 +82,7 @@ Enable the plugin for every current pane with one chart-level call:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { addAccessibilityPlugin } from '@tradingview/lwc-plugin-accessibility';
+import { addAccessibilityPlugin } from '@bishopbot/lwc-plugin-accessibility';
 
 const chart = createChart(document.getElementById('chart'));
 const series = chart.addSeries(LineSeries);
@@ -120,7 +120,7 @@ second constructor argument, the index of the pane you attach it to (only needed
 for a pane other than the first):
 
 ```js
-import { AccessibilityPlugin } from '@tradingview/lwc-plugin-accessibility';
+import { AccessibilityPlugin } from '@bishopbot/lwc-plugin-accessibility';
 
 chart.panes()[1].attachPrimitive(
     new AccessibilityPlugin({ chartTitle: 'Volume' }, 1)
@@ -348,7 +348,7 @@ custom series needs only the custom branch.
   whose pitch follows the value, so holding `→` plays the series:
 
 ```js
-import { addAccessibilityPlugin, createToneSonifier } from '@tradingview/lwc-plugin-accessibility';
+import { addAccessibilityPlugin, createToneSonifier } from '@bishopbot/lwc-plugin-accessibility';
 
 const sonifier = createToneSonifier();
 addAccessibilityPlugin(chart, { onSonify: sonifier });
@@ -380,7 +380,7 @@ atomic words are plain strings. Pass a partial override — anything you leave o
 stays English:
 
 ```js
-import { addAccessibilityPlugin } from '@tradingview/lwc-plugin-accessibility';
+import { addAccessibilityPlugin } from '@bishopbot/lwc-plugin-accessibility';
 
 addAccessibilityPlugin(chart, {
     chartTitle: 'Gráfico de precios',
@@ -405,7 +405,7 @@ A complete Spanish bundle ships with the package as `esMessages`, both as a
 ready-made translation and as a template for your own:
 
 ```js
-import { addAccessibilityPlugin, esMessages } from '@tradingview/lwc-plugin-accessibility';
+import { addAccessibilityPlugin, esMessages } from '@bishopbot/lwc-plugin-accessibility';
 
 addAccessibilityPlugin(chart, { messages: esMessages, lang: 'es' });
 ```

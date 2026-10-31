@@ -8,7 +8,7 @@ import {
 	UTCTimestamp,
 	WhitespaceData,
 	LineSeries
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import {
 	ExpiringPriceAlert,
 	IExpiringPriceAlerts,

@@ -1,4 +1,4 @@
-import { HIGH_CONTRAST_QUERIES, mediaQueryMatches, subscribeMediaQuery } from '@tradingview/lwc-toolkit/dom/media-query';
+import { HIGH_CONTRAST_QUERIES, mediaQueryMatches, subscribeMediaQuery } from '@bishopbot/lwc-toolkit/dom/media-query';
 
 /** Whether the OS asks for higher contrast (used by the `'auto'` high-contrast mode). */
 export function prefersHighContrast(): boolean {

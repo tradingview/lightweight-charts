@@ -1,4 +1,4 @@
-import { Time, WhitespaceData, createChart } from 'lightweight-charts';
+import { Time, WhitespaceData, createChart } from '@bishopbot/lightweight-charts';
 import { generateLineData } from './sample-data';
 import { createPrettyHistogramSeries } from '../pretty-histogram-series';
 import { PrettyHistogramData } from '../data';

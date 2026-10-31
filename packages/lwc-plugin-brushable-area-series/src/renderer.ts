@@ -1,17 +1,17 @@
-import { LineStyle, LineType } from 'lightweight-charts';
+import { LineStyle, LineType } from '@bishopbot/lightweight-charts';
 import {
 	BitmapCoordinatesRenderingScope,
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
-} from '@tradingview/lwc-toolkit/custom-series/renderer-base';
+} from '@bishopbot/lwc-toolkit/custom-series/renderer-base';
 import {
 	GapCheck, barCoordinate, extendRange, getConflationFactor,
 	visibleSegments,
-} from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+} from '@bishopbot/lwc-toolkit/custom-series/visible-bars';
 import {
 	setLineStyle,
 	type LineStyle as ToolkitLineStyle,
-} from '@tradingview/lwc-toolkit/line-style';
+} from '@bishopbot/lwc-toolkit/line-style';
 import { BrushableAreaData } from './data';
 import { BrushableAreaSeriesOptions, BrushableAreaStyle } from './options';
 import { createStyleResolver } from './style';

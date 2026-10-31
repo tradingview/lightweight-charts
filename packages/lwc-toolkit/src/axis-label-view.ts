@@ -1,4 +1,4 @@
-import { Coordinate, ISeriesPrimitiveAxisView } from 'lightweight-charts';
+import { Coordinate, ISeriesPrimitiveAxisView } from '@bishopbot/lightweight-charts';
 
 /**
  * Everything {@link AxisLabelView} needs to draw one label on a price or a time

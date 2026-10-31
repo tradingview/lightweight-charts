@@ -1,4 +1,4 @@
-import { Time, isUTCTimestamp, isUTCTimestampNanoseconds, isBusinessDay } from 'lightweight-charts';
+import { Time, isUTCTimestamp, isUTCTimestampNanoseconds, isBusinessDay } from '@bishopbot/lightweight-charts';
 
 const NANOS_PER_MILLI = 1_000_000;
 

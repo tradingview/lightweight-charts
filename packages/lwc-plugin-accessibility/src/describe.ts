@@ -1,5 +1,5 @@
-import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
-import { Time } from 'lightweight-charts';
+import { convertTimeUTC } from '@bishopbot/lwc-toolkit/time';
+import { Time } from '@bishopbot/lightweight-charts';
 
 import { AccessibilityMessages } from './messages';
 import { AccessibilityTimeFormat, PointRange, RangeAccessor, ValueAccessor } from './options';

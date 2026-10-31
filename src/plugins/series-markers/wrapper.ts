@@ -57,7 +57,7 @@ class SeriesMarkersPrimitiveWrapper<HorzScaleItem>
  *
  * @example
  * ```js
- * import { createSeriesMarkers } from 'lightweight-charts';
+ * import { createSeriesMarkers } from '@bishopbot/lightweight-charts';
  *
  *	const seriesMarkers = createSeriesMarkers(
  *		series,

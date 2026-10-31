@@ -1,4 +1,4 @@
-import { LineStyle, PrimitivePaneViewZOrder, Time } from 'lightweight-charts';
+import { LineStyle, PrimitivePaneViewZOrder, Time } from '@bishopbot/lightweight-charts';
 
 /**
  * An optional text badge drawn on the line itself, for a short caption that

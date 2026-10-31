@@ -8,10 +8,10 @@ import {
 	PriceScaleMode,
 	SeriesPartialOptions,
 	WhitespaceData,
-} from 'lightweight-charts';
-import { isChartRemoved, isSeriesAttached } from '@tradingview/lwc-toolkit/chart/lifecycle';
-import { cloneOptions } from '@tradingview/lwc-toolkit/options/merge';
-import { CoalescedTask, createCoalescedTask } from '@tradingview/lwc-toolkit/scheduling/coalesced-task';
+} from '@bishopbot/lightweight-charts';
+import { isChartRemoved, isSeriesAttached } from '@bishopbot/lwc-toolkit/chart/lifecycle';
+import { cloneOptions } from '@bishopbot/lwc-toolkit/options/merge';
+import { CoalescedTask, createCoalescedTask } from '@bishopbot/lwc-toolkit/scheduling/coalesced-task';
 
 import { scatterAutoscaleInfo } from './autoscale';
 import type { ScatterGroupInfo, ScatterPoint, ScatterPointInfo, ScatterSizeMapping, ScatterSlotData } from './data';

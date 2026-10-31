@@ -1,4 +1,4 @@
-import { drawRoundRectWithBorder } from '@tradingview/lwc-toolkit/canvas/round-rect';
+import { drawRoundRectWithBorder } from '@bishopbot/lwc-toolkit/canvas/round-rect';
 import { VerticalLineBadgeOptions } from './options';
 
 /**

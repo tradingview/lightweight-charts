@@ -1,4 +1,4 @@
-import { IPriceLine, SeriesMarker, Time } from 'lightweight-charts';
+import { IPriceLine, SeriesMarker, Time } from '@bishopbot/lightweight-charts';
 
 import { AccessibilityMessages } from './messages';
 import { timeKey } from './series-data';

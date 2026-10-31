@@ -3,7 +3,7 @@ import {
 	ChartOptions,
 	createChart,
 	DeepPartial,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import {
 	convertToLineData,
 	generateAlternativeCandleData,

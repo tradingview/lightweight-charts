@@ -2,7 +2,7 @@ import {
 	Coordinate,
 	IPrimitivePaneView,
 	PrimitivePaneViewZOrder,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_AxisPaneRenderer } from './axis-pane-renderer';
 import { _CLASSNAME_DataSource } from './data-source';
 

@@ -1,4 +1,4 @@
-import { UTCTimestamp } from 'lightweight-charts';
+import { UTCTimestamp } from '@bishopbot/lightweight-charts';
 
 type WithTime<V> = V & { time: unknown };
 

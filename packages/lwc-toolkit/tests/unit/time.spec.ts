@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import type { BusinessDay, UTCTimestamp } from 'lightweight-charts';
+import type { BusinessDay, UTCTimestamp } from '@bishopbot/lightweight-charts';
 import { describe, it } from 'node:test';
 
 import {

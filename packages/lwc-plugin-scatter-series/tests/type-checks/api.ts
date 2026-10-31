@@ -1,5 +1,5 @@
 // Resolve the built exports map, as an npm consumer does; no src aliases.
-import { createChart, createChartEx, LineStyle, type Coordinate, type IChartApiBase, type MouseEventParams } from 'lightweight-charts';
+import { createChart, createChartEx, LineStyle, type Coordinate, type IChartApiBase, type MouseEventParams } from '@bishopbot/lightweight-charts';
 import {
 	createScatterChart,
 	createScatterSeries,
@@ -19,13 +19,13 @@ import {
 	type ScatterSizeMapping,
 	type ScatterUnderlyingSeries,
 	type ScatterXDomain,
-} from '@tradingview/lwc-plugin-scatter-series';
-import * as scatterPlugin from '@tradingview/lwc-plugin-scatter-series';
+} from '@bishopbot/lwc-plugin-scatter-series';
+import * as scatterPlugin from '@bishopbot/lwc-plugin-scatter-series';
 import {
 	createScatterChart as createChartStandalone,
 	createScatterSeries as createSeriesStandalone,
 	ScatterHorzScaleBehavior as StandaloneBehavior,
-} from '@tradingview/lwc-plugin-scatter-series/standalone';
+} from '@bishopbot/lwc-plugin-scatter-series/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof createScatterChart, typeof createChartStandalone>>();

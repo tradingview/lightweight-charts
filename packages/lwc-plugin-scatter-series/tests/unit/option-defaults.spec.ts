@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import { mergeOptions } from '@tradingview/lwc-toolkit/options/merge';
+import { mergeOptions } from '@bishopbot/lwc-toolkit/options/merge';
 
 import { scatterChartDefaults } from '../../src/chart.js';
 import { DEFAULT_SCATTER_PALETTE, defaultOptions, scatterOptionDefaults, underlyingSeriesDefaults } from '../../src/options.js';

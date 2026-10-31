@@ -1,4 +1,4 @@
-import { CustomData } from 'lightweight-charts';
+import { CustomData } from '@bishopbot/lightweight-charts';
 
 /**
  * _CLASSNAME_ Data

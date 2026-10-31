@@ -1,4 +1,4 @@
-import { IRange } from 'lightweight-charts';
+import { IRange } from '@bishopbot/lightweight-charts';
 
 /**
  * The values of a point, padded to `length` and with anything that cannot be

@@ -1,4 +1,4 @@
-import type { LineStyle as ChartLineStyle } from 'lightweight-charts';
+import type { LineStyle as ChartLineStyle } from '@bishopbot/lightweight-charts';
 
 /**
  * The line styles the chart itself draws, by their numeric values. The values

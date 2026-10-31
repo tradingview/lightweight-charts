@@ -8,7 +8,7 @@ function markWithGreaterWeight(a, b) {
 }
 
 // remove-line
-/** @type {import('lightweight-charts').IHorzScaleBehavior} */
+/** @type {import('@bishopbot/lightweight-charts').IHorzScaleBehavior} */
 class HorzScaleBehaviorPrice {
 	constructor() {
 		this._options = {};
@@ -109,7 +109,7 @@ const chartOptions = {
 };
 
 // remove-line
-/** @type {import('lightweight-charts').IChartApi} */
+/** @type {import('@bishopbot/lightweight-charts').IChartApi} */
 const chart = createChartEx(
 	document.getElementById('container'),
 	horzItemBehavior,

@@ -4,16 +4,16 @@ import {
 	LineWidth,
 	PriceToCoordinateConverter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import {
 	BitmapCoordinatesRenderingScope,
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
-} from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { Position, areaBetween } from '@tradingview/lwc-toolkit/custom-series/line-paths';
-import { GapCheck, barCoordinate, extendRange, getConflationFactor, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
-import { LineStyle, setLineStyle } from '@tradingview/lwc-toolkit/line-style';
-import { stackLevels } from '@tradingview/lwc-toolkit/custom-series/stacking';
+} from '@bishopbot/lwc-toolkit/custom-series/renderer-base';
+import { Position, areaBetween } from '@bishopbot/lwc-toolkit/custom-series/line-paths';
+import { GapCheck, barCoordinate, extendRange, getConflationFactor, visibleSegments } from '@bishopbot/lwc-toolkit/custom-series/visible-bars';
+import { LineStyle, setLineStyle } from '@bishopbot/lwc-toolkit/line-style';
+import { stackLevels } from '@bishopbot/lwc-toolkit/custom-series/stacking';
 
 import { StackedAreaColor, StackedAreaSeriesOptions, defaultOptions } from './options';
 import { StackedAreaHitTestResult, isHitTestData } from './compat';

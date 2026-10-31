@@ -1,6 +1,6 @@
-import type { MouseEventParams } from 'lightweight-charts';
-import { Delegate } from '@tradingview/lwc-toolkit/delegate';
-import type { CoalescedTask, createCoalescedTask } from '@tradingview/lwc-toolkit/scheduling/coalesced-task';
+import type { MouseEventParams } from '@bishopbot/lightweight-charts';
+import { Delegate } from '@bishopbot/lwc-toolkit/delegate';
+import type { CoalescedTask, createCoalescedTask } from '@bishopbot/lwc-toolkit/scheduling/coalesced-task';
 
 import type { ScatterPoint, ScatterPointInfo } from './data';
 import type { ScatterModel } from './model';

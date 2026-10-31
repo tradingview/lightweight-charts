@@ -113,7 +113,7 @@ class SeriesUpDownMarkerPrimitiveWrapper<HorzScaleItem>
  *
  * @example
  * ```js
- * import { createUpDownMarkers, createChart, LineSeries } from 'lightweight-charts';
+ * import { createUpDownMarkers, createChart, LineSeries } from '@bishopbot/lightweight-charts';
  *
  * const chart = createChart('container');
  * const lineSeries = chart.addSeries(LineSeries);

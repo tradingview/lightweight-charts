@@ -1,4 +1,4 @@
-import { BarPrice, IChartApiBase, Time } from 'lightweight-charts';
+import { BarPrice, IChartApiBase, Time } from '@bishopbot/lightweight-charts';
 
 import { defaultTimeFormatter } from './describe';
 import { AccessibilityMessages } from './messages';

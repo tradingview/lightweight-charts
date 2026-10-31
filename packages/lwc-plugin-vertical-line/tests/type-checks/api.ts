@@ -1,6 +1,6 @@
-import { createChart, LineSeries, type Time } from 'lightweight-charts';
-import { VerticalLine, VertLine } from '@tradingview/lwc-plugin-vertical-line';
-import { VerticalLine as Standalone } from '@tradingview/lwc-plugin-vertical-line/standalone';
+import { createChart, LineSeries, type Time } from '@bishopbot/lightweight-charts';
+import { VerticalLine, VertLine } from '@bishopbot/lwc-plugin-vertical-line';
+import { VerticalLine as Standalone } from '@bishopbot/lwc-plugin-vertical-line/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof VerticalLine, typeof Standalone>>();

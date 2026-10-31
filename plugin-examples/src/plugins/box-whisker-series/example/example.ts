@@ -1,4 +1,4 @@
-import { WhitespaceData, createChart } from 'lightweight-charts';
+import { WhitespaceData, createChart } from '@bishopbot/lightweight-charts';
 import { WhiskerBoxSeries } from '../box-whisker-series';
 import { WhiskerData, sampleWhiskerData } from '../sample-data';
 

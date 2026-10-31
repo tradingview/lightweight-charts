@@ -4,9 +4,9 @@ import {
 	LineSeries,
 	Time,
 	createChart,
-} from 'lightweight-charts';
-import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
-import '@tradingview/lwc-plugin-preview-kit/preview.css';
+} from '@bishopbot/lightweight-charts';
+import { mountControls } from '@bishopbot/lwc-plugin-preview-kit/preview-controls';
+import '@bishopbot/lwc-plugin-preview-kit/preview.css';
 import { addAccessibilityPlugin, createToneSonifier, esMessages } from '../accessibility';
 import { generateLineData } from './sample-data';
 

@@ -80,7 +80,7 @@ main() {
 
 # Builds the toolkit and every plugin package of the checked-out revision.
 build_plugins() {
-	pnpm --filter @tradingview/lwc-toolkit --filter "@tradingview/lwc-plugin-*" build
+	pnpm --filter @bishopbot/lwc-toolkit --filter "@bishopbot/lwc-plugin-*" build
 }
 
 # Golden plugin builds: the merge-base revision's packages, kept next to the

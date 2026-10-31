@@ -24,6 +24,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { loadTargetPlugins } from './utils.mjs';
+import { PREVIEW_KIT_PACKAGE, TOOLKIT_PACKAGE } from './scope.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const staticDir = path.join(repoRoot, 'website', 'static');
@@ -49,7 +50,7 @@ async function loadVite(packageDir) {
 }
 
 /**
- * The pages import `lightweight-charts` and the toolkit through their package
+ * The pages import the library and the toolkit through their package
  * exports, which point at built output. The library is a long build and belongs
  * to the caller; the two workspace helper packages are `tsc` only, so they are
  * rebuilt here — which is what makes this work on a fresh checkout, and keeps a
@@ -59,12 +60,12 @@ function buildDependencies() {
 	if (!fs.existsSync(path.join(repoRoot, 'dist', 'lightweight-charts.production.mjs'))) {
 		throw new Error('The library is not built. Run `pnpm build` (or `pnpm build:prod`) first.');
 	}
-	console.log('📦 Building @tradingview/lwc-toolkit and @tradingview/lwc-plugin-preview-kit...');
+	console.log(`📦 Building ${TOOLKIT_PACKAGE} and ${PREVIEW_KIT_PACKAGE}...`);
 	execFileSync(
 		'pnpm',
 		[
-			'--filter', '@tradingview/lwc-toolkit',
-			'--filter', '@tradingview/lwc-plugin-preview-kit',
+			'--filter', TOOLKIT_PACKAGE,
+			'--filter', PREVIEW_KIT_PACKAGE,
 			'build',
 		],
 		{ cwd: repoRoot, stdio: 'inherit' }

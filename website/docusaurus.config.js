@@ -12,7 +12,7 @@ import versions from './versions.json';
 import { docsMarkdownPlugin } from './plugins/docs-markdown/index.js';
 
 /* Configuration Constants */
-const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'tradingview';
+const organizationName = process.env.GITHUB_ORGANIZATION_NAME || 'bishop-bot';
 const projectName = 'lightweight-charts';
 const projectUrl = `https://github.com/${organizationName}/${projectName}`;
 const githubPagesUrl = `https://${organizationName}.github.io`;

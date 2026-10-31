@@ -7,10 +7,10 @@ import {
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { GroupedBarsData } from './data';
 import { GroupedBarsSeriesOptions } from './options';
-import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
+import { positionsBox, positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 /**
  * Proof of Concept WIP.

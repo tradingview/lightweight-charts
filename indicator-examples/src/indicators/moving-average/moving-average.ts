@@ -9,7 +9,7 @@ import {
 	LineSeries,
 	SeriesDataItemTypeMap,
 	UTCTimestamp,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import {
 	calculateMovingAverageIndicatorValues,
 	MovingAverageCalculationOptions,

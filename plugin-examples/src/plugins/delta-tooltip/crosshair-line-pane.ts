@@ -3,8 +3,8 @@ import {
 	IPrimitivePaneRenderer,
 	IPrimitivePaneView,
 	PrimitivePaneViewZOrder,
-} from 'lightweight-charts';
-import { positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
+} from '@bishopbot/lightweight-charts';
+import { positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 class TooltipCrosshairLinePaneRenderer implements IPrimitivePaneRenderer {
 	_data: TooltipCrosshairLineData[];

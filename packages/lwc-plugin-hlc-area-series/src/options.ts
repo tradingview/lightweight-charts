@@ -3,7 +3,7 @@ import {
 	LineStyle,
 	LineWidth,
 	customSeriesDefaultOptions,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 /**
  * How the three lines and the two fills get from one point to the next.

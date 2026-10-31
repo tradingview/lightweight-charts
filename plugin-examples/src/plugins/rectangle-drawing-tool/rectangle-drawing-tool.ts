@@ -11,7 +11,7 @@ import {
 	PrimitivePaneViewZOrder,
 	SeriesType,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { ensureDefined } from '@tradingview/lwc-toolkit/assertions';
 import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
 import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
