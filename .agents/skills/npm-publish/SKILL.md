@@ -58,6 +58,24 @@ registry, and it fails until `@bishopbot/lightweight-charts` is there.
 > ```
 >
 > If `npm whoami` does not return an account that is a member of the `@bishopbot` org, stop. Publishing requires that scope.
+>
+> **The org's package list.** npm grants access per package, so every name this
+> repo publishes has to be in the org's package list
+> (<https://www.npmjs.com/org/bishopbot/access>, "Packages" tab) with write
+> access for the publishing team — or the team needs write on the whole scope.
+> A name that is missing is refused with a permission error even though the
+> scope itself is fine. Check the list before a release:
+>
+> ```sh
+> curl -s https://registry.npmjs.org/-/org/bishopbot/package | python3 -m json.tool
+> ```
+>
+> **Two-factor authentication.** The account has 2FA in `auth-and-writes` mode,
+> so every publish needs a one-time password. `npm publish` handles it: it
+> prints a URL to open, and the publish continues once the request is approved
+> in the browser (`--otp <code>` works too). `pnpm publish` cannot do that
+> dance and fails with `EOTP` — use `npm publish` for the library and for the
+> wizard.
 
 ---
 
@@ -230,8 +248,14 @@ The name, the version (`6.0.0`) and the top-level `CHANGELOG.md` are already in 
    git checkout master && git pull --ff-only
    git status                   # must be clean
    npm pack --dry-run           # dist/, LICENSE, NOTICE, CHANGELOG.md, package.json
-   pnpm publish --access public
+   npm publish --access public  # `npm`, not `pnpm`: it is the one that can do the 2FA prompt
+   git checkout -- package.json # put `private` back
    ```
+
+   npm asks for a one-time password: open the URL it prints and approve the
+   request in the browser. The package then appears on the registry within a
+   minute or two — a `404` right after the publish is the propagation delay,
+   not a failure.
 
 4. Tag the library and push:
 
@@ -243,6 +267,18 @@ The name, the version (`6.0.0`) and the top-level `CHANGELOG.md` are already in 
 5. The website `deploy.yml` workflow runs on the `v*` tag push and rebuilds the documentation site. Wait for it to finish before announcing the release.
 
 6. Only then publish the plugins and the toolkit: their floor check resolves the library peer from the registry, and it needs `@bishopbot/lightweight-charts@6.0.0` to be there.
+
+### The scaffolding wizard
+
+`packages/create-lwc-plugin` is published as `@bishopbot/create-lwc-plugin`. It has no
+`private` flag, so it goes out like any other package, with `npm publish` (the 2FA
+prompt) from its own folder:
+
+   ```sh
+   cd packages/create-lwc-plugin
+   pnpm build                     # unbuild; `prepublishOnly` runs it again on publish
+   npm publish --access public
+   ```
 
 ---
 
@@ -273,7 +309,7 @@ All tags are pushed with `git push origin --tags`. Do not push individual tags w
 | `pnpm build` | `tsc` + `rollup` + `bundle-dts` for the root library | Before any release, step 3.1 |
 | `pnpm build:prod` | Same as `pnpm build` but with `NODE_ENV=production` (minified) | Library release, step 6.3 |
 | `pnpm prepare-package-json-for-release` | Strip dev-only fields from root `package.json` | Library release, step 6.3 |
-| `pnpm publish` | Publish the current package (`prepare-release` is a wrapper around this for the root) | Library release, step 6.4 |
+| `npm publish` | Publish the current package (`prepare-release` is a wrapper around `npm publish` for the root) | Library and wizard release, step 6.4 |
 | `pnpm --filter @bishopbot/lwc-toolkit publish` | Publish the toolkit | Toolkit release, step 5.5 |
 
 `--filter` accepts the package name, the folder name, or a short name. `--path <dir>` accepts any directory and is for one-off packages that are not in the workspace.
