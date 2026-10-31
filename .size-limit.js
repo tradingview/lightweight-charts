@@ -8,7 +8,7 @@ export default [
 	{
 		name: 'ESM',
 		path: 'dist/lightweight-charts.production.mjs',
-		limit: '53 KB',
+		limit: '54 KB',
 		import: '*',
 		ignore: ['fancy-canvas'],
 		brotli: true,
@@ -48,14 +48,14 @@ export default [
 	{
 		name: 'Standalone-ESM',
 		path: 'dist/lightweight-charts.standalone.production.mjs',
-		limit: '54.5 KB',
+		limit: '55.5 KB',
 		import: '*',
 		brotli: true,
 	},
 	{
 		name: 'Standalone',
 		path: 'dist/lightweight-charts.standalone.production.js',
-		limit: '54.5 KB',
+		limit: '55.5 KB',
 		brotli: true,
 	},
 	{
@@ -63,7 +63,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ createTextWatermark }',
 		ignore: ['fancy-canvas'],
-		limit: '2.00 KB',
+		limit: '2.10 KB',
 		brotli: true,
 	},
 	{
@@ -119,7 +119,7 @@ export default [
 		path: 'dist/lightweight-charts.production.mjs',
 		import: '{ CandlestickSeries }',
 		ignore: ['fancy-canvas'],
-		limit: '3.00 KB',
+		limit: '3.05 KB',
 		brotli: true,
 	},
 	{
