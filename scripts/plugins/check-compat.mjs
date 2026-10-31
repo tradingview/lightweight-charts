@@ -8,6 +8,7 @@ import { execSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import semver from 'semver';
 import { loadTargetPlugins, buildWorkspaceDependencies } from './utils.mjs';
+import { LIBRARY_PACKAGE, TOOLKIT_PACKAGE } from './scope.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,8 +64,8 @@ function checkForwardCompat(plugins) {
 }
 
 /**
- * Packs @tradingview/lwc-toolkit into a tarball. Installed from a tarball rather
- * than linked, the toolkit's own `lightweight-charts` import resolves to the
+ * Packs the toolkit into a tarball. Installed from a tarball rather
+ * than linked, the toolkit's own library import resolves to the
  * floor version installed in the temp project instead of the workspace copy.
  *
  * The toolkit compiles against the workspace library, whose typings live in
@@ -78,7 +79,7 @@ function packToolkitTarball(destDir) {
 	});
 	const tgz = fs.readdirSync(destDir).find(f => f.endsWith('.tgz'));
 	if (!tgz) {
-		throw new Error('pnpm pack produced no tarball for @tradingview/lwc-toolkit');
+		throw new Error(`pnpm pack produced no tarball for ${TOOLKIT_PACKAGE}`);
 	}
 	return path.join(destDir, tgz);
 }
@@ -103,9 +104,9 @@ function setupFloorProject(tempDir, plugin, floorVersion, toolkitTarballPath) {
 		JSON.stringify({ extends: './tsconfig.package.json', exclude: ['src/example'] }, null, '\t')
 	);
 
-	const dependencies = { 'lightweight-charts': floorVersion };
+	const dependencies = { [LIBRARY_PACKAGE]: floorVersion };
 	for (const [dep, ver] of Object.entries(plugin.packageJson.dependencies || {})) {
-		if (dep === '@tradingview/lwc-toolkit') {
+		if (dep === TOOLKIT_PACKAGE) {
 			continue;
 		}
 		// npm cannot resolve workspace: specifiers outside the workspace.
@@ -118,11 +119,11 @@ function setupFloorProject(tempDir, plugin, floorVersion, toolkitTarballPath) {
 
 	const devDependencies = { typescript: tsVersion };
 	const usesToolkit = Boolean(
-		plugin.packageJson.devDependencies?.['@tradingview/lwc-toolkit'] ||
-		plugin.packageJson.dependencies?.['@tradingview/lwc-toolkit']
+		plugin.packageJson.devDependencies?.[TOOLKIT_PACKAGE] ||
+		plugin.packageJson.dependencies?.[TOOLKIT_PACKAGE]
 	);
 	if (usesToolkit) {
-		devDependencies['@tradingview/lwc-toolkit'] = `file:${toolkitTarballPath}`;
+		devDependencies[TOOLKIT_PACKAGE] = `file:${toolkitTarballPath}`;
 	}
 
 	fs.writeFileSync(
@@ -142,9 +143,9 @@ function setupFloorProject(tempDir, plugin, floorVersion, toolkitTarballPath) {
  */
 function verifySinglePluginFloor(plugin, toolkitTarballPath) {
 	console.log(`Testing declared floor for ${plugin.name}...`);
-	const peerRange = plugin.packageJson.peerDependencies?.['lightweight-charts'];
+	const peerRange = plugin.packageJson.peerDependencies?.[LIBRARY_PACKAGE];
 	if (!peerRange) {
-		throw new Error("No 'peerDependencies.lightweight-charts' declared");
+		throw new Error(`No 'peerDependencies.${LIBRARY_PACKAGE}' declared`);
 	}
 
 	const minVersionObj = semver.minVersion(peerRange);
@@ -159,7 +160,7 @@ function verifySinglePluginFloor(plugin, toolkitTarballPath) {
 	try {
 		setupFloorProject(tempDir, plugin, floorVersion, toolkitTarballPath);
 
-		console.log(`  Installing lightweight-charts@${floorVersion} in isolated environment...`);
+		console.log(`  Installing ${LIBRARY_PACKAGE}@${floorVersion} in isolated environment...`);
 		execSync('npm install --no-package-lock --no-audit', {
 			cwd: tempDir,
 			stdio: 'inherit',

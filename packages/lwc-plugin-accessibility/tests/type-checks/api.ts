@@ -1,6 +1,6 @@
-import { createChart, type IChartApiBase } from 'lightweight-charts';
-import { addAccessibilityPlugin, AccessibilityPlugin, type AnySeries, type SeriesDataPoint } from '@tradingview/lwc-plugin-accessibility';
-import { addAccessibilityPlugin as Standalone } from '@tradingview/lwc-plugin-accessibility/standalone';
+import { createChart, type IChartApiBase } from '@bishopbot/lightweight-charts';
+import { addAccessibilityPlugin, AccessibilityPlugin, type AnySeries, type SeriesDataPoint } from '@bishopbot/lwc-plugin-accessibility';
+import { addAccessibilityPlugin as Standalone } from '@bishopbot/lwc-plugin-accessibility/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof addAccessibilityPlugin, typeof Standalone>>();

@@ -1,5 +1,5 @@
-import { paneContentElement } from '@tradingview/lwc-toolkit/dom/pane-element';
-import { PanePluginBase } from '@tradingview/lwc-toolkit/pane-plugin-base';
+import { paneContentElement } from '@bishopbot/lwc-toolkit/dom/pane-element';
+import { PanePluginBase } from '@bishopbot/lwc-toolkit/pane-plugin-base';
 import {
 	IChartApiBase,
 	IPaneApi,
@@ -7,7 +7,7 @@ import {
 	IRange,
 	PaneAttachedParameter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import { DescribeEnv, extractRange, extractValue } from './describe';
 import { PaneLayer, PaneLayerView } from './dom/pane-dom';

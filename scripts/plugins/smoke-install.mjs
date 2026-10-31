@@ -8,13 +8,14 @@ import { execFileSync, execSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import semver from 'semver';
 import { loadTargetPlugins, buildWorkspaceDependencies, extractReadmeSnippet } from './utils.mjs';
+import { LIBRARY_PACKAGE, SCOPE } from './scope.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../..');
 
 /**
- * Resolves the lightweight-charts dependency version or tarball path.
+ * Resolves the library dependency version or tarball path.
  */
 function resolveLwcDependency(peerRange, lwcTarballOption) {
 	if (lwcTarballOption) {
@@ -24,7 +25,7 @@ function resolveLwcDependency(peerRange, lwcTarballOption) {
 
 	const range = peerRange || 'latest';
 	try {
-		const stdout = execFileSync('npm', ['view', `lightweight-charts@${range}`, 'version', '--json'], {
+		const stdout = execFileSync('npm', ['view', `${LIBRARY_PACKAGE}@${range}`, 'version', '--json'], {
 			encoding: 'utf-8',
 			stdio: ['pipe', 'pipe', 'pipe'],
 		}).trim();
@@ -34,7 +35,7 @@ function resolveLwcDependency(peerRange, lwcTarballOption) {
 		}
 		return typeof parsed === 'string' ? parsed : range;
 	} catch (e) {
-		console.warn(`⚠️ Warning: Failed to query registry for lightweight-charts@${range}: ${e.message}`);
+		console.warn(`⚠️ Warning: Failed to query registry for ${LIBRARY_PACKAGE}@${range}: ${e.message}`);
 		return range;
 	}
 }
@@ -112,7 +113,7 @@ function setupViteConsumerProject(projectDir, { pluginName, pluginTarballPath, l
 		private: true,
 		type: 'module',
 		dependencies: {
-			'lightweight-charts': lwcDep,
+			[LIBRARY_PACKAGE]: lwcDep,
 			[pluginName]: `file:${pluginTarballPath}`,
 		},
 		devDependencies: {
@@ -139,7 +140,7 @@ export default defineConfig({
     minify: false,
     rollupOptions: {
       input: '${entryFileName}',
-      external: ['lightweight-charts'],
+      external: ['${LIBRARY_PACKAGE}'],
       output: {
         entryFileNames: 'bundle.js',
         format: 'es',
@@ -155,7 +156,7 @@ export default defineConfig({
  * Asserts bundle isolation.
  */
 function assertBundleIsolation(bundleContent, pluginName) {
-	// 1. Must NOT inline lightweight-charts library (the string 'tv-lightweight-charts' survives minification)
+	// 1. Must NOT inline the chart library (the string 'tv-lightweight-charts' survives minification)
 	if (bundleContent.includes('tv-lightweight-charts')) {
 		throw new Error(
 			"Bundle isolation failure: 'tv-lightweight-charts' marker found in bundle — lightweight-charts was inlined"
@@ -163,17 +164,17 @@ function assertBundleIsolation(bundleContent, pluginName) {
 	}
 
 	const hasExternalLwcImport =
-		bundleContent.includes('from"lightweight-charts"') ||
-		bundleContent.includes("from'lightweight-charts'") ||
-		bundleContent.includes('from "lightweight-charts"') ||
-		bundleContent.includes("from 'lightweight-charts'");
+		bundleContent.includes(`from"${LIBRARY_PACKAGE}"`) ||
+		bundleContent.includes(`from'${LIBRARY_PACKAGE}'`) ||
+		bundleContent.includes(`from "${LIBRARY_PACKAGE}"`) ||
+		bundleContent.includes(`from '${LIBRARY_PACKAGE}'`);
 
 	if (!hasExternalLwcImport) {
-		throw new Error('Bundle isolation failure: lightweight-charts is not referenced as an external dependency');
+		throw new Error(`Bundle isolation failure: ${LIBRARY_PACKAGE} is not referenced as an external dependency`);
 	}
 
 	// 2. Must not contain code/names from other plugins
-	const ownUnscopedName = pluginName.replace(/^@tradingview\//, '');
+	const ownUnscopedName = pluginName.replace(new RegExp(`^${SCOPE}/`), '');
 	const pluginMatches = bundleContent.match(/lwc-plugin-[\w-]+/g) || [];
 	for (const match of pluginMatches) {
 		if (match !== ownUnscopedName && !match.startsWith(`${ownUnscopedName}-`)) {
@@ -204,9 +205,9 @@ function testSinglePluginSmoke(plugin, lwcTarballOption) {
 		const pluginTarballPath = packAndCheckPlugin(plugin, pluginTmpDir);
 		console.log(`  ✅ Packed plugin: ${pluginTarballPath}`);
 
-		const peerRange = plugin.packageJson.peerDependencies?.['lightweight-charts'];
+		const peerRange = plugin.packageJson.peerDependencies?.[LIBRARY_PACKAGE];
 		const lwcDep = resolveLwcDependency(peerRange, lwcTarballOption);
-		console.log(`  - Target lightweight-charts dependency: ${lwcDep}`);
+		console.log(`  - Target library dependency: ${lwcDep}`);
 
 		const { code: snippet, lang } = extractReadmeSnippet(path.join(plugin.dir, 'README.md'));
 		if (!snippet) {
@@ -273,7 +274,7 @@ Smoke tests plugin packaging, Vite integration, and bundle isolation.
 Options:
   -f, --filter <name>     Target only packages matching the name
   -p, --path <path>       Target a specific package directory directly
-  --lwc-tarball <path>    Install this lightweight-charts .tgz instead of the registry version.
+  --lwc-tarball <path>    Install this library .tgz instead of the registry version.
                           Pack it with "pnpm prepare-package-json-for-release && pnpm pack", so
                           the consumer install does not run the repository's own scripts.
   -h, --help              Show this help message

@@ -1,4 +1,4 @@
-import { WhitespaceData, createChart } from 'lightweight-charts';
+import { WhitespaceData, createChart } from '@bishopbot/lightweight-charts';
 import { CandleData, generateAlternativeCandleData } from './sample-data';
 import { RoundedCandleSeries } from '../rounded-candles-series';
 import { RoundedCandleRadius } from '../radius';

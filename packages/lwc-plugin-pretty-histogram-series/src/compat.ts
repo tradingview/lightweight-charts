@@ -1,4 +1,4 @@
-import { CustomData, PaneRendererCustomData } from 'lightweight-charts';
+import { CustomData, PaneRendererCustomData } from '@bishopbot/lightweight-charts';
 
 /**
  * The shape the library expects back from `ICustomSeriesPaneRenderer.hitTest`.

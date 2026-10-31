@@ -1,4 +1,4 @@
-import { BaselineSeries, WhitespaceData, createChart } from 'lightweight-charts';
+import { BaselineSeries, WhitespaceData, createChart } from '@bishopbot/lightweight-charts';
 import {
 	DualRangeHistogramData,
 	DualRangeHistogramNormalize,

@@ -3,7 +3,7 @@ import {
 	LineStyle,
 	AreaSeries,
 	createChart,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { UserAlertInfo } from '../state';
 import { UserPriceAlerts } from '../user-price-alerts';

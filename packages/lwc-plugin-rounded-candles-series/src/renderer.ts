@@ -1,19 +1,19 @@
-import { PriceToCoordinateConverter, Time } from 'lightweight-charts';
-import { candlestickWidth } from '@tradingview/lwc-toolkit/dimensions/candles';
+import { PriceToCoordinateConverter, Time } from '@bishopbot/lightweight-charts';
+import { candlestickWidth } from '@bishopbot/lwc-toolkit/dimensions/candles';
 import {
 	CornerRadii,
 	clampCornerRadius,
 	drawRoundRect,
 	drawRoundRectWithBorder,
-} from '@tradingview/lwc-toolkit/canvas/round-rect';
+} from '@bishopbot/lwc-toolkit/canvas/round-rect';
 import {
 	BitmapCoordinatesRenderingScope,
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
-} from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { gridAndCrosshairBitmapWidth } from '@tradingview/lwc-toolkit/dimensions/crosshair-width';
-import { mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
-import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
+} from '@bishopbot/lwc-toolkit/custom-series/renderer-base';
+import { gridAndCrosshairBitmapWidth } from '@bishopbot/lwc-toolkit/dimensions/crosshair-width';
+import { mapVisibleBars } from '@bishopbot/lwc-toolkit/custom-series/visible-bars';
+import { positionsBox, positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 import { RoundedCandleData } from './data';
 import { RoundedCandleSeriesOptions } from './options';

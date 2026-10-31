@@ -1,4 +1,4 @@
-import { IChartApiBase, IPriceScaleApi, ISeriesPrimitive, Time } from 'lightweight-charts';
+import { IChartApiBase, IPriceScaleApi, ISeriesPrimitive, Time } from '@bishopbot/lightweight-charts';
 
 /** The part of a series API {@link keepPixelSeriesInView} needs. */
 export interface PixelHeightSeriesApi<HorzScaleItem = Time> {

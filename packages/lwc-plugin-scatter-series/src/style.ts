@@ -1,5 +1,5 @@
-import { LineStyle } from 'lightweight-charts';
-import { clampOpacity, isFiniteNumber, nonNegativeOr } from '@tradingview/lwc-toolkit/numbers';
+import { LineStyle } from '@bishopbot/lightweight-charts';
+import { clampOpacity, isFiniteNumber, nonNegativeOr } from '@bishopbot/lwc-toolkit/numbers';
 
 import type { ScatterGroupInfo, ScatterPoint } from './data';
 import type { ScatterGroup, ScatterSeriesOptions, ScatterShape, ScatterSizeLimits } from './options';

@@ -4,7 +4,7 @@ import {
 	Time,
 	WhitespaceData,
 	createChart,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { generateLineData } from './sample-data';
 import { createBrushableAreaSeries } from '../brushable-area-series';
 import { BrushableAreaInteraction } from '../interaction';

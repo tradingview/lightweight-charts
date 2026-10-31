@@ -17,14 +17,14 @@ Install the package. It requires `lightweight-charts` `^5.0.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-hlc-area-series
+npm install @bishopbot/lwc-plugin-hlc-area-series
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { createHLCAreaSeries } from '@tradingview/lwc-plugin-hlc-area-series';
+import { createHLCAreaSeries } from '@bishopbot/lwc-plugin-hlc-area-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = createHLCAreaSeries(chart, {
@@ -50,7 +50,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-hlc-area-series": "https://unpkg.com/@tradingview/lwc-plugin-hlc-area-series/dist/hlc-area-series.standalone.js"
+    "@bishopbot/lwc-plugin-hlc-area-series": "https://unpkg.com/@bishopbot/lwc-plugin-hlc-area-series/dist/hlc-area-series.standalone.js"
   }
 }
 </script>
@@ -61,7 +61,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { createHLCAreaSeries } from '@tradingview/lwc-plugin-hlc-area-series';
+import { createHLCAreaSeries } from '@bishopbot/lwc-plugin-hlc-area-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = createHLCAreaSeries(chart, {
@@ -85,7 +85,7 @@ Add the series with `createHLCAreaSeries`, then set data with `high`, `low`, and
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { createHLCAreaSeries } from '@tradingview/lwc-plugin-hlc-area-series';
+import { createHLCAreaSeries } from '@bishopbot/lwc-plugin-hlc-area-series';
 
 const chart = createChart(document.getElementById('container'));
 const series = createHLCAreaSeries(chart, {

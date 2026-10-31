@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
-import type { ChartOptionsImpl, InternalHorzScaleItem, Mutable, TickMark, TickMarkWeightValue, TimeScalePoint } from 'lightweight-charts';
+import type { ChartOptionsImpl, InternalHorzScaleItem, Mutable, TickMark, TickMarkWeightValue, TimeScalePoint } from '@bishopbot/lightweight-charts';
 
 import {
 	ScatterHorzScaleBehavior,

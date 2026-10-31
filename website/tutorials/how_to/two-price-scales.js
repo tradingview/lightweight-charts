@@ -23,7 +23,7 @@ const chartOptions = {
 	// highlight-end
 };
 // remove-line
-/** @type {import('lightweight-charts').IChartApi} */
+/** @type {import('@bishopbot/lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 chart
 	.addSeries(LineSeries, {

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import type { AutoscaleInfo } from 'lightweight-charts';
+import type { AutoscaleInfo } from '@bishopbot/lightweight-charts';
 
 import {
 	applyOwnOptions,

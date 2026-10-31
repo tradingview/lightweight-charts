@@ -13,7 +13,7 @@ import type {
 	TickMarkWeightValue,
 	TimeMark,
 	TimeScalePoint,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import { SlotGrid, TickLevel, fallbackTickWeight, formatXValue, tickWeight } from './x-axis';
 

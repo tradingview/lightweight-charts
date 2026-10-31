@@ -1,4 +1,4 @@
-import { AreaSeries, createChart } from 'lightweight-charts';
+import { AreaSeries, createChart } from '@bishopbot/lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { TooltipPrimitive } from '../tooltip';
 

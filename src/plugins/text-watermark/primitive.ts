@@ -86,7 +86,7 @@ export type ITextWatermarkPluginApi<T> = PrimitiveHasApplyOptions<IPanePrimitive
  *
  * @example
  * ```js
- * import { createTextWatermark } from 'lightweight-charts';
+ * import { createTextWatermark } from '@bishopbot/lightweight-charts';
  *
  * const firstPane = chart.panes()[0];
  * const textWatermark = createTextWatermark(firstPane, {

@@ -1,6 +1,6 @@
-import { createChart } from 'lightweight-charts';
-import { addRefreshButton, mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
-import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { createChart } from '@bishopbot/lightweight-charts';
+import { addRefreshButton, mountControls } from '@bishopbot/lwc-plugin-preview-kit/preview-controls';
+import '@bishopbot/lwc-plugin-preview-kit/preview.css';
 import { RoundedCandleRadius } from '../radius';
 import { RoundedCandleSeries } from '../rounded-candles-series';
 import { generateAlternativeCandleData } from './sample-data';

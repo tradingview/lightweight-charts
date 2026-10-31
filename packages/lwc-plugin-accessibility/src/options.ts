@@ -1,4 +1,4 @@
-import { SeriesMarker, Time } from 'lightweight-charts';
+import { SeriesMarker, Time } from '@bishopbot/lightweight-charts';
 
 import { KeyBindings } from './keyboard';
 import { PartialAccessibilityMessages } from './messages';

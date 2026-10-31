@@ -1,7 +1,7 @@
 import {
 	CustomSeriesOptions,
 	customSeriesDefaultOptions,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 /**
  * A value of `T` per column of a point. The keys name the columns by their

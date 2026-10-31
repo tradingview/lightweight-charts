@@ -5,7 +5,7 @@ import {
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 /**
  * The canvas rendering target a custom series renderer is handed by the chart.

@@ -1,4 +1,4 @@
-import { CustomSeriesWhitespaceData, Time, createChart } from 'lightweight-charts';
+import { CustomSeriesWhitespaceData, Time, createChart } from '@bishopbot/lightweight-charts';
 import { createStackedBarsSeries } from '../stacked-bars-series';
 import { StackedBarsColumnWidthMode } from '../options';
 import { StackedBarsData } from '../data';

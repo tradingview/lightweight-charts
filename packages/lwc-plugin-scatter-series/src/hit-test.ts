@@ -1,4 +1,4 @@
-import { markerDistance } from '@tradingview/lwc-toolkit/canvas/markers';
+import { markerDistance } from '@bishopbot/lwc-toolkit/canvas/markers';
 
 import type { ScatterShape } from './options';
 import { cappedStrokeWidth } from './size';

@@ -1,7 +1,7 @@
 // Resolve the built exports map, as an npm consumer does; no src aliases.
-import { createChart, type IChartApiBase, type Time, type CustomSeriesWhitespaceData } from 'lightweight-charts';
-import { createPrettyHistogramSeries, PrettyHistogramSeries, type PrettyHistogramData, type PrettyHistogramSeriesOptions } from '@tradingview/lwc-plugin-pretty-histogram-series';
-import { PrettyHistogramSeries as Standalone, createPrettyHistogramSeries as createStandalone } from '@tradingview/lwc-plugin-pretty-histogram-series/standalone';
+import { createChart, type IChartApiBase, type Time, type CustomSeriesWhitespaceData } from '@bishopbot/lightweight-charts';
+import { createPrettyHistogramSeries, PrettyHistogramSeries, type PrettyHistogramData, type PrettyHistogramSeriesOptions } from '@bishopbot/lwc-plugin-pretty-histogram-series';
+import { PrettyHistogramSeries as Standalone, createPrettyHistogramSeries as createStandalone } from '@bishopbot/lwc-plugin-pretty-histogram-series/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof PrettyHistogramSeries, typeof Standalone>>();

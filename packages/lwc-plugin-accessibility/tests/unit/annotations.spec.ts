@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import type { IPriceLine, SeriesMarker, Time } from 'lightweight-charts';
+import type { IPriceLine, SeriesMarker, Time } from '@bishopbot/lightweight-charts';
 import { describe, it } from 'node:test';
 
 import { markerNote, priceLineNote } from '../../src/annotations';

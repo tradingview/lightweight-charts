@@ -26,7 +26,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/tradingview/lightweight-charts.git",
+		"url": "git+https://github.com/bishop-bot/lightweight-charts.git",
 		"directory": "packages/lwc-plugin-_ENTRYNAME_"
 	},
 	"publishConfig": {
@@ -39,16 +39,16 @@
 		"check-package": "publint --strict && attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm"
 	},
 	"peerDependencies": {
-		"lightweight-charts": "_PEERVERSION_"
+		"@bishopbot/lightweight-charts": "_PEERVERSION_"
 	},
 	"dependencies": {
 		"fancy-canvas": "~2.1.0"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "~0.18.5",
-		"@tradingview/lwc-toolkit": "~1.0.0",
+		"@bishopbot/lwc-toolkit": "~1.2.0",
 		"dts-bundle-generator": "~9.5.1",
-		"lightweight-charts": "_PEERVERSION_",
+		"@bishopbot/lightweight-charts": "_PEERVERSION_",
 		"publint": "~0.3.14",
 		"typescript": "~5.9.3",
 		"vite": "~8.2.2"

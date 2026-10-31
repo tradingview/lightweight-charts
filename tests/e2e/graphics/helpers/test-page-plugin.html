@@ -7,7 +7,7 @@
         <script type="importmap">
             {
                 "imports": {
-                    "lightweight-charts": "PATH_TO_STANDALONE_MODULE",
+                    "@bishopbot/lightweight-charts": "PATH_TO_STANDALONE_MODULE",
                     "PLUGIN_PACKAGE_NAME": "PATH_TO_PLUGIN_MODULE"
                 }
             }
@@ -29,7 +29,7 @@
             are exposed as globals so that test cases stay plain scripts.
         -->
         <script type="module">
-            import * as lib from 'lightweight-charts';
+            import * as lib from '@bishopbot/lightweight-charts';
             import * as plugin from 'PLUGIN_PACKAGE_NAME';
             window.LightweightCharts = lib;
             window.LwcPlugin = plugin;

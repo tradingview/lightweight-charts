@@ -1,4 +1,4 @@
-import { IChartApi, ISeriesApi, SeriesOptionsMap } from 'lightweight-charts';
+import { IChartApi, ISeriesApi, SeriesOptionsMap } from '@bishopbot/lightweight-charts';
 import { ExpiringPriceAlertParameters } from "./options";
 
 export interface ExpiringPriceAlert {

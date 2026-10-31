@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Coordinate } from 'lightweight-charts';
+import { Coordinate } from '@bishopbot/lightweight-charts';
 import { describe, it } from 'node:test';
 
 import {

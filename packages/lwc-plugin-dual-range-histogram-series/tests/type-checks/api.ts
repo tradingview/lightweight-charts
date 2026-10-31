@@ -1,7 +1,7 @@
 // Resolve the built exports map, as an npm consumer does; no src aliases.
-import { createChart, type IChartApiBase, type Time, type CustomSeriesWhitespaceData } from 'lightweight-charts';
-import { createDualRangeHistogramSeries, keepPixelSeriesInView, DualRangeHistogramSeries, type DualRangeHistogramData, type DualRangeHistogramSeriesOptions } from '@tradingview/lwc-plugin-dual-range-histogram-series';
-import { DualRangeHistogramSeries as Standalone, createDualRangeHistogramSeries as createStandalone } from '@tradingview/lwc-plugin-dual-range-histogram-series/standalone';
+import { createChart, type IChartApiBase, type Time, type CustomSeriesWhitespaceData } from '@bishopbot/lightweight-charts';
+import { createDualRangeHistogramSeries, keepPixelSeriesInView, DualRangeHistogramSeries, type DualRangeHistogramData, type DualRangeHistogramSeriesOptions } from '@bishopbot/lwc-plugin-dual-range-histogram-series';
+import { DualRangeHistogramSeries as Standalone, createDualRangeHistogramSeries as createStandalone } from '@bishopbot/lwc-plugin-dual-range-histogram-series/standalone';
 import { expectTrue, type Equal } from '../../../../tests/plugin-type-checks/assertions.js';
 
 expectTrue<Equal<typeof DualRangeHistogramSeries, typeof Standalone>>();

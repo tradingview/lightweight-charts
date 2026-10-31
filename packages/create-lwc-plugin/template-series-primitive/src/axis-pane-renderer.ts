@@ -1,6 +1,6 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
-import { IPrimitivePaneRenderer } from 'lightweight-charts';
-import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
+import { IPrimitivePaneRenderer } from '@bishopbot/lightweight-charts';
+import { positionsBox } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 export class _CLASSNAME_AxisPaneRenderer implements IPrimitivePaneRenderer {
 	private _p1: number | null;

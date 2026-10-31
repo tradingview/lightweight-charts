@@ -1,21 +1,21 @@
-import { PriceToCoordinateConverter, Time } from 'lightweight-charts';
+import { PriceToCoordinateConverter, Time } from '@bishopbot/lightweight-charts';
 
 import {
 	clampCornerRadius,
 	CornerRadii,
 	drawRoundRectWithBorder,
-} from '@tradingview/lwc-toolkit/canvas/round-rect';
+} from '@bishopbot/lwc-toolkit/canvas/round-rect';
 import {
 	calculateColumnPositionsInPlace,
 	ColumnPositionItem,
-} from '@tradingview/lwc-toolkit/dimensions/columns';
-import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
+} from '@bishopbot/lwc-toolkit/dimensions/columns';
+import { positionsBox } from '@bishopbot/lwc-toolkit/dimensions/positions';
 import {
 	BitmapCoordinatesRenderingScope,
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
-} from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+} from '@bishopbot/lwc-toolkit/custom-series/renderer-base';
+import { getConflationFactor, mapVisibleBars } from '@bishopbot/lwc-toolkit/custom-series/visible-bars';
 
 import { DualRangeHistogramData } from './data';
 import {

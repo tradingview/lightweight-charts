@@ -1,4 +1,4 @@
-import { createChart } from 'lightweight-charts';
+import { createChart } from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_ } from '../template-entry';
 import { _CLASSNAME_Data } from '../data';
 import { generateSampleData } from '../sample-data';

@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import type { CanvasRenderingTarget2D } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import type { PriceToCoordinateConverter } from 'lightweight-charts';
+import type { CanvasRenderingTarget2D } from '@bishopbot/lwc-toolkit/custom-series/renderer-base';
+import type { PriceToCoordinateConverter } from '@bishopbot/lightweight-charts';
 
 import { ScatterGeometryCache, XMapping } from '../../src/geometry.js';
 import { ScatterModel, buildScatterModel } from '../../src/model.js';

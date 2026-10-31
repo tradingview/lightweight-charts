@@ -1,4 +1,4 @@
-import { ISeriesApi, LineSeries, createChart } from 'lightweight-charts';
+import { ISeriesApi, LineSeries, createChart } from '@bishopbot/lightweight-charts';
 import { generateLineData } from './sample-data';
 
 import imgUrl from './image.svg';

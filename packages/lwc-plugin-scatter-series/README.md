@@ -20,13 +20,13 @@ Install the package. It requires `lightweight-charts` `^5.2.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-scatter-series
+npm install @bishopbot/lwc-plugin-scatter-series
 ```
 
 Then create a scatter chart and add the series to it:
 
 ```js
-import { createScatterChart, createScatterSeries } from '@tradingview/lwc-plugin-scatter-series';
+import { createScatterChart, createScatterSeries } from '@bishopbot/lwc-plugin-scatter-series';
 
 const chart = createScatterChart(document.getElementById('container'), { autoSize: true });
 
@@ -55,7 +55,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-scatter-series": "https://unpkg.com/@tradingview/lwc-plugin-scatter-series/dist/scatter-series.standalone.js"
+    "@bishopbot/lwc-plugin-scatter-series": "https://unpkg.com/@bishopbot/lwc-plugin-scatter-series/dist/scatter-series.standalone.js"
   }
 }
 </script>
@@ -65,7 +65,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 
 ```html
 <script type="module">
-import { createScatterChart, createScatterSeries } from '@tradingview/lwc-plugin-scatter-series';
+import { createScatterChart, createScatterSeries } from '@bishopbot/lwc-plugin-scatter-series';
 
 const series = createScatterSeries(createScatterChart(document.getElementById('container'), { autoSize: true }));
 series.setData([{ x: 1, y: 2 }, { x: 3, y: 5 }, { x: 4, y: 1 }]);
@@ -81,7 +81,7 @@ holds the whole dataset, every group included. Fields of your own travel with
 the points; give the series their type:
 
 ```ts
-import { createScatterChart, createScatterSeries, type ScatterPoint } from '@tradingview/lwc-plugin-scatter-series';
+import { createScatterChart, createScatterSeries, type ScatterPoint } from '@bishopbot/lwc-plugin-scatter-series';
 
 interface Bond extends ScatterPoint {
     title: string;
@@ -357,7 +357,7 @@ graph, say:
 
 ```ts
 import type { IPrimitivePaneView, ISeriesPrimitive } from 'lightweight-charts';
-import type { ScatterSeriesApi } from '@tradingview/lwc-plugin-scatter-series';
+import type { ScatterSeriesApi } from '@bishopbot/lwc-plugin-scatter-series';
 
 /** A rectangle in data units. An open end (`null`) runs to the edge of the pane. */
 interface ShadedRegion {

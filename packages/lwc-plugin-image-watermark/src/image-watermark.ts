@@ -1,11 +1,11 @@
-import { PanePluginBase } from '@tradingview/lwc-toolkit/pane-plugin-base';
-import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
+import { PanePluginBase } from '@bishopbot/lwc-toolkit/pane-plugin-base';
+import { PluginBase } from '@bishopbot/lwc-toolkit/plugin-base';
 import {
 	IPrimitivePaneView,
 	PaneAttachedParameter,
 	SeriesAttachedParameter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import { ImageWatermarkCore } from './core.js';
 import { ImageWatermarkPluginOptions } from './options.js';

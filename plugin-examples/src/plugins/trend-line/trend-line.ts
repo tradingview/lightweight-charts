@@ -11,7 +11,7 @@ import {
 	SeriesOptionsMap,
 	SeriesType,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 class TrendLinePaneRenderer implements IPrimitivePaneRenderer {
 	_p1: ViewPoint;

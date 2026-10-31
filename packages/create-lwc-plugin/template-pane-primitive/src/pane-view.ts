@@ -1,4 +1,4 @@
-import { IPanePrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts';
+import { IPanePrimitivePaneView, PrimitivePaneViewZOrder } from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_PaneRenderer } from './pane-renderer';
 import { _CLASSNAME_Options } from './options';
 

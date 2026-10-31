@@ -2,7 +2,7 @@ import {
 	CandlestickSeriesOptions,
 	CustomSeriesOptions,
 	customSeriesDefaultOptions,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { RoundedCandleRadius } from './radius';
 
 /**

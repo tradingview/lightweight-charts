@@ -1,5 +1,5 @@
-import { IPanePrimitivePaneView, Time } from 'lightweight-charts';
-import { PanePluginBase } from '@tradingview/lwc-toolkit/pane-plugin-base';
+import { IPanePrimitivePaneView, Time } from '@bishopbot/lightweight-charts';
+import { PanePluginBase } from '@bishopbot/lwc-toolkit/pane-plugin-base';
 import { _CLASSNAME_Options, defaultOptions } from './options';
 import { _CLASSNAME_PaneView } from './pane-view';
 

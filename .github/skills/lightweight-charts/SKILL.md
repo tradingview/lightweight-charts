@@ -12,30 +12,30 @@ description: >-
 
 # Lightweight Charts skill
 
-Works the same whether the project is a downstream npm consumer app or an upstream `lightweight-charts` source checkout. Detect which one you are in (below) and resolve every API name from whatever typings are locally available.
+Works the same whether the project is a downstream npm consumer app or an upstream `@bishopbot/lightweight-charts` source checkout. Detect which one you are in (below) and resolve every API name from whatever typings are locally available.
 
 ## Source lookup order
 
 Do not assume you are inside the upstream source repository.
 
 1. In a consumer app, inspect the installed package first:
-   - `node_modules/lightweight-charts/package.json` for the actual version.
-   - `node_modules/lightweight-charts/dist/typings.d.ts` for the API surface.
+   - `node_modules/@bishopbot/lightweight-charts/package.json` for the actual version.
+   - `node_modules/@bishopbot/lightweight-charts/dist/typings.d.ts` for the API surface.
 2. In the upstream repo, inspect `dist/typings.d.ts` first, then `src/` if generated output is unavailable.
 3. Use official docs/examples as supporting evidence, but local typings win when they disagree.
 
 Verify before answering (copy-paste):
 
 ```sh
-node -p "require('./node_modules/lightweight-charts/package.json').version"
-rg -n "createSeriesMarkers|addSeries|IPrimitivePaneRenderer|createImageWatermark|createOptionsChart" node_modules/lightweight-charts/dist/typings.d.ts
+node -p "require('./node_modules/@bishopbot/lightweight-charts/package.json').version"
+rg -n "createSeriesMarkers|addSeries|IPrimitivePaneRenderer|createImageWatermark|createOptionsChart" node_modules/@bishopbot/lightweight-charts/dist/typings.d.ts
 # upstream checkout instead of a consumer app:
 rg -n "createSeriesMarkers|IPrimitivePaneRenderer|createImageWatermark|createOptionsChart" dist/typings.d.ts src
 ```
 
 If the relevant file is unavailable, say what could not be verified. Do not invent option names, methods, exports, or wrapper behavior.
 
-If the user's code imports `from lightweight_charts import ...` (underscore), uses pandas/asyncio, or talks about a Python window wrapper, they are probably using the third-party Python wrapper rather than the TypeScript package. Say that clearly before giving core `lightweight-charts` v5 JavaScript advice.
+If the user's code imports `from lightweight_charts import ...` (underscore), uses pandas/asyncio, or talks about a Python window wrapper, they are probably using the third-party Python wrapper rather than the TypeScript package. Say that clearly before giving core `@bishopbot/lightweight-charts` v5 JavaScript advice.
 
 ## Mental model
 
@@ -55,7 +55,7 @@ Eight layers, in dependency order. Most bugs come from confusing one for another
 The conventions that catch people copying older snippets:
 
 ```ts
-import { createChart, CandlestickSeries, LineSeries } from 'lightweight-charts';
+import { createChart, CandlestickSeries, LineSeries } from '@bishopbot/lightweight-charts';
 
 const chart = createChart(container, { /* ChartOptions */ });
 const candles = chart.addSeries(CandlestickSeries, { /* options */ });
@@ -104,7 +104,7 @@ Stale copy-pasted snippets are the most common failure. Map them directly:
 
 ## Routing map (problem → where to look)
 
-Use local typings first. The repo paths below exist only in the upstream `lightweight-charts` checkout; in a consumer app, translate them to the installed package typings or official docs.
+Use local typings first. The repo paths below exist only in the upstream `@bishopbot/lightweight-charts` checkout; in a consumer app, translate them to the installed package typings or official docs.
 
 | Task | Canonical sources |
 |---|---|
@@ -127,7 +127,7 @@ Use local typings first. The repo paths below exist only in the upstream `lightw
 | iOS / Android wrappers | `website/docs/ios.md`, `website/docs/android.md` |
 | Version migration | `website/docs/migrations/from-v2-to-v3.md`, `from-v3-to-v4.md`, `from-v4-to-v5.md` |
 
-If these repo paths do not exist in the user's project, do not ask them to create or clone the source tree just to answer a normal usage question. Use `node_modules/lightweight-charts/dist/typings.d.ts` and concise v5 examples.
+If these repo paths do not exist in the user's project, do not ask them to create or clone the source tree just to answer a normal usage question. Use `node_modules/@bishopbot/lightweight-charts/dist/typings.d.ts` and concise v5 examples.
 
 ## Foot-guns (assertions, not categories)
 
@@ -164,7 +164,7 @@ If these repo paths do not exist in the user's project, do not ask them to creat
 
 - **Start plugins from the scaffold/examples.** Prefer `npm create lwc-plugin@latest` and `plugin-examples/` before writing a primitive from scratch.
 - **Interactive drawing tools need two parts:** a primitive/custom series for rendering, and chart interaction handlers (`subscribeClick`, `subscribeCrosshairMove`, drag state) that convert coordinates with public APIs.
-- **`CanvasRenderingTarget2D` is imported from `fancy-canvas`,** not from `lightweight-charts`.
+- **`CanvasRenderingTarget2D` is imported from `fancy-canvas`,** not from `@bishopbot/lightweight-charts`.
 - Use `target.useBitmapCoordinateSpace(scope => …)` for pixel-aligned strokes; use `target.useMediaCoordinateSpace(scope => …)` for CSS-pixel logic. Mixing them causes blur or sub-pixel jitter on HiDPI displays.
 - **`IPanePrimitive` views render across the whole pane; `ISeriesPrimitive` views are clipped to the series.** Pick the right base.
 - **The renderer interface is `IPrimitivePaneRenderer`, not `IPanePrimitivePaneRenderer`.** The view is `IPanePrimitivePaneView` and its `renderer()` returns `IPrimitivePaneRenderer | null` — the names are deliberately asymmetric. There is no `IPanePrimitivePaneRenderer` export; grep `dist/typings.d.ts` if unsure.
@@ -177,14 +177,14 @@ If these repo paths do not exist in the user's project, do not ask them to creat
 - **Don't drive `setData` from props on every render.** Use `series.update(...)` for incremental changes; only call `setData` when the dataset truly replaces.
 - **`undefined` in `applyOptions` means "not specified", not "reset".** `{ priceFormatter: custom ? fmt : undefined }` leaves the current formatter in place. To clear a `localization` formatter or `autoscaleInfoProvider`, pass `null`. Other options have no reset value: pass the default explicitly.
 - **Next.js/SSR must be client-only.** Put chart code in a `'use client'` component, create it in `useEffect`, and import that component with `next/dynamic(..., { ssr: false })` from server-rendered pages when needed.
-- **Plain HTML is not npm resolution.** The standalone `.js` build exposes `window.LightweightCharts`; ESM in the browser must import an actual `.mjs` URL or use an import map. `import { createChart } from 'lightweight-charts'` only works when a bundler/runtime resolves the package name.
+- **Plain HTML is not npm resolution.** The standalone `.js` build exposes `window.LightweightCharts`; ESM in the browser must import an actual `.mjs` URL or use an import map. `import { createChart } from '@bishopbot/lightweight-charts'` only works when a bundler/runtime resolves the package name.
 
 ## Canonical recipes
 
 ### Realtime updates
 
 ```ts
-import { createChart, CandlestickSeries } from 'lightweight-charts';
+import { createChart, CandlestickSeries } from '@bishopbot/lightweight-charts';
 
 const chart = createChart(container, {});
 const series = chart.addSeries(CandlestickSeries, {});
@@ -246,7 +246,7 @@ Line/Area points also take a per-point `color`. An omitted point color falls bac
 ### Series markers
 
 ```ts
-import { createSeriesMarkers } from 'lightweight-charts';
+import { createSeriesMarkers } from '@bishopbot/lightweight-charts';
 
 const markers = createSeriesMarkers(candles, [
     { time: 1700000000, position: 'aboveBar', color: '#e53935', shape: 'arrowDown', text: 'Sell' },
@@ -291,7 +291,7 @@ Do not invent `timeScale: { timezone: 'America/New_York' }`. If the user needs e
 ### Text watermark
 
 ```ts
-import { createTextWatermark } from 'lightweight-charts';
+import { createTextWatermark } from '@bishopbot/lightweight-charts';
 
 createTextWatermark(chart.panes()[0], {
     horzAlign: 'center',
@@ -359,8 +359,8 @@ Use the public conversion APIs for drawing tools and annotations. DOM canvas coo
 ```tsx
 'use client';
 
-import { createChart, LineSeries } from 'lightweight-charts';
-import type { ISeriesApi, LineData, Time } from 'lightweight-charts';
+import { createChart, LineSeries } from '@bishopbot/lightweight-charts';
+import type { ISeriesApi, LineData, Time } from '@bishopbot/lightweight-charts';
 import { useEffect, useRef } from 'react';
 
 export function LwcChart({ data }: { data: LineData<Time>[] }) {
@@ -411,9 +411,9 @@ Use the standalone IIFE build when there is no bundler:
 
 Choose the loading shape by environment:
 
-- **Bundler (Vite/webpack/Next):** bare `import { createChart } from 'lightweight-charts'`. The package `exports` resolve the right ESM/CJS build.
+- **Bundler (Vite/webpack/Next):** bare `import { createChart } from '@bishopbot/lightweight-charts'`. The package `exports` resolve the right ESM/CJS build.
 - **Browser `<script>` (no bundler):** the standalone IIFE build above exposes the `LightweightCharts` global; there is no bare-specifier resolution.
-- **Browser native ESM (`<script type="module">`):** import from a concrete `.mjs` URL (e.g. the standalone `.mjs`) or add an import map; a bare `'lightweight-charts'` specifier will not resolve.
+- **Browser native ESM (`<script type="module">`):** import from a concrete `.mjs` URL (e.g. the standalone `.mjs`) or add an import map; a bare `'@bishopbot/lightweight-charts'` specifier will not resolve.
 - **SSR frameworks:** load client-only (see the Next.js recipe above) — never import at module top level in a server component.
 
 ### Plugin starter
@@ -432,7 +432,7 @@ For draggable drawings, attach a primitive with `series.attachPrimitive(...)` or
 ### Non-financial data
 
 ```ts
-import { createOptionsChart } from 'lightweight-charts';
+import { createOptionsChart } from '@bishopbot/lightweight-charts';
 
 const chart = createOptionsChart(container);
 ```
@@ -465,7 +465,7 @@ import type {
     IPanePrimitivePaneView,
     IPrimitivePaneRenderer,
     Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import type { CanvasRenderingTarget2D } from 'fancy-canvas';
 
 class Overlay implements IPanePrimitive<Time> {
@@ -501,7 +501,7 @@ Working examples live under `plugin-examples/src/plugins/` — copy structure fr
 ## Code-generation rules
 
 - **Default to v5.** Assume v5 APIs unless the user's installed package or prompt pins an older version. If they're on v4, explain the v5 migration point instead of mixing syntaxes.
-- **Use real option names.** In consumer apps, grep `node_modules/lightweight-charts/dist/typings.d.ts`; in the upstream repo, grep `dist/typings.d.ts` or `src/api/options/`. Many similarly-named options exist across chart/series/scale — confirm which level owns the option.
+- **Use real option names.** In consumer apps, grep `node_modules/@bishopbot/lightweight-charts/dist/typings.d.ts`; in the upstream repo, grep `dist/typings.d.ts` or `src/api/options/`. Many similarly-named options exist across chart/series/scale — confirm which level owns the option.
 - **Minimal snippets.** One feature per code block. Combining markers + watermark + custom pane primitive in one snippet hides which API does what.
 - **Match the user's framework.** A React user wants the `useEffect` lifecycle; a vanilla user does not.
 - **Don't invent.** If an API name does not appear in the installed typings or upstream source, it does not exist.

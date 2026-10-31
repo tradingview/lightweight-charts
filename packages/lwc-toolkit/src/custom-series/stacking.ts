@@ -1,4 +1,4 @@
-import { CustomSeriesPricePlotValues } from 'lightweight-charts';
+import { CustomSeriesPricePlotValues } from '@bishopbot/lightweight-charts';
 
 /**
  * Running totals of `values`: entry `i` is the sum of `values[0..i]`, which is

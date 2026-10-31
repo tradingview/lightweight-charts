@@ -71,9 +71,9 @@ function buildPackageJson(template: string, answers: Answers): string {
 		pkg.devDependencies = sortedByKey({
 			...pinned,
 			// Private, so it is only available to a package inside the repository.
-			'@tradingview/lwc-plugin-preview-kit': 'workspace:*',
-			'@tradingview/lwc-toolkit': 'workspace:*',
-			'lightweight-charts': 'workspace:*',
+			'@bishopbot/lwc-plugin-preview-kit': 'workspace:*',
+			'@bishopbot/lwc-toolkit': 'workspace:*',
+			'@bishopbot/lightweight-charts': 'workspace:*',
 		});
 		// One LICENSE for the repository; npm drops symlinks, so it is copied in at pack time.
 		pkg.scripts.prepack = `node -e "require('fs').copyFileSync('../../LICENSE', 'LICENSE')"`;

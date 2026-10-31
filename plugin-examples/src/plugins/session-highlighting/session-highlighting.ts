@@ -10,8 +10,8 @@ import {
 	PrimitivePaneViewZOrder,
 	SeriesType,
 	Time,
-} from 'lightweight-charts';
-import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
+} from '@bishopbot/lightweight-charts';
+import { PluginBase } from '@bishopbot/lwc-toolkit/plugin-base';
 
 interface SessionHighlightingRendererData {
 	x: Coordinate | number;

@@ -5,7 +5,7 @@ import {
 	CustomSeriesWhitespaceData,
 	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import type { ScatterSlotData } from './data';
 import { underlyingSeriesDefaults } from './options';

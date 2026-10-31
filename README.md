@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://www.tradingview.com/lightweight-charts/" target="_blank">
-    <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true" alt="Lightweight Charts logo">
+    <img width="200" src="https://github.com/bishop-bot/lightweight-charts/raw/master/.github/logo.svg?sanitize=true" alt="Lightweight Charts logo">
   </a>
 
   <h1>Lightweight Charts™</h1>
@@ -17,6 +17,11 @@
 
 <!-- markdownlint-enable no-inline-html -->
 
+> **This is a fork.** It is published under the `@bishopbot` npm scope, not as
+> `lightweight-charts`. The upstream project by TradingView keeps the unscoped
+> name and the `@tradingview` scope, and is the project to install if you need
+> the original. See [Publishing](#publishing) below.
+
 [Demos][demo-url] | [Documentation](https://tradingview.github.io/lightweight-charts/) | [Reddit](https://www.reddit.com/r/TradingView/)
 
 TradingView Lightweight Charts™ are one of the smallest and fastest financial HTML5 charts.
@@ -24,7 +29,7 @@ TradingView Lightweight Charts™ are one of the smallest and fastest financial 
 The Lightweight Charts™ library is the best choice for you if you want to display financial data as an interactive chart on your web page, or replace static image charts with interactive ones. It does this without affecting your web page's loading speed and performance.
 The size of the library is close to static images but if you have dozens of image charts on a web page then using this library can make the size of your web page smaller.
 
-The library provides a rich set of charting capabilities out of the box, but you can also extend its functionality by building custom plugins. Browse the [plugin catalog](https://tradingview.github.io/lightweight-charts/plugins) for ready-made plugins, or see the [interactive plugin examples](https://tradingview.github.io/lightweight-charts/plugin-examples/) and [plugin-examples/README.md](https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples) to build your own.
+The library provides a rich set of charting capabilities out of the box, but you can also extend its functionality by building custom plugins. Browse the [plugin catalog](https://tradingview.github.io/lightweight-charts/plugins) for ready-made plugins, or see the [interactive plugin examples](https://tradingview.github.io/lightweight-charts/plugin-examples/) and [plugin-examples/README.md](https://github.com/bishop-bot/lightweight-charts/tree/master/plugin-examples) to build your own.
 
 Take a look at [awesome-tradingview](https://github.com/tradingview/awesome-tradingview?tab=readme-ov-file#lightweight-charts) for related projects created by our community members.
 
@@ -33,7 +38,7 @@ Take a look at [awesome-tradingview](https://github.com/tradingview/awesome-trad
 ### es6 via npm
 
 ```bash
-npm install lightweight-charts
+npm install @bishopbot/lightweight-charts
 ```
 
 ### Latest master build
@@ -41,13 +46,13 @@ npm install lightweight-charts
 To try the latest `master` build without waiting for a release (powered by [pkg.pr.new](https://pkg.pr.new)):
 
 ```bash
-npm install https://pkg.pr.new/lightweight-charts@master
+npm install https://pkg.pr.new/@bishopbot/lightweight-charts@master
 ```
 
 The import and usage below applies to both npm installation options:
 
 ```js
-import { createChart, LineSeries } from 'lightweight-charts';
+import { createChart, LineSeries } from '@bishopbot/lightweight-charts';
 
 const chart = createChart(document.body, { width: 400, height: 300 });
 const lineSeries = chart.addSeries(LineSeries);
@@ -69,7 +74,7 @@ lineSeries.setData([
 
 You can use [unpkg](https://unpkg.com/):
 
-<https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js>
+<https://unpkg.com/@bishopbot/lightweight-charts/dist/lightweight-charts.standalone.production.js>
 
 The standalone version creates `window.LightweightCharts` object with all exports from `esm` version:
 
@@ -101,20 +106,37 @@ lineSeries.setData([
 
 ## AI coding assistants
 
-This repository ships two [Agent Skills](https://github.com/tradingview/lightweight-charts/tree/master/.github/skills) for AI coding assistants, such as Claude Code and Codex. The skills give the assistant current v5 knowledge to work from, instead of outdated snippets it may remember from training:
+This repository ships two [Agent Skills](https://github.com/bishop-bot/lightweight-charts/tree/master/.github/skills) for AI coding assistants, such as Claude Code and Codex. The skills give the assistant current v5 knowledge to work from, instead of outdated snippets it may remember from training:
 
-- [`lightweight-charts`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) is about *using* the library. It covers the v5 API conventions, the mental model, and common time, scale, marker, plugin, and wrapper foot-guns.
-- [`lightweight-charts-plugin-authoring`](https://github.com/tradingview/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md) is about *writing* a [plugin](https://tradingview.github.io/lightweight-charts/docs/plugins/intro). The skill helps choose between a custom series and a primitive, build on `@tradingview/lwc-toolkit`, and learn from the official plugin packages. It also warns about the common autoscale, whitespace, and hit-test traps. The `create-lwc-plugin` wizard offers to install this skill into a new plugin project.
+- [`lightweight-charts`](https://github.com/bishop-bot/lightweight-charts/blob/master/.github/skills/lightweight-charts/SKILL.md) is about *using* the library. It covers the v5 API conventions, the mental model, and common time, scale, marker, plugin, and wrapper foot-guns.
+- [`lightweight-charts-plugin-authoring`](https://github.com/bishop-bot/lightweight-charts/blob/master/.github/skills/lightweight-charts-plugin-authoring/SKILL.md) is about *writing* a [plugin](https://tradingview.github.io/lightweight-charts/docs/plugins/intro). The skill helps choose between a custom series and a primitive, build on `@bishopbot/lwc-toolkit`, and learn from the official plugin packages. It also warns about the common autoscale, whitespace, and hit-test traps. The `create-lwc-plugin` wizard offers to install this skill into a new plugin project.
 
 Install either or both with the `skills` CLI; add `--skill <name>` to pick one of the two:
 
 ```console
-npx skills add tradingview/lightweight-charts
+npx skills add bishop-bot/lightweight-charts
 ```
 
 ## Development
 
-See [BUILDING.md](./BUILDING.md) for instructions on how to build `lightweight-charts` from source.
+See [BUILDING.md](./BUILDING.md) for instructions on how to build the library from source.
+
+## Publishing
+
+The packages of this fork are published under the `@bishopbot` scope:
+
+| Package | npm name |
+|---|---|
+| Library | `@bishopbot/lightweight-charts` |
+| Plugin toolkit | `@bishopbot/lwc-toolkit` |
+| Plugins | `@bishopbot/lwc-plugin-<name>` |
+| Plugin scaffolding wizard | `@bishopbot/create-lwc-plugin` |
+
+The library's peer dependency in every plugin is `@bishopbot/lightweight-charts`
+(`^6.0.0`); the upstream `lightweight-charts` stays an optional peer, so a
+project that already depends on the upstream 5.x line does not have to change
+it. See [`.agents/skills/npm-publish/SKILL.md`](./.agents/skills/npm-publish/SKILL.md)
+for the release flow.
 
 ## License
 
@@ -131,15 +153,15 @@ You can use the [`attributionLogo`](https://tradingview.github.io/lightweight-ch
 
 [demo-url]: https://www.tradingview.com/lightweight-charts/
 
-[ci-img]: https://img.shields.io/circleci/build/github/tradingview/lightweight-charts.svg
-[ci-link]: https://circleci.com/gh/tradingview/lightweight-charts
+[ci-img]: https://img.shields.io/circleci/build/github/bishop-bot/lightweight-charts.svg
+[ci-link]: https://circleci.com/gh/bishop-bot/lightweight-charts
 
-[npm-version-img]: https://badge.fury.io/js/lightweight-charts.svg
-[npm-downloads-img]: https://img.shields.io/npm/dm/lightweight-charts.svg
-[npm-link]: https://www.npmjs.com/package/lightweight-charts
+[npm-version-img]: https://badge.fury.io/js/@bishopbot/lightweight-charts.svg
+[npm-downloads-img]: https://img.shields.io/npm/dm/@bishopbot/lightweight-charts.svg
+[npm-link]: https://www.npmjs.com/package/@bishopbot/lightweight-charts
 
-[bundle-size-img]: https://badgen.net/bundlephobia/minzip/lightweight-charts
-[deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependencies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dlightweight-charts
-[bundle-size-link]: https://bundlephobia.com/result?p=lightweight-charts
-[pkg-pr-new-img]: https://pkg.pr.new/badge/tradingview/lightweight-charts
-[pkg-pr-new-link]: https://pkg.pr.new/~/tradingview/lightweight-charts
+[bundle-size-img]: https://badgen.net/bundlephobia/minzip/@bishopbot/lightweight-charts
+[deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependencies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3D%40bishopbot%2Flightweight-charts
+[bundle-size-link]: https://bundlephobia.com/result?p=@bishopbot/lightweight-charts
+[pkg-pr-new-img]: https://pkg.pr.new/badge/bishop-bot/lightweight-charts
+[pkg-pr-new-link]: https://pkg.pr.new/~/bishop-bot/lightweight-charts

@@ -1,5 +1,5 @@
-import { createWhitespaceSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
-import { GapCheck } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { createWhitespaceSeries, OptionsAwareSeries } from '@bishopbot/lwc-toolkit/custom-series/options-aware-series';
+import { GapCheck } from '@bishopbot/lwc-toolkit/custom-series/visible-bars';
 import {
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
@@ -9,8 +9,8 @@ import {
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
 	Time,
-} from 'lightweight-charts';
-import { stackedPlotValues } from '@tradingview/lwc-toolkit/custom-series/stacking';
+} from '@bishopbot/lightweight-charts';
+import { stackedPlotValues } from '@bishopbot/lwc-toolkit/custom-series/stacking';
 
 import { StackedAreaConflationContext } from './compat';
 import { StackedAreaSeriesOptions, defaultOptions } from './options';

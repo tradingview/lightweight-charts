@@ -13,7 +13,7 @@ const chartOptions = {
 // hide-end
 const container = document.getElementById('container');
 // remove-line
-/** @type {import('lightweight-charts').IChartApi} */
+/** @type {import('@bishopbot/lightweight-charts').IChartApi} */
 const chart = createChart(container, chartOptions);
 
 const candlestickSeries = chart.addSeries(CandlestickSeries, {

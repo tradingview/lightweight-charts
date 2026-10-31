@@ -109,7 +109,7 @@ export type IImageWatermarkPluginApi<T> = PrimitiveHasApplyOptions<IPanePrimitiv
  *
  * @example
  * ```js
- * import { createImageWatermark } from 'lightweight-charts';
+ * import { createImageWatermark } from '@bishopbot/lightweight-charts';
  *
  * const firstPane = chart.panes()[0];
  * const imageWatermark = createImageWatermark(firstPane, '/images/my-image.png', {

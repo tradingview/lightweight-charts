@@ -1,4 +1,4 @@
-import { Time, isBusinessDay } from 'lightweight-charts';
+import { Time, isBusinessDay } from '@bishopbot/lightweight-charts';
 
 export interface _CLASSNAME_Options {
 	//* Define the options for the primitive.

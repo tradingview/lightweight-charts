@@ -1,6 +1,6 @@
 // The README recipe "Draw your own overlays" as a class, with `setRegions` to
 // replace the regions in place; the README has the shorter function form.
-import type { IPrimitivePaneView, ISeriesPrimitive, SeriesAttachedParameter } from 'lightweight-charts';
+import type { IPrimitivePaneView, ISeriesPrimitive, SeriesAttachedParameter } from '@bishopbot/lightweight-charts';
 import type { ScatterSeriesApi } from '../scatter-series-api';
 
 /** A rectangle in data units. An open end (`null`) runs to the edge of the pane. */

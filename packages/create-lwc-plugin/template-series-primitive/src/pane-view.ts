@@ -1,4 +1,4 @@
-import { Coordinate, IPrimitivePaneView } from 'lightweight-charts';
+import { Coordinate, IPrimitivePaneView } from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_PaneRenderer } from './pane-renderer';
 import { _CLASSNAME_DataSource } from './data-source';
 

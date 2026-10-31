@@ -1,4 +1,4 @@
-import { CustomData, LineStyle } from 'lightweight-charts';
+import { CustomData, LineStyle } from '@bishopbot/lightweight-charts';
 
 import type { ScatterShape, ScatterSizeScale } from './options';
 

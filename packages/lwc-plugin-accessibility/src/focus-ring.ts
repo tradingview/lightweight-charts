@@ -1,4 +1,4 @@
-import { IChartApiBase, Time } from 'lightweight-charts';
+import { IChartApiBase, Time } from '@bishopbot/lightweight-charts';
 
 import { extractValue } from './describe';
 import { ValueAccessor } from './options';

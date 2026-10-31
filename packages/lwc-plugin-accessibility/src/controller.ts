@@ -1,5 +1,5 @@
-import { chartTableElement } from '@tradingview/lwc-toolkit/dom/pane-element';
-import { IChartApi, IPaneApi, Time } from 'lightweight-charts';
+import { chartTableElement } from '@bishopbot/lwc-toolkit/dom/pane-element';
+import { IChartApi, IPaneApi, Time } from '@bishopbot/lightweight-charts';
 
 import { ChartCanvases } from './dom/chart-canvases';
 import { defaultMessages, mergeMessages } from './messages';

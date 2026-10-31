@@ -1,5 +1,5 @@
-import { createWhitespaceSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
-import { GapCheck } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { createWhitespaceSeries, OptionsAwareSeries } from '@bishopbot/lwc-toolkit/custom-series/options-aware-series';
+import { GapCheck } from '@bishopbot/lwc-toolkit/custom-series/visible-bars';
 import {
 	CustomSeriesPricePlotValues,
 	CustomSeriesWhitespaceData,
@@ -9,7 +9,7 @@ import {
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { HLCAreaSeriesOptions, defaultOptions } from './options';
 import { HLCAreaSeriesRenderer } from './renderer';
 import { HLCAreaData } from './data';

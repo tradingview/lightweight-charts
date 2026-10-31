@@ -33,14 +33,14 @@ Install the package. It requires `lightweight-charts` `^5.0.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-anchored-text
+npm install @bishopbot/lwc-plugin-anchored-text
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { AnchoredText } from '@tradingview/lwc-plugin-anchored-text';
+import { AnchoredText } from '@bishopbot/lwc-plugin-anchored-text';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
@@ -59,7 +59,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-anchored-text": "https://unpkg.com/@tradingview/lwc-plugin-anchored-text/dist/anchored-text.standalone.js"
+    "@bishopbot/lwc-plugin-anchored-text": "https://unpkg.com/@bishopbot/lwc-plugin-anchored-text/dist/anchored-text.standalone.js"
   }
 }
 </script>
@@ -70,7 +70,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart, LineSeries } from 'lightweight-charts';
-import { AnchoredText } from '@tradingview/lwc-plugin-anchored-text';
+import { AnchoredText } from '@bishopbot/lwc-plugin-anchored-text';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
@@ -88,7 +88,7 @@ Create the text, then attach it to the series whose pane it should sit in:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { AnchoredText } from '@tradingview/lwc-plugin-anchored-text';
+import { AnchoredText } from '@bishopbot/lwc-plugin-anchored-text';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
@@ -117,7 +117,7 @@ of a series. Use it when the text should stay put while series are added and
 removed:
 
 ```js
-import { AnchoredTextPane } from '@tradingview/lwc-plugin-anchored-text';
+import { AnchoredTextPane } from '@bishopbot/lwc-plugin-anchored-text';
 
 const title = new AnchoredTextPane({ text: 'Volume', vertAlign: 'bottom' });
 chart.panes()[1].attachPrimitive(title);

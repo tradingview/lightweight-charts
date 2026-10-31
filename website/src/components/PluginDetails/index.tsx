@@ -458,7 +458,7 @@ function StatusBadges({ plugin }: { plugin: Plugin }): React.JSX.Element {
 			<span className={styles.tag}>{plugin.category}</span>
 			{plugin.peerRange && (
 				<span className={styles.badgeVersion}>
-					Works with lightweight-charts {plugin.peerRange}
+					Works with @bishopbot/lightweight-charts {plugin.peerRange}
 				</span>
 			)}
 			<span className={styles.badgeVersion}>v{plugin.version}</span>
@@ -524,7 +524,7 @@ function MetaTable({ plugin, tags }: { plugin: Plugin; tags: string[] }): React.
 				{plugin.peerRange && (
 					<tr>
 						<td>Supported range</td>
-						<td>lightweight-charts {plugin.peerRange}</td>
+						<td>@bishopbot/lightweight-charts {plugin.peerRange}</td>
 					</tr>
 				)}
 				<tr>

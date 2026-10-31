@@ -67,12 +67,12 @@ const validIllustration = [
 ].join('\n');
 
 const minimalPackage = {
-	name: '@tradingview/lwc-plugin-test',
+	name: '@bishopbot/lwc-plugin-test',
 	version: '1.0.0',
 	description: 'Test',
 	license: 'Apache-2.0',
 	publishConfig: { access: 'public' },
-	peerDependencies: { 'lightweight-charts': '^5.0.0' },
+	peerDependencies: { '@bishopbot/lightweight-charts': '^6.0.0' },
 	keywords: ['lightweight-charts-plugin'],
 	lwcPlugin: { title: 'Test', category: 'series-primitive', lifecycle: 'current', origin: 'official', demo: 'src/example/index.html' },
 };
@@ -96,7 +96,7 @@ describe('Plugin Repo Scripts Unit Tests', () => {
 				fs.mkdirSync(plugin1Dir);
 				fs.writeFileSync(
 					path.join(plugin1Dir, 'package.json'),
-					JSON.stringify({ name: '@tradingview/lwc-plugin-alpha', version: '1.0.0', private: false })
+					JSON.stringify({ name: '@bishopbot/lwc-plugin-alpha', version: '1.0.0', private: false })
 				);
 
 				// 2. Private plugin (must be excluded)
@@ -104,7 +104,7 @@ describe('Plugin Repo Scripts Unit Tests', () => {
 				fs.mkdirSync(plugin2Dir);
 				fs.writeFileSync(
 					path.join(plugin2Dir, 'package.json'),
-					JSON.stringify({ name: '@tradingview/lwc-plugin-beta', version: '1.0.0', private: true })
+					JSON.stringify({ name: '@bishopbot/lwc-plugin-beta', version: '1.0.0', private: true })
 				);
 
 				// 3. Non-plugin package (should be ignored)
@@ -117,7 +117,7 @@ describe('Plugin Repo Scripts Unit Tests', () => {
 
 				const plugins = findWorkspacePlugins(tempRoot);
 				expect(plugins).to.have.lengthOf(1);
-				expect(plugins[0].name).to.equal('@tradingview/lwc-plugin-alpha');
+				expect(plugins[0].name).to.equal('@bishopbot/lwc-plugin-alpha');
 				expect(path.basename(plugins[0].dir)).to.equal('lwc-plugin-alpha');
 				expect(plugins[0].version).to.equal('1.0.0');
 			} finally {
@@ -133,15 +133,15 @@ describe('Plugin Repo Scripts Unit Tests', () => {
 
 				const dirA = path.join(packagesDir, 'lwc-plugin-foo');
 				fs.mkdirSync(dirA);
-				fs.writeFileSync(path.join(dirA, 'package.json'), JSON.stringify({ name: '@tradingview/lwc-plugin-foo' }));
+				fs.writeFileSync(path.join(dirA, 'package.json'), JSON.stringify({ name: '@bishopbot/lwc-plugin-foo' }));
 
 				const dirB = path.join(packagesDir, 'lwc-plugin-bar');
 				fs.mkdirSync(dirB);
-				fs.writeFileSync(path.join(dirB, 'package.json'), JSON.stringify({ name: '@tradingview/lwc-plugin-bar' }));
+				fs.writeFileSync(path.join(dirB, 'package.json'), JSON.stringify({ name: '@bishopbot/lwc-plugin-bar' }));
 
 				expect(findWorkspacePlugins(tempRoot, 'foo')).to.have.lengthOf(1);
 				expect(findWorkspacePlugins(tempRoot, 'lwc-plugin-foo')).to.have.lengthOf(1);
-				expect(findWorkspacePlugins(tempRoot, '@tradingview/lwc-plugin-foo')).to.have.lengthOf(1);
+				expect(findWorkspacePlugins(tempRoot, '@bishopbot/lwc-plugin-foo')).to.have.lengthOf(1);
 				expect(findWorkspacePlugins(tempRoot, 'non-existent')).to.have.lengthOf(0);
 			} finally {
 				fs.rmSync(tempRoot, { recursive: true, force: true });
@@ -151,7 +151,7 @@ describe('Plugin Repo Scripts Unit Tests', () => {
 		it('should resolve --path to a single package and reject a directory without package.json', () => {
 			const [plugin] = resolveTargetPlugins('/nonexistent-root', { path: validFixtureDir });
 			expect(plugin.dir).to.equal(validFixtureDir);
-			expect(plugin.name).to.equal('@tradingview/lwc-plugin-valid-sample');
+			expect(plugin.name).to.equal('@bishopbot/lwc-plugin-valid-sample');
 			expect(plugin.version).to.equal('1.0.0');
 
 			expect(() => resolveTargetPlugins('/nonexistent-root', { path: os.tmpdir() }))
@@ -213,7 +213,7 @@ describe('Plugin Repo Scripts Unit Tests', () => {
 				}),
 				stderr: '',
 			};
-			const result = parseRemoteVersionError(mock404Error, '@tradingview/lwc-plugin-foo');
+			const result = parseRemoteVersionError(mock404Error, '@bishopbot/lwc-plugin-foo');
 			expect(result).to.be.null;
 		});
 
@@ -228,8 +228,8 @@ describe('Plugin Repo Scripts Unit Tests', () => {
 				stderr: '',
 			};
 			expect(() => {
-				parseRemoteVersionError(mock500Error, '@tradingview/lwc-plugin-foo');
-			}).to.throw(/Failed to query registry for '@tradingview\/lwc-plugin-foo': Internal Server Error/);
+				parseRemoteVersionError(mock500Error, '@bishopbot/lwc-plugin-foo');
+			}).to.throw(/Failed to query registry for '@bishopbot\/lwc-plugin-foo': Internal Server Error/);
 		});
 	});
 
@@ -283,11 +283,11 @@ A helpful test plugin for lightweight charts.
 ### npm
 
 \`\`\`shell
-npm install @tradingview/lwc-plugin-test
+npm install @bishopbot/lwc-plugin-test
 \`\`\`
 
 \`\`\`js
-import { createChart } from 'lightweight-charts';
+import { createChart } from '@bishopbot/lightweight-charts';
 \`\`\`
 
 ### CDN
@@ -523,10 +523,10 @@ const p = new Plugin();
 			expect(result.errors.length).to.be.greaterThan(0);
 
 			const allErrors = result.errors.join(' | ');
-			expect(allErrors).to.include('@tradingview/');
+			expect(allErrors).to.include('@bishopbot/');
 			expect(allErrors).to.include('lwc-plugin-');
 			expect(allErrors).to.include('publishConfig.access');
-			expect(allErrors).to.include('peerDependencies.lightweight-charts');
+			expect(allErrors).to.include('peerDependencies.@bishopbot/lightweight-charts');
 			expect(allErrors).to.include('lightweight-charts-plugin');
 			expect(allErrors).to.include('lwcPlugin schema error: /category');
 		});
@@ -535,12 +535,12 @@ const p = new Plugin();
 			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-contract-test-'));
 			try {
 				const pkg = {
-					name: '@tradingview/lwc-plugin-test',
+					name: '@bishopbot/lwc-plugin-test',
 					version: 'next',
 					description: '_DESCRIPTION_',
 					license: 'Apache-2.0',
 					publishConfig: { access: 'public' },
-					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					peerDependencies: { '@bishopbot/lightweight-charts': '^6.0.0' },
 					keywords: ['lightweight-charts-plugin'],
 					lwcPlugin: {
 						title: 'Test',
@@ -576,13 +576,13 @@ const p = new Plugin();
 			try {
 				fs.mkdirSync(path.join(tempDir, 'src', 'example'), { recursive: true });
 				const pkg = {
-					name: '@tradingview/lwc-plugin-test',
+					name: '@bishopbot/lwc-plugin-test',
 					version: '1.0.0',
 					description: 'Test',
 					license: 'Apache-2.0',
 					repository: { type: 'git', url: 'git+https://example.test/repo.git', directory: 'packages/lwc-plugin-other' },
 					publishConfig: { access: 'public' },
-					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					peerDependencies: { '@bishopbot/lightweight-charts': '^6.0.0' },
 					keywords: ['lightweight-charts-plugin'],
 					lwcPlugin: { title: 'Test', category: 'series-primitive', lifecycle: 'current', origin: 'official', demo: 'src/example/index.html' },
 				};
@@ -651,11 +651,11 @@ const p = new Plugin();
 			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-demo-test-'));
 			try {
 				const pkg = {
-					name: '@tradingview/lwc-plugin-test',
+					name: '@bishopbot/lwc-plugin-test',
 					version: '1.0.0',
 					license: 'Apache-2.0',
 					publishConfig: { access: 'public' },
-					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					peerDependencies: { '@bishopbot/lightweight-charts': '^6.0.0' },
 					keywords: ['lightweight-charts-plugin'],
 					lwcPlugin: {
 						title: 'Test',
@@ -680,12 +680,12 @@ const p = new Plugin();
 			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-preview-test-'));
 			try {
 				const pkg = {
-					name: '@tradingview/lwc-plugin-test',
+					name: '@bishopbot/lwc-plugin-test',
 					version: '1.0.0',
 					license: 'Apache-2.0',
 					description: 'Test plugin',
 					publishConfig: { access: 'public' },
-					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					peerDependencies: { '@bishopbot/lightweight-charts': '^6.0.0' },
 					keywords: ['lightweight-charts-plugin'],
 					lwcPlugin: {
 						title: 'Test',
@@ -716,12 +716,12 @@ const p = new Plugin();
 			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-preview-height-test-'));
 			try {
 				const pkg = {
-					name: '@tradingview/lwc-plugin-test',
+					name: '@bishopbot/lwc-plugin-test',
 					version: '1.0.0',
 					license: 'Apache-2.0',
 					description: 'Test plugin',
 					publishConfig: { access: 'public' },
-					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					peerDependencies: { '@bishopbot/lightweight-charts': '^6.0.0' },
 					keywords: ['lightweight-charts-plugin'],
 					lwcPlugin: {
 						title: 'Test',
@@ -756,11 +756,11 @@ const p = new Plugin();
 			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-meta-test-'));
 			try {
 				const pkg = {
-					name: '@tradingview/lwc-plugin-test',
+					name: '@bishopbot/lwc-plugin-test',
 					version: '1.0.0',
 					license: 'Apache-2.0',
 					publishConfig: { access: 'public' },
-					peerDependencies: { 'lightweight-charts': '^5.0.0' },
+					peerDependencies: { '@bishopbot/lightweight-charts': '^6.0.0' },
 					keywords: ['lightweight-charts-plugin'],
 					lwcPlugin: {
 						title: 'Test',

@@ -1,7 +1,7 @@
 import {
 	CustomSeriesOptions,
 	customSeriesDefaultOptions,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 /**
  * How the width of a column is decided.

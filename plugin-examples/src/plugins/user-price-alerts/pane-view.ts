@@ -2,7 +2,7 @@ import {
 	IPrimitivePaneRenderer,
 	IPrimitivePaneView,
 	PrimitivePaneViewZOrder,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { IRendererData } from './irenderer-data';
 import { PaneRenderer } from './pane-renderer';
 import { PriceScalePaneRenderer } from './price-scale-pane-renderer';

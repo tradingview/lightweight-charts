@@ -1,4 +1,4 @@
-import type { OhlcData, UTCTimestamp } from 'lightweight-charts';
+import type { OhlcData, UTCTimestamp } from '@bishopbot/lightweight-charts';
 
 type LineData = {
 	time: UTCTimestamp;

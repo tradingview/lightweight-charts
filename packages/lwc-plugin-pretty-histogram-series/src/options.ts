@@ -1,4 +1,4 @@
-import { customSeriesDefaultOptions, CustomSeriesOptions } from 'lightweight-charts';
+import { customSeriesDefaultOptions, CustomSeriesOptions } from '@bishopbot/lightweight-charts';
 
 /**
  * How a column's width is derived from the bar spacing.

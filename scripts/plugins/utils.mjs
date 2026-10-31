@@ -4,6 +4,7 @@ import { execFileSync, execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import semver from 'semver';
 import Ajv from 'ajv';
+import { LIBRARY_PACKAGE, PREVIEW_KIT_PACKAGE, SCOPE, TOOLKIT_PACKAGE } from './scope.mjs';
 
 const AjvCtor = Ajv.default ?? Ajv;
 const SCHEMA_PATH = fileURLToPath(new URL('./lwc-plugin-metadata.schema.json', import.meta.url));
@@ -49,7 +50,7 @@ function matchesPluginFilter(folderName, pkgName, filter) {
 		normalized === pkgName ||
 		normalized === folderName ||
 		normalized === shortName ||
-		normalized === `@tradingview/${folderName}`
+		normalized === `${SCOPE}/${folderName}`
 	);
 }
 
@@ -167,7 +168,7 @@ export function loadTargetPlugins(repoRoot, options) {
 
 /**
  * Builds the library and the workspace helper packages a plugin compiles
- * against: @tradingview/lwc-toolkit, and @tradingview/lwc-plugin-preview-kit,
+ * against: @bishopbot/lwc-toolkit, and @bishopbot/lwc-plugin-preview-kit,
  * which the catalogue preview page of every package imports. Plugin builds
  * resolve all three through workspace links whose entry points live in `dist/`,
  * so nothing that compiles a plugin can run on a clean checkout before this has.
@@ -177,9 +178,9 @@ export function loadTargetPlugins(repoRoot, options) {
 export function buildWorkspaceDependencies(repoRoot) {
 	console.log('📦 Building the workspace library...');
 	execSync('pnpm build', { cwd: repoRoot, stdio: 'inherit' });
-	console.log('📦 Building @tradingview/lwc-toolkit and @tradingview/lwc-plugin-preview-kit...');
+	console.log(`📦 Building ${TOOLKIT_PACKAGE} and ${PREVIEW_KIT_PACKAGE}...`);
 	execSync(
-		'pnpm --filter @tradingview/lwc-toolkit --filter @tradingview/lwc-plugin-preview-kit build',
+		`pnpm --filter ${TOOLKIT_PACKAGE} --filter ${PREVIEW_KIT_PACKAGE} build`,
 		{ cwd: repoRoot, stdio: 'inherit' }
 	);
 }
@@ -292,8 +293,8 @@ function validateNamingAndLicense(pkg, isOfficial) {
 	const errors = [];
 	const name = pkg.name || '';
 
-	if (isOfficial && !name.startsWith('@tradingview/')) {
-		errors.push(`Official package name must start with '@tradingview/' (got '${name}')`);
+	if (isOfficial && !name.startsWith(`${SCOPE}/`)) {
+		errors.push(`Official package name must start with '${SCOPE}/' (got '${name}')`);
 	}
 
 	const unscopedName = name.slice(name.indexOf('/') + 1);
@@ -349,10 +350,10 @@ function validateDependenciesAndKeywords(pkg) {
 		errors.push(`'publishConfig.access' must be set to 'public'`);
 	}
 
-	const peerRange = pkg.peerDependencies && pkg.peerDependencies['lightweight-charts'];
+	const peerRange = pkg.peerDependencies && pkg.peerDependencies[LIBRARY_PACKAGE];
 	if (!peerRange || typeof peerRange !== 'string' || !semver.validRange(peerRange)) {
 		errors.push(
-			`'peerDependencies.lightweight-charts' must be a valid semver range (got '${peerRange}')`
+			`'peerDependencies.${LIBRARY_PACKAGE}' must be a valid semver range (got '${peerRange}')`
 		);
 	}
 

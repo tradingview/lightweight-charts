@@ -1,6 +1,6 @@
-import type { AutoscaleInfoProvider, CustomSeriesOptions, SeriesPartialOptions } from 'lightweight-charts';
-import { clampOpacity, nonNegativeOr } from '@tradingview/lwc-toolkit/numbers';
-import { isUnsafeKey, mergeOptions } from '@tradingview/lwc-toolkit/options/merge';
+import type { AutoscaleInfoProvider, CustomSeriesOptions, SeriesPartialOptions } from '@bishopbot/lightweight-charts';
+import { clampOpacity, nonNegativeOr } from '@bishopbot/lwc-toolkit/numbers';
+import { isUnsafeKey, mergeOptions } from '@bishopbot/lwc-toolkit/options/merge';
 
 import {
 	ScatterOnlyOptions,

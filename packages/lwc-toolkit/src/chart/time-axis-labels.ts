@@ -53,11 +53,18 @@ export function tickMarkPixelsPerCharacter(fontSize: number): number {
  * a `timeScale.tickMarkMaxCharacterLength` of `characters`: `undefined` and
  * `0` count as the default of 8, as the library does.
  *
+ * A horizontal scale behavior may ask for more room than the configured
+ * budget (a nanosecond chart needs it for its sub-second labels); the library
+ * takes the wider of the two, so pass the behavior's budget here to get the
+ * same room the time scale uses.
+ *
  * @param characters - the `tickMarkMaxCharacterLength` option.
  * @param fontSize - `layout.fontSize` of the chart options.
+ * @param behaviorMaxCharacters - the budget the horizontal scale behavior asks for, if any.
  */
-export function tickMarkMaxLabelWidth(characters: number | undefined, fontSize: number): number {
-	return tickMarkPixelsPerCharacter(fontSize) * (characters || DEFAULT_TICK_MARK_MAX_CHARACTER_LENGTH);
+export function tickMarkMaxLabelWidth(characters: number | undefined, fontSize: number, behaviorMaxCharacters?: number): number {
+	const configured = characters || DEFAULT_TICK_MARK_MAX_CHARACTER_LENGTH;
+	return tickMarkPixelsPerCharacter(fontSize) * Math.max(configured, behaviorMaxCharacters ?? 0);
 }
 
 /**
@@ -71,9 +78,14 @@ export function tickMarkMaxLabelWidth(characters: number | undefined, fontSize: 
  * pass a positive width for the closest labels, or `0` to hand the spacing
  * back to the chart.
  *
+ * A horizontal scale behavior that asks for more room than the width does is
+ * honoured: the time scale takes the wider of the two budgets, so the answer
+ * is never below the behavior's own.
+ *
  * @param width - room between labels, CSS pixels.
  * @param fontSize - `layout.fontSize` of the chart options.
+ * @param behaviorMaxCharacters - the budget the horizontal scale behavior asks for, if any.
  */
-export function tickMarkCharactersForWidth(width: number, fontSize: number): number {
-	return width / tickMarkPixelsPerCharacter(fontSize);
+export function tickMarkCharactersForWidth(width: number, fontSize: number, behaviorMaxCharacters?: number): number {
+	return Math.max(width / tickMarkPixelsPerCharacter(fontSize), behaviorMaxCharacters ?? 0);
 }

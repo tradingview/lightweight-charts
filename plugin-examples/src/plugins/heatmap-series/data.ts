@@ -1,4 +1,4 @@
-import { CustomData } from 'lightweight-charts';
+import { CustomData } from '@bishopbot/lightweight-charts';
 
 export interface HeatmapCell {
 	// Price for the lower edge of the heatmap cell

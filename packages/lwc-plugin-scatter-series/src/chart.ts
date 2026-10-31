@@ -5,8 +5,8 @@ import {
 	IChartApiBase,
 	LineStyle,
 	createChartEx,
-} from 'lightweight-charts';
-import { freezeOptions, mergeOptions } from '@tradingview/lwc-toolkit/options/merge';
+} from '@bishopbot/lightweight-charts';
+import { freezeOptions, mergeOptions } from '@bishopbot/lwc-toolkit/options/merge';
 
 import { ScatterHorzScaleBehavior } from './horz-scale-behavior';
 

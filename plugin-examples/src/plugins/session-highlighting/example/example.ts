@@ -1,4 +1,4 @@
-import { Time, createChart, isBusinessDay, isUTCTimestamp, CandlestickSeries } from 'lightweight-charts';
+import { Time, createChart, isBusinessDay, isUTCTimestamp, isUTCTimestampNanoseconds, CandlestickSeries } from '@bishopbot/lightweight-charts';
 import { generateAlternativeCandleData } from '../../../sample-data';
 import { SessionHighlighting } from '../session-highlighting';
 
@@ -13,6 +13,9 @@ candleSeries.setData(data);
 function getDate(time: Time): Date {
 	if (isUTCTimestamp(time)) {
 		return new Date(time * 1000);
+	} else if (isUTCTimestampNanoseconds(time)) {
+		// `Date` holds milliseconds; the sub-millisecond part is dropped.
+		return new Date(Number(time / 1_000_000n));
 	} else if (isBusinessDay(time)) {
 		return new Date(time.year, time.month, time.day);
 	} else {

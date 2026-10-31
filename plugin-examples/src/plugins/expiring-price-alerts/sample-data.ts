@@ -1,4 +1,4 @@
-import { LineData, UTCTimestamp } from 'lightweight-charts';
+import { LineData, UTCTimestamp } from '@bishopbot/lightweight-charts';
 
 const values = [
 	22.75105, 22.7028, 22.91657, 22.89733, 22.58714, 22.79207, 22.4285, 22.12538,

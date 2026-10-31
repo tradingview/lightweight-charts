@@ -15,7 +15,7 @@ import {
 	CandlestickSeries,
 	HistogramSeries,
 	BaselineSeries,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { themeColors } from '../../../theme-colors';
 
 let series;

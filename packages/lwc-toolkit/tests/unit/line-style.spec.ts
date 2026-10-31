@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
-import type { LineStyle as ChartLineStyle } from 'lightweight-charts';
+import type { LineStyle as ChartLineStyle } from '@bishopbot/lightweight-charts';
 
 import {
 	getDashPattern,

@@ -2,7 +2,7 @@ import {
 	CandlestickData,
 	CustomData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 /**
  * Rounded candle series data

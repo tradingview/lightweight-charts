@@ -8,10 +8,10 @@ import {
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { LollipopData } from './data';
 import { LollipopSeriesOptions } from './options';
-import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
+import { positionsBox, positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 interface LollipopBarItem {
 	x: number;

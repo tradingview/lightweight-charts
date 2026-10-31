@@ -1,4 +1,4 @@
-import { ISeriesApi, SeriesDataItemTypeMap, SeriesType, Time } from 'lightweight-charts';
+import { ISeriesApi, SeriesDataItemTypeMap, SeriesType, Time } from '@bishopbot/lightweight-charts';
 
 /** A series of any type attached to the pane. */
 export type AnySeries = ISeriesApi<SeriesType, Time>;

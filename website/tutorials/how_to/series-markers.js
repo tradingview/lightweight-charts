@@ -10,7 +10,7 @@ const chartOptions = {
 	},
 };
 // remove-line
-/** @type {import('lightweight-charts').IChartApi} */
+/** @type {import('@bishopbot/lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
 const series = chart.addSeries(CandlestickSeries, {
@@ -769,7 +769,7 @@ for (let i = 0; i < datesForMarkers.length; i++) {
 		});
 	}
 }
-/** @type {import('lightweight-charts').createSeriesMarkers} */
+/** @type {import('@bishopbot/lightweight-charts').createSeriesMarkers} */
 createSeriesMarkers(series, markers);
 // highlight-end
 

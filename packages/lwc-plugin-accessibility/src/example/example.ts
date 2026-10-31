@@ -8,7 +8,7 @@ import {
 	Time,
 	createChart,
 	createSeriesMarkers,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { generateLineData } from './sample-data';
 import { addAccessibilityPlugin, createToneSonifier, esMessages } from '../accessibility';
 

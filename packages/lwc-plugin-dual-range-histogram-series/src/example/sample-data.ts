@@ -1,4 +1,4 @@
-import { Time, WhitespaceData } from 'lightweight-charts';
+import { Time, WhitespaceData } from '@bishopbot/lightweight-charts';
 import { DualRangeHistogramData } from '../data';
 
 type LineData = {

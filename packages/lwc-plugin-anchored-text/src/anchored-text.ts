@@ -1,6 +1,6 @@
-import { PanePluginBase } from '@tradingview/lwc-toolkit/pane-plugin-base';
-import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
-import { IPrimitivePaneView, Time } from 'lightweight-charts';
+import { PanePluginBase } from '@bishopbot/lwc-toolkit/pane-plugin-base';
+import { PluginBase } from '@bishopbot/lwc-toolkit/plugin-base';
+import { IPrimitivePaneView, Time } from '@bishopbot/lightweight-charts';
 
 import { AnchoredTextCore } from './core.js';
 import { AnchoredTextInputOptions, AnchoredTextOptions } from './options.js';

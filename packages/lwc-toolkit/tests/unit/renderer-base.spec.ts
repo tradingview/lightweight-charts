@@ -8,7 +8,7 @@ import {
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import {
 	BitmapCoordinatesRenderingScope,

@@ -13,8 +13,8 @@ import {
 	SeriesType,
 	Time,
 	WhitespaceData,
-} from 'lightweight-charts';
-import { positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
+} from '@bishopbot/lightweight-charts';
+import { positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 class PartialPriceLineRenderer implements IPrimitivePaneRenderer {
 	_price: number | null = null;

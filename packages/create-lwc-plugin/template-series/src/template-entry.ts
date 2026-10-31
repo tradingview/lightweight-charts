@@ -4,7 +4,7 @@ import {
 	PaneRendererCustomData,
 	WhitespaceData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_Options, defaultOptions } from './options';
 import { _CLASSNAME_Renderer } from './renderer';
 import { _CLASSNAME_Data } from './data';

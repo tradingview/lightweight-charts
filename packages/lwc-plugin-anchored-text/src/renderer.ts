@@ -3,7 +3,7 @@ import {
 	IPrimitivePaneRenderer,
 	IPrimitivePaneView,
 	PrimitivePaneViewZOrder,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 import { layoutAnchoredText } from './layout.js';
 import { AnchoredTextOptions } from './options.js';

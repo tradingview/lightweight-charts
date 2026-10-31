@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
-import { LineStyle } from 'lightweight-charts';
-import type { IRange, Logical } from 'lightweight-charts';
+import { LineStyle } from '@bishopbot/lightweight-charts';
+import type { IRange, Logical } from '@bishopbot/lightweight-charts';
 
 import { BrushableAreaSeriesOptions, defaultOptions } from '../../src/options.js';
 import { createStyleResolver } from '../../src/style.js';

@@ -5,7 +5,7 @@ import {
 	ICustomSeriesPaneView,
 	PaneRendererCustomData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { RoundedCandleData } from './data';
 import { RoundedCandleSeriesOptions, defaultOptions } from './options';
 import { RoundedCandleSeriesRenderer } from './renderer';

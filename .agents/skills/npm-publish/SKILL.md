@@ -4,7 +4,7 @@ description: >-
   Use when cutting and publishing a release of this lightweight-charts fork to
   the npm registry under the @bishopbot scope. Covers the three publishable
   surfaces — the root lightweight-charts library, the @bishopbot/lwc-toolkit
-  shared package, and the 13 @bishopbot/lwc-plugin-* packages under packages/
+  shared package, and the 12 @bishopbot/lwc-plugin-* packages under packages/
   — including feature branches, PR CI gates, merge to master, the local
   release script, version tags, and the grouped GitHub release. Triggers:
   "publish", "release", "cut a release", "bump version", "tag and push",
@@ -18,13 +18,23 @@ This fork is a pnpm workspace, derived from `tradingview/lightweight-charts`. Th
 
 | Surface | Path | Publishes as | Cadence |
 |---|---|---|---|
-| Library | `package.json` (root) | `@bishopbot/lightweight-charts` (under a renamed `name` field) | Manual; rarely used in this fork |
+| Library | `package.json` (root) | `@bishopbot/lightweight-charts` | Manual; publish it first, the plugins peer on it |
 | Toolkit | `packages/lwc-toolkit/` | `@bishopbot/lwc-toolkit` | When a shared primitive changes |
-| Plugins | `packages/lwc-plugin-*/` (13 packages) | `@bishopbot/lwc-plugin-<name>` | Per-package, on demand |
+| Plugins | `packages/lwc-plugin-*/` (12 publishable) | `@bishopbot/lwc-plugin-<name>` | Per-package, on demand |
+| Wizard | `packages/create-lwc-plugin/` | `@bishopbot/create-lwc-plugin` | Rarely |
 
 > **Why the scope is `@bishopbot`, not `@tradingview`.** This repo is a fork — the GitHub remote is `github.com/bishop-bot/lightweight-charts`, and the npm publish target is the npm org you (the maintainer) own. Upstream `tradingview/lightweight-charts` is still maintained by TradingView and still publishes the original `lightweight-charts` and `@tradingview/lwc-*` packages. Publishing under `@bishopbot` keeps the fork's tarballs and tags separate from the upstream's.
 
 The plugins and toolkit are the surfaces this repo documents a script for. The root library's `package.json` is `private: true` to keep it from publishing accidentally; it ships via `pnpm prepare-release` only when a maintainer intentionally runs it (see step 6).
+
+**The library peer contract.** Every plugin and the toolkit declare
+`@bishopbot/lightweight-charts` (`^6.0.0`) as their library peer dependency,
+and the upstream `lightweight-charts` (`^5.0.0`) as an **optional** peer, so
+a consumer that already depends on the upstream 5.x line is not forced to
+change anything. The fork's packages import the scoped name at runtime; the
+optional peer only keeps the two lines installable side by side. Publish the
+library **before** the plugins: the floor check installs the peer from the
+registry, and it fails until `@bishopbot/lightweight-charts` is there.
 
 > **One-time setup, do this once on a fresh machine before your first release.**
 >
@@ -199,43 +209,40 @@ Plugins bundle the toolkit into their own `dist/` at build time, so a toolkit bu
 
 ---
 
-## 6. Library (root package) path — rarely used
+## 6. Library (root package) path
 
-The root library is `private: true` to prevent accidental publish. In this fork, the library normally reaches users **through the plugins** (which bundle it), not as a standalone npm package. If you need to publish the fork's library to npm on its own:
+The root library is `private: true` to prevent accidental publish, and it is published under the scoped name `@bishopbot/lightweight-charts` (the unscoped `lightweight-charts` is owned upstream by TradingView).
 
-1. Rename the package in `package.json` (root) because the unscoped name `lightweight-charts` is owned upstream by TradingView:
+The name, the version (`6.0.0`) and the top-level `CHANGELOG.md` are already in the tree. For every release after that:
 
-   ```diff
-   -  "name": "lightweight-charts",
-   +  "name": "@bishopbot/lightweight-charts",
-   ```
-
-   Land the rename on its own PR so the diff is reviewable. The rest of the package layout, the `peerDependencies` declared by each plugin (which currently say `lightweight-charts`), and the `lightweight-charts-plugin` keyword in `keywords` are unchanged by the rename.
-2. Bump `version` in the same `package.json` and add a `## X.Y.Z` entry to `CHANGELOG.md` (there is no top-level CHANGELOG by default — create one following the plugin Keep-a-Changelog format).
-3. Build the release artefact:
+1. Bump `version` in the root `package.json` and add a `## X.Y.Z` entry to the root `CHANGELOG.md` (Keep a Changelog format, as the plugin changelogs use).
+2. Build the release artefact:
 
    ```sh
    pnpm build:prod              # NODE_ENV=production pnpm build
    pnpm prepare-package-json-for-release
    ```
 
-   `prepare-package-json-for-release` (script `scripts/clean-package-json.js`) strips `private`, `engines`, `devDependencies`, `scripts`, and `packageManager` from the root `package.json` so a published tarball does not leak dev-only fields. The change is on disk and must be reverted before committing if you do not want it tracked.
-4. Publish from a clean `master`:
+   `prepare-package-json-for-release` (script `scripts/clean-package-json.js`) strips `private`, `engines`, `devDependencies`, `scripts`, and `packageManager` from the root `package.json` so a published tarball does not leak dev-only fields. The change is on disk and must be reverted before committing if you do not want it tracked. `publishConfig.access` is `public`, and `files` carries `LICENSE`, `NOTICE` and `CHANGELOG.md`, as Apache-2.0 requires.
+3. Check what the tarball will contain, then publish from a clean `master`:
 
    ```sh
    git checkout master && git pull --ff-only
    git status                   # must be clean
+   npm pack --dry-run           # dist/, LICENSE, NOTICE, CHANGELOG.md, package.json
    pnpm publish --access public
    ```
 
-5. Tag the library and push:
+4. Tag the library and push:
 
    ```sh
    git tag vX.Y.Z
    git push origin vX.Y.Z
    ```
 
-6. The website `deploy.yml` workflow runs on the `v*` tag push and rebuilds the documentation site. Wait for it to finish before announcing the release.
+5. The website `deploy.yml` workflow runs on the `v*` tag push and rebuilds the documentation site. Wait for it to finish before announcing the release.
+
+6. Only then publish the plugins and the toolkit: their floor check resolves the library peer from the registry, and it needs `@bishopbot/lightweight-charts@6.0.0` to be there.
 
 ---
 

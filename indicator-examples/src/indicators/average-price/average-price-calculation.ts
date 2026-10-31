@@ -3,7 +3,7 @@ import {
 	LineData,
 	Time,
 	WhitespaceData,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 export type SupportedData = CandlestickData | WhitespaceData;
 

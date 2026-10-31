@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import semver from 'semver';
 import { catalogSlugOf as slugOf, findWorkspacePlugins, validatePackageMetadata } from './utils.mjs';
+import { LIBRARY_PACKAGE } from './scope.mjs';
 
 export const DEFAULT_REGISTRY = 'https://registry.npmjs.org';
 
@@ -172,7 +173,7 @@ export function publishedRelease(packument) {
 	return {
 		version: latest,
 		publishedAt: packument.time?.[latest] ?? null,
-		peerRange: manifest.peerDependencies?.['lightweight-charts'] ?? null,
+		peerRange: manifest.peerDependencies?.[LIBRARY_PACKAGE] ?? null,
 		description: textOrNull(manifest.description),
 		license: textOrNull(manifest.license),
 		keywords: Array.isArray(manifest.keywords) ? manifest.keywords : [],
@@ -248,7 +249,7 @@ function warnAboutFallbacks(plugin, release, publishedReadme, log) {
 		log.warn(`${plugin.name}: the workspace version ${plugin.version} is behind the published ${release.version}`);
 	}
 	if (release.peerRange === null) {
-		log.warn(`${plugin.name}: the published manifest declares no lightweight-charts peer range`);
+		log.warn(`${plugin.name}: the published manifest declares no ${LIBRARY_PACKAGE} peer range`);
 	}
 	if (publishedReadme === null) {
 		log.warn(`${plugin.name}: the published ${release.version} has no README, using the workspace one`);

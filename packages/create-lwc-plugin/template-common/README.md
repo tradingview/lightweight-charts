@@ -99,7 +99,7 @@ declarations (`dist/_ENTRYNAME_.d.ts`).
 ## The plugin toolkit
 
 This project depends on
-[`@tradingview/lwc-toolkit`](https://www.npmjs.com/package/@tradingview/lwc-toolkit),
+[`@bishopbot/lwc-toolkit`](https://www.npmjs.com/package/@bishopbot/lwc-toolkit),
 a small set of helpers written for plugin authors: pixel-perfect coordinate and
 width calculations for candles, columns and full-width bars, crosshair-aligned
 line widths, time conversion, and a `PluginBase` class that keeps the chart and

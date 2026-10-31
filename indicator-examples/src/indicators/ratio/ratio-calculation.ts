@@ -3,7 +3,7 @@ import {
 	LineData,
 	UTCTimestamp,
 	WhitespaceData,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { ClosestTimeIndexFinder } from '../../helpers/closest-index';
 import { ensureTimestampData } from '../../helpers/timestamp-data';
 

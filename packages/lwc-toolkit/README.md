@@ -1,4 +1,4 @@
-# @tradingview/lwc-toolkit
+# @bishopbot/lwc-toolkit
 
 Helpers for authoring [Lightweight Charts™](https://www.tradingview.com/lightweight-charts/)
 plugins — the pixel-arithmetic, subscription and base-class pieces that every
@@ -7,7 +7,7 @@ plugin ends up needing, so they do not have to be copied into each project.
 Requires `lightweight-charts` 5.0 or later as a peer dependency.
 
 ```shell
-npm install --save-dev @tradingview/lwc-toolkit
+npm install --save-dev @bishopbot/lwc-toolkit
 ```
 
 A dev dependency is usually the right choice: a plugin bundles the handful of
@@ -17,12 +17,12 @@ need this package themselves. See [Bundling](#bundling) below.
 ## Usage
 
 Every helper is imported from its own sub-path. There is no barrel entry point,
-so `@tradingview/lwc-toolkit` on its own does not resolve — import the module
+so `@bishopbot/lwc-toolkit` on its own does not resolve — import the module
 you want:
 
 ```js
-import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
-import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
+import { PluginBase } from '@bishopbot/lwc-toolkit/plugin-base';
+import { positionsBox, positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
 ```
 
 Sub-path exports need a modern module resolver. Set `moduleResolution` to
@@ -87,10 +87,10 @@ bug rather than an inefficiency.
 ## Contributing
 
 The sources live in the
-[Lightweight Charts™ repository](https://github.com/tradingview/lightweight-charts/tree/master/packages/lwc-toolkit).
+[Lightweight Charts™ repository](https://github.com/bishop-bot/lightweight-charts/tree/master/packages/lwc-toolkit).
 
 ```shell
-pnpm --filter @tradingview/lwc-toolkit build
+pnpm --filter @bishopbot/lwc-toolkit build
 ```
 
 On a fresh checkout, build the library first (`pnpm build:prod` in the

@@ -1,6 +1,6 @@
-import { Time, createChart } from 'lightweight-charts';
-import { addRefreshButton, mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
-import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { Time, createChart } from '@bishopbot/lightweight-charts';
+import { addRefreshButton, mountControls } from '@bishopbot/lwc-plugin-preview-kit/preview-controls';
+import '@bishopbot/lwc-plugin-preview-kit/preview.css';
 import { PrettyHistogramData } from '../data';
 import { createPrettyHistogramSeries } from '../pretty-histogram-series';
 import { generateLineData } from './sample-data';

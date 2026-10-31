@@ -3,7 +3,7 @@ import {
 	LineData,
 	UTCTimestamp,
 	WhitespaceData,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 export type SupportedData = CandlestickData<UTCTimestamp> | WhitespaceData<UTCTimestamp>;
 

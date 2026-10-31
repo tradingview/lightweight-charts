@@ -4,7 +4,7 @@ the docusaurus site to ensure that the chart looks great in both dark and light 
 If you want to use this example then please copy the code presented on the documentation site.
 [link](https://tradingview.github.io/lightweight-charts/tutorials/react/simple) */
 // delete-end
-import { AreaSeries, createChart, ColorType } from 'lightweight-charts';
+import { AreaSeries, createChart, ColorType } from '@bishopbot/lightweight-charts';
 import React, { useEffect, useRef } from 'react';
 
 export const ChartComponent = props => {

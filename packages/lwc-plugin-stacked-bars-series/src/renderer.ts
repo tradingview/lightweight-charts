@@ -1,18 +1,18 @@
-import { CustomBarItemData, PaneRendererCustomData, PriceToCoordinateConverter, Time } from 'lightweight-charts';
+import { CustomBarItemData, PaneRendererCustomData, PriceToCoordinateConverter, Time } from '@bishopbot/lightweight-charts';
 import {
 	CornerRadii,
 	clampCornerRadius,
 	drawRoundRectWithBorder,
-} from '@tradingview/lwc-toolkit/canvas/round-rect';
+} from '@bishopbot/lwc-toolkit/canvas/round-rect';
 import {
 	BitmapCoordinatesRenderingScope,
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
-} from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { ColumnPosition, ColumnPositionItem, calculateColumnPositionsInPlace } from '@tradingview/lwc-toolkit/dimensions/columns';
-import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
-import { getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
-import { stackLevels } from '@tradingview/lwc-toolkit/custom-series/stacking';
+} from '@bishopbot/lwc-toolkit/custom-series/renderer-base';
+import { ColumnPosition, ColumnPositionItem, calculateColumnPositionsInPlace } from '@bishopbot/lwc-toolkit/dimensions/columns';
+import { positionsBox, positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
+import { getConflationFactor, mapVisibleBars } from '@bishopbot/lwc-toolkit/custom-series/visible-bars';
+import { stackLevels } from '@bishopbot/lwc-toolkit/custom-series/stacking';
 
 import { StackedBarsHitTestResult, isHitTestData } from './compat';
 import { StackedBand, bandValues, stackBands } from './stack';

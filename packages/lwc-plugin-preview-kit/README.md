@@ -13,12 +13,12 @@ short frame and nothing else.
 
 Two entry points:
 
-- `@tradingview/lwc-plugin-preview-kit/preview.css` — the whole layout. One
+- `@bishopbot/lwc-plugin-preview-kit/preview.css` — the whole layout. One
   compact `#controls` row above a `#chart` that fills the rest of the frame.
   Light only (`color-scheme: light`), because the page is framed inside a site
   that also has a dark theme. Nothing is restyled after load, so the chart is
   created at its final size and does not jump.
-- `@tradingview/lwc-plugin-preview-kit/preview-controls` — `mountControls(defs)`
+- `@bishopbot/lwc-plugin-preview-kit/preview-controls` — `mountControls(defs)`
   builds the control row from `select`, `checkbox` and `button` declarations,
   and `addRefreshButton(onRefresh)` adds a "New data" button for the previews
   whose sample data is random. Plain DOM, no framework.
@@ -31,6 +31,6 @@ A preview page is therefore two elements and a script:
 <script type="module" src="./preview.ts"></script>
 ```
 
-Add it to a package with `@tradingview/lwc-plugin-preview-kit: workspace:*` in
+Add it to a package with `@bishopbot/lwc-plugin-preview-kit: workspace:*` in
 `devDependencies` — `create-lwc-plugin --workspace` does this for you — and
 declare `lwcPlugin.preview` (and `previewHeight`, when 330 px is not enough).

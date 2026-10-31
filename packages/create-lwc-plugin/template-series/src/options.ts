@@ -1,7 +1,7 @@
 import {
 	CustomSeriesOptions,
 	customSeriesDefaultOptions,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 export interface _CLASSNAME_Options extends CustomSeriesOptions {
 	//* Define the options for the series.

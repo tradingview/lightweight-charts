@@ -4,7 +4,7 @@ import {
 	PaneRendererCustomData,
 	WhitespaceData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { WhiskerBoxSeriesOptions, defaultOptions } from './options';
 import { WhiskerBoxSeriesRenderer } from './renderer';
 import { WhiskerData } from './sample-data';

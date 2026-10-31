@@ -1,4 +1,4 @@
-import { AutoscaleInfo, Logical, Time, DataChangedScope } from 'lightweight-charts';
+import { AutoscaleInfo, Logical, Time, DataChangedScope } from '@bishopbot/lightweight-charts';
 import {
 	_CLASSNAME_PriceAxisPaneView,
 	_CLASSNAME_TimeAxisPaneView,
@@ -10,8 +10,8 @@ import {
 import { Point, _CLASSNAME_DataSource } from './data-source';
 import { _CLASSNAME_Options, defaultOptions } from './options';
 import { _CLASSNAME_PaneView } from './pane-view';
-import { AxisLabelView } from '@tradingview/lwc-toolkit/axis-label-view';
-import { PluginBase } from '@tradingview/lwc-toolkit/plugin-base';
+import { AxisLabelView } from '@bishopbot/lwc-toolkit/axis-label-view';
+import { PluginBase } from '@bishopbot/lwc-toolkit/plugin-base';
 
 export class _CLASSNAME_
 	extends PluginBase

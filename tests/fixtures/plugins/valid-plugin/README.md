@@ -9,14 +9,14 @@ A valid sample plugin used for testing repository scripts and verification gates
 Install the package into your project:
 
 ```shell
-npm install @tradingview/lwc-plugin-valid-sample
+npm install @bishopbot/lwc-plugin-valid-sample
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
-import { createChart, LineSeries } from 'lightweight-charts';
-import { ValidSamplePlugin } from '@tradingview/lwc-plugin-valid-sample';
+import { createChart, LineSeries } from '@bishopbot/lightweight-charts';
+import { ValidSamplePlugin } from '@bishopbot/lwc-plugin-valid-sample';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
@@ -31,8 +31,8 @@ Map the library and the plugin to their CDN builds with an import map:
 <script type="importmap">
 {
   "imports": {
-    "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-valid-sample": "https://unpkg.com/@tradingview/lwc-plugin-valid-sample/dist/valid-sample.standalone.js"
+    "@bishopbot/lightweight-charts": "https://unpkg.com/@bishopbot/lightweight-charts@^6/dist/lightweight-charts.standalone.production.mjs",
+    "@bishopbot/lwc-plugin-valid-sample": "https://unpkg.com/@bishopbot/lwc-plugin-valid-sample/dist/valid-sample.standalone.js"
   }
 }
 </script>

@@ -1,4 +1,4 @@
-import { createChart, LineSeries } from 'lightweight-charts';
+import { createChart, LineSeries } from '@bishopbot/lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { BandsIndicator } from '../bands-indicator';
 

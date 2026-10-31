@@ -3,7 +3,7 @@ import {
 	LineData,
 	LineSeries,
 	createChart,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { generateLineData } from '../../../sample-data';
 import { PartialPriceLine } from '../partial-price-line';
 

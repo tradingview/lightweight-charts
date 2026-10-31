@@ -1,4 +1,4 @@
-import { CustomData, UTCTimestamp } from 'lightweight-charts';
+import { CustomData, UTCTimestamp } from '@bishopbot/lightweight-charts';
 
 /**
  * Construction of a box plot is based around a dataset’s quartiles,

@@ -39,7 +39,7 @@ const chartOptions = {
 	},
 };
 // remove-line
-/** @type {import('lightweight-charts').IChartApi} */
+/** @type {import('@bishopbot/lightweight-charts').IChartApi} */
 const chart = createChart(document.getElementById('container'), chartOptions);
 
 const lineSeriesOne = chart.addSeries(LineSeries, { color: LINE_LINE_COLOR });

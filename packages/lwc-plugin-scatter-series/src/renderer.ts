@@ -3,14 +3,14 @@ import {
 	ICustomSeriesPaneRenderer,
 	LineStyle,
 	PriceToCoordinateConverter,
-} from 'lightweight-charts';
-import { beginMarker, beginMarkerOffset } from '@tradingview/lwc-toolkit/canvas/markers';
+} from '@bishopbot/lightweight-charts';
+import { beginMarker, beginMarkerOffset } from '@bishopbot/lwc-toolkit/canvas/markers';
 import type {
 	BitmapCoordinatesRenderingScope,
 	CanvasRenderingTarget2D,
-} from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
-import { setLineStyle } from '@tradingview/lwc-toolkit/line-style';
+} from '@bishopbot/lwc-toolkit/custom-series/renderer-base';
+import { positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
+import { setLineStyle } from '@bishopbot/lwc-toolkit/line-style';
 
 import { XMapping, YToCoordinate, isInPane, xToCoordinate } from './geometry';
 import { ScatterHitGeometry, hitTestScatter } from './hit-test';

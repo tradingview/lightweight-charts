@@ -1,4 +1,4 @@
-import { IChartApiBase, IPaneApi, Time } from 'lightweight-charts';
+import { IChartApiBase, IPaneApi, Time } from '@bishopbot/lightweight-charts';
 
 /**
  * Structural check instead of `instanceof HTMLElement`, so these helpers also

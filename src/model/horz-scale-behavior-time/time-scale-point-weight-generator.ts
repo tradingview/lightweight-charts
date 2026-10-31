@@ -2,7 +2,6 @@ import { Mutable } from '../../helpers/mutable';
 
 import { InternalHorzScaleItem } from '../ihorz-scale-behavior';
 import { TickMarkWeightValue, TimeScalePoint } from '../time-data';
-
 import { TickMarkWeight, TimePoint } from './types';
 
 function hours(count: number): number {

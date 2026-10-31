@@ -3,7 +3,7 @@ import {
 	ISeriesApi,
 	SeriesOptionsMap,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { _CLASSNAME_Options } from './options';
 
 export interface Point {

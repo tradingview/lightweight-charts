@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { IChartApiBase, IPaneApi, Time } from 'lightweight-charts';
+import { IChartApiBase, IPaneApi, Time } from '@bishopbot/lightweight-charts';
 import { describe, it } from 'node:test';
 
 import { chartTableElement, paneContentElement } from '../../src/dom/pane-element.js';

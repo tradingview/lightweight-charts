@@ -7,11 +7,11 @@ import {
 	PaneRendererCustomData,
 	PriceToCoordinateConverter,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { HeatMapData } from './data';
 import { HeatMapSeriesOptions } from './options';
-import { fullBarWidth } from '@tradingview/lwc-toolkit/dimensions/full-width';
-import { positionsBox } from '@tradingview/lwc-toolkit/dimensions/positions';
+import { fullBarWidth } from '@bishopbot/lwc-toolkit/dimensions/full-width';
+import { positionsBox } from '@bishopbot/lwc-toolkit/dimensions/positions';
 
 interface HeatMapBarItemCell {
 	low: number;

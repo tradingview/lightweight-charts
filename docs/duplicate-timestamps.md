@@ -18,7 +18,7 @@ only thing protecting users: in a production build duplicates were accepted and
 silently corrupted the layout. Measured on the old code, with data
 `1000, 2000, 3000, 3000(dup), 4000`:
 
-```
+```text
 rows:   idx 0, 1, 0(stale), 2, 3      <- non-monotonic plot list
 points: 4 distinct times for 5 items
 ```
@@ -36,7 +36,7 @@ data item with that time. `TimePointIndex` is a slot index, so it stays unique a
 strictly increasing for every data item. That single change keeps the entire
 index-driven render pipeline valid:
 
-```ts
+```text
 _pointDataByTimePoint: Map<InternalHorzScaleItemKey, TimePointData[]>
 ```
 
@@ -52,13 +52,13 @@ through `timeScale.indexesToCoordinates`.
 
 ```ts
 const series = chart.addSeries(CandlestickSeries, {
-	allowDuplicateTimes: true,
+    allowDuplicateTimes: true,
 });
 
 series.setData([
-	{ time: 1700000000, open: 1.0, high: 1.1, low: 0.9, close: 1.05 }, // tick 1
-	{ time: 1700000000, open: 1.05, high: 1.2, low: 1.0, close: 1.15 }, // tick 2, same second
-	{ time: 1700000001, open: 1.15, high: 1.2, low: 1.1, close: 1.12 },
+    { time: 1700000000, open: 1.0, high: 1.1, low: 0.9, close: 1.05 }, // tick 1
+    { time: 1700000000, open: 1.05, high: 1.2, low: 1.0, close: 1.15 }, // tick 2, same second
+    { time: 1700000001, open: 1.15, high: 1.2, low: 1.1, close: 1.12 },
 ]);
 
 // streaming: an update with the same time as the last bar appends a tick

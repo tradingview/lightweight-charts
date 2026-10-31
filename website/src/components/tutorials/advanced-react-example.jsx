@@ -4,7 +4,7 @@ the docusaurus site to ensure that the chart looks great in both dark and light 
 If you want to use this example then please copy the code presented on the documentation site.
 [link](https://tradingview.github.io/lightweight-charts/tutorials/react/advanced) */
 // delete-end
-import { createChart, LineSeries, AreaSeries } from 'lightweight-charts';
+import { createChart, LineSeries, AreaSeries } from '@bishopbot/lightweight-charts';
 import React, {
 	createContext,
 	forwardRef,

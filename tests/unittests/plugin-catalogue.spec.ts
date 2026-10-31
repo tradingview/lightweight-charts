@@ -33,7 +33,7 @@ const validReadme = [
 	'### npm',
 	'',
 	'```js',
-	"import { Sample } from '@tradingview/lwc-plugin-sample';",
+	"import { Sample } from '@bishopbot/lwc-plugin-sample';",
 	'```',
 	'',
 	'### CDN',
@@ -58,9 +58,9 @@ function validManifest(name: string, version: string): Record<string, unknown> {
 		description: `Workspace description of ${name}`,
 		license: 'Apache-2.0',
 		keywords: ['lightweight-charts-plugin'],
-		repository: { type: 'git', url: 'git+https://github.com/tradingview/lightweight-charts.git', directory: `packages/${unscoped}` },
+		repository: { type: 'git', url: 'git+https://github.com/bishop-bot/lightweight-charts.git', directory: `packages/${unscoped}` },
 		publishConfig: { access: 'public' },
-		peerDependencies: { 'lightweight-charts': '^5.0.0' },
+		peerDependencies: { '@bishopbot/lightweight-charts': '^6.0.0' },
 		lwcPlugin: {
 			title: `Title of ${name}`,
 			category: 'series-primitive',
@@ -126,7 +126,7 @@ function packument(latest: string, extra: Partial<Packument> & { manifest?: Reco
 				description: `Published description ${latest}`,
 				license: 'Apache-2.0',
 				keywords: ['lightweight-charts-plugin', 'published'],
-				peerDependencies: { 'lightweight-charts': '^5.1.0' },
+				peerDependencies: { '@bishopbot/lightweight-charts': '^6.0.0' },
 				dist: { tarball: TARBALL_URL, integrity: sri(tarball) },
 				...manifest,
 			},
@@ -196,7 +196,7 @@ describe('Plugin catalogue data', () => {
 			expect(release).to.deep.equal({
 				version: '1.2.0',
 				publishedAt: '2026-09-01T10:00:00.000Z',
-				peerRange: '^5.1.0',
+				peerRange: '^6.0.0',
 				description: 'Published description 1.2.0',
 				license: 'Apache-2.0',
 				keywords: ['lightweight-charts-plugin', 'published'],
@@ -256,8 +256,8 @@ describe('Plugin catalogue data', () => {
 
 		it('should name the package when the registry keeps failing, and make at least one attempt', async () => {
 			const down = (() => Promise.reject(new Error('ENOTFOUND'))) as typeof fetch;
-			const error = await rejection(fetchPackument('@tradingview/lwc-plugin-a', { fetchImpl: down, retries: 0 }));
-			expect(error.message).to.match(/Could not fetch @tradingview\/lwc-plugin-a from .*ENOTFOUND/);
+			const error = await rejection(fetchPackument('@bishopbot/lwc-plugin-a', { fetchImpl: down, retries: 0 }));
+			expect(error.message).to.match(/Could not fetch @bishopbot\/lwc-plugin-a from .*ENOTFOUND/);
 		});
 	});
 
@@ -287,15 +287,15 @@ describe('Plugin catalogue data', () => {
 
 	describe('buildCatalogueData', () => {
 		it('should fail on invalid metadata, listing every problem, before touching the registry', async () => {
-			const broken = validManifest('@tradingview/lwc-plugin-broken', '1.0.0');
+			const broken = validManifest('@bishopbot/lwc-plugin-broken', '1.0.0');
 			delete broken.description;
 			(broken.lwcPlugin as Record<string, unknown>).category = 'nonsense';
-			const root = makeRepo({ 'lwc-plugin-broken': broken, 'lwc-plugin-fine': validManifest('@tradingview/lwc-plugin-fine', '1.0.0') });
+			const root = makeRepo({ 'lwc-plugin-broken': broken, 'lwc-plugin-fine': validManifest('@bishopbot/lwc-plugin-fine', '1.0.0') });
 			const calls: string[] = [];
 			try {
 				const error = await rejection(buildCatalogueData({ repoRoot: root, fetchImpl: fakeFetch({}, calls), log: silent }));
 				expect(error.message).to.include('Plugin metadata is invalid');
-				expect(error.message).to.include('@tradingview/lwc-plugin-broken');
+				expect(error.message).to.include('@bishopbot/lwc-plugin-broken');
 				expect(error.message).to.include("'description'");
 				expect(error.message).to.include('/category should be equal to one of the allowed values');
 				expect(error.message).to.not.include('lwc-plugin-fine');
@@ -306,7 +306,7 @@ describe('Plugin catalogue data', () => {
 		});
 
 		it('should reject a repository.directory that names another folder, relative to the given repo root', async () => {
-			const wrong = validManifest('@tradingview/lwc-plugin-line', '1.0.0');
+			const wrong = validManifest('@bishopbot/lwc-plugin-line', '1.0.0');
 			(wrong.repository as Record<string, unknown>).directory = 'packages/totally-wrong';
 			const root = makeRepo({ 'lwc-plugin-line': wrong });
 			try {
@@ -318,12 +318,12 @@ describe('Plugin catalogue data', () => {
 		});
 
 		it('should fail the build when a published tarball does not match its integrity', async () => {
-			const root = makeRepo({ 'lwc-plugin-line': validManifest('@tradingview/lwc-plugin-line', '1.0.0') });
+			const root = makeRepo({ 'lwc-plugin-line': validManifest('@bishopbot/lwc-plugin-line', '1.0.0') });
 			try {
 				const tampered = makeTarball({ 'README.md': '# tampered\n' });
 				const error = await rejection(buildCatalogueData({
 					repoRoot: root,
-					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': packument('1.0.0') }, [], tampered),
+					fetchImpl: fakeFetch({ '@bishopbot/lwc-plugin-line': packument('1.0.0') }, [], tampered),
 					log: silent,
 				}));
 				expect(error.message).to.match(/does not match its published integrity/);
@@ -343,20 +343,20 @@ describe('Plugin catalogue data', () => {
 
 		it('should list unpublished packages by name, sorted, and give them no entry', async () => {
 			const root = makeRepo({
-				'lwc-plugin-zeta': validManifest('@tradingview/lwc-plugin-zeta', '1.0.0'),
-				'lwc-plugin-alpha': validManifest('@tradingview/lwc-plugin-alpha', '1.0.0'),
+				'lwc-plugin-zeta': validManifest('@bishopbot/lwc-plugin-zeta', '1.0.0'),
+				'lwc-plugin-alpha': validManifest('@bishopbot/lwc-plugin-alpha', '1.0.0'),
 			});
 			try {
 				const data = await buildCatalogueData({ repoRoot: root, fetchImpl: fakeFetch({}), log: silent });
 				expect(data.plugins).to.be.empty;
-				expect(data.unpublished).to.deep.equal(['@tradingview/lwc-plugin-alpha', '@tradingview/lwc-plugin-zeta']);
+				expect(data.unpublished).to.deep.equal(['@bishopbot/lwc-plugin-alpha', '@bishopbot/lwc-plugin-zeta']);
 			} finally {
 				fs.rmSync(root, { recursive: true, force: true });
 			}
 		});
 
 		it('should describe a published package from the registry and its tarball, and curate it from the workspace', async () => {
-			const manifest = validManifest('@tradingview/lwc-plugin-line', '1.0.0');
+			const manifest = validManifest('@bishopbot/lwc-plugin-line', '1.0.0');
 			delete (manifest.lwcPlugin as Record<string, unknown>).tags;
 			(manifest.lwcPlugin as Record<string, unknown>).demo = './src/example/index.html';
 			const root = makeRepo({ 'lwc-plugin-line': manifest });
@@ -364,7 +364,7 @@ describe('Plugin catalogue data', () => {
 			try {
 				const data = await buildCatalogueData({
 					repoRoot: root,
-					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': packument('1.0.0') }, calls),
+					fetchImpl: fakeFetch({ '@bishopbot/lwc-plugin-line': packument('1.0.0') }, calls),
 					registry: 'https://registry.example.test/',
 					log: silent,
 				});
@@ -372,12 +372,12 @@ describe('Plugin catalogue data', () => {
 				expect(data.unpublished).to.be.empty;
 				expect(data.plugins).to.have.lengthOf(1);
 				const [entry] = data.plugins;
-				expect(entry.name).to.equal('@tradingview/lwc-plugin-line');
+				expect(entry.name).to.equal('@bishopbot/lwc-plugin-line');
 				expect(entry.slug).to.equal('line');
 				// from the registry
 				expect(entry.version).to.equal('1.0.0');
 				expect(entry.publishedAt).to.equal('2026-09-01T10:00:00.000Z');
-				expect(entry.peerRange).to.equal('^5.1.0');
+				expect(entry.peerRange).to.equal('^6.0.0');
 				expect(entry.description).to.equal('Published description 1.0.0');
 				expect(entry.keywords).to.deep.equal(['lightweight-charts-plugin', 'published']);
 				expect(entry.deprecated).to.be.null;
@@ -386,7 +386,7 @@ describe('Plugin catalogue data', () => {
 				expect(entry.readme).to.equal('# Published README 1.0.0');
 				expect(calls.filter(url => url.endsWith('.tgz'))).to.deep.equal([TARBALL_URL]);
 				// from the workspace, normalised
-				expect(entry.lwcPlugin.title).to.equal('Title of @tradingview/lwc-plugin-line');
+				expect(entry.lwcPlugin.title).to.equal('Title of @bishopbot/lwc-plugin-line');
 				expect(entry.lwcPlugin.tags).to.deep.equal([]);
 				expect(entry.repository.directory).to.equal('packages/lwc-plugin-line');
 				expect(entry.demoPath).to.equal('packages/lwc-plugin-line/src/example/index.html');
@@ -394,14 +394,14 @@ describe('Plugin catalogue data', () => {
 				expect(entry.demoUrl).to.equal('/plugin-demos/line/');
 				expect(entry.previewUrl).to.equal('/plugin-previews/line/');
 				expect(entry.previewHeight).to.equal(440);
-				expect(entry.npmUrl).to.equal('https://www.npmjs.com/package/@tradingview/lwc-plugin-line');
+				expect(entry.npmUrl).to.equal('https://www.npmjs.com/package/@bishopbot/lwc-plugin-line');
 			} finally {
 				fs.rmSync(root, { recursive: true, force: true });
 			}
 		});
 
 		it('should fall back to framing the demo, with a warning, for a package declaring no preview', async () => {
-			const manifest = validManifest('@tradingview/lwc-plugin-line', '1.0.0');
+			const manifest = validManifest('@bishopbot/lwc-plugin-line', '1.0.0');
 			delete (manifest.lwcPlugin as Record<string, unknown>).preview;
 			delete (manifest.lwcPlugin as Record<string, unknown>).previewHeight;
 			const root = makeRepo({ 'lwc-plugin-line': manifest });
@@ -409,7 +409,7 @@ describe('Plugin catalogue data', () => {
 			try {
 				const data = await buildCatalogueData({
 					repoRoot: root,
-					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': packument('1.0.0') }),
+					fetchImpl: fakeFetch({ '@bishopbot/lwc-plugin-line': packument('1.0.0') }),
 					log: { warn: message => warnings.push(message) },
 				});
 				const [entry] = data.plugins;
@@ -424,25 +424,25 @@ describe('Plugin catalogue data', () => {
 		});
 
 		it('should fall back to workspace fields the registry lacks, warning for the README', async () => {
-			const root = makeRepo({ 'lwc-plugin-line': validManifest('@tradingview/lwc-plugin-line', '1.0.0') });
+			const root = makeRepo({ 'lwc-plugin-line': validManifest('@bishopbot/lwc-plugin-line', '1.0.0') });
 			const warnings: string[] = [];
 			try {
 				const noReadme = makeTarball({ 'package.json': '{}' });
 				const bare = packument('1.0.0', { tarball: noReadme, manifest: { description: undefined, license: undefined, keywords: [], peerDependencies: {} } });
 				const data = await buildCatalogueData({
 					repoRoot: root,
-					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': bare }, [], noReadme),
+					fetchImpl: fakeFetch({ '@bishopbot/lwc-plugin-line': bare }, [], noReadme),
 					log: { warn: message => warnings.push(message) },
 				});
 				const [entry] = data.plugins;
 				expect(entry.readme).to.equal(validReadme);
-				expect(entry.description).to.equal('Workspace description of @tradingview/lwc-plugin-line');
+				expect(entry.description).to.equal('Workspace description of @bishopbot/lwc-plugin-line');
 				expect(entry.license).to.equal('Apache-2.0');
 				expect(entry.keywords).to.deep.equal(['lightweight-charts-plugin']);
 				expect(entry.peerRange).to.be.null;
 				const joined = warnings.join('\n');
 				expect(joined).to.include('has no README');
-				expect(joined).to.include('no lightweight-charts peer range');
+				expect(joined).to.include('no @bishopbot/lightweight-charts peer range');
 				for (const field of ['description', 'license', 'keywords']) {
 					expect(joined).to.include(`has no ${field}`);
 				}
@@ -453,16 +453,16 @@ describe('Plugin catalogue data', () => {
 
 		it('should keep a published plugin live while a newer workspace version awaits publishing, and warn when behind', async () => {
 			const root = makeRepo({
-				'lwc-plugin-ahead': validManifest('@tradingview/lwc-plugin-ahead', '1.1.0'),
-				'lwc-plugin-behind': validManifest('@tradingview/lwc-plugin-behind', '1.0.0'),
+				'lwc-plugin-ahead': validManifest('@bishopbot/lwc-plugin-ahead', '1.1.0'),
+				'lwc-plugin-behind': validManifest('@bishopbot/lwc-plugin-behind', '1.0.0'),
 			});
 			const warnings: string[] = [];
 			try {
 				const data = await buildCatalogueData({
 					repoRoot: root,
 					fetchImpl: fakeFetch({
-						'@tradingview/lwc-plugin-ahead': packument('1.0.0'),
-						'@tradingview/lwc-plugin-behind': packument('1.0.5'),
+						'@bishopbot/lwc-plugin-ahead': packument('1.0.0'),
+						'@bishopbot/lwc-plugin-behind': packument('1.0.5'),
 					}),
 					log: { warn: message => warnings.push(message) },
 				});
@@ -478,17 +478,17 @@ describe('Plugin catalogue data', () => {
 		});
 
 		it('should sort entries by title and expose a deprecation notice', async () => {
-			const b = validManifest('@tradingview/lwc-plugin-b', '1.0.0');
+			const b = validManifest('@bishopbot/lwc-plugin-b', '1.0.0');
 			(b.lwcPlugin as Record<string, unknown>).title = 'Alpha';
-			const a = validManifest('@tradingview/lwc-plugin-a', '1.0.0');
+			const a = validManifest('@bishopbot/lwc-plugin-a', '1.0.0');
 			(a.lwcPlugin as Record<string, unknown>).title = 'Zulu';
 			const root = makeRepo({ 'lwc-plugin-b': b, 'lwc-plugin-a': a });
 			try {
 				const data = await buildCatalogueData({
 					repoRoot: root,
 					fetchImpl: fakeFetch({
-						'@tradingview/lwc-plugin-a': packument('1.0.0', { manifest: { deprecated: 'superseded' } }),
-						'@tradingview/lwc-plugin-b': packument('1.0.0'),
+						'@bishopbot/lwc-plugin-a': packument('1.0.0', { manifest: { deprecated: 'superseded' } }),
+						'@bishopbot/lwc-plugin-b': packument('1.0.0'),
 					}),
 					log: silent,
 				});
@@ -500,22 +500,22 @@ describe('Plugin catalogue data', () => {
 		});
 
 		it('should fail the build when the registry is unreachable', async () => {
-			const root = makeRepo({ 'lwc-plugin-line': validManifest('@tradingview/lwc-plugin-line', '1.0.0') });
+			const root = makeRepo({ 'lwc-plugin-line': validManifest('@bishopbot/lwc-plugin-line', '1.0.0') });
 			try {
 				const error = await rejection(buildCatalogueData({
 					repoRoot: root,
-					fetchImpl: fakeFetch({ '@tradingview/lwc-plugin-line': new Error('ECONNREFUSED') }),
+					fetchImpl: fakeFetch({ '@bishopbot/lwc-plugin-line': new Error('ECONNREFUSED') }),
 					retries: 1,
 					log: silent,
 				}));
-				expect(error.message).to.match(/Could not fetch @tradingview\/lwc-plugin-line/);
+				expect(error.message).to.match(/Could not fetch @bishopbot\/lwc-plugin-line/);
 			} finally {
 				fs.rmSync(root, { recursive: true, force: true });
 			}
 		});
 
 		it('should treat every package as unpublished in offline mode without calling the registry', async () => {
-			const root = makeRepo({ 'lwc-plugin-line': validManifest('@tradingview/lwc-plugin-line', '1.0.0') });
+			const root = makeRepo({ 'lwc-plugin-line': validManifest('@bishopbot/lwc-plugin-line', '1.0.0') });
 			const calls: string[] = [];
 			const warnings: string[] = [];
 			try {
@@ -528,7 +528,7 @@ describe('Plugin catalogue data', () => {
 				expect(calls).to.be.empty;
 				expect(data.registry).to.be.null;
 				expect(data.plugins).to.be.empty;
-				expect(data.unpublished).to.deep.equal(['@tradingview/lwc-plugin-line']);
+				expect(data.unpublished).to.deep.equal(['@bishopbot/lwc-plugin-line']);
 				expect(warnings.join('\n')).to.include('Offline mode');
 			} finally {
 				fs.rmSync(root, { recursive: true, force: true });

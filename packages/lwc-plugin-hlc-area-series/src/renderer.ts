@@ -1,18 +1,18 @@
-import { LineStyle, PriceToCoordinateConverter, Time } from 'lightweight-charts';
+import { LineStyle, PriceToCoordinateConverter, Time } from '@bishopbot/lightweight-charts';
 import {
 	LinePathData,
 	areaBetween,
 	buildLinePath,
 	buildStepLinePath,
-} from '@tradingview/lwc-toolkit/custom-series/line-paths';
+} from '@bishopbot/lwc-toolkit/custom-series/line-paths';
 import {
 	BitmapCoordinatesRenderingScope,
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
-} from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { GapCheck, barCoordinate, extendRange, getConflationFactor, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
-import { setLineStyle } from '@tradingview/lwc-toolkit/line-style';
-import type { LineStyle as ToolkitLineStyle } from '@tradingview/lwc-toolkit/line-style';
+} from '@bishopbot/lwc-toolkit/custom-series/renderer-base';
+import { GapCheck, barCoordinate, extendRange, getConflationFactor, visibleSegments } from '@bishopbot/lwc-toolkit/custom-series/visible-bars';
+import { setLineStyle } from '@bishopbot/lwc-toolkit/line-style';
+import type { LineStyle as ToolkitLineStyle } from '@bishopbot/lwc-toolkit/line-style';
 
 import { HLCAreaData } from './data';
 import { HLCAreaSeriesOptions } from './options';

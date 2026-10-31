@@ -7,7 +7,7 @@ import { Answers, SkillChoice, askQuestions, askSkillInstall } from './questions
 import { scaffold } from './scaffold';
 
 /** The repository the `skills` CLI installs from, and the skill to pick out of it. */
-const SKILL_SOURCE = 'tradingview/lightweight-charts';
+const SKILL_SOURCE = 'bishop-bot/lightweight-charts';
 const SKILL_NAME = 'lightweight-charts-plugin-authoring';
 const SKILL_COMMAND = `npx skills add ${SKILL_SOURCE} --skill ${SKILL_NAME}`;
 

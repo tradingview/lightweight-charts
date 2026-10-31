@@ -1,4 +1,4 @@
-import { Time } from 'lightweight-charts';
+import { Time } from '@bishopbot/lightweight-charts';
 import { HeatMapData } from './data';
 
 const rawData = [

@@ -33,14 +33,14 @@ Install the package. It requires `lightweight-charts` `^5.0.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-image-watermark
+npm install @bishopbot/lwc-plugin-image-watermark
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { ImageWatermark } from '@tradingview/lwc-plugin-image-watermark';
+import { ImageWatermark } from '@bishopbot/lwc-plugin-image-watermark';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
@@ -59,7 +59,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-image-watermark": "https://unpkg.com/@tradingview/lwc-plugin-image-watermark/dist/image-watermark.standalone.js"
+    "@bishopbot/lwc-plugin-image-watermark": "https://unpkg.com/@bishopbot/lwc-plugin-image-watermark/dist/image-watermark.standalone.js"
   }
 }
 </script>
@@ -70,7 +70,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart, LineSeries } from 'lightweight-charts';
-import { ImageWatermark } from '@tradingview/lwc-plugin-image-watermark';
+import { ImageWatermark } from '@bishopbot/lwc-plugin-image-watermark';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
@@ -89,7 +89,7 @@ should follow:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { ImageWatermark } from '@tradingview/lwc-plugin-image-watermark';
+import { ImageWatermark } from '@bishopbot/lwc-plugin-image-watermark';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
@@ -117,7 +117,7 @@ attached to a pane instead of a series. Use it when the watermark should stay
 put while series are added and removed:
 
 ```js
-import { ImageWatermarkPane } from '@tradingview/lwc-plugin-image-watermark';
+import { ImageWatermarkPane } from '@bishopbot/lwc-plugin-image-watermark';
 
 const watermark = new ImageWatermarkPane('/logo.svg', { alpha: 0.4 });
 chart.panes()[0].attachPrimitive(watermark);

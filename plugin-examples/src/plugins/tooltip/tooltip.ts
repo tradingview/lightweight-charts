@@ -11,10 +11,10 @@ import {
 	WhitespaceData,
 	CandlestickData,
 	Time,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { TooltipElement, TooltipOptions } from './tooltip-element';
-import { positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
-import { convertTime, formattedDateAndTime } from '@tradingview/lwc-toolkit/time';
+import { positionsLine } from '@bishopbot/lwc-toolkit/dimensions/positions';
+import { convertTime, formattedDateAndTime } from '@bishopbot/lwc-toolkit/time';
 
 class TooltipCrosshairLinePaneRenderer implements IPrimitivePaneRenderer {
 	_data: TooltipCrosshairLineData;

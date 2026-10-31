@@ -1,5 +1,5 @@
-import { IChartApi, Logical } from 'lightweight-charts';
-import { Delegate, ISubscription } from '@tradingview/lwc-toolkit/delegate';
+import { IChartApi, Logical } from '@bishopbot/lightweight-charts';
+import { Delegate, ISubscription } from '@bishopbot/lwc-toolkit/delegate';
 
 /**
  * One pointer or finger on the chart: where it is, and which logical index of

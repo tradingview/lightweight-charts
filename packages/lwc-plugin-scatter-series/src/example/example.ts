@@ -1,4 +1,4 @@
-import { DeepPartial, IChartApiBase, LineStyle } from 'lightweight-charts';
+import { DeepPartial, IChartApiBase, LineStyle } from '@bishopbot/lightweight-charts';
 
 import { ScatterChartOptions, createScatterChart } from '../chart';
 import type { ScatterGroupInfo, ScatterPoint, ScatterPointInfo } from '../data';

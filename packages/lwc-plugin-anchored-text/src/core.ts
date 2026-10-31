@@ -1,4 +1,4 @@
-import { IPrimitivePaneView } from 'lightweight-charts';
+import { IPrimitivePaneView } from '@bishopbot/lightweight-charts';
 
 import {
 	AnchoredTextInputOptions,

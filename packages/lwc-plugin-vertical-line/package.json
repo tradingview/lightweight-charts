@@ -1,8 +1,8 @@
 {
-	"name": "@tradingview/lwc-plugin-vertical-line",
-	"version": "1.0.0",
+	"name": "@bishopbot/lwc-plugin-vertical-line",
+	"version": "1.1.0",
 	"description": "Full-height vertical line at a given time, with an optional label on the time axis, for marking events, trades, and session boundaries.",
-	"author": "TradingView",
+	"author": "bishop-bot",
 	"license": "Apache-2.0",
 	"type": "module",
 	"types": "./dist/vertical-line.d.ts",
@@ -28,7 +28,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/tradingview/lightweight-charts.git",
+		"url": "git+https://github.com/bishop-bot/lightweight-charts.git",
 		"directory": "packages/lwc-plugin-vertical-line"
 	},
 	"publishConfig": {
@@ -43,6 +43,7 @@
 		"postpack": "node -e \"require('fs').unlinkSync('LICENSE')\""
 	},
 	"peerDependencies": {
+		"@bishopbot/lightweight-charts": "^6.0.0",
 		"lightweight-charts": "^5.0.0"
 	},
 	"dependencies": {
@@ -50,10 +51,10 @@
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.5",
-		"@tradingview/lwc-plugin-preview-kit": "workspace:*",
-		"@tradingview/lwc-toolkit": "workspace:*",
+		"@bishopbot/lwc-plugin-preview-kit": "workspace:*",
+		"@bishopbot/lwc-toolkit": "workspace:*",
 		"dts-bundle-generator": "9.5.1",
-		"lightweight-charts": "workspace:*",
+		"@bishopbot/lightweight-charts": "workspace:*",
 		"publint": "0.3.14",
 		"typescript": "5.9.3",
 		"vite": "8.2.2"
@@ -63,7 +64,7 @@
 		"category": "series-primitive",
 		"lifecycle": "current",
 		"origin": "official",
-		"author": "TradingView",
+		"author": "bishop-bot",
 		"demo": "src/example/index.html",
 		"preview": "src/example/preview.html",
 		"tags": [

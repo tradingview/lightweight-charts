@@ -3,7 +3,7 @@ import {
 	LineStyle,
 	Time,
 	createChart,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 import { createHLCAreaSeries } from '../hlc-area-series';
 import { HLCAreaData } from '../data';
 import { HLCAreaLineType } from '../options';

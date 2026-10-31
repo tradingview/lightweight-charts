@@ -1,13 +1,30 @@
 import {
 	CustomData, CustomSeriesOptions, CustomSeriesWhitespaceData, DeepPartial,
-	IChartApiBase, ICustomSeriesPaneView, ISeriesApi,
-} from 'lightweight-charts';
+	IChartApiBase, ICustomSeriesPaneView, InternalHorzScaleItemKey, ISeriesApi,
+} from '@bishopbot/lightweight-charts';
 
 import { AcceptedInput, GapCheck, whitespaceGapCheck } from './visible-bars.js';
 
 /** A custom series API with the plugin's data and options preserved. */
 export type OptionsAwareSeries<H, D extends CustomData<H>, O extends CustomSeriesOptions> =
 	ISeriesApi<'Custom', H, D | CustomSeriesWhitespaceData<H>, O, DeepPartial<O>>;
+
+/**
+ * Compares two time keys. A chart uses either numbers or bigints, never both,
+ * so the comparison stays in the type the chart uses.
+ *
+ * @param a - The first key.
+ * @param b - The second key.
+ * @returns A negative number when `a` comes first, a positive one when `b` does, and zero when they are the same.
+ */
+function compareKeys(a: InternalHorzScaleItemKey, b: InternalHorzScaleItemKey): number {
+	if (typeof a === 'bigint' && typeof b === 'bigint') {
+		return a < b ? -1 : a > b ? 1 : 0;
+	}
+	const left = Number(a);
+	const right = Number(b);
+	return left < right ? -1 : left > right ? 1 : 0;
+}
 
 /**
  * Creates a custom series whose price-value builder can read current options
@@ -39,16 +56,16 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 	// explicit whitespace read the array itself and cache on the revision,
 	// which only moves after an accepted mutation and before consumer
 	// data-change callbacks.
-	let keys: number[] = [];
+	let keys: InternalHorzScaleItemKey[] = [];
 	const input: { points: Point[]; revision: number } = { points: [], revision: 0 };
 	const readInput = (): AcceptedInput<H, D> => input;
 	// Position of `time` in `keys`, or where it would be inserted.
-	const seek = (time: number): number => {
+	const seek = (time: InternalHorzScaleItemKey): number => {
 		let low = 0;
 		let high = keys.length;
 		while (low < high) {
 			const mid = (low + high) >> 1;
-			if (keys[mid] < time) { low = mid + 1; } else { high = mid; }
+			if (compareKeys(keys[mid], time) < 0) { low = mid + 1; } else { high = mid; }
 		}
 		return low;
 	};
@@ -56,7 +73,7 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 	const view = createView(() => series?.options() ?? defaults, readInput);
 	series = chart.addCustomSeries(view, options, paneIndex);
 	const api = series;
-	const key = (point: Point): number => chart.horzBehaviour().key(point.time);
+	const key = (point: Point): InternalHorzScaleItemKey => chart.horzBehaviour().key(point.time);
 	const operations: { commit: (() => void) | null }[] = [];
 	let refreshPending = false;
 	const setData = api.setData.bind(api);
@@ -97,7 +114,7 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 
 	api.setData = (data: Point[]): void => {
 		const sorted = data.map(point => ({ time: key(point), point: { ...point } }))
-			.sort((a, b) => a.time - b.time);
+			.sort((a, b) => compareKeys(a.time, b.time));
 		changeData(() => {
 			keys = sorted.map(entry => entry.time);
 			input.points = sorted.map(entry => entry.point);

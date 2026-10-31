@@ -3,7 +3,7 @@ import {
 	LineData,
 	UTCTimestamp,
 	WhitespaceData,
-} from 'lightweight-charts';
+} from '@bishopbot/lightweight-charts';
 
 const DEFAULT_WEIGHT = 2;
 

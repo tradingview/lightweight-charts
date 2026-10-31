@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import type { Time } from 'lightweight-charts';
+import type { Time } from '@bishopbot/lightweight-charts';
 
 import { paddedValues, percentValues, styleRuns, sumValues } from '../../src/stack.js';
 import { StackedAreaSeries } from '../../src/stacked-area-series.js';

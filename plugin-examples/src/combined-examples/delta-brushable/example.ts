@@ -1,9 +1,9 @@
-import { WhitespaceData, createChart } from 'lightweight-charts';
+import { WhitespaceData, createChart } from '@bishopbot/lightweight-charts';
 import {
 	BrushableAreaData,
 	BrushableAreaSeries,
 	BrushableAreaStyle,
-} from '@tradingview/lwc-plugin-brushable-area-series';
+} from '@bishopbot/lwc-plugin-brushable-area-series';
 import { DeltaTooltipPrimitive } from '../../plugins/delta-tooltip/delta-tooltip';
 import { generateLineData } from '../../sample-data';
 

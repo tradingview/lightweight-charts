@@ -1,4 +1,4 @@
-import { LineSeries, LineStyle, Time, createChart } from 'lightweight-charts';
+import { LineSeries, LineStyle, Time, createChart } from '@bishopbot/lightweight-charts';
 import { generateLineData } from './sample-data';
 import { VerticalLine } from '../vertical-line';
 import { VerticalLineSnap } from '../options';

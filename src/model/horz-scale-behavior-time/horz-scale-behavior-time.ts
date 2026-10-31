@@ -126,39 +126,6 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 		return key;
 	}
 
-	/**
-	 * The key of a time point is what makes it unique on the horizontal scale.
-	 *
-	 * It stays a `number` (seconds) whenever the value fits in a double exactly, and becomes a
-	 * `bigint` (nanoseconds) as soon as a nanosecond part is present: epoch nanoseconds need ~61
-	 * bits, so a double would silently merge timestamps which differ in the last ~200 nanoseconds.
-	 */
-	private _computeKey(timePoint: TimePoint): InternalHorzScaleItemKey {
-		if (timePoint.businessDay !== undefined) {
-			const seconds = Math.round(Date.UTC(
-				timePoint.businessDay.year,
-				timePoint.businessDay.month - 1,
-				timePoint.businessDay.day
-			) / 1000);
-			return seconds as unknown as InternalHorzScaleItemKey;
-		}
-
-		if (timePoint.nanos !== undefined) {
-			return (BigInt(Math.floor(timePoint.timestamp)) * 1_000_000_000n + BigInt(timePoint.nanos)) as unknown as InternalHorzScaleItemKey;
-		}
-
-		return timePoint.timestamp as unknown as InternalHorzScaleItemKey;
-	}
-
-	private _asTimePoint(item: InternalHorzScaleItem | Time): TimePoint {
-		// eslint-disable-next-line no-restricted-syntax
-		if (typeof item === 'object' && 'timestamp' in item) {
-			return item as unknown as TimePoint;
-		}
-
-		return this.convertHorzItemToInternal(item as Time) as unknown as TimePoint;
-	}
-
 	public cacheKey(item: InternalHorzScaleItem): number | bigint {
 		// the key is already exact and unique per point, and labels are cached per weight,
 		// so it is the natural cache key (milliseconds would collapse sub-millisecond labels)
@@ -253,5 +220,38 @@ export class HorzScaleBehaviorTime implements IHorzScaleBehavior<Time> {
 
 	public static applyDefaults(options?: DeepPartial<TimeChartOptions>): DeepPartial<TimeChartOptions> {
 		return merge({ localization: { dateFormat: 'dd MMM \'yy' } }, options ?? {});
+	}
+
+	/**
+	 * The key of a time point is what makes it unique on the horizontal scale.
+	 *
+	 * It stays a `number` (seconds) whenever the value fits in a double exactly, and becomes a
+	 * `bigint` (nanoseconds) as soon as a nanosecond part is present: epoch nanoseconds need ~61
+	 * bits, so a double would silently merge timestamps which differ in the last ~200 nanoseconds.
+	 */
+	private _computeKey(timePoint: TimePoint): InternalHorzScaleItemKey {
+		if (timePoint.businessDay !== undefined) {
+			const seconds = Math.round(Date.UTC(
+				timePoint.businessDay.year,
+				timePoint.businessDay.month - 1,
+				timePoint.businessDay.day
+			) / 1000);
+			return seconds as unknown as InternalHorzScaleItemKey;
+		}
+
+		if (timePoint.nanos !== undefined) {
+			return (BigInt(Math.floor(timePoint.timestamp)) * 1_000_000_000n + BigInt(timePoint.nanos)) as unknown as InternalHorzScaleItemKey;
+		}
+
+		return timePoint.timestamp as unknown as InternalHorzScaleItemKey;
+	}
+
+	private _asTimePoint(item: InternalHorzScaleItem | Time): TimePoint {
+		// eslint-disable-next-line no-restricted-syntax
+		if (typeof item === 'object' && 'timestamp' in item) {
+			return item as unknown as TimePoint;
+		}
+
+		return this.convertHorzItemToInternal(item as Time) as unknown as TimePoint;
 	}
 }

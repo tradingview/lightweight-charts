@@ -24,14 +24,14 @@ Install the package. It requires `lightweight-charts` `^5.0.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-dual-range-histogram-series
+npm install @bishopbot/lwc-plugin-dual-range-histogram-series
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
 import { createChart } from 'lightweight-charts';
-import { createDualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
+import { createDualRangeHistogramSeries } from '@bishopbot/lwc-plugin-dual-range-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
 
@@ -56,7 +56,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-dual-range-histogram-series": "https://unpkg.com/@tradingview/lwc-plugin-dual-range-histogram-series/dist/dual-range-histogram-series.standalone.js"
+    "@bishopbot/lwc-plugin-dual-range-histogram-series": "https://unpkg.com/@bishopbot/lwc-plugin-dual-range-histogram-series/dist/dual-range-histogram-series.standalone.js"
   }
 }
 </script>
@@ -67,7 +67,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart } from 'lightweight-charts';
-import { createDualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
+import { createDualRangeHistogramSeries } from '@bishopbot/lwc-plugin-dual-range-histogram-series';
 
 const chart = createChart(document.getElementById('container'));
 
@@ -92,7 +92,7 @@ options name their columns:
 
 ```js
 import { createChart, BaselineSeries } from 'lightweight-charts';
-import { createDualRangeHistogramSeries } from '@tradingview/lwc-plugin-dual-range-histogram-series';
+import { createDualRangeHistogramSeries } from '@bishopbot/lwc-plugin-dual-range-histogram-series';
 
 const chart = createChart(document.getElementById('container'), {
     timeScale: { barSpacing: 21, minBarSpacing: 4 },
@@ -146,7 +146,7 @@ with `keepPixelSeriesInView`, which sets the price scale's margins and keeps
 them correct while the chart is resized:
 
 ```js
-import { keepPixelSeriesInView } from '@tradingview/lwc-plugin-dual-range-histogram-series';
+import { keepPixelSeriesInView } from '@bishopbot/lwc-plugin-dual-range-histogram-series';
 
 const stop = keepPixelSeriesInView(chart, histogram);
 // … later, before removing the chart:

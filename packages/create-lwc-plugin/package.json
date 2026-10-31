@@ -1,11 +1,15 @@
 {
-  "name": "create-lwc-plugin",
-  "version": "0.2.0",
+  "name": "@bishopbot/create-lwc-plugin",
+  "version": "0.2.1",
   "type": "module",
   "license": "Apache-2.0",
-  "author": "TradingView, Inc.",
-  "description": "Wizard-like CLI tool for scaffolding a new plugin for Lightweight Charts™",
-  "keywords": ["lightweight-charts", "lwc-plugin", "plugins"],
+  "author": "bishop-bot",
+  "description": "Wizard-like CLI tool for scaffolding a new plugin for Lightweight Charts",
+  "keywords": [
+    "lightweight-charts",
+    "lwc-plugin",
+    "plugins"
+  ],
   "bin": {
     "create-lwc-plugin": "index.js"
   },
@@ -30,13 +34,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tradingview/lightweight-charts.git",
+    "url": "git+https://github.com/bishop-bot/lightweight-charts.git",
     "directory": "packages/create-lwc-plugin"
   },
   "bugs": {
-    "url": "https://github.com/tradingview/lightweight-charts/issues"
+    "url": "https://github.com/bishop-bot/lightweight-charts/issues"
   },
-  "homepage": "https://www.tradingview.com/lightweight-charts/",
+  "homepage": "https://github.com/bishop-bot/lightweight-charts#readme",
   "devDependencies": {
     "@clack/prompts": "0.7.0",
     "@types/node": "20.19.43",

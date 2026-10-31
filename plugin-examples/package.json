@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build:deps": "pnpm --filter @tradingview/lwc-toolkit --filter @tradingview/lwc-plugin-preview-kit --filter @tradingview/lwc-plugin-brushable-area-series build",
+        "build:deps": "pnpm --filter @bishopbot/lwc-toolkit --filter @bishopbot/lwc-plugin-preview-kit --filter @bishopbot/lwc-plugin-brushable-area-series build",
         "build": "pnpm build:deps && tsc",
         "compile": "pnpm build:deps && tsc && node compile.mjs",
         "dev": "pnpm build:deps && vite --config src/vite.config.js",
@@ -14,11 +14,11 @@
         "vite": "7.2.0"
     },
     "dependencies": {
-        "@tradingview/lwc-plugin-brushable-area-series": "workspace:*",
-        "@tradingview/lwc-toolkit": "workspace:*",
+        "@bishopbot/lwc-plugin-brushable-area-series": "workspace:*",
+        "@bishopbot/lwc-toolkit": "workspace:*",
         "dts-bundle-generator": "9.5.1",
         "fancy-canvas": "2.1.0",
         "globby": "14.1.0",
-        "lightweight-charts": "workspace:*"
+        "@bishopbot/lightweight-charts": "workspace:*"
     }
 }

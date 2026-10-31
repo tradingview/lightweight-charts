@@ -1,5 +1,5 @@
-import { convertTimeUTC } from '@tradingview/lwc-toolkit/time';
-import { DataChangedScope, IRange, MismatchDirection, Time } from 'lightweight-charts';
+import { convertTimeUTC } from '@bishopbot/lwc-toolkit/time';
+import { DataChangedScope, IRange, MismatchDirection, Time } from '@bishopbot/lightweight-charts';
 
 import { AnySeries, SeriesDataPoint } from './types';
 

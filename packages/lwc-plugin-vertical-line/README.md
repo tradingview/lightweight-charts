@@ -23,14 +23,14 @@ Install the package. It requires `lightweight-charts` `^5.0.0` in your
 project:
 
 ```shell
-npm install @tradingview/lwc-plugin-vertical-line
+npm install @bishopbot/lwc-plugin-vertical-line
 ```
 
 Then import the plugin and add it to a chart:
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { VerticalLine } from '@tradingview/lwc-plugin-vertical-line';
+import { VerticalLine } from '@bishopbot/lwc-plugin-vertical-line';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
@@ -49,7 +49,7 @@ CDN builds with an import map:
 {
   "imports": {
     "lightweight-charts": "https://unpkg.com/lightweight-charts@^5/dist/lightweight-charts.standalone.production.mjs",
-    "@tradingview/lwc-plugin-vertical-line": "https://unpkg.com/@tradingview/lwc-plugin-vertical-line/dist/vertical-line.standalone.js"
+    "@bishopbot/lwc-plugin-vertical-line": "https://unpkg.com/@bishopbot/lwc-plugin-vertical-line/dist/vertical-line.standalone.js"
   }
 }
 </script>
@@ -60,7 +60,7 @@ The plugin can then be imported by name, exactly as it is under a bundler:
 ```html
 <script type="module">
 import { createChart, LineSeries } from 'lightweight-charts';
-import { VerticalLine } from '@tradingview/lwc-plugin-vertical-line';
+import { VerticalLine } from '@bishopbot/lwc-plugin-vertical-line';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);
@@ -76,7 +76,7 @@ Create a line for a time that exists in your series data, then attach it to that
 
 ```js
 import { createChart, LineSeries } from 'lightweight-charts';
-import { VerticalLine } from '@tradingview/lwc-plugin-vertical-line';
+import { VerticalLine } from '@bishopbot/lwc-plugin-vertical-line';
 
 const chart = createChart(document.getElementById('container'));
 const series = chart.addSeries(LineSeries);

@@ -13,6 +13,7 @@ import { BusinessDay, Time, TimePoint, UTCTimestamp } from '../../src/model/horz
 import { PlotRowValueIndex } from '../../src/model/plot-data';
 import { PlotList } from '../../src/model/plot-list';
 import { Series } from '../../src/model/series';
+import { SeriesPlotRow } from '../../src/model/series-data';
 import { SeriesType } from '../../src/model/series-options';
 import { TimePointIndex } from '../../src/model/time-data';
 
@@ -1256,8 +1257,8 @@ describe('DataLayer (duplicate times)', () => {
 		});
 
 		const rows = update.series.get(series)?.data ?? [];
-		expect(rows.map(row => row.index)).to.deep.equal([0, 1, 2, 3, 4] as TimePointIndex[]);
-		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2, 3, 4, 5]);
+		expect(rows.map((row: SeriesPlotRow) => row.index)).to.deep.equal([0, 1, 2, 3, 4] as TimePointIndex[]);
+		expect(rows.map((row: SeriesPlotRow) => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2, 3, 4, 5]);
 	});
 
 	it('should keep duplicates of the first time in data order', () => {
@@ -1275,8 +1276,8 @@ describe('DataLayer (duplicate times)', () => {
 			.to.deep.equal([1000, 1000, 2000]);
 
 		const rows = update.series.get(series)?.data ?? [];
-		expect(rows.map(row => row.index)).to.deep.equal([0, 1, 2] as TimePointIndex[]);
-		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2, 3]);
+		expect(rows.map((row: SeriesPlotRow) => row.index)).to.deep.equal([0, 1, 2] as TimePointIndex[]);
+		expect(rows.map((row: SeriesPlotRow) => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2, 3]);
 	});
 
 	it('should align series which have different numbers of duplicates at the same time', () => {
@@ -1299,7 +1300,7 @@ describe('DataLayer (duplicate times)', () => {
 
 		// the second series joins the first slot of the shared time, and stays aligned with it
 		const rows = update.series.get(series2)?.data ?? [];
-		expect(rows.map(row => row.index)).to.deep.equal([0, 2] as TimePointIndex[]);
+		expect(rows.map((row: SeriesPlotRow) => row.index)).to.deep.equal([0, 2] as TimePointIndex[]);
 	});
 
 	it('should append a new occurrence when updating the last bar time with duplicates allowed', () => {
@@ -1315,8 +1316,8 @@ describe('DataLayer (duplicate times)', () => {
 			.to.deep.equal([1000, 1000]);
 
 		const rows = update.series.get(series)?.data ?? [];
-		expect(rows.map(row => row.index)).to.deep.equal([0, 1] as TimePointIndex[]);
-		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2]);
+		expect(rows.map((row: SeriesPlotRow) => row.index)).to.deep.equal([0, 1] as TimePointIndex[]);
+		expect(rows.map((row: SeriesPlotRow) => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2]);
 	});
 
 	it('should replace the last bar when duplicates are not allowed', () => {
@@ -1329,8 +1330,8 @@ describe('DataLayer (duplicate times)', () => {
 		expect(update.timeScale.points).to.equal(undefined);
 
 		const rows = update.series.get(series)?.data ?? [];
-		expect(rows.map(row => row.index)).to.deep.equal([0] as TimePointIndex[]);
-		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([2]);
+		expect(rows.map((row: SeriesPlotRow) => row.index)).to.deep.equal([0] as TimePointIndex[]);
+		expect(rows.map((row: SeriesPlotRow) => row.value[PlotRowValueIndex.Close])).to.deep.equal([2]);
 	});
 
 	it('should not allocate an occurrence for a whitespace update of the last bar time', () => {
@@ -1347,7 +1348,7 @@ describe('DataLayer (duplicate times)', () => {
 		// no time scale change, and the last bar is gone
 		expect(update.timeScale.points).to.equal(undefined);
 		const rows = update.series.get(series)?.data ?? [];
-		expect(rows.map(row => row.index)).to.deep.equal([0] as TimePointIndex[]);
+		expect(rows.map((row: SeriesPlotRow) => row.index)).to.deep.equal([0] as TimePointIndex[]);
 	});
 
 	it('should release the extra time points when duplicates are removed', () => {
@@ -1375,8 +1376,8 @@ describe('DataLayer (duplicate times)', () => {
 			expect(point.pointData.index).to.equal(index);
 		});
 
-		expect((update.series.get(series1)?.data ?? []).map(row => row.index)).to.deep.equal([0, 1] as TimePointIndex[]);
-		expect((update.series.get(series2)?.data ?? []).map(row => row.index)).to.deep.equal([1] as TimePointIndex[]);
+		expect((update.series.get(series1)?.data ?? []).map((row: SeriesPlotRow) => row.index)).to.deep.equal([0, 1] as TimePointIndex[]);
+		expect((update.series.get(series2)?.data ?? []).map((row: SeriesPlotRow) => row.index)).to.deep.equal([1] as TimePointIndex[]);
 	});
 
 	it('should pop duplicates from the end one by one', () => {
@@ -1392,7 +1393,7 @@ describe('DataLayer (duplicate times)', () => {
 		expect(popped1).to.have.length(1);
 		expect(popped1[0].value[PlotRowValueIndex.Close]).to.equal(2);
 		expect(update1.timeScale.points).to.have.length(1);
-		expect((update1.series.get(series)?.data ?? []).map(row => row.index)).to.deep.equal([0] as TimePointIndex[]);
+		expect((update1.series.get(series)?.data ?? []).map((row: SeriesPlotRow) => row.index)).to.deep.equal([0] as TimePointIndex[]);
 
 		const [popped2, update2] = dataLayer.popSeriesData(series, 1);
 		expect(popped2).to.have.length(1);
@@ -1415,8 +1416,8 @@ describe('DataLayer (duplicate times)', () => {
 		expect(update.timeScale.points).to.have.length(6);
 
 		const rows = update.series.get(series)?.data ?? [];
-		expect(rows.map(row => row.index)).to.deep.equal([0, 1, 2, 3, 4, 5] as TimePointIndex[]);
-		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([0, 1, 2, 3, 4, 5]);
+		expect(rows.map((row: SeriesPlotRow) => row.index)).to.deep.equal([0, 1, 2, 3, 4, 5] as TimePointIndex[]);
+		expect(rows.map((row: SeriesPlotRow) => row.value[PlotRowValueIndex.Close])).to.deep.equal([0, 1, 2, 3, 4, 5]);
 	});
 
 	it('should keep indices increasing when a duplicate is added in the middle of the series', () => {
@@ -1437,8 +1438,8 @@ describe('DataLayer (duplicate times)', () => {
 		]);
 
 		const rows = update.series.get(series)?.data ?? [];
-		expect(rows.map(row => row.index)).to.deep.equal([0, 1, 2, 3] as TimePointIndex[]);
-		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2, 4, 3]);
+		expect(rows.map((row: SeriesPlotRow) => row.index)).to.deep.equal([0, 1, 2, 3] as TimePointIndex[]);
+		expect(rows.map((row: SeriesPlotRow) => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2, 4, 3]);
 
 		const points = update.timeScale.points as InternalTimeScalePoint[];
 		expect(points.map((point: InternalTimeScalePoint) => (point.time as unknown as TimePoint).timestamp))

@@ -1,15 +1,15 @@
-# `@tradingview/lwc-toolkit`, module by module
+# `@bishopbot/lwc-toolkit`, module by module
 
-Every module is its own sub-path export: `@tradingview/lwc-toolkit/<module>`.
+Every module is its own sub-path export: `@bishopbot/lwc-toolkit/<module>`.
 There is no root import. This file describes the shape and the reason, not
 every overload: verify signatures against
-`node_modules/@tradingview/lwc-toolkit/dist/<module>.d.ts`, whose doc comments
+`node_modules/@bishopbot/lwc-toolkit/dist/<module>.d.ts`, whose doc comments
 are the module's documentation.
 
 "Read:" names the official plugin whose source shows the module used for
 real. Upstream that is `packages/lwc-plugin-<name>/src/<file>`; from any other
 repository fetch
-`https://raw.githubusercontent.com/tradingview/lightweight-charts/master/packages/lwc-plugin-<name>/src/<file>`
+`https://raw.githubusercontent.com/bishop-bot/lightweight-charts/master/packages/lwc-plugin-<name>/src/<file>`
 (the published package ships `dist/` only).
 
 ## Custom series

@@ -1,4 +1,4 @@
-import { PrimitivePaneViewZOrder } from 'lightweight-charts';
+import { PrimitivePaneViewZOrder } from '@bishopbot/lightweight-charts';
 
 /** Horizontal anchor of the text within the pane. */
 export type AnchoredTextHorzAlign = 'left' | 'center' | 'right';

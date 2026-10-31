@@ -31,7 +31,7 @@ at epoch, and ISO strings with three digits are exact.
 `InternalHorzScaleItemKey` (the identity used by every map, sort and binary search) was
 `Nominal<number>`, and a double is exact only up to `2^53`:
 
-```
+```text
 2^53              9 007 199 254 740 991
 epoch ns today    1.79e18   (61 bits)  -> not representable
 epoch µs today    1.79e15   -> representable
@@ -74,7 +74,7 @@ second-resolution tick data. Duplicates only happen when the same nanosecond rep
 
 **Axis labels** get sub-second precision from the weight classes:
 
-```
+```text
 1 s    apart -> HH:MM:SS
 1 ms   apart -> HH:MM:SS.123
 1 µs   apart -> HH:MM:SS.123456
