@@ -18,7 +18,7 @@ import { TimePointIndex } from '../../src/model/time-data';
 
 chai.use(chaiExclude);
 
-function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Series<T> {
+function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T, allowDuplicateTimes: boolean = false): Series<T> {
 	const data = new PlotList();
 
 	return {
@@ -28,6 +28,7 @@ function createSeriesMock<T extends SeriesType = SeriesType>(seriesType?: T): Se
 		customSeriesPlotValuesBuilder: () => {},
 		customSeriesWhitespaceCheck: () => {},
 		isConflationEnabled: () => false, // Default to false for tests
+		allowDuplicateTimes: () => allowDuplicateTimes,
 		updateLastConflatedChunk: () => {}, // Empty implementation for tests
 		model: () => ({
 			timeScale: () => ({
@@ -1228,5 +1229,219 @@ describe('DataLayer', () => {
 			expect(popped3).to.have.length(2);
 			expect(updateResponse3.timeScale.baseIndex).to.equal(0);
 		});
+	});
+});
+
+describe('DataLayer (duplicate times)', () => {
+	it('should give every item its own time point and a unique increasing index', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series = createSeriesMock('Line', true);
+
+		const update = dataLayer.setSeriesData(series, [
+			lineDataAt(1000 as UTCTimestamp, 1),
+			lineDataAt(2000 as UTCTimestamp, 2),
+			lineDataAt(3000 as UTCTimestamp, 3),
+			lineDataAt(3000 as UTCTimestamp, 4),
+			lineDataAt(4000 as UTCTimestamp, 5),
+		]);
+
+		expect(update.timeScale.points).to.have.length(5);
+		expect(update.timeScale.baseIndex).to.equal(4);
+
+		const points = update.timeScale.points as InternalTimeScalePoint[];
+		expect(points.map((point: InternalTimeScalePoint) => (point.time as unknown as TimePoint).timestamp))
+			.to.deep.equal([1000, 2000, 3000, 3000, 4000]);
+		points.forEach((point: InternalTimeScalePoint, index: number) => {
+			expect(point.pointData.index).to.equal(index);
+		});
+
+		const rows = update.series.get(series)?.data ?? [];
+		expect(rows.map(row => row.index)).to.deep.equal([0, 1, 2, 3, 4] as TimePointIndex[]);
+		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2, 3, 4, 5]);
+	});
+
+	it('should keep duplicates of the first time in data order', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series = createSeriesMock('Line', true);
+
+		const update = dataLayer.setSeriesData(series, [
+			lineDataAt(1000 as UTCTimestamp, 1),
+			lineDataAt(1000 as UTCTimestamp, 2),
+			lineDataAt(2000 as UTCTimestamp, 3),
+		]);
+
+		const points = update.timeScale.points as InternalTimeScalePoint[];
+		expect(points.map((point: InternalTimeScalePoint) => (point.time as unknown as TimePoint).timestamp))
+			.to.deep.equal([1000, 1000, 2000]);
+
+		const rows = update.series.get(series)?.data ?? [];
+		expect(rows.map(row => row.index)).to.deep.equal([0, 1, 2] as TimePointIndex[]);
+		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2, 3]);
+	});
+
+	it('should align series which have different numbers of duplicates at the same time', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series1 = createSeriesMock('Line', true);
+		const series2 = createSeriesMock('Line');
+
+		dataLayer.setSeriesData(series1, [
+			lineDataAt(1000 as UTCTimestamp, 1),
+			lineDataAt(1000 as UTCTimestamp, 2),
+			lineDataAt(2000 as UTCTimestamp, 3),
+		]);
+
+		const update = dataLayer.setSeriesData(series2, [
+			lineDataAt(1000 as UTCTimestamp, 10),
+			lineDataAt(2000 as UTCTimestamp, 20),
+		]);
+
+		expect(update.timeScale.points).to.equal(undefined);
+
+		// the second series joins the first slot of the shared time, and stays aligned with it
+		const rows = update.series.get(series2)?.data ?? [];
+		expect(rows.map(row => row.index)).to.deep.equal([0, 2] as TimePointIndex[]);
+	});
+
+	it('should append a new occurrence when updating the last bar time with duplicates allowed', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series = createSeriesMock('Line', true);
+
+		dataLayer.setSeriesData(series, [lineDataAt(1000 as UTCTimestamp, 1)]);
+		const update = dataLayer.updateSeriesData(series, lineDataAt(1000 as UTCTimestamp, 2), false);
+
+		expect(update.timeScale.points).to.have.length(2);
+		const points = update.timeScale.points as InternalTimeScalePoint[];
+		expect(points.map((point: InternalTimeScalePoint) => (point.time as unknown as TimePoint).timestamp))
+			.to.deep.equal([1000, 1000]);
+
+		const rows = update.series.get(series)?.data ?? [];
+		expect(rows.map(row => row.index)).to.deep.equal([0, 1] as TimePointIndex[]);
+		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2]);
+	});
+
+	it('should replace the last bar when duplicates are not allowed', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series = createSeriesMock('Line');
+
+		dataLayer.setSeriesData(series, [lineDataAt(1000 as UTCTimestamp, 1)]);
+		const update = dataLayer.updateSeriesData(series, lineDataAt(1000 as UTCTimestamp, 2), false);
+
+		expect(update.timeScale.points).to.equal(undefined);
+
+		const rows = update.series.get(series)?.data ?? [];
+		expect(rows.map(row => row.index)).to.deep.equal([0] as TimePointIndex[]);
+		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([2]);
+	});
+
+	it('should not allocate an occurrence for a whitespace update of the last bar time', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series = createSeriesMock('Line', true);
+
+		dataLayer.setSeriesData(series, [
+			lineDataAt(1000 as UTCTimestamp, 1),
+			lineDataAt(1000 as UTCTimestamp, 2),
+		]);
+
+		const update = dataLayer.updateSeriesData(series, whitespaceItemAt(1000 as UTCTimestamp), false);
+
+		// no time scale change, and the last bar is gone
+		expect(update.timeScale.points).to.equal(undefined);
+		const rows = update.series.get(series)?.data ?? [];
+		expect(rows.map(row => row.index)).to.deep.equal([0] as TimePointIndex[]);
+	});
+
+	it('should release the extra time points when duplicates are removed', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series1 = createSeriesMock('Line', true);
+		const series2 = createSeriesMock('Line');
+
+		dataLayer.setSeriesData(series1, [
+			lineDataAt(1000 as UTCTimestamp, 1),
+			lineDataAt(1000 as UTCTimestamp, 2),
+			lineDataAt(2000 as UTCTimestamp, 3),
+		]);
+		dataLayer.setSeriesData(series2, [lineDataAt(2000 as UTCTimestamp, 20)]);
+
+		const update = dataLayer.setSeriesData(series1, [
+			lineDataAt(1000 as UTCTimestamp, 1),
+			lineDataAt(2000 as UTCTimestamp, 3),
+		]);
+
+		expect(update.timeScale.points).to.have.length(2);
+		const points = update.timeScale.points as InternalTimeScalePoint[];
+		expect(points.map((point: InternalTimeScalePoint) => (point.time as unknown as TimePoint).timestamp))
+			.to.deep.equal([1000, 2000]);
+		points.forEach((point: InternalTimeScalePoint, index: number) => {
+			expect(point.pointData.index).to.equal(index);
+		});
+
+		expect((update.series.get(series1)?.data ?? []).map(row => row.index)).to.deep.equal([0, 1] as TimePointIndex[]);
+		expect((update.series.get(series2)?.data ?? []).map(row => row.index)).to.deep.equal([1] as TimePointIndex[]);
+	});
+
+	it('should pop duplicates from the end one by one', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series = createSeriesMock('Line', true);
+
+		dataLayer.setSeriesData(series, [
+			lineDataAt(1000 as UTCTimestamp, 1),
+			lineDataAt(1000 as UTCTimestamp, 2),
+		]);
+
+		const [popped1, update1] = dataLayer.popSeriesData(series, 1);
+		expect(popped1).to.have.length(1);
+		expect(popped1[0].value[PlotRowValueIndex.Close]).to.equal(2);
+		expect(update1.timeScale.points).to.have.length(1);
+		expect((update1.series.get(series)?.data ?? []).map(row => row.index)).to.deep.equal([0] as TimePointIndex[]);
+
+		const [popped2, update2] = dataLayer.popSeriesData(series, 1);
+		expect(popped2).to.have.length(1);
+		expect(popped2[0].value[PlotRowValueIndex.Close]).to.equal(1);
+		// the response carries no points when the last one is removed (same as before duplicates were supported)
+		expect(update2.timeScale.points).to.equal(undefined);
+		expect(update2.timeScale.baseIndex).to.equal(0);
+	});
+
+	it('should keep indices increasing over a run of updates with the same time', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series = createSeriesMock('Line', true);
+
+		dataLayer.setSeriesData(series, [lineDataAt(1000 as UTCTimestamp, 0)]);
+		for (let i = 1; i < 5; ++i) {
+			dataLayer.updateSeriesData(series, lineDataAt(1000 as UTCTimestamp, i), false);
+		}
+
+		const update = dataLayer.updateSeriesData(series, lineDataAt(2000 as UTCTimestamp, 5), false);
+		expect(update.timeScale.points).to.have.length(6);
+
+		const rows = update.series.get(series)?.data ?? [];
+		expect(rows.map(row => row.index)).to.deep.equal([0, 1, 2, 3, 4, 5] as TimePointIndex[]);
+		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([0, 1, 2, 3, 4, 5]);
+	});
+
+	it('should keep indices increasing when a duplicate is added in the middle of the series', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const series = createSeriesMock('Line', true);
+
+		dataLayer.setSeriesData(series, [
+			lineDataAt(1000 as UTCTimestamp, 1),
+			lineDataAt(2000 as UTCTimestamp, 2),
+			lineDataAt(3000 as UTCTimestamp, 3),
+		]);
+
+		const update = dataLayer.setSeriesData(series, [
+			lineDataAt(1000 as UTCTimestamp, 1),
+			lineDataAt(2000 as UTCTimestamp, 2),
+			lineDataAt(2000 as UTCTimestamp, 4),
+			lineDataAt(3000 as UTCTimestamp, 3),
+		]);
+
+		const rows = update.series.get(series)?.data ?? [];
+		expect(rows.map(row => row.index)).to.deep.equal([0, 1, 2, 3] as TimePointIndex[]);
+		expect(rows.map(row => row.value[PlotRowValueIndex.Close])).to.deep.equal([1, 2, 4, 3]);
+
+		const points = update.timeScale.points as InternalTimeScalePoint[];
+		expect(points.map((point: InternalTimeScalePoint) => (point.time as unknown as TimePoint).timestamp))
+			.to.deep.equal([1000, 2000, 2000, 3000]);
 	});
 });

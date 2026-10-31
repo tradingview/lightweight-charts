@@ -29,6 +29,7 @@ function createMockSeries<TSeriesType extends SeriesType = 'Line'>(
 		isConflationEnabled: (): boolean => {
 			return isConflated;
 		},
+		allowDuplicateTimes: (): boolean => false,
 		updateLastConflatedChunk: () => {},
 		model: () => ({
 			timeScale: () => ({

@@ -6,7 +6,7 @@ import { SeriesDataItemTypeMap } from './data-consumer';
 import { LocalizationOptions } from './localization-options';
 import { SeriesType } from './series-options';
 import { TickMark } from './tick-marks';
-import { TickMarkWeightValue, TimeScalePoint } from './time-data';
+import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from './time-data';
 import { TimeMark } from './time-scale';
 
 /**
@@ -26,8 +26,12 @@ export type DataItem<HorzScaleItem> = SeriesDataItemTypeMap<HorzScaleItem>[Serie
 
 /**
  * Index key for a horizontal scale item.
+ *
+ * It is a `number` for scales whose item identity fits in a double (time in seconds,
+ * price, yield curve length) and a `bigint` for identity which does not (time in
+ * nanoseconds). Use relational comparison (`<`, `>`) to compare keys - never subtraction.
  */
-export type InternalHorzScaleItemKey = Nominal<number, 'InternalHorzScaleItemKey'>;
+export type InternalHorzScaleItemKey = Nominal<number | bigint, 'InternalHorzScaleItemKey'>;
 
 /**
  * Class interface for Horizontal scale behavior
@@ -79,9 +83,9 @@ export interface IHorzScaleBehavior<HorzScaleItem> {
 	 * Returns the cache key for the specified horizontal scale item.
 	 *
 	 * @param internalItem - horizontal scale item for which the cache key should be returned
-	 * @returns number
+	 * @returns number or bigint
 	 */
-	cacheKey(internalItem: InternalHorzScaleItem): number;
+	cacheKey(internalItem: InternalHorzScaleItem): number | bigint;
 	/**
 	 * Update the formatter with the localization options.
 	 *
@@ -129,4 +133,18 @@ export interface IHorzScaleBehavior<HorzScaleItem> {
 	 * @returns boolean
 	 */
 	shouldResetTickmarkLabels?(tickMarks: readonly TickMark[]): boolean;
+
+	/**
+	 * Maximum number of characters a tick mark label can occupy for the given time scale points.
+	 *
+	 * When it returns a number larger than `timeScale.tickMarkMaxCharacterLength`, the time scale
+	 * uses it to space the labels further apart instead of letting them overlap. Return `undefined`
+	 * to use the chart option as is.
+	 *
+	 * @param points - time scale points
+	 * @param from - first visible point index (inclusive)
+	 * @param to - last visible point index (inclusive)
+	 * @returns number | undefined
+	 */
+	maxTickMarkCharacterLength?(points: readonly TimeScalePoint[], from: TimePointIndex, to: TimePointIndex): number | undefined;
 }

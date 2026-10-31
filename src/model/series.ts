@@ -225,6 +225,14 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 		return this._options as SeriesOptionsMap[T];
 	}
 
+	/**
+	 * Whether several data items with the same time are allowed in this series.
+	 * See {@link SeriesOptionsCommon.allowDuplicateTimes}.
+	 */
+	public allowDuplicateTimes(): boolean {
+		return this._options.allowDuplicateTimes;
+	}
+
 	public applyOptions(options: SeriesPartialOptionsInternal<T>): void {
 		const model = this.model();
 

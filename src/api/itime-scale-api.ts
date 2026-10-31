@@ -1,6 +1,7 @@
 import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
+import { SeriesOptionsCommon } from '../model/series-options';
 import { IRange, Logical, LogicalRange, TimePointIndex } from '../model/time-data';
 import { HorzScaleOptions } from '../model/time-scale';
 
@@ -113,6 +114,9 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	/**
 	 * Converts time to index.
 	 *
+	 * When a series allows duplicate times ({@link SeriesOptionsCommon.allowDuplicateTimes}) the same time can
+	 * occupy several indexes - this returns the first (leftmost) one of them.
+	 *
 	 * @param time - Time needs to be converted
 	 * @returns Index of that time or `null` if no time found on time scale
 	 */
@@ -120,6 +124,9 @@ export interface ITimeScaleApi<HorzScaleItem> {
 
 	/**
 	 * Converts a time to local x coordinate.
+	 *
+	 * When a series allows duplicate times ({@link SeriesOptionsCommon.allowDuplicateTimes}) the same time can
+	 * occupy several indexes - this returns the coordinate of the first (leftmost) one of them.
 	 *
 	 * @param time - Time needs to be converted
 	 * @returns X coordinate of that time or `null` if no time found on time scale

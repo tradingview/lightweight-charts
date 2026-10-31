@@ -16,8 +16,8 @@ export class FormattedLabelsCache<HorzScaleItem> {
 	private _actualSize: number = 0;
 	private _usageTick: number = 1;
 	private _oldestTick: number = 1;
-	private _cache: Map<number, CachedTick> = new Map();
-	private _tick2Labels: Map<number, number> = new Map();
+	private _cache: Map<number | bigint, CachedTick> = new Map();
+	private _tick2Labels: Map<number, number | bigint> = new Map();
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
 

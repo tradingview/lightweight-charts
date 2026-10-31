@@ -148,7 +148,7 @@ export class SeriesApi<
 	}
 
 	public setData(data: TData[]): void {
-		checkItemsAreOrdered(data, this._horzScaleBehavior);
+		checkItemsAreOrdered(data, this._horzScaleBehavior, this._series.allowDuplicateTimes());
 		checkSeriesValuesType(this._series.seriesType(), data);
 
 		this._dataUpdatesConsumer.applyNewData(this._series, data);

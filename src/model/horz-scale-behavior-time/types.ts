@@ -19,6 +19,19 @@ import { isNumber, isString } from '../../helpers/strict-type-checks';
 export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
 
 /**
+ * Represents a time as a UNIX timestamp in **nanoseconds**.
+ *
+ * A `number` cannot hold epoch nanoseconds (a double is exact only up to 2^53 ≈ 9.0e15, while
+ * epoch nanoseconds need ~61 bits), so nanosecond timestamps must use a `bigint`.
+ *
+ * @example
+ * ```ts
+ * const nanosecondTimestamp = 1700000000123456789n as UTCTimestampNanoseconds;
+ * ```
+ */
+export type UTCTimestampNanoseconds = Nominal<bigint, 'UTCTimestampNanoseconds'>;
+
+/**
  * Represents a time as a day/month/year.
  *
  * @example
@@ -44,19 +57,27 @@ export interface BusinessDay {
 /**
  * The Time type is used to represent the time of data items.
  *
- * Values can be a {@link UTCTimestamp}, a {@link BusinessDay}, or a business day string in ISO format.
+ * Values can be a {@link UTCTimestamp} (seconds, optionally fractional), a
+ * {@link UTCTimestampNanoseconds} (nanoseconds, exact), a {@link BusinessDay}, a business day
+ * string in ISO format (`yyyy-mm-dd`), or an ISO 8601 date-time string with 1 to 9 fractional
+ * digits (`2024-05-01T12:00:00.123456789Z`).
  *
  * @example
  * ```js
  * const timestamp = 1529899200; // Literal timestamp representing 2018-06-25T04:00:00.000Z
  * const businessDay = { year: 2019, month: 6, day: 1 }; // June 1, 2019
  * const businessDayString = '2021-02-03'; // Business day string literal
+ * const nanosecondTimestamp = 1700000000123456789n; // epoch nanoseconds, exact
+ * const isoDateTime = '2024-05-01T12:00:00.123456789Z'; // also exact
  * ```
  */
-export type Time = UTCTimestamp | BusinessDay | string;
+export type Time = UTCTimestamp | UTCTimestampNanoseconds | BusinessDay | string;
 
 export interface TimePoint {
+	/** Whole seconds since the epoch. Fractional seconds are possible for {@link UTCTimestamp} times. */
 	timestamp: UTCTimestamp;
+	/** Nanosecond part, `0..999999999`. Present only for sub-second precision times. */
+	nanos?: number;
 	businessDay?: BusinessDay;
 }
 
@@ -67,7 +88,18 @@ export interface TimePoint {
  * @returns `true` if `time` is a {@link BusinessDay} object, false otherwise.
  */
 export function isBusinessDay(time: Time): time is BusinessDay {
-	return !isNumber(time) && !isString(time);
+	return !isNumber(time) && !isString(time) && typeof time !== 'bigint';
+}
+
+/**
+ * Check if a time value is a nanosecond UNIX timestamp.
+ *
+ * @param time - The time to check.
+ * @returns `true` if the time is a {@link UTCTimestampNanoseconds}, false otherwise.
+ */
+export function isUTCTimestampNanoseconds(time: Time): time is UTCTimestampNanoseconds {
+	// eslint-disable-next-line no-restricted-syntax
+	return typeof time === 'bigint';
 }
 
 /**
@@ -104,6 +136,18 @@ export const enum TickMarkType {
 	 * A time with seconds.
 	 */
 	TimeWithSeconds,
+	/**
+	 * A time with seconds and milliseconds.
+	 */
+	TimeWithMilliseconds,
+	/**
+	 * A time with seconds and microseconds.
+	 */
+	TimeWithMicroseconds,
+	/**
+	 * A time with seconds and nanoseconds.
+	 */
+	TimeWithNanoseconds,
 }
 
 /**
@@ -115,6 +159,18 @@ export const enum TickMarkType {
  */
 export const enum TickMarkWeight {
 	LessThanSecond = 0,
+	/**
+	 * The nanosecond changed (sub-microsecond difference).
+	 */
+	Nano = 1,
+	/**
+	 * The microsecond changed (sub-millisecond difference).
+	 */
+	Micro = 2,
+	/**
+	 * The millisecond changed (sub-second difference).
+	 */
+	Milli = 3,
 	Second = 10,
 	Minute1 = 20,
 	Minute5 = 21,
@@ -126,4 +182,56 @@ export const enum TickMarkWeight {
 	Day = 50,
 	Month = 60,
 	Year = 70,
+}
+
+/**
+ * Number of fractional second digits a tick mark of this weight renders.
+ * Returns 0 for weights which do not display a fractional part.
+ */
+export function fractionalDigitsForWeight(weight: number): number {
+	switch (weight) {
+		case TickMarkWeight.Milli:
+			return 3;
+
+		case TickMarkWeight.Micro:
+			return 6;
+
+		case TickMarkWeight.Nano:
+			return 9;
+
+		default:
+			return 0;
+	}
+}
+
+/**
+ * Number of fractional second digits needed to represent a nanosecond value without loss.
+ * `0` for a zero nanosecond part, otherwise 3, 6 or 9 digits.
+ */
+export function fractionalDigitsForNanos(nanos: number | undefined): number {
+	if (nanos === undefined || nanos === 0) {
+		return 0;
+	}
+
+	if (nanos % 1_000_000 === 0) {
+		return 3;
+	}
+
+	if (nanos % 1_000 === 0) {
+		return 6;
+	}
+
+	return 9;
+}
+
+/**
+ * Formats the fractional part of a timestamp (without the leading dot), padded to `digits`.
+ */
+export function formatNanosFraction(nanos: number | undefined, digits: number): string {
+	if (digits === 0 || nanos === undefined || nanos === 0) {
+		return '';
+	}
+
+	const divisor = Math.pow(10, 9 - digits);
+	return String(Math.floor(nanos / divisor)).padStart(digits, '0');
 }
