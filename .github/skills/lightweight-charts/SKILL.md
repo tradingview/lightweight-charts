@@ -75,6 +75,42 @@ If a snippet calls `addLineSeries` or `series.setMarkers`, it's v4 or older. Con
 
 When the task targets v5, show the v5 API directly — do not hedge by mixing in v4 syntax.
 
+## Fork extensions (this package only)
+
+`@bishopbot/lightweight-charts` carries a few additions that upstream does
+not have. Check the installed typings before using them — they are not in
+upstream's API, so a snippet that uses one will not work against the
+`lightweight-charts` package.
+
+| Extension | What it does | Since |
+|---|---|---|
+| Duplicate times | A series may hold several items with the same time; each keeps its own column and the axis renders one tick label per timestamp. | 6.0.0 |
+| Nanosecond timestamps | `Time` accepts nanosecond values; ISO date-times with a sub-second part keep their precision and the axis labels show the fraction. | 6.0.0 |
+| `candleWidth` | Pins the width of a candlestick body in CSS pixels instead of deriving it from `barSpacing`. | 6.1.0 |
+
+### `candleWidth` — candlestick body width
+
+```ts
+const candles = chart.addSeries(CandlestickSeries, { candleWidth: 3 });
+```
+
+Without it, the body width is derived from the time scale's `barSpacing`:
+the wider the spacing, the wider the body (upstream's
+`optimalCandlestickWidth`). The two knobs answer different questions:
+
+- `timeScale.barSpacing` — how much history fits on the screen.
+- `series.candleWidth` — how fat the bodies are.
+
+`candleWidth` is in **CSS pixels** (it is scaled by the device pixel
+ratio internally). It is clamped to the current bar spacing — a body wider
+than the space between two candles would overlap its neighbours — and it is
+ignored when it is not a positive number.
+
+Beware the small-spacing special case: upstream pins the body to 3 px for
+any `barSpacing` between 2.5 and 4, so a narrower spacing does **not**
+narrow the body in that range. Set `candleWidth` explicitly to thin the
+bodies down.
+
 ## Triage (problem → API → avoid)
 
 | User asks about | First check | Answer with | Avoid |
@@ -85,6 +121,7 @@ When the task targets v5, show the v5 API directly — do not hedge by mixing in
 | realtime updates | last-bar vs full replace | `series.update(point)` | `setData` on every tick |
 | panes | `paneIndex` + `chart.panes()` | v5 pane APIs, `pane.setHeight` | private widget / DOM hacks |
 | per-bar colors | data-point color fields | `color`/`borderColor`/`wickColor` on points | extra series / markers to recolor |
+| candle body width | `barSpacing` vs `candleWidth` | `barSpacing` for how much fits, `candleWidth` for how fat the bodies are | assuming a narrower spacing narrows the body (it does not below 4 px) |
 | plugins | primitive vs custom series | scaffold/examples + public coordinate APIs | invented renderer names |
 
 ### v4 → v5 replacement matrix
@@ -151,6 +188,7 @@ If these repo paths do not exist in the user's project, do not ask them to creat
 - **Keep pane references if panes can move.** `const mainPane = chart.panes()[0]` remains the same `IPaneApi`; `mainPane.paneIndex()` gives its current index after `swapPanes` or moves.
 - **Sync separate charts with public time-scale events.** Use `subscribeVisibleLogicalRangeChange` and `setVisibleLogicalRange`; avoid `_private__chartWidget`, `paneWidgets`, or DOM offset hacks.
 - **Price-scale width is readable, not directly settable.** Use `series.priceScale().width()` or `chart.priceScale(id).width()` to measure when aligning adjacent containers.
+- **A narrower `barSpacing` does not narrow the candle body below 4 px.** The body width is derived from the spacing, but spacings between 2.5 and 4 pin the body to 3 px. Set `candleWidth` to control the body width.
 
 ### Markers and interaction
 
