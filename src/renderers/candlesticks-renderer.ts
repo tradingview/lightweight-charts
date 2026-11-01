@@ -17,6 +17,13 @@ export interface PaneRendererCandlesticksData {
 
 	barSpacing: number;
 
+	/**
+	 * Explicit width of the candle body, in CSS pixels.
+	 *
+	 * When undefined the width is derived from `barSpacing`.
+	 */
+	candleWidth?: number;
+
 	wickVisible: boolean;
 	borderVisible: boolean;
 
@@ -45,7 +52,7 @@ export class PaneRendererCandlesticks extends BitmapCoordinatesPaneRenderer {
 		const { horizontalPixelRatio } = renderingScope;
 
 		// now we know pixelRatio and we could calculate barWidth effectively
-		this._barWidth = optimalCandlestickWidth(this._data.barSpacing, horizontalPixelRatio);
+		this._barWidth = optimalCandlestickWidth(this._data.barSpacing, horizontalPixelRatio, this._data.candleWidth);
 
 		// grid and crosshair have line width = Math.floor(pixelRatio)
 		// if this value is odd, we have to make candlesticks' width odd

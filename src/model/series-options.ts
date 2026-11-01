@@ -78,6 +78,27 @@ export interface CandlestickStyleOptions {
 	 * @defaultValue `'#ef5350'`
 	 */
 	wickDownColor: string;
+
+	/**
+	 * Width of the candle body, in CSS pixels.
+	 *
+	 * When left unset, the body width is derived from the time
+	 * scale's `barSpacing` (the wider the spacing, the wider the
+	 * body), which keeps candles readable at every zoom level.
+	 * Setting this option pins the body width instead, so the candle
+	 * body can be made thinner or chunkier independently of how far
+	 * the series is zoomed out.
+	 *
+	 * The value is clamped to the current bar spacing — a body wider
+	 * than the space between two candles would overlap its
+	 * neighbours.
+	 *
+	 * This option is specific to this fork; upstream derives the
+	 * candle width from the bar spacing and exposes no override.
+	 *
+	 * @defaultValue `undefined` (derived from `barSpacing`)
+	 */
+	candleWidth?: number;
 }
 
 export function fillUpDownCandlesticksColors(options: Partial<CandlestickStyleOptions>): void {
