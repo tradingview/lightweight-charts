@@ -17,6 +17,7 @@ export const candlestickStyleDefaults: CandlestickStyleOptions = {
 	wickColor: '#737375',
 	wickUpColor: '#26a69a',
 	wickDownColor: '#ef5350',
+	candleWidth: undefined,
 };
 
 const createPaneView = (series: ISeries<'Candlestick'>, model: IChartModelBase): IUpdatablePaneView => new SeriesCandlesticksPaneView(series, model);

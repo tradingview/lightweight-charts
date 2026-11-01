@@ -10,6 +10,16 @@ This package is the `bishop-bot` fork of
 It is published under the `@bishopbot` npm scope; the upstream package keeps the
 unscoped `lightweight-charts` name and the `@tradingview` scope.
 
+## Unreleased
+
+### Added
+
+- `candleWidth` option for candlestick series: pins the width of the candle
+  body in CSS pixels instead of deriving it from the time scale's
+  `barSpacing`. The value is clamped to the bar spacing, and it is ignored
+  when it is not a positive number. This is a fork-specific option; upstream
+  exposes no equivalent.
+
 ## 6.0.1 - 2026-10-31
 
 ### Fixed

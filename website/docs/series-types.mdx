@@ -117,6 +117,17 @@ chart.timeScale().fitContent();
 
 <CodeBlock className="language-js" replaceThemeConstants chart>{candlestickExample}</CodeBlock>
 
+#### Candle width
+
+Upstream derives the width of a candle body from the time scale's
+[`barSpacing`](/api/interfaces/TimeScaleOptions.md#barspacing): the wider the spacing, the wider the body. This fork adds a `candleWidth` option that pins the body width in CSS pixels instead, so the candles can be made thinner or chunkier without changing how much history fits on the screen:
+
+```js
+const candlestickSeries = chart.addSeries(CandlestickSeries, { candleWidth: 3 });
+```
+
+The value is clamped to the current bar spacing — a body wider than the space between two candles would overlap its neighbours — and it is ignored when it is not a positive number.
+
 ### Histogram
 
 - **Series Definition**: [`HistogramSeries`](/api/variables/HistogramSeries.md)

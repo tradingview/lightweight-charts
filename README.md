@@ -33,6 +33,24 @@ The library provides a rich set of charting capabilities out of the box, but you
 
 Take a look at [awesome-tradingview](https://github.com/tradingview/awesome-tradingview?tab=readme-ov-file#lightweight-charts) for related projects created by our community members.
 
+## Fork additions
+
+This fork ships a few capabilities upstream does not have:
+
+- **Duplicate times** — a series may hold several items with the same time.
+- **Nanosecond timestamps** — `Time` accepts nanosecond values, and the axis
+  labels show the sub-second fraction.
+- **`candleWidth`** — pins the width of a candlestick body in CSS pixels,
+  instead of deriving it from the time scale's `barSpacing`:
+
+  ```js
+  const candles = chart.addSeries(CandlestickSeries, { candleWidth: 3 });
+  ```
+
+  Use `barSpacing` for how much history fits on the screen, and
+  `candleWidth` for how fat the bodies are. The value is clamped to the
+  current bar spacing.
+
 ## Installing
 
 ### es6 via npm
