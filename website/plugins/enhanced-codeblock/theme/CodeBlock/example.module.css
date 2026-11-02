@@ -20,6 +20,12 @@
 	color: var(--ifm-color-emphasis-600);
 }
 
+/* Dark mode already sets the caption off from the chart: the block's surface
+   color is lighter than the chart's background. Light mode needs its own tint. */
+:global(html[data-theme='light']) .previewCaption {
+	background: var(--ifm-color-emphasis-100);
+}
+
 .codeHeading {
 	margin-bottom: 12px;
 }

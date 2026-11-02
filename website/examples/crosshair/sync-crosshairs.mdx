@@ -24,7 +24,7 @@ Two separate charts are kept in step: scrolling or zooming one moves the other, 
 2. Each chart's [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove) handler reads the data point under the crosshair.
 3. [`setCrosshairPosition`](/docs/api/interfaces/IChartApi#setcrosshairposition) puts the other chart's crosshair on the same time. When there is no data point, [`clearCrosshairPosition`](/docs/api/interfaces/IChartApi#clearcrosshairposition) removes it.
 
-The upper chart hides its time scale, so the two read as one.
+The upper chart hides its time scale, so the two read as one. Both right price scales get the same [`minimumWidth`](/docs/api/interfaces/PriceScaleOptions#minimumwidth), wide enough for the widest label, so the time axes stay aligned while you scroll and zoom.
 
 ## Tips
 

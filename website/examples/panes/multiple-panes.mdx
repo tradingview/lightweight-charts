@@ -22,7 +22,7 @@ A chart can be split into [panes](/docs/panes), stacked areas that share the tim
 
 1. The third argument of [`addSeries`](/docs/api/interfaces/IChartApi#addseries) is the pane index. The candlesticks go to pane `1`, which is created for them.
 2. [`panes`](/docs/api/interfaces/IChartApi#panes) returns the panes. The candlestick pane is moved to the top with [`moveTo`](/docs/api/interfaces/IPaneApi#moveto) and given a height with [`setHeight`](/docs/api/interfaces/IPaneApi#setheight).
-3. [`layout.panes`](/docs/api/interfaces/LayoutPanesOptions) in the chart options sets the separator colors and turns off resizing by dragging.
+3. [`layout.panes`](/docs/api/interfaces/LayoutPanesOptions) in the chart options sets the separator colors. Drag the separator to resize the panes.
 
 These lines are highlighted in the code.
 
@@ -30,6 +30,7 @@ These lines are highlighted in the code.
 
 - A series can change panes later with [`moveToPane`](/docs/api/interfaces/ISeriesApi#movetopane). A pane left without series is removed.
 - [`removePane`](/docs/api/interfaces/IChartApi#removepane) removes a pane together with its series.
+- To keep the pane heights fixed, set `layout.panes.enableResize` to `false`.
 
 ## Resources
 

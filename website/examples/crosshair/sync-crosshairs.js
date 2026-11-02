@@ -80,6 +80,11 @@ const mainSeries2 = chart2.addSeries(LineSeries, {
 mainSeries2.setData(generateData(100));
 // hide-end
 
+// The same price scale width on both charts keeps their time axes aligned.
+// 70px fits the widest label, so neither scale grows past it.
+chart1.priceScale('right').applyOptions({ minimumWidth: 70 });
+chart2.priceScale('right').applyOptions({ minimumWidth: 70 });
+
 chart1.timeScale().subscribeVisibleLogicalRangeChange(timeRange => {
 	chart2.timeScale().setVisibleLogicalRange(timeRange);
 });

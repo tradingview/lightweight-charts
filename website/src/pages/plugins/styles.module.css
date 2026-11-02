@@ -410,6 +410,7 @@
 	line-height: 16px;
 	color: var(--ifm-color-emphasis-600);
 }
+:global(html[data-theme='light']) .previewCaption { background: var(--ifm-color-emphasis-100); }
 
 .section { margin-bottom: 44px; }
 /* accent-20px-semibold */

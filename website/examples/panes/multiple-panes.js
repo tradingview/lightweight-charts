@@ -11,8 +11,6 @@ const chartOptions = {
 		panes: {
 			separatorColor: '#f22c3d',
 			separatorHoverColor: 'rgba(255, 0, 0, 0.1)',
-			// setting this to false will disable the resize of the panes by the user
-			enableResize: false,
 		},
 		// highlight-end
 	},

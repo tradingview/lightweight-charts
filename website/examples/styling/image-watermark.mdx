@@ -11,6 +11,12 @@ keywords:
 import CodeBlock from '@theme/CodeBlock';
 import code from '!!raw-loader!./image-watermark.js';
 
+:::tip
+
+For more control than the built-in watermark gives, use the [Image watermark](/plugins/image-watermark) plugin. It can anchor the image to a corner, fill the pane, or draw it behind one series instead of the whole pane. You can also replace the image after it is added.
+
+:::
+
 <CodeBlock example className="language-js">
 	{code}
 </CodeBlock>
@@ -27,7 +33,7 @@ The call is highlighted in the code.
 ## Tips
 
 - The image in this example is black on a transparent background, so it is hard to see in dark mode. Use an image that works on both backgrounds, or switch it with the theme.
-- `createImageWatermark` centers the image and scales it to fit. For more control, use the [Image watermark](/plugins/image-watermark) plugin. It can anchor the image to a corner, fill the pane, or draw it behind one series instead of the whole pane. You can also replace the image after it is added.
+- `createImageWatermark` centers the image and scales it to fit. To place it any other way, use the plugin from the tip above.
 
 ## Resources
 
