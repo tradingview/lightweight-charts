@@ -48,8 +48,8 @@ function saveScreenshot() {
 		link.href = URL.createObjectURL(blob);
 		link.download = 'chart.png';
 		link.click();
-		// Released later: some browsers still read the file after `click` returns.
-		setTimeout(() => URL.revokeObjectURL(link.href));
+		// Released a second later: some browsers still read the file after `click` returns.
+		setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 	}, 'image/png');
 	// highlight-end
 }

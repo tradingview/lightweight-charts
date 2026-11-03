@@ -42,18 +42,10 @@ const series = chart.addSeries(CandlestickSeries, {
 const utcData = generateBars();
 
 // highlight-start
-// Moves a UTC timestamp so that the chart, which shows every time in UTC,
-// shows the local time that `format` reads for it instead.
-function timeToTz(time, format) {
-	const parts = {};
-	for (const { type, value } of format.formatToParts(new Date(time * 1000))) {
-		parts[type] = Number(value);
-	}
-	return Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second) / 1000;
-}
-
-function setTimeZone(timeZone) {
-	// Created once per time zone: creating a format is slower than using it.
+// Returns a function that moves a UTC timestamp so that the chart, which shows
+// every time in UTC, shows the local time of `timeZone` instead.
+function createTimeToTz(timeZone) {
+	// Create the format once and reuse it: creating one is slow.
 	const format = new Intl.DateTimeFormat('en-US', {
 		timeZone,
 		hourCycle: 'h23',
@@ -64,7 +56,18 @@ function setTimeZone(timeZone) {
 		minute: 'numeric',
 		second: 'numeric',
 	});
-	series.setData(utcData.map(bar => ({ ...bar, time: timeToTz(bar.time, format) })));
+	return originalTime => {
+		const parts = {};
+		for (const { type, value } of format.formatToParts(new Date(originalTime * 1000))) {
+			parts[type] = Number(value);
+		}
+		return Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second) / 1000;
+	};
+}
+
+function setTimeZone(timeZone) {
+	const timeToTz = createTimeToTz(timeZone);
+	series.setData(utcData.map(bar => ({ ...bar, time: timeToTz(bar.time) })));
 }
 // highlight-end
 
