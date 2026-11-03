@@ -44,11 +44,6 @@ export function selectTimeConverter(data: TimedData<Time>[]): TimeConverter | nu
 }
 
 const validDateRegex = /^\d\d\d\d-\d\d-\d\d$/;
-const nonPaddedDateRegex = /^(\d\d\d\d)-(\d\d?)-(\d\d?)$/;
-
-function padDatePart(value: string): string {
-	return value.length === 1 ? `0${value}` : value;
-}
 
 export function convertTime(time: Time): InternalHorzScaleItem {
 	if (isUTCTimestamp(time)) {
@@ -63,29 +58,14 @@ export function convertTime(time: Time): InternalHorzScaleItem {
 }
 
 export function stringToBusinessDay(value: string): BusinessDay {
-	if (process.env.NODE_ENV === 'development') {
-		// in some browsers (I look at your Chrome) the Date constructor may accept invalid date string
-		// but parses them in 'implementation specific' way
-		// for example 2019-1-1 isn't the same as 2019-01-01 (for Chrome both are 'valid' date strings)
-		// see https://bugs.chromium.org/p/chromium/issues/detail?id=968939
-		// so, we need to be sure that date has valid format to avoid strange behavior and hours of debugging
-		// but let's do this in development build only because of perf
-		if (!validDateRegex.test(value)) {
-			throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
-		}
+	// the Date constructor parses only yyyy-mm-dd strings as UTC; other formats it accepts
+	// (e.g. 2019-1-1, 2019/01/01) are parsed as local time, which shifts the date for timezones ahead of UTC
+	// see https://bugs.chromium.org/p/chromium/issues/detail?id=968939
+	if (!validDateRegex.test(value)) {
+		throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
 	}
 
-	// the Date constructor parses non-padded strings like 2019-1-1 as local time rather than UTC,
-	// which shifts the date back by one day for timezones ahead of UTC, so pad them to yyyy-mm-dd first
-	let isoValue = value;
-	if (value.length !== 10) {
-		const match = nonPaddedDateRegex.exec(value);
-		if (match !== null) {
-			isoValue = `${match[1]}-${padDatePart(match[2])}-${padDatePart(match[3])}`;
-		}
-	}
-
-	const d = new Date(isoValue);
+	const d = new Date(value);
 	if (isNaN(d.getTime())) {
 		throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
 	}

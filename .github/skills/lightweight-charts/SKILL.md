@@ -138,6 +138,7 @@ If these repo paths do not exist in the user's project, do not ask them to creat
 - **Pre-shifting timestamps changes chart semantics.** It can make ticks line up in a chosen timezone, but it also changes where bars sit on the UTC time scale. Prefer formatter-based display unless the user intentionally wants shifted data.
 - **Series data must be strictly ascending by `time`, with unique values.** Duplicates replace silently; out-of-order points are dropped or throw.
 - **One time format per series.** `BusinessDay` (`'YYYY-MM-DD'` string or `{ year, month, day }`) or `UTCTimestamp`, but do not mix within a single series.
+- **Business day strings must be zero-padded `'YYYY-MM-DD'`.** `'2024-1-5'`, `'2024/01/05'` or `'Jan 5 2024'` throw. Pad the string or pass `{ year, month, day }`.
 - **Whitespace points carry `time` only** (no `value` / `open` / …). Use them to create gaps or align overlays; do not set values to `null`.
 - **`setData` replaces the dataset and can reset the visible range. `update(point)` appends if `time > last` and replaces if `time === last`.** `update(point, true)` can update an existing historical point, but it is slower and does not insert missing old points. To prepend older history, build a new array and call `setData` again — there is no prepend method; save and restore the visible logical range to avoid the chart snapping.
 - **`timeScale.setVisibleLogicalRange` is logical (bar indices), not time-based.** Use `setVisibleRange` for time bounds, or `fitContent()` to reset.
