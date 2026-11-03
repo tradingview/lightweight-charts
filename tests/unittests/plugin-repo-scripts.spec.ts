@@ -14,6 +14,7 @@ import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
+	catalogSlugOf,
 	findWorkspacePlugins,
 	resolveTargetPlugins,
 	compareVersions,
@@ -529,6 +530,32 @@ const p = new Plugin();
 			expect(allErrors).to.include('peerDependencies.lightweight-charts');
 			expect(allErrors).to.include('lightweight-charts-plugin');
 			expect(allErrors).to.include('lwcPlugin schema error: /category');
+		});
+
+		it('should reject package names whose slug is not a single safe path segment', () => {
+			const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lwc-slug-test-'));
+			try {
+				fs.writeFileSync(path.join(tempDir, 'README.md'), minimalValidReadme);
+				for (const name of ['@tradingview/lwc-plugin-..', '@tradingview/lwc-plugin-../../x', '@tradingview/lwc-plugin-a/b', '@tradingview/lwc-plugin-Upper', '@tradingview/lwc-plugin-a--b', '@tradingview/lwc-plugin-']) {
+					fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify({ ...minimalPackage, name }, null, 2));
+					expect(validatePackageMetadata(tempDir, { isOfficial: true }).errors.join('\n'), name)
+						.to.include("Package name after 'lwc-plugin-' must be lowercase letters and digits");
+				}
+
+				fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify({ ...minimalPackage, name: '@tradingview/lwc-plugin-stacked-bars-2' }, null, 2));
+				expect(validatePackageMetadata(tempDir, { isOfficial: true }).errors.join('\n'))
+					.to.not.include("Package name after 'lwc-plugin-'");
+			} finally {
+				fs.rmSync(tempDir, { recursive: true, force: true });
+			}
+		});
+
+		it('should only derive catalog slugs that are a single safe path segment (catalogSlugOf)', () => {
+			expect(catalogSlugOf('@tradingview/lwc-plugin-vertical-line')).to.equal('vertical-line');
+			expect(catalogSlugOf('lwc-plugin-community-thing')).to.equal('community-thing');
+			for (const name of ['@tradingview/lwc-plugin-..', '@tradingview/lwc-plugin-../../x', '@x/lwc-plugin-a/b', '@tradingview/lwc-plugin-']) {
+				expect(() => catalogSlugOf(name), name).to.throw('does not yield a valid catalog slug');
+			}
 		});
 
 		it('should require a description, a valid version and no scaffold placeholders', () => {

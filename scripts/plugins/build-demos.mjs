@@ -23,7 +23,7 @@ import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
-import { loadTargetPlugins } from './utils.mjs';
+import { catalogSlugOf as slugOf, loadTargetPlugins } from './utils.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const staticDir = path.join(repoRoot, 'website', 'static');
@@ -33,11 +33,6 @@ const outputs = {
 	demo: 'plugin-demos',
 	preview: 'plugin-previews',
 };
-
-/** Unscoped package name without the `lwc-plugin-` prefix: the catalogue's URL segment. */
-function slugOf(packageName) {
-	return packageName.slice(packageName.indexOf('/') + 1).replace(/^lwc-plugin-/, '');
-}
 
 /**
  * The Vite the package pins, so a page is built with the same version that

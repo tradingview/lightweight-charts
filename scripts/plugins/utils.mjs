@@ -299,6 +299,8 @@ function validateNamingAndLicense(pkg, isOfficial) {
 	const unscopedName = name.slice(name.indexOf('/') + 1);
 	if (!unscopedName.startsWith('lwc-plugin-')) {
 		errors.push(`Package name must start with 'lwc-plugin-' (got '${unscopedName}')`);
+	} else if (!CATALOG_SLUG_PATTERN.test(unscopedName.slice('lwc-plugin-'.length))) {
+		errors.push(`Package name after 'lwc-plugin-' must be lowercase letters and digits separated by single hyphens (got '${unscopedName}')`);
 	}
 
 	if (!pkg.license || typeof pkg.license !== 'string' || pkg.license.trim().length === 0) {
@@ -414,13 +416,24 @@ function validateRepositoryDirectory(pkg, packageDir, repoRoot) {
 }
 
 /**
+ * The catalog slug grammar. A slug becomes both a URL segment and a folder name
+ * under `website/static`, so it must never contain `/` or `..`.
+ */
+const CATALOG_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/**
  * Unscoped name without the `lwc-plugin-` prefix: the catalog's URL segment.
  *
  * @param {string} packageName
  * @returns {string}
+ * @throws {Error} When the slug is not lowercase words joined by hyphens.
  */
 export function catalogSlugOf(packageName) {
-	return packageName.slice(packageName.indexOf('/') + 1).replace(/^lwc-plugin-/, '');
+	const slug = packageName.slice(packageName.indexOf('/') + 1).replace(/^lwc-plugin-/, '');
+	if (!CATALOG_SLUG_PATTERN.test(slug)) {
+		throw new Error(`Package name '${packageName}' does not yield a valid catalog slug (got '${slug}')`);
+	}
+	return slug;
 }
 
 /** `#abc` and `#AABBCC` as `#aabbcc`; null for anything that is not a 3- or 6-digit hex color. */
