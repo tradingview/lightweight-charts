@@ -17,7 +17,7 @@ Use [`TimeScaleOptions`](/api/interfaces/TimeScaleOptions.md) to adjust the time
 - On chart initialization. To do this, provide the desired options as a [`timeScale`](api/interfaces/ChartOptionsBase#timescale) parameter when calling [`createChart`](/api/functions/createChart.md).
 - On the fly using either the [`ITimeScaleApi.applyOptions`](/api/interfaces/ITimeScaleApi.md#applyoptions) or [`IChartApi.applyOptions`](/api/interfaces/IChartApi.md#applyoptions) method. Both methods produce the same result.
 
-See the [Hidden time scale](/examples/styling/hidden-time-scale) example.
+See the [Hidden time scale](/examples/styling/hidden-time-scale) and [Custom date format](/examples/time-scale/custom-date-format) examples.
 
 ## Time scale API
 
@@ -39,7 +39,7 @@ You can adjust the visible range using the following methods:
 - [`setVisibleLogicalRange`]
 - [`getVisibleLogicalRange`]
 
-See the [Range switcher](/examples/data/range-switcher) example.
+See the [Visible range](/examples/time-scale/visible-range) and [Range switcher](/examples/data/range-switcher) examples.
 
 ## Data range
 

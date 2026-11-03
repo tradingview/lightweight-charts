@@ -34,7 +34,7 @@ To change the default settings for an overlay price scale, use the [`overlayPric
 You can use the [`IChartApi.priceScale`](/api/interfaces/IChartApi.md#pricescale) method to retrieve the API object for any price scale.
 Similarly, to access the API object for the price scale that a series is attached to, use the [`ISeriesApi.priceScale`](/api/interfaces/ISeriesApi.md#pricescale) method.
 
-See the [Two price scales](/examples/price-scales/two-price-scales) and [Inverted price scale](/examples/price-scales/inverted-price-scale) examples.
+See the [Two price scales](/examples/price-scales/two-price-scales), [Inverted price scale](/examples/price-scales/inverted-price-scale), [Price scale modes](/examples/price-scales/price-scale-modes), and [Custom price format](/examples/price-scales/custom-price-format) examples.
 
 ## Remove price scale
 

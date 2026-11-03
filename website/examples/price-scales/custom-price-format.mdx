@@ -1,0 +1,42 @@
+---
+title: Custom price format
+sidebar_label: Custom price format
+sidebar_position: 5
+description: Large values shown as short dollar amounts, such as $1.25B, on the price scale.
+sidebar_custom_props:
+  previewScales: true
+pagination_prev: null
+pagination_next: null
+keywords:
+  - price format
+  - price formatter
+  - currency
+  - localization
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./custom-price-format.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart turns each price into text with a function you give it. Here the function shortens large values to dollar amounts such as $1.25B.
+
+1. [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) with `notation: 'compact'` does the formatting. It is created once and reused for every label.
+2. [`localization.priceFormatter`](/docs/api/interfaces/LocalizationOptions#priceformatter) gives the chart the function. The price scale labels, the crosshair label, and the last value label all use it.
+
+These lines are highlighted in the code.
+
+## Tips
+
+- To change only the number of decimals, set [`priceFormat`](/docs/api/interfaces/SeriesOptionsCommon#priceformat) on the series instead, with `precision` and `minMove`.
+- To format the prices of one series only, use `priceFormat` with `type: 'custom'` and a `formatter` function on that series.
+
+## Resources
+
+- [`LocalizationOptions.priceFormatter`](/docs/api/interfaces/LocalizationOptions#priceformatter)
+- [`PriceFormatCustom`](/docs/api/interfaces/PriceFormatCustom)
+- Related examples: [Custom locale](../styling/custom-locale.mdx), [Price scale modes](./price-scale-modes.mdx)
