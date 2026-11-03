@@ -44,6 +44,11 @@ export function selectTimeConverter(data: TimedData<Time>[]): TimeConverter | nu
 }
 
 const validDateRegex = /^\d\d\d\d-\d\d-\d\d$/;
+const nonPaddedDateRegex = /^(\d\d\d\d)-(\d\d?)-(\d\d?)$/;
+
+function padDatePart(value: string): string {
+	return value.length === 1 ? `0${value}` : value;
+}
 
 export function convertTime(time: Time): InternalHorzScaleItem {
 	if (isUTCTimestamp(time)) {
@@ -70,7 +75,17 @@ export function stringToBusinessDay(value: string): BusinessDay {
 		}
 	}
 
-	const d = new Date(value);
+	// the Date constructor parses non-padded strings like 2019-1-1 as local time rather than UTC,
+	// which shifts the date back by one day for timezones ahead of UTC, so pad them to yyyy-mm-dd first
+	let isoValue = value;
+	if (value.length !== 10) {
+		const match = nonPaddedDateRegex.exec(value);
+		if (match !== null) {
+			isoValue = `${match[1]}-${padDatePart(match[2])}-${padDatePart(match[3])}`;
+		}
+	}
+
+	const d = new Date(isoValue);
 	if (isNaN(d.getTime())) {
 		throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
 	}
