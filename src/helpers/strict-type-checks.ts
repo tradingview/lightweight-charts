@@ -71,8 +71,7 @@ export function clone<T>(object: T): T {
 	let v;
 	// eslint-disable-next-line no-restricted-syntax
 	for (p in o) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,no-prototype-builtins
-		if (o.hasOwnProperty(p)) {
+		if (Object.prototype.hasOwnProperty.call(o, p)) {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 			v = o[p];
 			if (v && 'object' === typeof v) {

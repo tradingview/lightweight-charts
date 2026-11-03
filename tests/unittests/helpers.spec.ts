@@ -179,6 +179,24 @@ describe('Helpers', () => {
 			expect((Object.prototype as any).polluted).to.be.undefined;
 			expect(Object.prototype.toString).to.equal(originalProto);
 		});
+
+		it('should not be defeated by a shadowed hasOwnProperty', () => {
+			const shadowed = JSON.parse('{ "hasOwnProperty": 1, "value": 1234, "nested": { "hasOwnProperty": 1 } }');
+
+			const cloned = clone(shadowed);
+
+			expect(cloned).to.deep.equal(shadowed);
+			expect(cloned.nested).to.not.equal(shadowed.nested);
+		});
+
+		it('should clone merged options containing a shadowed hasOwnProperty', () => {
+			const userOptions = JSON.parse('{ "leftPriceScale": { "hasOwnProperty": 1 } }') as Record<string, unknown>;
+			const options = merge({ leftPriceScale: { visible: true } }, userOptions);
+
+			expect(() => {
+				clone(options.leftPriceScale);
+			}).to.not.throw();
+		});
 	});
 	/* eslint-enable
 		@typescript-eslint/unbound-method,
