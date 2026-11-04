@@ -524,6 +524,26 @@ describe('DataLayer', () => {
 		expect(() => stringToBusinessDay('2019-15-01')).to.throw();
 	});
 
+	it('stringToBusinessDay should parse yyyy-mm-dd dates regardless of timezone and reject other formats', () => {
+		const originalTz = process.env.TZ;
+		try {
+			for (const tz of ['Asia/Kolkata', 'Pacific/Kiritimati', 'UTC', 'America/New_York']) {
+				process.env.TZ = tz;
+				expect(stringToBusinessDay('2026-01-05'), tz).to.be.deep.equal({ day: 5, month: 1, year: 2026 });
+				expect(stringToBusinessDay('2026-12-31'), tz).to.be.deep.equal({ day: 31, month: 12, year: 2026 });
+				for (const value of ['2026-1-5', '2026-01-5', '2026-1-05', '2026/01/05', 'Jan 5 2026', '2026-01-05T00:00:00Z']) {
+					expect(() => stringToBusinessDay(value), `${tz} ${value}`).to.throw(`Invalid date string=${value}`);
+				}
+			}
+		} finally {
+			if (originalTz === undefined) {
+				delete process.env.TZ;
+			} else {
+				process.env.TZ = originalTz;
+			}
+		}
+	});
+
 	it('should ignore "value" fields on OHLC-based series update', () => {
 		const ohlcBasedTypes: SeriesType[] = ['Bar', 'Candlestick'];
 

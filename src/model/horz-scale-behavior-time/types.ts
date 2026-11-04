@@ -44,7 +44,11 @@ export interface BusinessDay {
 /**
  * The Time type is used to represent the time of data items.
  *
- * Values can be a {@link UTCTimestamp}, a {@link BusinessDay}, or a business day string in ISO format.
+ * Values can be a {@link UTCTimestamp}, a {@link BusinessDay}, or a business day string in `YYYY-MM-DD` format.
+ *
+ * Business day strings must be exactly `YYYY-MM-DD` with zero-padded month and day (for example `'2021-02-03'`).
+ * Any other string, such as `'2021-2-3'`, `'2021/02/03'` or `'Feb 3 2021'`, throws an error.
+ * If your dates are not in this format, use a {@link BusinessDay} object instead.
  *
  * @example
  * ```js
