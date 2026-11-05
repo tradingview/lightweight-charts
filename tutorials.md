@@ -20,13 +20,9 @@ or submit your own.
 
 :::
 
-## How To
+## Examples
 
-A collection of code examples showcasing the various capabilities of the library, and how to implement common additional features.
-
-## Examples / Demos
-
-A collection of demos showcasing the various capabilities of the library.
+Live code examples of the library's features — series types, scales, tooltips, legends, markers, and more — are in the [Examples](https://tradingview.github.io/lightweight-charts/examples.md) gallery.
 
 ## Analysis indicators
 

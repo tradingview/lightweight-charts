@@ -24,6 +24,8 @@ areaSeries.setData(data);
 chart.timeScale().fitContent();
 ```
 
+See the [Area series](https://tradingview.github.io/lightweight-charts/examples/series-types/area.md) example.
+
 ### Bar
 
 - **Series Definition**: [`BarSeries`](https://tradingview.github.io/lightweight-charts/docs/api/variables/BarSeries)
@@ -67,6 +69,8 @@ barSeries.setData(data);
 chart.timeScale().fitContent();
 ```
 
+See the [Bar series](https://tradingview.github.io/lightweight-charts/examples/series-types/bar.md) example.
+
 ### Baseline
 
 - **Series Definition**: [`BaselineSeries`](https://tradingview.github.io/lightweight-charts/docs/api/variables/BaselineSeries)
@@ -86,6 +90,8 @@ baselineSeries.setData(data);
 
 chart.timeScale().fitContent();
 ```
+
+See the [Baseline series](https://tradingview.github.io/lightweight-charts/examples/series-types/baseline.md) example.
 
 ### Candlestick
 
@@ -108,6 +114,8 @@ candlestickSeries.setData(data);
 chart.timeScale().fitContent();
 ```
 
+See the [Candlestick series](https://tradingview.github.io/lightweight-charts/examples/series-types/candlestick.md) example.
+
 ### Histogram
 
 - **Series Definition**: [`HistogramSeries`](https://tradingview.github.io/lightweight-charts/docs/api/variables/HistogramSeries)
@@ -128,6 +136,8 @@ histogramSeries.setData(data);
 chart.timeScale().fitContent();
 ```
 
+See the [Histogram series](https://tradingview.github.io/lightweight-charts/examples/series-types/histogram.md) example.
+
 ### Line
 
 - **Series Definition**: [`LineSeries`](https://tradingview.github.io/lightweight-charts/docs/api/variables/LineSeries)
@@ -147,6 +157,8 @@ lineSeries.setData(data);
 
 chart.timeScale().fitContent();
 ```
+
+See the [Line series](https://tradingview.github.io/lightweight-charts/examples/series-types/line.md) example.
 
 ### Custom series (plugins)
 

@@ -13,6 +13,8 @@ Use [`TimeScaleOptions`](https://tradingview.github.io/lightweight-charts/docs/a
 - On chart initialization. To do this, provide the desired options as a [`timeScale`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ChartOptionsBase#timescale) parameter when calling [`createChart`](https://tradingview.github.io/lightweight-charts/docs/api/functions/createChart).
 - On the fly using either the [`ITimeScaleApi.applyOptions`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi#applyoptions) or [`IChartApi.applyOptions`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#applyoptions) method. Both methods produce the same result.
 
+See the [Hidden time scale](https://tradingview.github.io/lightweight-charts/examples/styling/hidden-time-scale.md) and [Custom date format](https://tradingview.github.io/lightweight-charts/examples/time-scale/custom-date-format.md) examples.
+
 ## Time scale API
 
 Call the [`IChartApi.timeScale`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IChartApi#timescale) method to get an instance of the [`ITimeScaleApi`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi) interface. This interface provides an extensive API for controlling the time scale. For example, you can adjust the visible range, convert a time point or [index](https://tradingview.github.io/lightweight-charts/docs/api/type-aliases/Logical) to a coordinate, and subscribe to events.
@@ -32,6 +34,8 @@ You can adjust the visible range using the following methods:
 - [`getVisibleRange`]
 - [`setVisibleLogicalRange`]
 - [`getVisibleLogicalRange`]
+
+See the [Visible range](https://tradingview.github.io/lightweight-charts/examples/time-scale/visible-range.md) and [Range switcher](https://tradingview.github.io/lightweight-charts/examples/data/range-switcher.md) examples.
 
 ## Data range
 
@@ -83,7 +87,7 @@ Note the following:
 Use the [`getVisibleLogicalRange`] method to get the size of the visible logical range as the difference between `to` and `from`. Note that this range can include empty space before the first bar or after the last one.
 
 To check how many bars of a series are outside the visible range, use [`barsInLogicalRange`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ISeriesApi#barsinlogicalrange).
-To load more data while the user scrolls, subscribe to range changes with [`subscribeVisibleLogicalRangeChange`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange) as shown in the [Infinite history](https://tradingview.github.io/lightweight-charts/tutorials/demos/infinite-history.md) tutorial.
+To load more data while the user scrolls, subscribe to range changes with [`subscribeVisibleLogicalRangeChange`](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange) as shown in the [Infinite history](https://tradingview.github.io/lightweight-charts/examples/data/infinite-history.md) example.
 
 ## Chart margin
 

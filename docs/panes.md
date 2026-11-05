@@ -3,7 +3,7 @@
 Panes are essential elements that help segregate data visually within a single chart.
 Panes are useful when you have a chart that needs to show more than one kind of data. For example, you might want to see a stock's price over time in one pane and its trading volume in another. This setup helps users get a fuller picture without cluttering the chart.
 
-By default, Lightweight Charts™ has a single pane, however, you can add more panes to the chart to display different series in separate areas. For detailed examples and code snippets on how to implement panes in your charts [see tutorial](https://tradingview.github.io/lightweight-charts/tutorials/how_to/panes.md).
+By default, Lightweight Charts™ has a single pane, however, you can add more panes to the chart to display different series in separate areas. For detailed examples and code snippets on how to implement panes in your charts see the [Panes](https://tradingview.github.io/lightweight-charts/examples/panes/multiple-panes.md) example.
 
 ## Customization Options
 
@@ -17,7 +17,7 @@ Lightweight Charts™ offers a few [customization options](https://tradingview.g
 
 ## Managing Panes
 
-While the specific methods to manipulate panes are covered in the detailed [example](https://tradingview.github.io/lightweight-charts/tutorials/how_to/panes.md), it's important to note that Lightweight Charts™ provides an [API for pane management](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPaneApi). This includes adding new panes, moving series between panes, adjusting pane height, and removing panes. The API ensures that developers have full control over the pane lifecycle and organization within their charts.
+While the specific methods to manipulate panes are covered in the detailed [example](https://tradingview.github.io/lightweight-charts/examples/panes/multiple-panes.md), it's important to note that Lightweight Charts™ provides an [API for pane management](https://tradingview.github.io/lightweight-charts/docs/api/interfaces/IPaneApi). This includes adding new panes, moving series between panes, adjusting pane height, and removing panes. The API ensures that developers have full control over the pane lifecycle and organization within their charts.
 
 ---
 

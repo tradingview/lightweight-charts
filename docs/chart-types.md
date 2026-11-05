@@ -71,6 +71,8 @@ lineSeries.setData(curve);
 chart.timeScale().fitContent();
 ```
 
+See the [Yield curve with updates](https://tradingview.github.io/lightweight-charts/examples/chart-types/yield-curve-with-update-markers.md) example.
+
 ## Options Chart (Price-based)
 
 The options chart is a specialized type that uses price values on the horizontal scale instead of time.
@@ -86,6 +88,7 @@ const chart = createOptionsChart(document.getElementById('container'), options);
 ```
 
 This chart type is particularly useful for financial instruments like options, where the price is a more relevant x-axis metric than time.
+See the [Options chart](https://tradingview.github.io/lightweight-charts/examples/chart-types/options-chart.md) example.
 
 ```js
 const chartOptions = {
@@ -126,6 +129,7 @@ const chart = createChartEx(document.getElementById('container'), customBehavior
 ```
 
 This method provides the flexibility to define custom horizontal scale behavior, allowing for unique and specialized chart types.
+See the [Custom horizontal scale](https://tradingview.github.io/lightweight-charts/examples/chart-types/custom-horizontal-scale.md) example.
 
 ## Choosing the Right Chart Type
 

@@ -3,7 +3,7 @@
 A map of all documentation pages with their headings, for navigation by LLMs and tools. Every page is available as Markdown at the linked URL.
 
 > Version: 5.2 (latest released)
-> Last updated: 2026-11-04 11:36:23 UTC
+> Last updated: 2026-11-05 09:43:54 UTC
 
 This map uses a hierarchical structure:
 
@@ -68,9 +68,10 @@ This map uses a hierarchical structure:
   - Overview
   - Approaches
     - Using pure JavaScript
+    - Using the Temporal API
     - Using the date-fns-tz library
     - Using the IANA time zone database
-  - Why are time zones not supported?
+  - Why does the chart not convert time zones?
 - [iOS wrapper](https://tradingview.github.io/lightweight-charts/docs/ios.md)
   - Installation
     - Swift Package Manager
@@ -251,8 +252,7 @@ This map uses a hierarchical structure:
 - [Tutorials](https://tradingview.github.io/lightweight-charts/tutorials.md)
   - Guides
   - Framework integrations
-  - How To
-  - Examples / Demos
+  - Examples
   - Analysis indicators
 - [Analysis indicators](https://tradingview.github.io/lightweight-charts/tutorials/analysis-indicators.md)
   - Overview
@@ -266,6 +266,7 @@ This map uses a hierarchical structure:
       - Example
     - Direct calculation
       - Example
+- [Moving average indicator](https://tradingview.github.io/lightweight-charts/tutorials/demos/moving-average.md)
 
 ### Guides
 
@@ -425,10 +426,50 @@ This map uses a hierarchical structure:
     - Wrapper Custom Element
     - Example Usage Custom Element
 
-### How To
+## Examples
 
-- [Custom horizontal scale](https://tradingview.github.io/lightweight-charts/tutorials/how_to/horizontal-price-scale.md)
-  - Understanding the IHorzScaleBehavior interface
+- [Examples](https://tradingview.github.io/lightweight-charts/examples.md)
+
+### Series types
+
+- [Candlestick series](https://tradingview.github.io/lightweight-charts/examples/series-types/candlestick.md)
+  - How it works
+  - Tips
+  - Resources
+- [Bar series](https://tradingview.github.io/lightweight-charts/examples/series-types/bar.md)
+  - How it works
+  - Tips
+  - Resources
+- [Line series](https://tradingview.github.io/lightweight-charts/examples/series-types/line.md)
+  - How it works
+  - Tips
+  - Resources
+- [Area series](https://tradingview.github.io/lightweight-charts/examples/series-types/area.md)
+  - How it works
+  - Tips
+  - Resources
+- [Baseline series](https://tradingview.github.io/lightweight-charts/examples/series-types/baseline.md)
+  - How it works
+  - Tips
+  - Resources
+- [Histogram series](https://tradingview.github.io/lightweight-charts/examples/series-types/histogram.md)
+  - How it works
+  - Tips
+  - Resources
+- [Compare multiple series](https://tradingview.github.io/lightweight-charts/examples/series-types/compare-multiple-series.md)
+  - How it works
+  - Tips
+  - Resources
+
+### Chart types
+
+- [Yield curve chart with update markers](https://tradingview.github.io/lightweight-charts/examples/chart-types/yield-curve-with-update-markers.md)
+  - How it works
+  - Tips
+  - Resources
+- [Custom horizontal scale](https://tradingview.github.io/lightweight-charts/examples/chart-types/custom-horizontal-scale.md)
+  - How it works
+  - The IHorzScaleBehavior interface
     - options
     - setOptions
     - preprocessData
@@ -441,78 +482,150 @@ This map uses a hierarchical structure:
     - formatTickmark
     - maxTickMarkWeight
     - fillWeightsForPoints
-  - Example
-    - Implement price-based horizontal scale
-    - Customize horizontal scale behavior
-    - Conclusion
-    - Full example
-- [Inverted Price Scale](https://tradingview.github.io/lightweight-charts/tutorials/how_to/inverted-price-scale.md)
-  - How to
+  - Implementing a price-based scale
+    - Using it with createChartEx
   - Resources
-  - Full example
-- [Legends](https://tradingview.github.io/lightweight-charts/tutorials/how_to/legends.md)
-  - How to
-  - Resources
-  - Examples
-    - Simple Legend Example
-    - 3 Line Legend Example
-- [Panes](https://tradingview.github.io/lightweight-charts/tutorials/how_to/panes.md)
-  - How to add a pane
-    - Customizations
-  - Full Example
-- [Price and volume on a single chart](https://tradingview.github.io/lightweight-charts/tutorials/how_to/price-and-volume.md)
-  - How to add a volume histogram
-  - Resources
-  - Full example
-- [Add Price Line](https://tradingview.github.io/lightweight-charts/tutorials/how_to/price-line.md)
-  - Short answer
+- [Options chart](https://tradingview.github.io/lightweight-charts/examples/chart-types/options-chart.md)
+  - How it works
   - Tips
   - Resources
-  - Full example
-- [Add Series Markers](https://tradingview.github.io/lightweight-charts/tutorials/how_to/series-markers.md)
-  - Short answer
-  - Further information
-  - Resources
-  - Full example
-- [Set crosshair position](https://tradingview.github.io/lightweight-charts/tutorials/how_to/set-crosshair-position.md)
-  - Syncing two charts
-  - Tracking without long-press (on mobile)
-- [Tooltips](https://tradingview.github.io/lightweight-charts/tutorials/how_to/tooltips.md)
-  - How to
-    - Getting the mouse cursors position
-    - Getting the data points position
-  - Resources
-  - Examples
-    - Floating Tooltip
-    - Tracking Tooltip
-    - Magnifier Tooltip
-- [Two Price Scales](https://tradingview.github.io/lightweight-charts/tutorials/how_to/two-price-scales.md)
-  - Short answer
+
+### Price scales
+
+- [Two price scales](https://tradingview.github.io/lightweight-charts/examples/price-scales/two-price-scales.md)
+  - How it works
   - Tips
   - Resources
-  - Full example
-- [Watermark](https://tradingview.github.io/lightweight-charts/tutorials/how_to/watermark.md)
-  - Short answer
+- [Inverted price scale](https://tradingview.github.io/lightweight-charts/examples/price-scales/inverted-price-scale.md)
+  - How it works
+  - Tips
   - Resources
-  - Examples
-    - Simple Watermark Example
-    - Image Watermark Example
+- [Price and volume on a single chart](https://tradingview.github.io/lightweight-charts/examples/price-scales/price-and-volume.md)
+  - How it works
+  - Tips
+  - Resources
+- [Price scale modes](https://tradingview.github.io/lightweight-charts/examples/price-scales/price-scale-modes.md)
+  - How it works
+  - Tips
+  - Resources
+- [Custom price format](https://tradingview.github.io/lightweight-charts/examples/price-scales/custom-price-format.md)
+  - How it works
+  - Tips
   - Resources
 
-### Examples / Demos
+### Time scale
 
-- [Compare multiple series](https://tradingview.github.io/lightweight-charts/tutorials/demos/compare-multiple-series.md)
-- [Custom font family](https://tradingview.github.io/lightweight-charts/tutorials/demos/custom-font-family.md)
-    - API Reference
-- [Custom locale](https://tradingview.github.io/lightweight-charts/tutorials/demos/custom-locale.md)
-    - API Reference
-- [Infinite history](https://tradingview.github.io/lightweight-charts/tutorials/demos/infinite-history.md)
-- [Moving average indicator](https://tradingview.github.io/lightweight-charts/tutorials/demos/moving-average.md)
-- [Range switcher](https://tradingview.github.io/lightweight-charts/tutorials/demos/range-switcher.md)
-- [Realtime updates](https://tradingview.github.io/lightweight-charts/tutorials/demos/realtime-updates.md)
-- [Whitespace data](https://tradingview.github.io/lightweight-charts/tutorials/demos/whitespace.md)
-    - API Reference
-- [Yield Curve Chart with Update Markers](https://tradingview.github.io/lightweight-charts/tutorials/demos/yield-curve-with-update-markers.md)
+- [Time zones](https://tradingview.github.io/lightweight-charts/examples/time-scale/time-zones.md)
+  - How it works
+  - Tips
+  - Resources
+- [Visible range](https://tradingview.github.io/lightweight-charts/examples/time-scale/visible-range.md)
+  - How it works
+  - Tips
+  - Resources
+- [Custom date format](https://tradingview.github.io/lightweight-charts/examples/time-scale/custom-date-format.md)
+  - How it works
+  - Tips
+  - Resources
+
+### Data
+
+- [Whitespace data](https://tradingview.github.io/lightweight-charts/examples/data/whitespace.md)
+  - How it works
+  - Resources
+- [Realtime updates](https://tradingview.github.io/lightweight-charts/examples/data/realtime-updates.md)
+  - How it works
+  - Tips
+  - Resources
+- [Infinite history](https://tradingview.github.io/lightweight-charts/examples/data/infinite-history.md)
+  - How it works
+  - Resources
+- [Range switcher](https://tradingview.github.io/lightweight-charts/examples/data/range-switcher.md)
+  - How it works
+  - Tips
+  - Resources
+- [Screenshot](https://tradingview.github.io/lightweight-charts/examples/data/screenshot.md)
+  - How it works
+  - Tips
+  - Resources
+
+### Panes
+
+- [Panes](https://tradingview.github.io/lightweight-charts/examples/panes/multiple-panes.md)
+  - How it works
+  - Tips
+  - Resources
+
+### Markers and lines
+
+- [Series markers](https://tradingview.github.io/lightweight-charts/examples/markers-and-lines/series-markers.md)
+  - How it works
+  - Tips
+  - Resources
+- [Price lines](https://tradingview.github.io/lightweight-charts/examples/markers-and-lines/price-line.md)
+  - How it works
+  - Tips
+  - Resources
+- [Click to add markers](https://tradingview.github.io/lightweight-charts/examples/markers-and-lines/click-to-add-markers.md)
+  - How it works
+  - Tips
+  - Resources
+
+### Tooltips and legends
+
+- [Floating tooltip](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/floating-tooltip.md)
+  - How it works
+  - Tips
+  - Resources
+- [Tracking tooltip](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/tracking-tooltip.md)
+  - How it works
+  - Resources
+- [Magnifier tooltip](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/magnifier-tooltip.md)
+  - How it works
+  - Resources
+- [Legend](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/legend.md)
+  - How it works
+  - Tips
+  - Resources
+- [Three-line legend](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/three-line-legend.md)
+  - How it works
+  - Resources
+
+### Crosshair
+
+- [Sync crosshairs between two charts](https://tradingview.github.io/lightweight-charts/examples/crosshair/sync-crosshairs.md)
+  - How it works
+  - Tips
+  - Resources
+- [Tracking without long-press](https://tradingview.github.io/lightweight-charts/examples/crosshair/tracking-without-long-press.md)
+  - How it works
+  - Resources
+- [Crosshair modes](https://tradingview.github.io/lightweight-charts/examples/crosshair/crosshair-modes.md)
+  - How it works
+  - Tips
+  - Resources
+
+### Styling
+
+- [Custom font family](https://tradingview.github.io/lightweight-charts/examples/styling/custom-font-family.md)
+  - How it works
+  - Tips
+  - Resources
+- [Custom locale](https://tradingview.github.io/lightweight-charts/examples/styling/custom-locale.md)
+  - How it works
+  - Resources
+- [Text watermark](https://tradingview.github.io/lightweight-charts/examples/styling/text-watermark.md)
+  - How it works
+  - Tips
+  - Resources
+- [Image watermark](https://tradingview.github.io/lightweight-charts/examples/styling/image-watermark.md)
+  - How it works
+  - Tips
+  - Resources
+- [Hidden time scale](https://tradingview.github.io/lightweight-charts/examples/styling/hidden-time-scale.md)
+  - How it works
+  - Tips
+  - Resources
 
 ## Type Definitions
 

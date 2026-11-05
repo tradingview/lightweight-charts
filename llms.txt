@@ -3,7 +3,7 @@
 > Official documentation for Lightweight Charts™, a free, open-source library for building interactive financial charts on the web. Every page below is available as Markdown by appending `.md` to its URL.
 > See [docs_map.md](https://tradingview.github.io/lightweight-charts/docs_map.md) for a version that also lists each page's headings.
 > Version: 5.2 (latest released)
-> Last updated: 2026-11-04 11:36:23 UTC
+> Last updated: 2026-11-05 09:43:54 UTC
 
 
 ## Documentation
@@ -50,6 +50,7 @@
 
 - [Tutorials](https://tradingview.github.io/lightweight-charts/tutorials.md)
 - [Analysis indicators](https://tradingview.github.io/lightweight-charts/tutorials/analysis-indicators.md)
+- [Moving average indicator](https://tradingview.github.io/lightweight-charts/tutorials/demos/moving-average.md)
 
 ### Guides
 
@@ -87,31 +88,79 @@
 - [Vue.js - Wrapper Component](https://tradingview.github.io/lightweight-charts/tutorials/vuejs/wrapper.md)
 - [Web Components - Custom Element](https://tradingview.github.io/lightweight-charts/tutorials/webcomponents/custom-element.md)
 
-### How To
+## Examples
 
-- [Custom horizontal scale](https://tradingview.github.io/lightweight-charts/tutorials/how_to/horizontal-price-scale.md)
-- [Inverted Price Scale](https://tradingview.github.io/lightweight-charts/tutorials/how_to/inverted-price-scale.md)
-- [Legends](https://tradingview.github.io/lightweight-charts/tutorials/how_to/legends.md)
-- [Panes](https://tradingview.github.io/lightweight-charts/tutorials/how_to/panes.md)
-- [Price and volume on a single chart](https://tradingview.github.io/lightweight-charts/tutorials/how_to/price-and-volume.md)
-- [Add Price Line](https://tradingview.github.io/lightweight-charts/tutorials/how_to/price-line.md)
-- [Add Series Markers](https://tradingview.github.io/lightweight-charts/tutorials/how_to/series-markers.md)
-- [Set crosshair position](https://tradingview.github.io/lightweight-charts/tutorials/how_to/set-crosshair-position.md)
-- [Tooltips](https://tradingview.github.io/lightweight-charts/tutorials/how_to/tooltips.md)
-- [Two Price Scales](https://tradingview.github.io/lightweight-charts/tutorials/how_to/two-price-scales.md)
-- [Watermark](https://tradingview.github.io/lightweight-charts/tutorials/how_to/watermark.md)
+- [Examples](https://tradingview.github.io/lightweight-charts/examples.md)
 
-### Examples / Demos
+### Series types
 
-- [Compare multiple series](https://tradingview.github.io/lightweight-charts/tutorials/demos/compare-multiple-series.md)
-- [Custom font family](https://tradingview.github.io/lightweight-charts/tutorials/demos/custom-font-family.md)
-- [Custom locale](https://tradingview.github.io/lightweight-charts/tutorials/demos/custom-locale.md)
-- [Infinite history](https://tradingview.github.io/lightweight-charts/tutorials/demos/infinite-history.md)
-- [Moving average indicator](https://tradingview.github.io/lightweight-charts/tutorials/demos/moving-average.md)
-- [Range switcher](https://tradingview.github.io/lightweight-charts/tutorials/demos/range-switcher.md)
-- [Realtime updates](https://tradingview.github.io/lightweight-charts/tutorials/demos/realtime-updates.md)
-- [Whitespace data](https://tradingview.github.io/lightweight-charts/tutorials/demos/whitespace.md)
-- [Yield Curve Chart with Update Markers](https://tradingview.github.io/lightweight-charts/tutorials/demos/yield-curve-with-update-markers.md)
+- [Candlestick series](https://tradingview.github.io/lightweight-charts/examples/series-types/candlestick.md)
+- [Bar series](https://tradingview.github.io/lightweight-charts/examples/series-types/bar.md)
+- [Line series](https://tradingview.github.io/lightweight-charts/examples/series-types/line.md)
+- [Area series](https://tradingview.github.io/lightweight-charts/examples/series-types/area.md)
+- [Baseline series](https://tradingview.github.io/lightweight-charts/examples/series-types/baseline.md)
+- [Histogram series](https://tradingview.github.io/lightweight-charts/examples/series-types/histogram.md)
+- [Compare multiple series](https://tradingview.github.io/lightweight-charts/examples/series-types/compare-multiple-series.md)
+
+### Chart types
+
+- [Yield curve chart with update markers](https://tradingview.github.io/lightweight-charts/examples/chart-types/yield-curve-with-update-markers.md)
+- [Custom horizontal scale](https://tradingview.github.io/lightweight-charts/examples/chart-types/custom-horizontal-scale.md)
+- [Options chart](https://tradingview.github.io/lightweight-charts/examples/chart-types/options-chart.md)
+
+### Price scales
+
+- [Two price scales](https://tradingview.github.io/lightweight-charts/examples/price-scales/two-price-scales.md)
+- [Inverted price scale](https://tradingview.github.io/lightweight-charts/examples/price-scales/inverted-price-scale.md)
+- [Price and volume on a single chart](https://tradingview.github.io/lightweight-charts/examples/price-scales/price-and-volume.md)
+- [Price scale modes](https://tradingview.github.io/lightweight-charts/examples/price-scales/price-scale-modes.md)
+- [Custom price format](https://tradingview.github.io/lightweight-charts/examples/price-scales/custom-price-format.md)
+
+### Time scale
+
+- [Time zones](https://tradingview.github.io/lightweight-charts/examples/time-scale/time-zones.md)
+- [Visible range](https://tradingview.github.io/lightweight-charts/examples/time-scale/visible-range.md)
+- [Custom date format](https://tradingview.github.io/lightweight-charts/examples/time-scale/custom-date-format.md)
+
+### Data
+
+- [Whitespace data](https://tradingview.github.io/lightweight-charts/examples/data/whitespace.md)
+- [Realtime updates](https://tradingview.github.io/lightweight-charts/examples/data/realtime-updates.md)
+- [Infinite history](https://tradingview.github.io/lightweight-charts/examples/data/infinite-history.md)
+- [Range switcher](https://tradingview.github.io/lightweight-charts/examples/data/range-switcher.md)
+- [Screenshot](https://tradingview.github.io/lightweight-charts/examples/data/screenshot.md)
+
+### Panes
+
+- [Panes](https://tradingview.github.io/lightweight-charts/examples/panes/multiple-panes.md)
+
+### Markers and lines
+
+- [Series markers](https://tradingview.github.io/lightweight-charts/examples/markers-and-lines/series-markers.md)
+- [Price lines](https://tradingview.github.io/lightweight-charts/examples/markers-and-lines/price-line.md)
+- [Click to add markers](https://tradingview.github.io/lightweight-charts/examples/markers-and-lines/click-to-add-markers.md)
+
+### Tooltips and legends
+
+- [Floating tooltip](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/floating-tooltip.md)
+- [Tracking tooltip](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/tracking-tooltip.md)
+- [Magnifier tooltip](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/magnifier-tooltip.md)
+- [Legend](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/legend.md)
+- [Three-line legend](https://tradingview.github.io/lightweight-charts/examples/tooltips-and-legends/three-line-legend.md)
+
+### Crosshair
+
+- [Sync crosshairs between two charts](https://tradingview.github.io/lightweight-charts/examples/crosshair/sync-crosshairs.md)
+- [Tracking without long-press](https://tradingview.github.io/lightweight-charts/examples/crosshair/tracking-without-long-press.md)
+- [Crosshair modes](https://tradingview.github.io/lightweight-charts/examples/crosshair/crosshair-modes.md)
+
+### Styling
+
+- [Custom font family](https://tradingview.github.io/lightweight-charts/examples/styling/custom-font-family.md)
+- [Custom locale](https://tradingview.github.io/lightweight-charts/examples/styling/custom-locale.md)
+- [Text watermark](https://tradingview.github.io/lightweight-charts/examples/styling/text-watermark.md)
+- [Image watermark](https://tradingview.github.io/lightweight-charts/examples/styling/image-watermark.md)
+- [Hidden time scale](https://tradingview.github.io/lightweight-charts/examples/styling/hidden-time-scale.md)
 
 ## Type Definitions
 
