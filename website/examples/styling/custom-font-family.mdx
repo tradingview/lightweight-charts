@@ -1,0 +1,36 @@
+---
+title: Custom font family
+sidebar_position: 1
+sidebar_label: Custom font
+description: Chart text in a custom font, switched with buttons.
+sidebar_custom_props:
+  previewScales: true
+pagination_prev: null
+pagination_next: null
+keywords:
+  - font
+  - typeface
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./custom-font-family.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+All the text on the chart, on the scales and in labels, uses one font family from the layout options.
+
+The buttons call `setFontFamily`, which passes the chosen font to [`applyOptions`](/docs/api/interfaces/IChartApi#applyoptions) as `layout.fontFamily`. The chart starts with the first font in the list. The call is highlighted in the code.
+
+## Tips
+
+- Load a web font before the chart is created, or call `applyOptions` again once it has loaded. Otherwise the chart draws with a fallback font.
+
+## Resources
+
+- [`LayoutOptions.fontFamily`](/docs/api/interfaces/LayoutOptions#fontfamily)
+- [Customization tutorial](/tutorials/customization/intro)
+- Related examples: [Custom locale](./custom-locale.mdx)

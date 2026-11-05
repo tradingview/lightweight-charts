@@ -452,7 +452,8 @@ function renderCodeBlock(props, node, ctx) {
 		return null;
 	}
 	const language = languageOf(props);
-	const cleaned = cleanCodeSample(code, props.replaceThemeConstants === true).trim();
+	// An example page's block (`example`) always runs with the theme colors.
+	const cleaned = cleanCodeSample(code, props.replaceThemeConstants === true || props.example === true).trim();
 	const fence = fenceFor(cleaned);
 	// A `chartOnly` block is shown on the page as a live chart with its code
 	// hidden. The chart cannot survive the export, so its code stands in for it,
@@ -657,12 +658,11 @@ const RENDERERS = {
 // chart demos (a canvas) and the banner that depends on which version the
 // reader has selected. Listing them keeps the unhandled-component warning
 // meaningful.
-// The two list components on the tutorials landing page are also left out:
-// each one renders the links of one sidebar category, and every page they
-// would list is already in `llms.txt` and `docs_map.md` under that category.
+// The examples gallery is also left out: it renders the links of the examples
+// sidebar, and every page it would list is already in `llms.txt` and
+// `docs_map.md` under the Examples section.
 const NO_CONTENT_COMPONENTS = new Set([
-	'HowToList',
-	'ExamplesList',
+	'ExamplesGallery',
 	'Chart',
 	'ChartContainer',
 	'ThemedChart',

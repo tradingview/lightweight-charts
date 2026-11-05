@@ -1,0 +1,33 @@
+---
+title: Legend
+sidebar_label: Legend
+sidebar_position: 4
+description: A legend that shows the symbol name and the price under the cursor.
+keywords:
+  - legend
+  - crosshair
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./legend.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+Lightweight Charts™ has no built-in legend. This one is an HTML element over the chart, updated from a [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove) handler.
+
+1. A `div` is added to the chart's container, in the top left corner, with a row for the symbol name and price.
+2. The handler reads the price under the crosshair from [`param.seriesData`](/docs/api/interfaces/MouseEventParams#seriesdata) and writes it into the row. When the cursor leaves the data, the price is cleared.
+
+## Tips
+
+- The legend's `z-index` keeps it above the chart, and `pointer-events` are left on, so it can hold links or buttons.
+
+## Resources
+
+- [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove)
+- [`MouseEventParams`](/docs/api/interfaces/MouseEventParams)
+- Related examples: [Three-line legend](./three-line-legend.mdx), [Floating tooltip](./floating-tooltip.mdx)

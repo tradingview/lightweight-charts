@@ -1,0 +1,39 @@
+---
+title: Bar series
+sidebar_label: Bar
+sidebar_position: 2
+description: Price movement drawn as OHLC bars colored by direction.
+keywords:
+  - series
+  - bar
+pagination_prev: null
+pagination_next: null
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./bar.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A bar series draws each period as a vertical line from the low to the high, with a tick for the open on the left and for the close on the right.
+
+1. [`addSeries`](/docs/api/interfaces/IChartApi#addseries) with `BarSeries` adds the series. The options set the colors for rising and falling bars.
+2. [`setData`](/docs/api/interfaces/ISeriesApi#setdata) gives it the data. Each item has a `time`, `open`, `high`, `low`, and `close`, the same as for candlesticks.
+3. [`fitContent`](/docs/api/interfaces/ITimeScaleApi#fitcontent) fits all the data into view.
+
+`generateCandles` only makes sample data. Replace it with your own.
+
+## Tips
+
+- `openVisible: false` hides the open tick, for a high-low-close chart.
+- `thinBars: false` draws thicker bars when they have room.
+
+## Resources
+
+- [Series types: Bar](/docs/series-types#bar)
+- [`BarStyleOptions`](/docs/api/interfaces/BarStyleOptions)
+- Related examples: [Candlestick series](./candlestick.mdx)

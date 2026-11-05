@@ -1,0 +1,40 @@
+---
+title: Yield curve chart with update markers
+sidebar_position: 1
+sidebar_label: Yield curve with updates
+description: Two yield curves updating live, with markers that show each change.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - yield curve
+  - realtime updates
+  - markers
+  - plugins
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./yield-curve-with-update-markers.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A [yield curve chart](/docs/chart-types#yield-curve-chart) has durations, in months, on the horizontal scale instead of dates. This one shows two curves and marks each change to the first one.
+
+1. [`createYieldCurveChart`](/docs/api/functions/createYieldCurveChart) creates the chart.
+2. Two line series are added with `lineType: 2` for curved lines and `pointMarkersVisible: true` to mark each point.
+3. [`createUpDownMarkers`](/docs/api/functions/createUpDownMarkers) is attached to the first series. Its `setData` sets the initial curve.
+4. Every five seconds a few points of the first curve change. The markers' `update` applies each change and shows an up or down marker on the point.
+
+## Tips
+
+- Pass the data through the markers' `setData` and `update`, not through the series directly. Otherwise the markers cannot tell what changed.
+
+## Resources
+
+- [Chart types: Yield curve chart](/docs/chart-types#yield-curve-chart)
+- [`createYieldCurveChart`](/docs/api/functions/createYieldCurveChart)
+- [`createUpDownMarkers`](/docs/api/functions/createUpDownMarkers)
+- Related examples: [Realtime updates](../data/realtime-updates.mdx)

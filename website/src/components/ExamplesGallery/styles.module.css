@@ -1,0 +1,20 @@
+/* The gallery takes its layout and cards from the plugin catalog's stylesheet
+   (src/pages/plugins/styles.module.css). This only fits the live preview into
+   the card's preview frame, where the catalog shows a static illustration. */
+.livePreview {
+	position: relative;
+	height: 100%;
+	/* The preview is a picture of the example: the chart in it does not take
+	   the pointer, so the whole card stays one link. */
+	pointer-events: none;
+}
+
+.livePreview iframe {
+	display: block;
+}
+
+/* Charts are stacked while a new one fades in over the old. */
+.previewLayer {
+	position: absolute;
+	inset: 10px 16px;
+}

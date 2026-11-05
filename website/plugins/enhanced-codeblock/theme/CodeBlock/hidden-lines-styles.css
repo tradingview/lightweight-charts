@@ -83,6 +83,10 @@ input.toggle-hidden-lines:not(:checked)
 	background-color: var(--hidden-lines-warning-bg, rgba(0, 0, 0, 0.1));
 	text-align: left;
 	padding: 0 var(--ifm-pre-padding);
+	/* Padding inside the width: otherwise the placeholder is wider than the
+	   block, the code counts as scrollable, and the theme shows a word wrap
+	   button that has nothing to wrap. */
+	box-sizing: border-box;
 	width: 100%;
 	border-radius: 0.2rem;
 }

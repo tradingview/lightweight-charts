@@ -4,6 +4,7 @@ import BrowserOnly from '@docusaurus/BrowserOnly';
 import { useColorMode } from '@docusaurus/theme-common';
 
 import { Chart } from './chart';
+import { ExampleBlock } from './example';
 
 import styles from './styles.module.css';
 import './hidden-lines-styles.css';
@@ -32,8 +33,14 @@ export function removeUnwantedLines(originalString) {
 	return originalString.replace(new RegExp(/\/\/ delete-start[\w\W]*?\/\/ delete-end/, 'gm'), '');
 }
 
+// An example's code as it is shown and run: in the theme's colors, with tabs
+// replaced and the `delete-start` … `delete-end` sections dropped.
+export function prepareExampleScript(code, isDarkTheme) {
+	return removeUnwantedLines(replaceTabsString(replaceThemeConstantStrings(code, isDarkTheme)));
+}
+
 const EnhancedCodeBlock = props => {
-	const { chart, replaceThemeConstants, hideableCode, chartOnly, chartOnTop = false, iframeStyle, replaceTabs = true, codeUsage, ...rest } = props;
+	const { chart, example, replaceThemeConstants, hideableCode, chartOnly, chartOnTop = false, iframeStyle, replaceTabs = true, codeUsage, ...rest } = props;
 	let { children } = props;
 	const { colorMode } = useColorMode();
 	const isDarkTheme = colorMode === 'dark';
@@ -46,6 +53,13 @@ const EnhancedCodeBlock = props => {
 		children = replaceTabsString(children);
 	}
 	children = removeUnwantedLines(children);
+
+	// An example page's block: theme colors, a live chart, and the code with its
+	// hidden lines, in the layout of src/components/ExampleItem.
+	if (example) {
+		const themed = prepareExampleScript(props.children, isDarkTheme);
+		return <ExampleBlock code={themed} iframeStyle={iframeStyle} codeBlock={<CodeBlock {...rest}>{themed}</CodeBlock>} />;
+	}
 
 	if (chart || hideableCode) {
 		const codeBlockSection = !chartOnly && <CodeBlock {...rest}>{children}</CodeBlock>;

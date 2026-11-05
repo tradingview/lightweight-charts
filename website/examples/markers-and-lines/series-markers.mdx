@@ -1,0 +1,38 @@
+---
+title: Series markers
+sidebar_position: 1
+sidebar_label: Series markers
+description: Buy, sell, and other markers placed on candlesticks.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - series
+  - markers
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./series-markers.js";
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A series marker is a shape with optional text attached to a data point, for example to show a trade or an event.
+
+1. The markers are built as an array. Each has a `time`, a `position` (above, below, or in the bar), a `shape`, a `color`, and optional `text`. The vertical position comes from the data point, so no price is needed.
+2. [`createSeriesMarkers`](/docs/api/functions/createSeriesMarkers) attaches the markers to the series.
+
+The markers are highlighted in the code.
+
+## Tips
+
+- `createSeriesMarkers` returns an object whose `setMarkers` replaces the markers later, and `setMarkers([])` removes them all.
+
+## Resources
+
+- [`createSeriesMarkers`](/docs/api/functions/createSeriesMarkers)
+- [`SeriesMarker`](/docs/api/type-aliases/SeriesMarker)
+- [`SeriesMarkerShape`](/docs/api/type-aliases/SeriesMarkerShape)
+- Related examples: [Price lines](./price-line.mdx), [Yield curve with updates](../chart-types/yield-curve-with-update-markers.mdx)

@@ -1,4 +1,4 @@
-import { useDoc } from '@docusaurus/plugin-content-docs/client';
+import { useDoc, useDocsVersion } from '@docusaurus/plugin-content-docs/client';
 import { ThemeClassNames } from '@docusaurus/theme-common';
 import type { Props } from '@theme/DocItem/Content';
 import Heading from '@theme/Heading';
@@ -6,7 +6,16 @@ import MDXContent from '@theme/MDXContent';
 import clsx from 'clsx';
 import React from 'react';
 
+import VersionWarningAdmonition from '../../../components/VersionWarningAdmonition';
 import { MarkdownActions, MarkdownActionsInContentProvider } from './markdown-actions';
+
+// The tutorials and examples aren't versioned: they always target the latest
+// release. A reader who picked an older docs version gets a warning on every
+// page of these sections, keyed by the docs plugin the page belongs to.
+const UNVERSIONED_SECTION_WARNINGS: Record<string, string> = {
+	tutorials: 'These tutorials are for the latest published version of Lightweight Charts.',
+	examples: 'These examples are for the latest published version of Lightweight Charts.',
+};
 
 /**
  * Title can be declared inside md content or declared through front matter and
@@ -36,9 +45,14 @@ function useSyntheticTitle(): string | null {
 // instead — the provider is what hands it that job.
 export default function DocItemContent({ children }: Props): React.JSX.Element {
 	const { contentTitle } = useDoc();
+	const { pluginId } = useDocsVersion();
 	const syntheticTitle = useSyntheticTitle();
+	const versionWarning = UNVERSIONED_SECTION_WARNINGS[pluginId];
 	return (
 		<div className={clsx(ThemeClassNames.docs.docMarkdown, 'markdown')}>
+			{versionWarning !== undefined && (
+				<VersionWarningAdmonition notCurrent={versionWarning} type="caution" displayVersionMessage />
+			)}
 			{syntheticTitle !== null && (
 				<>
 					<header>

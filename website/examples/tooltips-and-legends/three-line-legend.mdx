@@ -1,0 +1,30 @@
+---
+title: Three-line legend
+sidebar_label: Three-line legend
+sidebar_position: 5
+description: A legend that shows the symbol, the price, and the date under the cursor on three lines.
+keywords:
+  - legend
+  - crosshair
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./three-line-legend.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+This legend shows the symbol, the price, and the date on three lines. Like the [simple legend](./legend.mdx), it is an HTML element over the chart, updated from a [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove) handler.
+
+1. `updateLegend` takes the data point under the crosshair from [`param.seriesData`](/docs/api/interfaces/MouseEventParams#seriesdata).
+2. When the cursor is outside the chart, it shows the last data point instead, from [`dataByIndex`](/docs/api/interfaces/ISeriesApi#databyindex). So the legend is never empty, even before the first mouse move.
+
+## Resources
+
+- [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove)
+- [`MouseEventParams`](/docs/api/interfaces/MouseEventParams)
+- [`ISeriesApi.dataByIndex`](/docs/api/interfaces/ISeriesApi#databyindex)
+- Related examples: [Legend](./legend.mdx), [Floating tooltip](./floating-tooltip.mdx)

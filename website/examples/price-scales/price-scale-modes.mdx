@@ -1,0 +1,47 @@
+---
+title: Price scale modes
+sidebar_label: Price scale modes
+sidebar_position: 4
+description: Two assets compared on a normal, logarithmic, percentage, or indexed price scale.
+sidebar_custom_props:
+  previewScales: true
+pagination_prev: null
+pagination_next: null
+keywords:
+  - price scale
+  - logarithmic
+  - percentage
+  - indexed
+  - compare
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./price-scale-modes.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The price scale has four modes. The two assets here trade near 20 and near 400, so on a normal scale the cheaper one is almost flat.
+
+1. The buttons call `setMode`, which passes [`mode`](/docs/api/interfaces/PriceScaleOptions#mode) to the price scale's [`applyOptions`](/docs/api/interfaces/IPriceScaleApi#applyoptions).
+2. [`PriceScaleMode`](/docs/api/enumerations/PriceScaleMode) lists the modes:
+   - `Normal` shows prices as they are;
+   - `Logarithmic` gives equal percent changes equal height;
+   - `Percentage` shows the change from the first visible value, in percent;
+   - `IndexedTo100` shows the same change as an index that starts at 100.
+
+The chart starts in percentage mode. The call is highlighted in the code.
+
+## Tips
+
+- Percentage and indexed modes count from the first value in view, so the lines move as you scroll. Use them to compare how assets moved over the same period.
+- All series on a price scale share its mode. To show one series in another mode, put it on a [second price scale](./two-price-scales.mdx).
+
+## Resources
+
+- [Price scale](/docs/price-scale)
+- [`PriceScaleOptions.mode`](/docs/api/interfaces/PriceScaleOptions#mode)
+- Related examples: [Compare multiple series](../series-types/compare-multiple-series.mdx), [Two price scales](./two-price-scales.mdx)

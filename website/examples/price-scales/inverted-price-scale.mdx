@@ -1,0 +1,35 @@
+---
+title: Inverted price scale
+sidebar_position: 2
+sidebar_label: Inverted price scale
+description: A price scale flipped so that higher values are at the bottom.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - price scale
+  - Inverted
+  - example
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./inverted-price-scale.js";
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A price scale normally grows from bottom to top. Inverted, it grows from top to bottom, so higher values are drawn lower.
+
+To flip the scale, set [`invertScale: true`](/docs/api/interfaces/PriceScaleOptions#invertscale) in the price scale options. The example sets it on the right price scale, which the series uses; the line is highlighted in the code.
+
+## Tips
+
+- The option can be set for one scale with `chart.priceScale('right').applyOptions({ invertScale: true })`.
+
+## Resources
+
+- [Price scale](/docs/price-scale)
+- [`PriceScaleOptions.invertScale`](/docs/api/interfaces/PriceScaleOptions#invertscale)
+- Related examples: [Two price scales](./two-price-scales.mdx)

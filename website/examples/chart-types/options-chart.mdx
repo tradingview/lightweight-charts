@@ -1,0 +1,43 @@
+---
+title: Options chart
+sidebar_label: Options chart
+sidebar_position: 3
+description: The profit of an options position at expiry, plotted against the price.
+sidebar_custom_props:
+  previewScales: true
+pagination_prev: null
+pagination_next: null
+keywords:
+  - options
+  - payoff
+  - price-based
+  - horizontal scale
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./options-chart.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+An options chart has prices on the horizontal scale instead of dates. The chart here shows the profit of a long straddle: a call and a put at the same strike, bought for a premium of 8 in total.
+
+1. [`createOptionsChart`](/docs/api/functions/createOptionsChart) creates the chart. It takes the same options as `createChart`.
+2. [`setData`](/docs/api/interfaces/ISeriesApi#setdata) gives the series its points. On this chart, `time` holds a price, a plain number.
+3. A [baseline series](/docs/series-types#baseline) with `baseValue` at `0` draws the profit in green and the loss in red.
+
+`straddlePayoff` only makes sample data. Replace it with your own.
+
+## Tips
+
+- [`localization.precision`](/docs/api/interfaces/PriceChartLocalizationOptions#precision) sets the number of decimals in the labels of the horizontal scale.
+- For a horizontal scale that is neither time nor price, see [Custom horizontal scale](./custom-horizontal-scale.mdx).
+
+## Resources
+
+- [Chart types: Options chart](/docs/chart-types#options-chart-price-based)
+- [`createOptionsChart`](/docs/api/functions/createOptionsChart)
+- Related examples: [Yield curve with updates](./yield-curve-with-update-markers.mdx), [Baseline series](../series-types/baseline.mdx)

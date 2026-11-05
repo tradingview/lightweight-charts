@@ -1,0 +1,29 @@
+---
+title: Whitespace data
+sidebar_position: 1
+sidebar_label: Whitespace data
+description: Gaps in a series for periods that have no data.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - whitespace data
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./whitespace.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A data item with only a `time` is whitespace: it takes a place on the time scale but draws nothing. Use it for periods with no data, such as a trading halt.
+
+1. [`setData`](/docs/api/interfaces/ISeriesApi#setdata) gets a mix of full candles and items with only a `time`. One of them is highlighted in the code.
+2. The chart leaves a gap at each whitespace item, while the time scale keeps its date.
+
+## Resources
+
+- [`WhitespaceData`](/docs/api/interfaces/WhitespaceData)
+- Related examples: [Infinite history](./infinite-history.mdx)

@@ -1,0 +1,39 @@
+---
+title: Price lines
+sidebar_position: 2
+sidebar_label: Price lines
+description: Horizontal lines at the minimum, average, and maximum price.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - price line
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./price-line.js";
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+A price line is a horizontal line across the chart at a given price, with an optional label on the price scale.
+
+1. The minimum, maximum, and average prices are computed from the data.
+2. [`createPriceLine`](/docs/api/interfaces/ISeriesApi#createpriceline) adds a line for each, with its own color, [line style](/docs/api/enumerations/LineStyle), and title.
+3. The series options turn off the built-in last-value line and label, so only the custom lines are shown.
+
+These lines are highlighted in the code.
+
+## Tips
+
+- `createPriceLine` returns the line. Call its `applyOptions` to move it, or pass it to [`removePriceLine`](/docs/api/interfaces/ISeriesApi#removepriceline) to delete it.
+- A price line is horizontal. To mark a moment in time instead, such as an event or a trade, use the [Vertical line](/plugins/vertical-line) plugin. It draws a full-height line at a given time, with an optional label on the time axis.
+
+## Resources
+
+- [`ISeriesApi.createPriceLine`](/docs/api/interfaces/ISeriesApi#createpriceline)
+- [`PriceLineOptions`](/docs/api/interfaces/PriceLineOptions)
+- Related examples: [Series markers](./series-markers.mdx)
+- Plugin: [Vertical line](/plugins/vertical-line)

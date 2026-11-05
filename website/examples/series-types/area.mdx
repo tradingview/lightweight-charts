@@ -1,0 +1,39 @@
+---
+title: Area series
+sidebar_label: Area
+sidebar_position: 4
+description: A line with the area below it filled with a gradient.
+keywords:
+  - series
+  - area
+pagination_prev: null
+pagination_next: null
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./area.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+An area series is a line with the space below it filled.
+
+1. [`addSeries`](/docs/api/interfaces/IChartApi#addseries) with `AreaSeries` adds the series. `lineColor` and `lineWidth` set the line; the fill is a gradient from `topColor` to `bottomColor`.
+2. [`setData`](/docs/api/interfaces/ISeriesApi#setdata) gives it the data. Each item has a `time` and a `value`.
+3. [`fitContent`](/docs/api/interfaces/ITimeScaleApi#fitcontent) fits all the data into view.
+
+`generateValues` only makes sample data. Replace it with your own.
+
+## Tips
+
+- Set the same color with a lower opacity as both `topColor` and `bottomColor` for a flat fill instead of a gradient.
+- `invertFilledArea: true` fills the space above the line instead of below it.
+
+## Resources
+
+- [Series types: Area](/docs/series-types#area)
+- [`AreaStyleOptions`](/docs/api/interfaces/AreaStyleOptions)
+- Related examples: [Line series](./line.mdx), [Baseline series](./baseline.mdx)

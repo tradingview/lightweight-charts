@@ -1,0 +1,31 @@
+---
+title: Magnifier tooltip
+sidebar_label: Magnifier tooltip
+sidebar_position: 3
+description: A tooltip at the top edge of the chart that follows the cursor along the time scale.
+keywords:
+  - tooltip
+  - crosshair
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./magnifier-tooltip.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+This tooltip stays at the top of the chart and moves only along the time scale. Like the [floating tooltip](./floating-tooltip.mdx), it is an HTML element over the chart, updated from a [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove) handler.
+
+1. The handler hides the tooltip when the cursor is outside the chart or not over data. Otherwise it fills in the price and date.
+2. The tooltip is centered on the cursor's `x` and kept between the left price scale and the right edge of the time scale, using the [price scale](/docs/api/interfaces/IPriceScaleApi#width) and [time scale](/docs/api/interfaces/ITimeScaleApi#width) widths. Its top is fixed at `0`.
+
+These lines are highlighted in the code.
+
+## Resources
+
+- [`subscribeCrosshairMove`](/docs/api/interfaces/IChartApi#subscribecrosshairmove)
+- [`MouseEventParams`](/docs/api/interfaces/MouseEventParams)
+- Related examples: [Floating tooltip](./floating-tooltip.mdx), [Tracking tooltip](./tracking-tooltip.mdx)

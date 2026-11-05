@@ -1,0 +1,33 @@
+---
+title: Infinite history
+sidebar_position: 3
+sidebar_label: Infinite history
+description: A candlestick chart that loads older data as you scroll back in time.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - history
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./infinite-history.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The chart starts with only enough data to fill the screen and loads older data as you scroll back, the way a chart backed by a server would.
+
+1. The number of bars that fit on screen is the time scale's [`width`](/docs/api/interfaces/ITimeScaleApi#width) divided by its `barSpacing`. The chart loads that many bars plus 20%. See [Number of visible bars](/docs/time-scale#number-of-visible-bars).
+2. [`subscribeVisibleLogicalRangeChange`](/docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange) reports each scroll. When fewer than 10 bars are left to the left of the screen, the handler asks the data feed for more.
+3. The data feed returns the older bars together with the ones already loaded, and [`setData`](/docs/api/interfaces/ISeriesApi#setdata) replaces the series data. A short delay stands in for a network request.
+
+`Datafeed` only makes sample data. Replace `getBars` with a request to your server.
+
+## Resources
+
+- [Time scale: Number of visible bars](/docs/time-scale#number-of-visible-bars)
+- [`subscribeVisibleLogicalRangeChange`](/docs/api/interfaces/ITimeScaleApi#subscribevisiblelogicalrangechange)
+- Related examples: [Realtime updates](./realtime-updates.mdx), [Range switcher](./range-switcher.mdx)

@@ -268,6 +268,8 @@ const getConfig = async () => {
 			],
 		],
 
+		clientModules: ['./src/client-modules/theme-switch-without-transitions.ts'],
+
 		customFields: {
 			// Frozen at build time so the server-rendered markup and the
 			// hydrated client derive the same "New" badge (no Date.now() in render).
@@ -298,6 +300,11 @@ const getConfig = async () => {
 						docId: 'api/index',
 						position: 'left',
 						label: 'API Reference',
+					},
+					{
+						to: '/examples',
+						position: 'left',
+						label: 'Examples',
 					},
 					{
 						to: '/plugins',
@@ -334,6 +341,10 @@ const getConfig = async () => {
 							{
 								label: 'Tutorials',
 								to: '/tutorials',
+							},
+							{
+								label: 'Examples',
+								to: '/examples',
 							},
 							{
 								label: 'API Reference',
@@ -417,6 +428,19 @@ const getConfig = async () => {
 					routeBasePath: 'tutorials',
 					sidebarPath: new URL('./sidebars-tutorials.js', import.meta.url)
 						.pathname,
+				},
+			],
+			[
+				'content-docs',
+				{
+					id: 'examples',
+					path: 'examples',
+					routeBasePath: 'examples',
+					sidebarPath: new URL('./sidebars-examples.js', import.meta.url)
+						.pathname,
+					// Laid out like the plugin catalog rather than as docs pages.
+					docRootComponent: '@site/src/components/ExamplesRoot',
+					docItemComponent: '@site/src/components/ExampleItem',
 				},
 			],
 			[

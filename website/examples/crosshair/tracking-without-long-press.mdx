@@ -1,0 +1,33 @@
+---
+title: Tracking without long-press
+sidebar_label: Tracking on mobile
+sidebar_position: 2
+description: Crosshair tracking on touch devices without a long press.
+keywords:
+  - crosshair
+  - tracking
+  - mobile
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import code from '!!raw-loader!./tracking-without-long-press.js';
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+On touch screens the crosshair appears after a long press, because a plain swipe scrolls the chart. With scrolling and scaling turned off, the crosshair can follow the finger right away.
+
+1. `handleScroll: false` and `handleScale: false` in the chart options free touch moves from scrolling.
+2. A `touchmove` listener on the container converts the touch position to a price with [`coordinateToPrice`](/docs/api/interfaces/ISeriesApi#coordinatetoprice) and to a time with [`coordinateToTime`](/docs/api/interfaces/ITimeScaleApi#coordinatetotime).
+3. [`setCrosshairPosition`](/docs/api/interfaces/IChartApi#setcrosshairposition) moves the crosshair there. A `touchend` listener clears it with [`clearCrosshairPosition`](/docs/api/interfaces/IChartApi#clearcrosshairposition).
+
+Open the page on a phone, or in a browser's device mode, to try it.
+
+## Resources
+
+- [`setCrosshairPosition`](/docs/api/interfaces/IChartApi#setcrosshairposition)
+- [`HandleScrollOptions`](/docs/api/interfaces/HandleScrollOptions)
+- Related examples: [Sync two charts](./sync-crosshairs.mdx)

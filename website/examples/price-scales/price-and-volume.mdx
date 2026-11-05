@@ -1,0 +1,37 @@
+---
+title: Price and volume on a single chart
+sidebar_position: 3
+sidebar_label: Price and volume
+description: Volume bars drawn under the price on the same chart.
+pagination_prev: null
+pagination_next: null
+keywords:
+  - example
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import code from "!!raw-loader!./price-and-volume.js";
+
+<CodeBlock example className="language-js">
+	{code}
+</CodeBlock>
+
+## How it works
+
+The volume is a histogram series drawn as an overlay in the lower part of the chart, under the price.
+
+1. The volume series gets an empty [`priceScaleId`](/docs/api/interfaces/SeriesOptionsCommon#pricescaleid). That makes it an overlay with its own invisible scale instead of sharing the right one.
+2. [`scaleMargins`](/docs/api/interfaces/PriceScaleOptions#scalemargins) on each series' price scale divides the height: the volume takes the bottom 30%, and the price leaves 40% at the bottom free, so they do not overlap.
+3. `priceFormat: { type: 'volume' }` shortens large volume numbers in labels.
+
+These lines are highlighted in the code.
+
+## Tips
+
+- To give volume a separate area with its own separator, put it in a pane instead. See [Panes](../panes/multiple-panes.mdx).
+
+## Resources
+
+- [Price scale](/docs/price-scale)
+- [`PriceScaleOptions.scaleMargins`](/docs/api/interfaces/PriceScaleOptions#scalemargins)
+- Related examples: [Histogram series](../series-types/histogram.mdx), [Panes](../panes/multiple-panes.mdx)
