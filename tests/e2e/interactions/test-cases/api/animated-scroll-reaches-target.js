@@ -1,5 +1,3 @@
-// Regression test for https://tradingview-air.atlassian.net/browse/CLL-422.
-//
 // The time scale animation used to apply nothing on the frame where it became
 // finished, so `scrollToRealTime()` and `scrollToPosition(x, true)` stopped a frame
 // short of their target.
