@@ -527,7 +527,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			let calculatePaneHeight = 0;
 
 			if (paneIndex === this._paneWidgets.length - 1) {
-				calculatePaneHeight = Math.ceil((totalPaneHeight - accumulatedHeight) * pixelRatio) / pixelRatio;
+				calculatePaneHeight = totalPaneHeight - accumulatedHeight;
 			} else {
 				calculatePaneHeight = Math.round(paneWidget.stretchFactor() * stretchPixels * pixelRatio) / pixelRatio;
 			}
