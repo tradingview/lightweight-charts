@@ -57,9 +57,10 @@ export interface TimeScaleResetInvalidation {
 export interface ITimeScaleAnimation {
 	getPosition(time: number): number;
 	finished(time: number): boolean;
-	/** Shifts the positions this animation produces by `delta` bars to the left,
+	/**
+	 * Shifts the positions this animation produces by `delta` bars to the left,
 	 * so a right offset shift during the animation is not undone on the next frame.
-	*/
+	 */
 	shift(delta: number): void;
 }
 export interface StartTimeScaleAnimationInvalidation {
