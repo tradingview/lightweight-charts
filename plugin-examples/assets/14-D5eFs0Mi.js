@@ -1,1 +1,0 @@
-import{_ as i,t as r}from"./lightweight-charts.production-EEKGLmd6.js";import{a}from"./sample-data-x_8-FZm1.js";import{C as e}from"./highlight-bar-crosshair-UV11Bm50.js";import"./positions-t2UKkghX.js";const o=window.chart=i("chart",{autoSize:!0}),t=o.addSeries(r);t.setData(a());const s=new e({color:"rgba(0, 50, 100, 0.2)"});t.attachPrimitive(s);
