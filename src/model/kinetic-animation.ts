@@ -131,6 +131,12 @@ export class KineticAnimation {
 		return startPosition.position + this._speedPxPerMsec * (Math.pow(this._dumpingCoeff, durationMsecs) - 1) / (Math.log(this._dumpingCoeff)) as Coordinate;
 	}
 
+	public shift(delta: number): void {
+		if (this._animationStartPosition !== null) {
+			this._animationStartPosition.position = this._animationStartPosition.position - delta as Coordinate;
+		}
+	}
+
 	public finished(time: number): boolean {
 		return this._animationStartPosition === null || this._progressDuration(time) === this._durationMsecs;
 	}
