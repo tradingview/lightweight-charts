@@ -4,6 +4,8 @@ import { Coordinate } from '../model/coordinate';
 import { IRange, Logical, LogicalRange, TimePointIndex } from '../model/time-data';
 import { HorzScaleOptions } from '../model/time-scale';
 
+import { IAxisApi } from './iaxis-api';
+
 /**
  * A custom function used to handle changes to the time scale's time range.
  */
@@ -18,7 +20,7 @@ export type LogicalRangeChangeEventHandler = (logicalRange: LogicalRange | null)
 export type SizeChangeEventHandler = (width: number, height: number) => void;
 
 /** Interface to chart time scale */
-export interface ITimeScaleApi<HorzScaleItem> {
+export interface ITimeScaleApi<HorzScaleItem> extends IAxisApi {
 	/**
 	 * Return the distance from the right edge of the time scale to the lastest bar of the series measured in bars.
 	 */
