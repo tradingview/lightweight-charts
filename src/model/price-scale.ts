@@ -1047,7 +1047,12 @@ export class PriceScale {
 			if (priceRange.minValue() === priceRange.maxValue()) {
 				// if price range is degenerated to 1 point let's extend it by 10 min move values
 				// to avoid incorrect range and empty (blank) scale (in case of min tick much greater than 1)
-				const extendValue = 5 * this.minMove();
+				// At very large magnitudes 10 min moves are smaller than the float64
+				// spacing around the value, so the extension would collapse back to a
+				// single point, the range length would stay 0 and every coordinate
+				// would become NaN - the series is then not drawn at all (#1650).
+				// Guarantee a span of at least a few dozen ulps at that magnitude.
+				const extendValue = Math.max(5 * this.minMove(), Math.abs(priceRange.minValue()) * 1e-14);
 
 				if (this.isLog()) {
 					priceRange = convertPriceRangeFromLog(priceRange, this._logFormula);
