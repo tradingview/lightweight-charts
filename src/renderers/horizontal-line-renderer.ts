@@ -10,13 +10,14 @@ export interface HorizontalLineRendererData {
 	color: string;
 	lineStyle: LineStyle;
 	lineWidth: LineWidth;
+	hitTestTolerance?: number;
 
 	y: Coordinate;
 	visible?: boolean;
 	externalId?: string;
 }
 
-const enum Constants { HitTestThreshold = 7, }
+const DEFAULT_HIT_TEST_TOLERANCE = 7;
 
 export class HorizontalLineRenderer extends BitmapCoordinatesPaneRenderer {
 	private _data: HorizontalLineRendererData | null = null;
@@ -30,10 +31,11 @@ export class HorizontalLineRenderer extends BitmapCoordinatesPaneRenderer {
 			return null;
 		}
 
-		const { y: itemY, lineWidth, externalId } = this._data;
-		// Price lines and baseline lines use the renderer fallback path, not the
-		// main-series hitTestTolerance option. Keep their legacy grab area stable.
-		if (y >= itemY - lineWidth - Constants.HitTestThreshold && y <= itemY + lineWidth + Constants.HitTestThreshold) {
+		const { y: itemY, lineWidth, hitTestTolerance = DEFAULT_HIT_TEST_TOLERANCE, externalId } = this._data;
+		// Expand the hit area by lineWidth + tolerance on each side. Baseline lines and
+		// internal price lines use this renderer's fallback default rather than the
+		// series hitTestTolerance option, so callers that omit the field keep the legacy grab area.
+		if (y >= itemY - lineWidth - hitTestTolerance && y <= itemY + lineWidth + hitTestTolerance) {
 			return {
 				hitTestData: this._data,
 				distance: Math.abs(y - itemY),

@@ -1,6 +1,7 @@
 /// <reference types="_build-time-constants" />
 
 import { assert } from '../helpers/assertions';
+import { isNumber } from '../helpers/strict-type-checks';
 
 import { isFulfilledData, OhlcData, SeriesDataItemTypeMap } from './data-consumer';
 import { IHorzScaleBehavior } from './ihorz-scale-behavior';
@@ -13,6 +14,11 @@ export function checkPriceLineOptions(options: CreatePriceLineOptions): void {
 	}
 
 	assert(typeof options.price === 'number', `the type of 'price' price line's property must be a number, got '${typeof options.price}'`);
+
+	if (options.hitTestTolerance !== undefined) {
+		assert(isNumber(options.hitTestTolerance), `'hitTestTolerance' price line's property must be a finite number, got '${options.hitTestTolerance}'`);
+		assert(options.hitTestTolerance >= 0, `'hitTestTolerance' price line's property must be a non-negative number, got '${options.hitTestTolerance}'`);
+	}
 }
 
 export function checkItemsAreOrdered<HorzScaleItem>(data: readonly (SeriesDataItemTypeMap<HorzScaleItem>[SeriesType])[], bh: IHorzScaleBehavior<HorzScaleItem>, allowDuplicates: boolean = false): void {

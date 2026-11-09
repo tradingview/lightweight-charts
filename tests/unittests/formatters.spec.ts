@@ -57,6 +57,29 @@ describe('Formatters', () => {
 			expect(res).to.be.equal('\u22121.50');
 		}
 	});
+	it('price-formatter should round to the nearest minMove when minMove >= 1', () => {
+		{
+			// precision = 0, minMove = 1
+			const formatter = new PriceFormatter(1, 1);
+			expect(formatter.format(12.4)).to.be.equal('12');
+			expect(formatter.format(12.6)).to.be.equal('13');
+			expect(formatter.format(99.9)).to.be.equal('100');
+			expect(formatter.format(-12.6)).to.be.equal('\u221213');
+		}
+		{
+			// precision = 0, minMove = 5
+			const formatter = new PriceFormatter(1, 5);
+			expect(formatter.format(12.4)).to.be.equal('10');
+			expect(formatter.format(12.6)).to.be.equal('15');
+			expect(formatter.format(14.9)).to.be.equal('15');
+		}
+		{
+			// precision = 1, minMove = 2
+			const formatter = new PriceFormatter(10, 20);
+			expect(formatter.format(12.9)).to.be.equal('12.0');
+			expect(formatter.format(13.1)).to.be.equal('14.0');
+		}
+	});
 	it('time-formatter', () => {
 		{
 			const formatter = new TimeFormatter();
