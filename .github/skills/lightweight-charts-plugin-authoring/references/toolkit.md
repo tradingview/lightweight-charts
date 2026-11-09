@@ -62,10 +62,9 @@ Read: `stacked-bars-series/src/renderer.ts` (short), `hlc-area-series/src/render
 
 Read: `stacked-area-series/src/renderer.ts` for all of them together.
 
-### `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`, `nearestVerticalRange`, `createHitTestDataCache`
+### `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`, `nearestBar`, `nearestVerticalRange`, `createHitTestDataCache`
 
-For a renderer's `hitTest` (called from 5.2) over bars that each cover a
-vertical range: a column, a candle, a stem.
+For a renderer's `hitTest` (called from 5.2).
 
 - `seriesHitTestTolerance(options, fallback = 8)` reads the series'
   `hitTestTolerance` option, in CSS pixels.
@@ -75,8 +74,13 @@ vertical range: a column, a candle, a stem.
   nearest the pointer and within `tolerance`, or `null`. It finds the bars
   near `x` by binary search. Return `null` from `span` for a bar with
   nothing to hit.
-- `distanceToRange(value, a, b)` is the distance to a range, `0` inside it:
-  build your own distance from it when the geometry is not one box per bar.
+- `nearestBar(data, x, reach, tolerance, distance)` is the same search with
+  your own `distance(bar, index)`, for geometry that is not one box per bar:
+  a dot, a ring, a shape. Only the bars whose `x` is within `reach` of the
+  pointer are measured, so make `reach` the widest the geometry gets from a
+  bar's `x`, plus `tolerance`. Measure to the shape itself; picking the bar by
+  a box around it reports the wrong bar where neighboring shapes touch.
+- `distanceToRange(value, a, b)` is the distance to a range, `0` inside it.
 - `createHitTestDataCache()` returns `get(key, create)`, which hands back the
   same object while the same key is asked for. Use it for an object
   `hitTestData`, keyed by the `objectId`: the chart compares `hitTestData` by

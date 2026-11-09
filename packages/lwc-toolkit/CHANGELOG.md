@@ -59,13 +59,15 @@ plugins, which had been writing them for themselves.
   conflation context, from 5.1. Types only, so that a plugin can implement
   `hitTest` and `conflationReducer` and keep 5.0 as its floor.
 - `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`,
-  `nearestVerticalRange`, `createHitTestDataCache`, `VerticalSpan`,
-  `NearestBarHit`, `HitTestDataCache`: the parts of a renderer's `hitTest` for
-  bars that span a vertical range. The series' `hitTestTolerance`, 8 px when
-  the option is missing; the visible bar nearest the pointer within it, found
-  by binary search, so the cost does not grow with the bars on screen; and one
-  `hitTestData` object per hovered item, so that the chart does not repaint on
-  every pointer move.
+  `nearestBar`, `nearestVerticalRange`, `createHitTestDataCache`,
+  `VerticalSpan`, `NearestBarHit`, `HitTestDataCache`: the parts of a
+  renderer's `hitTest`. The series' `hitTestTolerance`, 8 px when the option
+  is missing; the visible bar nearest the pointer within it, measured by a
+  distance the renderer gives (`nearestBar`) or to the box of a bar that spans
+  a vertical range (`nearestVerticalRange`), over the bars near the pointer
+  found by binary search, so the cost does not grow with the bars on screen;
+  and one `hitTestData` object per hovered item, so that the chart does not
+  repaint on every pointer move.
 - `custom-series/visible-bars` — `effectiveBarSpacing`: the bar spacing times
   the conflation factor, so that a conflated bar is as wide as the slots it
   covers. Only for a series with a `conflationReducer`: the chart reports the

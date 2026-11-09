@@ -11,6 +11,7 @@ import {
 import {
 	createHitTestDataCache,
 	distanceToRange,
+	nearestBar,
 	nearestVerticalRange,
 	seriesHitTestTolerance,
 	VerticalSpan,
@@ -72,6 +73,41 @@ void describe('seriesHitTestTolerance', () => {
 		expect(seriesHitTestTolerance({ hitTestTolerance: Number.NaN })).to.equal(8);
 		expect(seriesHitTestTolerance({ hitTestTolerance: -1 })).to.equal(8);
 		expect(seriesHitTestTolerance({ hitTestTolerance: '3' })).to.equal(8);
+	});
+});
+
+void describe('nearestBar', () => {
+	const bars = makeBars([[40, 60], [40, 60], [40, 60], [40, 60]]);
+	// A dot of radius 4 at y 50 on every bar.
+	const dot = (x: number, y: number) => (bar: TestBar): number => Math.max(0, Math.hypot(x - bar.x, y - 50) - 4);
+
+	void it('measures the bars near the pointer with the given distance', () => {
+		expect(nearestBar(paneData(bars, { from: 0, to: 4 }), 21, 7, 3, dot(21, 50))).to.deep.equal({ index: 2, distance: 0 });
+	});
+
+	void it('picks the bar the distance says is nearest, not the nearest x', () => {
+		const hit = nearestBar(paneData(bars, { from: 0, to: 4 }), 12, 30, 3, (_: TestBar, index: number) => 3 - index);
+		expect(hit).to.deep.equal({ index: 3, distance: 0 });
+	});
+
+	void it('misses beyond the tolerance, and skips bars with nothing to hit', () => {
+		expect(nearestBar(paneData(bars, { from: 0, to: 4 }), 21, 7, 3, dot(21, 60))).to.equal(null);
+		expect(nearestBar(paneData(bars, { from: 0, to: 4 }), 21, 7, 3, () => null)).to.equal(null);
+	});
+
+	void it('picks the earlier of two bars at the same distance', () => {
+		expect(nearestBar(paneData(bars, { from: 0, to: 4 }), 15, 7, 3, dot(15, 50))).to.deep.equal({ index: 1, distance: 1 });
+	});
+
+	void it('measures only the visible bars within reach', () => {
+		const measured: number[] = [];
+		const many = makeBars(Array.from({ length: 100 }, () => [40, 60] as [number, number]));
+		nearestBar(paneData(many, { from: 10, to: 90 }), 500, 10, 3, (_: TestBar, index: number) => {
+			measured.push(index);
+			return null;
+		});
+		expect(measured).to.deep.equal([49, 50, 51]);
+		expect(nearestBar(paneData(bars, null), 21, 7, 3, dot(21, 50))).to.equal(null);
 	});
 });
 

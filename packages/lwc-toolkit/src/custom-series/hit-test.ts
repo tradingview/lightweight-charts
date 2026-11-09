@@ -35,25 +35,61 @@ export function seriesHitTestTolerance(options: object, fallback: number = 8): n
  */
 export type VerticalSpan = readonly [number, number];
 
-/** The bar {@link nearestVerticalRange} found, and how far the pointer is from it. */
+/** The bar {@link nearestBar} or {@link nearestVerticalRange} found, and how far the pointer is from it. */
 export interface NearestBarHit {
 	/** Index of the bar in `data.bars`. */
 	index: number;
-	/** Distance from the pointer to the bar's box, in CSS pixels; `0` inside it. */
+	/** Distance from the pointer to the bar's geometry, in CSS pixels; `0` inside it. */
 	distance: number;
 }
 
 /**
- * Finds the visible bar closest to the pointer, for a renderer's `hitTest`.
- * A bar's box is `halfWidth` either side of its `x`, between the two ends
- * `span` returns for it, and the pointer hits it when the straight-line
- * distance to the box is at most `tolerance`. `span` returns `null` for a bar
- * with nothing to hit, such as one whose value is off the price scale. Of two
- * bars at the same distance, the earlier one wins.
+ * Finds the visible bar closest to the pointer, for a renderer's `hitTest`
+ * over any geometry. `distance(bar, index)` measures from the pointer to what
+ * the bar draws, or returns `null` for a bar with nothing to hit, and the
+ * nearest bar within `tolerance` wins; of two at the same distance, the
+ * earlier one.
  *
- * Only the bars within `halfWidth + tolerance` of the pointer horizontally are
- * visited, found by binary search, so the cost does not grow with the number
- * of bars on screen.
+ * Only the bars whose `x` is within `reach` of the pointer's `x` are measured,
+ * found by binary search, so the cost does not grow with the number of bars on
+ * screen. `reach` has to cover the widest a bar's geometry gets from its `x`,
+ * plus `tolerance`.
+ */
+export function nearestBar<HorzScaleItem, TData extends CustomData<HorzScaleItem>>(
+	data: PaneRendererCustomData<HorzScaleItem, TData>,
+	x: number,
+	reach: number,
+	tolerance: number,
+	distance: (bar: CustomBarItemData<HorzScaleItem, TData>, index: number) => number | null
+): NearestBarHit | null {
+	const range = data.visibleRange;
+	if (range === null) {
+		return null;
+	}
+	const bars = data.bars;
+	const to = Math.min(range.to, bars.length);
+	let best: NearestBarHit | null = null;
+	for (let index = firstBarAtOrAfter(bars, Math.max(0, range.from), to, x - reach); index < to; index++) {
+		const bar = bars[index];
+		if (bar.x > x + reach) {
+			break;
+		}
+		const measured = distance(bar, index);
+		if (measured !== null && measured <= tolerance && (best === null || measured < best.distance)) {
+			best = { index, distance: measured };
+		}
+	}
+	return best;
+}
+
+/**
+ * Finds the visible bar closest to the pointer, for a renderer's `hitTest`
+ * over bars that each cover a vertical range: a column, a candle, a stem. A
+ * bar's box is `halfWidth` either side of its `x`, between the two ends `span`
+ * returns for it, and the pointer hits it when the straight-line distance to
+ * the box is at most `tolerance`. `span` returns `null` for a bar with nothing
+ * to hit, such as one whose value is off the price scale. Of two bars at the
+ * same distance, the earlier one wins. Built on {@link nearestBar}.
  */
 export function nearestVerticalRange<HorzScaleItem, TData extends CustomData<HorzScaleItem>>(
 	data: PaneRendererCustomData<HorzScaleItem, TData>,
@@ -63,34 +99,18 @@ export function nearestVerticalRange<HorzScaleItem, TData extends CustomData<Hor
 	tolerance: number,
 	span: (bar: CustomBarItemData<HorzScaleItem, TData>, index: number) => VerticalSpan | null
 ): NearestBarHit | null {
-	const range = data.visibleRange;
-	if (range === null) {
-		return null;
-	}
-	const bars = data.bars;
-	const to = Math.min(range.to, bars.length);
-	const reach = halfWidth + tolerance;
-	let best: NearestBarHit | null = null;
-	for (let index = firstBarAtOrAfter(bars, Math.max(0, range.from), to, x - reach); index < to; index++) {
-		const bar = bars[index];
-		if (bar.x > x + reach) {
-			break;
-		}
+	return nearestBar(data, x, halfWidth + tolerance, tolerance, (bar, index) => {
 		const dx = distanceToRange(x, bar.x - halfWidth, bar.x + halfWidth);
 		if (dx > tolerance) {
-			continue;
+			return null;
 		}
 		const extent = span(bar, index);
 		if (extent === null) {
-			continue;
+			return null;
 		}
 		const dy = distanceToRange(y, extent[0], extent[1]);
-		const distance = Math.sqrt(dx * dx + dy * dy);
-		if (distance <= tolerance && (best === null || distance < best.distance)) {
-			best = { index, distance };
-		}
-	}
-	return best;
+		return Math.sqrt(dx * dx + dy * dy);
+	});
 }
 
 /** The first index in `[from, to)` whose bar has `x >= minX`; `to` when there is none. */
