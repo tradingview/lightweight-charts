@@ -18,15 +18,18 @@ export function distanceToRange(value: number, a: number, b: number): number {
 	return 0;
 }
 
+/** The library's default `hitTestTolerance`, in CSS pixels. */
+const DEFAULT_HIT_TEST_TOLERANCE = 3;
+
 /**
  * The series' `hitTestTolerance` option, in CSS pixels: how far from an
- * item's geometry the pointer still hovers it. The option exists from 5.2,
- * the first version that calls `hitTest`; `fallback` stands in when it is
- * missing or is not a finite, non-negative number.
+ * item's geometry the pointer still hovers it. Every version that calls
+ * `hitTest`, 5.2 and later, has the option, so the library's default of 3
+ * only stands in for a value that is not a finite, non-negative number.
  */
-export function seriesHitTestTolerance(options: object, fallback: number = 8): number {
+export function seriesHitTestTolerance(options: object): number {
 	const tolerance = (options as { hitTestTolerance?: unknown }).hitTestTolerance;
-	return isFiniteNumber(tolerance) && tolerance >= 0 ? tolerance : fallback;
+	return isFiniteNumber(tolerance) && tolerance >= 0 ? tolerance : DEFAULT_HIT_TEST_TOLERANCE;
 }
 
 /**
@@ -99,11 +102,10 @@ export function nearestVerticalRange<HorzScaleItem, TData extends CustomData<Hor
 	tolerance: number,
 	span: (bar: CustomBarItemData<HorzScaleItem, TData>, index: number) => VerticalSpan | null
 ): NearestBarHit | null {
+	// nearestBar only measures the bars whose `x` is within `halfWidth +
+	// tolerance` of the pointer, so `dx` is never beyond the tolerance.
 	return nearestBar(data, x, halfWidth + tolerance, tolerance, (bar, index) => {
 		const dx = distanceToRange(x, bar.x - halfWidth, bar.x + halfWidth);
-		if (dx > tolerance) {
-			return null;
-		}
 		const extent = span(bar, index);
 		if (extent === null) {
 			return null;

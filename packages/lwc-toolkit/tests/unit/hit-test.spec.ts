@@ -64,15 +64,11 @@ void describe('seriesHitTestTolerance', () => {
 		expect(seriesHitTestTolerance({ hitTestTolerance: 0 })).to.equal(0);
 	});
 
-	void it('falls back without the option, which hosts before 5.2 lack', () => {
-		expect(seriesHitTestTolerance({})).to.equal(8);
-		expect(seriesHitTestTolerance({}, 5)).to.equal(5);
-	});
-
-	void it('falls back for a value that is not a finite, non-negative number', () => {
-		expect(seriesHitTestTolerance({ hitTestTolerance: Number.NaN })).to.equal(8);
-		expect(seriesHitTestTolerance({ hitTestTolerance: -1 })).to.equal(8);
-		expect(seriesHitTestTolerance({ hitTestTolerance: '3' })).to.equal(8);
+	void it('falls back to the library default of 3 for a value that is not a finite, non-negative number', () => {
+		expect(seriesHitTestTolerance({ hitTestTolerance: Number.NaN })).to.equal(3);
+		expect(seriesHitTestTolerance({ hitTestTolerance: -1 })).to.equal(3);
+		expect(seriesHitTestTolerance({ hitTestTolerance: '8' })).to.equal(3);
+		expect(seriesHitTestTolerance({})).to.equal(3);
 	});
 });
 

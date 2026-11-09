@@ -61,13 +61,13 @@ plugins, which had been writing them for themselves.
 - `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`,
   `nearestBar`, `nearestVerticalRange`, `createHitTestDataCache`,
   `VerticalSpan`, `NearestBarHit`, `HitTestDataCache`: the parts of a
-  renderer's `hitTest`. The series' `hitTestTolerance`, 8 px when the option
-  is missing; the visible bar nearest the pointer within it, measured by a
-  distance the renderer gives (`nearestBar`) or to the box of a bar that spans
-  a vertical range (`nearestVerticalRange`), over the bars near the pointer
-  found by binary search, so the cost does not grow with the bars on screen;
-  and one `hitTestData` object per hovered item, so that the chart does not
-  repaint on every pointer move.
+  renderer's `hitTest`. The series' `hitTestTolerance`, or the library's
+  default of 3 px for an invalid value; the visible bar nearest the pointer
+  within it, measured by a distance the renderer gives (`nearestBar`) or to
+  the box of a bar that spans a vertical range (`nearestVerticalRange`), over
+  the bars near the pointer found by binary search, so the cost does not grow
+  with the bars on screen; and one `hitTestData` object per hovered item, so
+  that the chart does not repaint on every pointer move.
 - `custom-series/visible-bars` — `effectiveBarSpacing`: the bar spacing times
   the conflation factor, so that a conflated bar is as wide as the slots it
   covers. Only for a series with a `conflationReducer`: the chart reports the
