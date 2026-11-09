@@ -1,0 +1,1 @@
+import{_ as a,g as s,t as i,P as n,h as o}from"./sample-data-BtYvpHXm.js";import{c as r}from"./median-price-calculation-B_oJYv0G.js";const c={autoSize:!0},t=a("chart",c),e=s(150,new Date(2024,0,1)),l=t.addSeries(i,{});l.setData(e);const d=r(e,{}),m=t.addSeries(n,{color:"blue",lineWidth:2,lineStyle:o.Solid});m.setData(d);t.timeScale().fitContent();
