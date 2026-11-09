@@ -1,6 +1,8 @@
-// The series reports the bar under the pointer as `hlc-<index>`: on the
-// vertical line from its low to its high, and within the hit test tolerance
-// (3px by default) beside it. Farther away it reports no object.
+// The series reports the bar under the pointer as `hlc-<time index>`, the
+// bar's index on the time scale, which is its position in the data here only
+// because no other series adds times: on the vertical line from its low to
+// its high, and within the hit test tolerance (3px by default) beside it.
+// Farther away it reports no object.
 async function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container, { height: 380, crosshair: { mode: LightweightCharts.CrosshairMode.Normal } });
 	const series = LwcPlugin.createHLCAreaSeries(chart, { priceLineVisible: false, lastValueVisible: false });

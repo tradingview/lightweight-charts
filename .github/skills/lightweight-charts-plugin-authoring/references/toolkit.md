@@ -66,8 +66,8 @@ Read: `stacked-area-series/src/renderer.ts` for all of them together.
 
 For a renderer's `hitTest` (called from 5.2).
 
-- `seriesHitTestTolerance(options, fallback = 8)` reads the series'
-  `hitTestTolerance` option, in CSS pixels.
+- `seriesHitTestTolerance(options)` reads the series' `hitTestTolerance`
+  option, in CSS pixels, with the library's default of 3 for an invalid value.
 - `nearestVerticalRange(data, x, y, halfWidth, tolerance, span)` returns
   `{ index, distance }` for the visible bar whose box — `halfWidth` either
   side of its `x`, between the two ends `span(bar, index)` returns — is
