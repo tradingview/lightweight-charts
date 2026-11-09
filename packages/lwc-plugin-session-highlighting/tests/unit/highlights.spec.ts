@@ -74,6 +74,15 @@ void describe('updateLastColor', () => {
 		expect(calls).to.equal(0);
 	});
 
+	void it('refuses when the count grew by one but the last bar is unchanged', () => {
+		// A historical update on a whitespace point inserted bar 3 before bar 4.
+		const highlights = colorsForTimes([1, 2, 4] as Time[], even);
+		let calls = 0;
+		expect(updateLastColor(highlights, 4, 4 as Time, () => { calls++; return 'blue'; })).to.equal(false);
+		expect(highlights).to.have.length(3);
+		expect(calls).to.equal(0);
+	});
+
 	void it('tells apart two bars within the same second', () => {
 		const highlights = colorsForTimes([1704067200.25] as Time[], () => 'red');
 		expect(updateLastColor(highlights, 1, 1704067200.5 as Time, () => 'blue')).to.equal(false);

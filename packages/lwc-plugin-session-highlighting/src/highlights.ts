@@ -56,9 +56,10 @@ export function colorsForTimes(times: readonly Time[], highlighter: SessionHighl
  * Applies an incremental data update that kept or grew the bar count by one,
  * which is what `series.update()` does: the last entry is replaced when the
  * count is unchanged and `time` is still the same bar, whatever form the time
- * now has, and a new one is appended when the count grew by one. Returns
- * false without touching the list when the change is neither, such as the
- * last bar being a different bar at the same count, meaning every bar has to
+ * now has, and a new one is appended when the count grew by one and `time`
+ * is later than the last bar. Returns false without touching the list when
+ * the change is neither, such as the last bar being a different bar at the
+ * same count or a bar inserted before the last one, meaning every bar has to
  * be recolored.
  */
 export function updateLastColor(
@@ -76,6 +77,11 @@ export function updateLastColor(
 		return true;
 	}
 	if (count === highlights.length + 1) {
+		if (last !== undefined && timestampOf(time) <= last.timestamp) {
+			// A historical update filled a whitespace point: the bar was
+			// inserted before the last one, which is unchanged.
+			return false;
+		}
 		highlights.push(highlightFor(time, highlighter));
 		return true;
 	}
