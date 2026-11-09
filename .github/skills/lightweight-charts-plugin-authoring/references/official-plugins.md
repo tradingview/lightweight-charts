@@ -56,6 +56,26 @@ library's own fallback: where the renderer's `hitTest` returns `null`, a
 pointer inside a bar's slot between its plot values still reports the series
 as hovered, without an `objectId`.
 
+### `grouped-bars-series` — several values per point, side by side
+
+A group of columns per point from `values[]`, with series and per-point
+`colors`, a `base`, and `columnWidthMode`/`widthPercent` named as in
+`stacked-bars-series`. Read for: one column count for the whole series, the
+most values any point that draws a column has, so a column is as wide in
+every group, counted once per data change by keying it on the
+`AcceptedInput` revision that `createOptionsAwareSeries` hands the view, and
+read when the renderer draws or hit tests rather than in the view's `update`,
+which the chart calls while `setData` is still running, before the revision
+moves; groups placed with `calculateColumnPositionsInPlace` in `histogram`
+mode and `positionsLine` in `percent` mode, where they are all the same width
+and never wider than the bar spacing covers; splitting each group into
+whole-pixel columns that tile it exactly (`splitGroup` in `layout.ts`,
+unit-tested), every column keeping at least a pixel and the tallest drawn
+first once they share pixels; values equal to `base`, `null` and non-finite
+values skipped like whitespace; and a `hitTest` that measures every column
+within reach with `nearestBar`, naming the point and the column in
+`objectId`.
+
 ### `stacked-area-series` — bands, gaps and conflation together
 
 Cumulative bands from `values[]`, negatives folding back to the base,
@@ -169,7 +189,7 @@ interaction tests show how to assert on DOM state.
 
 Upstream `plugin-examples/src/plugins/` holds unpublished proof-of-concept
 plugins: tooltips and delta tooltips, a rectangle drawing tool, trend lines,
-session highlighting, a heatmap series, grouped bars, box-whisker,
+session highlighting, a heatmap series, box-whisker,
 background shading, price alerts, a volume profile, a partial price line,
 and crosshair highlighting. Good for seeing the shape of an
 idea; they predate the toolkit and skip the tests and README the packages

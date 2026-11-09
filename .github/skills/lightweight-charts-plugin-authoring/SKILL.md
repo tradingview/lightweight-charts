@@ -192,7 +192,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 | Building… | Read |
 | --- | --- |
 | any custom series | `stacked-bars-series` (the simplest complete one), then `pretty-histogram-series` |
-| a series with several values per point | `stacked-area-series`, `stacked-bars-series` |
+| a series with several values per point | `stacked-area-series`, `stacked-bars-series`, `grouped-bars-series` (side by side) |
 | a line/area that must break at gaps, or survive conflation | `hlc-area-series`, `brushable-area-series` |
 | a series with its own pointer interaction | `brushable-area-series` (`BrushableAreaInteraction`) |
 | a replacement for a built-in series | `rounded-candles-series` (matches candlestick options and widths) |
