@@ -1146,6 +1146,42 @@ describe('DataLayer', () => {
 			expect(seriesUpdate.data.map((row: SeriesChanges['data'][number]) => (row.time as unknown as TimePoint).timestamp)).to.be.deep.equal([1000, 2000, 3000, 4000]);
 		});
 
+		it('should not move the last time back when a historical update inserts a bar before trailing whitespace', () => {
+			const dataLayer = new DataLayer<Time>(behavior);
+
+			const series = createSeriesMock();
+
+			dataLayer.setSeriesData(series, [
+				dataItemAt(1000 as UTCTimestamp),
+				whitespaceItemAt(2000 as UTCTimestamp),
+				whitespaceItemAt(3000 as UTCTimestamp),
+			]);
+
+			dataLayer.updateSeriesData(series, dataItemAt(2000 as UTCTimestamp), true);
+
+			// same as after setData([1000, 2000, whitespace 3000]): the last time is still 3000
+			expect(() => dataLayer.updateSeriesData(series, dataItemAt(2500 as UTCTimestamp), false)).to.throw('Cannot update oldest data');
+			expect(() => dataLayer.updateSeriesData(series, dataItemAt(2000 as UTCTimestamp), false)).to.throw('Cannot update oldest data');
+		});
+
+		it('should move the last time forward when a historical update sets whitespace after the last bar', () => {
+			const dataLayer = new DataLayer<Time>(behavior);
+
+			const series1 = createSeriesMock();
+			const series2 = createSeriesMock();
+
+			dataLayer.setSeriesData(series1, [dataItemAt(1000 as UTCTimestamp)]);
+			dataLayer.setSeriesData(series2, [
+				dataItemAt(1000 as UTCTimestamp),
+				dataItemAt(3000 as UTCTimestamp),
+			]);
+
+			dataLayer.updateSeriesData(series1, whitespaceItemAt(3000 as UTCTimestamp), true);
+
+			// same as after setData([1000, whitespace 3000]): the last time is 3000
+			expect(() => dataLayer.updateSeriesData(series1, dataItemAt(2000 as UTCTimestamp), false)).to.throw('Cannot update oldest data');
+		});
+
 		it('should generate full update if whitespace extends timescale', () => {
 			const dataLayer = new DataLayer<Time>(behavior);
 
