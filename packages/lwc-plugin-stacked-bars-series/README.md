@@ -173,7 +173,8 @@ series' price line.
   bands that are drawn. `percent`, nonzero `base`, and `stackOrder: 'reverse'`
   therefore autoscale without a custom range provider.
 
-- On `lightweight-charts` 5.1 and later the series reports the hovered segment
+- On `lightweight-charts` 5.2 and later the series reports the hovered segment
   through `hitTest` (the `objectId` is the index of the value within the point)
-  and dims the other segments while one is hovered, and conflated points are
-  merged by summing each band. On 5.0.0 those hooks are simply never called.
+  and dims the other segments while one is hovered, and from 5.1 conflated
+  points are merged by summing each band. Older versions simply never call
+  those hooks.

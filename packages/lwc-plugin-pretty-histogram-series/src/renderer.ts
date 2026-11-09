@@ -15,11 +15,11 @@ import {
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { CustomSeriesHitTestResult } from '@tradingview/lwc-toolkit/custom-series/compat';
+import { effectiveBarSpacing, getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 
 import { PrettyHistogramData } from './data';
 import { PrettyHistogramSeriesOptions } from './options';
-import { CustomSeriesHitTestResult, effectiveBarSpacing } from './compat';
 
 interface PrettyHistogramColumnItem extends ColumnPositionItem {
 	/** Index of the bar within `data.bars`. */
@@ -52,8 +52,8 @@ export class PrettyHistogramSeriesRenderer<
 > extends CustomSeriesRendererBase<HorzScaleItem, TData, PrettyHistogramSeriesOptions> {
 	/**
 	 * Reports the column under the cursor, so that the chart can highlight it and
-	 * report it through the crosshair. Optional in the library before v5.1; hosts
-	 * which do not know about it simply never call it.
+	 * report it through the crosshair. Called by the library from v5.2; older
+	 * hosts simply never call it.
 	 *
 	 * The whole slot of a bar is hoverable, not just the painted column, which
 	 * is how the built-in histogram series behaves at narrow widths.

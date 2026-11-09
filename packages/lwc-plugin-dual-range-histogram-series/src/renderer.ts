@@ -15,7 +15,8 @@ import {
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
-import { getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { CustomSeriesHitTestResult } from '@tradingview/lwc-toolkit/custom-series/compat';
+import { effectiveBarSpacing, getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 
 import { DualRangeHistogramData } from './data';
 import {
@@ -23,7 +24,6 @@ import {
 	DualRangeHistogramColumns,
 	DualRangeHistogramSeriesOptions,
 } from './options';
-import { CustomSeriesHitTestResult, effectiveBarSpacing } from './compat';
 
 interface DualRangeHistogramBarItem extends ColumnPositionItem {
 	/** Index of the bar within `data.bars`. */
@@ -85,8 +85,8 @@ export class DualRangeHistogramSeriesRenderer<
 
 	/**
 	 * Reports the point under the cursor, so that the chart can highlight it and
-	 * report it through the crosshair. Optional in the library before v5.1;
-	 * hosts which do not know about it simply never call it.
+	 * report it through the crosshair. Called by the library from v5.2; older
+	 * hosts simply never call it.
 	 */
 	public hitTest(x: number, y: number): CustomSeriesHitTestResult | null {
 		for (const area of this._hitAreas) {

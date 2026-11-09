@@ -10,24 +10,14 @@ import {
 	CustomSeriesDrawArgs,
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
+import { CustomSeriesHitTestResult } from '@tradingview/lwc-toolkit/custom-series/compat';
+import { nearestVerticalRange, seriesHitTestTolerance } from '@tradingview/lwc-toolkit/custom-series/hit-test';
 import { GapCheck, barCoordinate, extendRange, getConflationFactor, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { setLineStyle } from '@tradingview/lwc-toolkit/line-style';
 import type { LineStyle as ToolkitLineStyle } from '@tradingview/lwc-toolkit/line-style';
 
 import { HLCAreaData } from './data';
 import { HLCAreaSeriesOptions } from './options';
-
-/**
- * A custom-series hit test result. Declared here rather than imported so that
- * the package still typechecks against `lightweight-charts` 5.0.0, which has
- * no hit testing for custom series.
- */
-export interface HLCAreaHitTestResult {
-	distance: number;
-	objectId?: string;
-	type?: 'point' | 'line' | 'range' | 'custom';
-	hitTestData?: unknown;
-}
 
 /** One bar with its three prices already converted to media coordinates. */
 interface HLCAreaBarItem {
@@ -39,24 +29,6 @@ interface HLCAreaBarItem {
 	index: number;
 	/** Logical time scale index of the bar, which gaps make jump. */
 	time: number;
-}
-
-/** Default hit test tolerance, in CSS pixels, on hosts which have no option for it. */
-const defaultHitTestTolerance = 8;
-
-function distanceToRange(value: number, low: number, high: number): number {
-	if (value < low) {
-		return low - value;
-	}
-	if (value > high) {
-		return value - high;
-	}
-	return 0;
-}
-
-function hitTestTolerance(options: HLCAreaSeriesOptions): number {
-	const tolerance = (options as { hitTestTolerance?: number }).hitTestTolerance;
-	return typeof tolerance === 'number' ? tolerance : defaultHitTestTolerance;
 }
 
 export class HLCAreaSeriesRenderer<
@@ -79,42 +51,28 @@ export class HLCAreaSeriesRenderer<
 		x: number,
 		y: number,
 		priceConverter: PriceToCoordinateConverter
-	): HLCAreaHitTestResult | null {
+	): CustomSeriesHitTestResult | null {
 		const data = this.data;
 		const options = this.options;
-		if (data === null || options === null || data.visibleRange === null) {
+		if (data === null || options === null) {
 			return null;
 		}
-		const tolerance = hitTestTolerance(options);
-		let best: HLCAreaHitTestResult | null = null;
 		// The visible range as it is: the bars outside it have no coordinates.
-		const { from, to } = data.visibleRange;
-		for (let i = from; i < to; i++) {
-			const bar = data.bars[i];
-			const dx = Math.abs(x - bar.x);
-			if (dx > tolerance) {
-				continue;
-			}
+		// A bar is a vertical line, so it has no width of its own.
+		const hit = nearestVerticalRange(data, x, y, 0, seriesHitTestTolerance(options), bar => {
 			const high = priceConverter(bar.originalData.high);
 			const low = priceConverter(bar.originalData.low);
-			if (high === null || low === null) {
-				continue;
-			}
-			const dy = distanceToRange(y, Math.min(high, low), Math.max(high, low));
-			const distance = Math.sqrt(dx * dx + dy * dy);
-			if (distance > tolerance) {
-				continue;
-			}
-			if (best === null || distance < best.distance) {
-				best = {
-					distance,
-					objectId: `hlc-${bar.time}`,
-					type: 'range',
-					hitTestData: i,
-				};
-			}
+			return high === null || low === null ? null : [high, low];
+		});
+		if (hit === null) {
+			return null;
 		}
-		return best;
+		return {
+			distance: hit.distance,
+			objectId: `hlc-${data.bars[hit.index].time}`,
+			type: 'range',
+			hitTestData: hit.index,
+		};
 	}
 
 	protected drawImpl(
@@ -126,7 +84,6 @@ export class HLCAreaSeriesRenderer<
 		// first and last segments would stop at the outermost visible point
 		// instead of leaving the pane.
 		const range = extendRange({ from, to }, data.bars.length);
-
 
 		const bars: HLCAreaBarItem[] = [];
 		for (let i = range.from; i < range.to; i++) {

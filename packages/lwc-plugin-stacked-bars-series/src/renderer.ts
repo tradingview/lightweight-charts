@@ -1,4 +1,4 @@
-import { CustomBarItemData, PaneRendererCustomData, PriceToCoordinateConverter, Time } from 'lightweight-charts';
+import { CustomBarItemData, PriceToCoordinateConverter, Time } from 'lightweight-charts';
 import {
 	CornerRadii,
 	clampCornerRadius,
@@ -11,10 +11,12 @@ import {
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import { ColumnPosition, ColumnPositionItem, calculateColumnPositionsInPlace } from '@tradingview/lwc-toolkit/dimensions/columns';
 import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
-import { getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { CustomSeriesHitTestResult } from '@tradingview/lwc-toolkit/custom-series/compat';
+import { createHitTestDataCache } from '@tradingview/lwc-toolkit/custom-series/hit-test';
+import { effectiveBarSpacing, getConflationFactor, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { stackLevels } from '@tradingview/lwc-toolkit/custom-series/stacking';
 
-import { StackedBarsHitTestResult, isHitTestData } from './compat';
+import { StackedBarsHitTestData, isHitTestData } from './hit-test-data';
 import { StackedBand, bandValues, stackBands } from './stack';
 import { StackedBarsData } from './data';
 import { StackedBarsSeriesOptions, defaultOptions } from './options';
@@ -41,18 +43,6 @@ interface SegmentRect {
 	top: number;
 	height: number;
 	index: number;
-}
-
-/**
- * Bar spacing including the conflation factor, so that conflated columns stay
- * as wide as the space they now cover. `conflationFactor` was added to the
- * library after 5.0.0, hence the guarded read.
- */
-function effectiveBarSpacing<HorzScaleItem, TData extends StackedBarsData<HorzScaleItem>>(
-	data: PaneRendererCustomData<HorzScaleItem, TData>
-): number {
-	const factor = (data as { conflationFactor?: number }).conflationFactor;
-	return data.barSpacing * (factor !== undefined && factor > 0 ? factor : 1);
 }
 
 /** Width of a column in media coordinates, used for hit testing. */
@@ -105,16 +95,18 @@ export class StackedBarsSeriesRenderer<
 	TData extends StackedBarsData<HorzScaleItem> = StackedBarsData<HorzScaleItem>
 > extends CustomSeriesRendererBase<HorzScaleItem, TData, StackedBarsSeriesOptions>
 {
+	private readonly _hitTestData = createHitTestDataCache<StackedBarsHitTestData>();
+
 	/**
-	 * Reports the segment under the cursor. Optional on
-	 * `ICustomSeriesPaneRenderer` from `lightweight-charts` 5.1; on 5.0.0 it is
-	 * simply an extra method the chart never calls.
+	 * Reports the segment under the cursor. Called by
+	 * `lightweight-charts` 5.2 and later; on older versions it is simply an
+	 * extra method the chart never calls.
 	 */
 	public hitTest(
 		x: number,
 		y: number,
 		priceToCoordinate: PriceToCoordinateConverter
-	): StackedBarsHitTestResult | null {
+	): CustomSeriesHitTestResult | null {
 		const data = this.data;
 		const options = this.options;
 		if (data === null || options === null || data.visibleRange === null) {
@@ -153,7 +145,7 @@ export class StackedBarsSeriesRenderer<
 					distance: 0,
 					objectId: String(bands[i].index),
 					type: 'range',
-					hitTestData: { barIndex: hitIndex, segmentIndex: bands[i].index },
+					hitTestData: this._hitTestData.get(`${hitIndex}-${bands[i].index}`, () => ({ barIndex: hitIndex, segmentIndex: bands[i].index })),
 				};
 			}
 		}

@@ -12,25 +12,15 @@ import {
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import { gridAndCrosshairBitmapWidth } from '@tradingview/lwc-toolkit/dimensions/crosshair-width';
-import { mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
+import { CustomSeriesHitTestResult } from '@tradingview/lwc-toolkit/custom-series/compat';
+import { nearestVerticalRange, seriesHitTestTolerance } from '@tradingview/lwc-toolkit/custom-series/hit-test';
+import { effectiveBarSpacing, mapVisibleBars } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
 
 import { RoundedCandleData } from './data';
 import { RoundedCandleSeriesOptions } from './options';
 import { ResolvedCandleColors, isUpCandle, resolveCandleColors } from './colors';
 import { resolveRadius } from './radius';
-
-/**
- * A custom-series hit test result. Declared here rather than imported so that
- * the package still typechecks against `lightweight-charts` 5.0.0, which has
- * no hit testing for custom series.
- */
-export interface RoundedCandleHitTestResult {
-	distance: number;
-	objectId?: string;
-	type?: 'point' | 'line' | 'range' | 'custom';
-	hitTestData?: unknown;
-}
 
 interface BarItem extends ResolvedCandleColors {
 	openY: number;
@@ -39,29 +29,6 @@ interface BarItem extends ResolvedCandleColors {
 	closeY: number;
 	x: number;
 	index: number;
-}
-
-/** Default hit test tolerance, in CSS pixels, on hosts which have no option for it. */
-const defaultHitTestTolerance = 8;
-
-function effectiveBarSpacing(data: { barSpacing: number }): number {
-	const factor = (data as { conflationFactor?: number }).conflationFactor;
-	return data.barSpacing * (typeof factor === 'number' && factor > 0 ? factor : 1);
-}
-
-function hitTestTolerance(options: RoundedCandleSeriesOptions): number {
-	const tolerance = (options as { hitTestTolerance?: number }).hitTestTolerance;
-	return typeof tolerance === 'number' ? tolerance : defaultHitTestTolerance;
-}
-
-function distanceToRange(value: number, low: number, high: number): number {
-	if (value < low) {
-		return low - value;
-	}
-	if (value > high) {
-		return value - high;
-	}
-	return 0;
 }
 
 export class RoundedCandleSeriesRenderer<
@@ -80,41 +47,33 @@ export class RoundedCandleSeriesRenderer<
 		x: number,
 		y: number,
 		priceConverter: PriceToCoordinateConverter
-	): RoundedCandleHitTestResult | null {
+	): CustomSeriesHitTestResult | null {
 		const data = this.data;
 		const options = this.options;
-		if (data === null || options === null || data.visibleRange === null) {
+		if (data === null || options === null) {
 			return null;
 		}
-		const halfSlot = effectiveBarSpacing(data) / 2;
-		const tolerance = hitTestTolerance(options);
-		let best: RoundedCandleHitTestResult | null = null;
-		for (let i = data.visibleRange.from; i < data.visibleRange.to; i++) {
-			const bar = data.bars[i];
-			const dx = distanceToRange(x, bar.x - halfSlot, bar.x + halfSlot);
-			if (dx > tolerance) {
-				continue;
+		const hit = nearestVerticalRange(
+			data,
+			x,
+			y,
+			effectiveBarSpacing(data) / 2,
+			seriesHitTestTolerance(options),
+			bar => {
+				const high = priceConverter(bar.originalData.high);
+				const low = priceConverter(bar.originalData.low);
+				return high === null || low === null ? null : [high, low];
 			}
-			const high = priceConverter(bar.originalData.high);
-			const low = priceConverter(bar.originalData.low);
-			if (high === null || low === null) {
-				continue;
-			}
-			const dy = distanceToRange(y, Math.min(high, low), Math.max(high, low));
-			const distance = Math.sqrt(dx * dx + dy * dy);
-			if (distance > tolerance) {
-				continue;
-			}
-			if (best === null || distance < best.distance) {
-				best = {
-					distance,
-					objectId: `candle-${bar.time}`,
-					type: 'range',
-					hitTestData: i,
-				};
-			}
+		);
+		if (hit === null) {
+			return null;
 		}
-		return best;
+		return {
+			distance: hit.distance,
+			objectId: `candle-${data.bars[hit.index].time}`,
+			type: 'range',
+			hitTestData: hit.index,
+		};
 	}
 
 	protected drawImpl(

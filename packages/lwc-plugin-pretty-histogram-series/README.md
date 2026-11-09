@@ -167,7 +167,7 @@ In addition to the standard
 | `borderColor` | `string \| null` | `null` | Border color of the bars. `null` for no border. |
 | `borderWidth` | `number` | `1` | Border width in CSS pixels. Only drawn when `borderColor` is set. |
 | `gradientColor` | `string \| null` | `null` | Color the fill fades into at the outer end of each bar. `null` for a flat fill. |
-| `highlightHovered` | `boolean` | `false` | Whether hovering the series fades every bar except the one under the cursor. Requires Lightweight Charts 5.1 or later. |
+| `highlightHovered` | `boolean` | `false` | Whether hovering the series fades every bar except the one under the cursor. Requires Lightweight Charts 5.2 or later. |
 
 ## Notes
 
@@ -180,7 +180,7 @@ In addition to the standard
 - Flat, borderless bars are drawn in batches: consecutive bars of the same
   color are filled in one canvas operation. Setting `borderColor`,
   `gradientColor` or `highlightHovered` paints bar by bar instead.
-- `hitTest` (which reports the hovered bar through the crosshair as
-  `bar-<index>`) and `conflationReducer` are used by Lightweight Charts 5.1 and
-  later. On 5.0 they are simply never called, and `highlightHovered` has no
-  effect.
+- `hitTest`, which reports the hovered bar through the crosshair as
+  `bar-<index>`, is used by Lightweight Charts 5.2 and later, and
+  `conflationReducer` from 5.1. Older versions simply never call them, and
+  `highlightHovered` has no effect before 5.2.

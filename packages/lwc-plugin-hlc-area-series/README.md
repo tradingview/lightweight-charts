@@ -158,10 +158,10 @@ gradient runs down the whole pane, like the built-in Area series' `topColor` and
 - Line widths follow the library's `LineWidth` type, so `0` is not one of them.
   Use `highLineVisible` / `lowLineVisible` / `closeLineVisible` to hide a line
   and `areaVisible` to hide both fills.
-- On hosts that support them (Lightweight Charts™ 5.1 and later) the series
-  reports the bar under the cursor through `hitTest` and highlights its three
-  values, and conflated points are merged as the highest high, the lowest low
-  and the last close.
+- On Lightweight Charts™ 5.2 and later the series reports the bar under the
+  cursor through `hitTest` and highlights its three values, and from 5.1
+  conflated points are merged as the highest high, the lowest low and the
+  last close.
 
 ### Explicit whitespace
 

@@ -10,9 +10,9 @@ import {
 	PaneRendererCustomData,
 	Time,
 } from 'lightweight-charts';
+import { ConflationContext } from '@tradingview/lwc-toolkit/custom-series/compat';
 import { stackedPlotValues } from '@tradingview/lwc-toolkit/custom-series/stacking';
 
-import { StackedAreaConflationContext } from './compat';
 import { StackedAreaSeriesOptions, defaultOptions } from './options';
 import { StackedAreaSeriesRenderer } from './renderer';
 import { StackedAreaData } from './data';
@@ -61,8 +61,8 @@ export class StackedAreaSeries<
 	 * `lightweight-charts` 5.1; older hosts simply never call it.
 	 */
 	public conflationReducer(
-		item1: StackedAreaConflationContext<TData>,
-		item2: StackedAreaConflationContext<TData>
+		item1: ConflationContext<TData>,
+		item2: ConflationContext<TData>
 	): TData {
 		return {
 			...item1.data,

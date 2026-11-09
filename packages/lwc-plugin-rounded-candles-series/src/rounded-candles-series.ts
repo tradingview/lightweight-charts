@@ -6,18 +6,17 @@ import {
 	PaneRendererCustomData,
 	Time,
 } from 'lightweight-charts';
+import { ConflationContext } from '@tradingview/lwc-toolkit/custom-series/compat';
 import { RoundedCandleData } from './data';
 import { RoundedCandleSeriesOptions, defaultOptions } from './options';
 import { RoundedCandleSeriesRenderer } from './renderer';
 
 /**
- * One of the two data points a conflation reducer is handed. Declared here
- * rather than imported so that the package still typechecks against
- * `lightweight-charts` 5.0.0, which has no conflation.
+ * One of the two data points a conflation reducer is handed: the toolkit's
+ * structural copy of the library's `CustomConflationContext`, which only
+ * exists from `lightweight-charts` 5.1.
  */
-export interface RoundedCandleConflationContext<TData> {
-	readonly data: TData;
-}
+export type RoundedCandleConflationContext<TData> = ConflationContext<TData>;
 
 export class RoundedCandleSeries<
 	HorzScaleItem = Time,
