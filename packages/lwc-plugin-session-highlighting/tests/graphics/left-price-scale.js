@@ -21,7 +21,7 @@ function generateData(count = 100, start = Date.UTC(2018, 0, 1, 0, 0, 0, 0)) {
 
 function weekends(time) {
 	const day = new Date(time * 1000).getUTCDay();
-	return day === 0 || day === 6 ? "rgba(255, 152, 1, 0.25)" : "rgba(41, 98, 255, 0.08)";
+	return day === 0 || day === 6 ? 'rgba(255, 152, 1, 0.25)' : 'rgba(41, 98, 255, 0.08)';
 }
 
 function createCandles(container, options) {
