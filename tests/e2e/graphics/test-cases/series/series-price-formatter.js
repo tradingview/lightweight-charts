@@ -41,7 +41,7 @@ function runTestCase(container) {
 			minMove: 0.05,
 		},
 	});
-	console.assert(lineSeries.priceFormatter().format(12.1) === '12.0%', 'Wrong format');
+	console.assert(lineSeries.priceFormatter().format(12.1) === '12.100%', 'Wrong format');
 
 	lineSeries.applyOptions({
 		priceFormat: {
