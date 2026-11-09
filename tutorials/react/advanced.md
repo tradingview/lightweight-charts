@@ -454,8 +454,8 @@ Series.displayName = 'Series';
 
 Consider other community examples on how to wrap Lightweight Charts™ into React components:
 
-- [lightweight-charts-react-wrapper](https://github.com/trash-and-fire/lightweight-charts-react-wrapper)
 - [lightweight-charts-react-components](https://github.com/ukorvl/lightweight-charts-react-components)
+- [lightweight-charts-react-wrapper](https://github.com/trash-and-fire/lightweight-charts-react-wrapper)
 
 ---
 
