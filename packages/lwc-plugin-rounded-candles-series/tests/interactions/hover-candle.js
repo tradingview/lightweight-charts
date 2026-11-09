@@ -1,6 +1,7 @@
-// The series reports the candle under the pointer as `candle-<index>`, inside
-// its body and within the hit test tolerance (3px by default) of its wick,
-// and nothing well clear of it.
+// The series reports the candle under the pointer as `candle-<time index>`,
+// the bar's index on the time scale, which is its position in the data here
+// only because no other series adds times: inside its body and within the hit
+// test tolerance (3px by default) of its wick, and nothing well clear of it.
 async function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container, { height: 380, crosshair: { mode: LightweightCharts.CrosshairMode.Normal } });
 	const series = chart.addCustomSeries(new LwcPlugin.RoundedCandleSeries(), { priceLineVisible: false, lastValueVisible: false });

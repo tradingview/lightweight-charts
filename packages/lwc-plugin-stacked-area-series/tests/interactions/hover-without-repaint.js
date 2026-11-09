@@ -1,8 +1,9 @@
 // Moving the pointer within the hovered band keeps reporting it and does
 // not repaint the series: the hit test hands back the same `hitTestData`
 // object, which the chart compares by reference to decide whether to repaint.
-// The draws are counted at each move, and none may follow the third: the
-// first move hovers the band, which does repaint.
+// The draws are counted at each move, and none may follow the second: the
+// first move hovers the band, which does repaint, and every later move
+// within it must hand back the same object.
 async function beforeInteractions(container) {
 	const chart = LightweightCharts.createChart(container, { height: 380, crosshair: { mode: LightweightCharts.CrosshairMode.Normal } });
 	const view = new LwcPlugin.StackedAreaSeries();
@@ -39,7 +40,7 @@ async function beforeInteractions(container) {
 		for (const y of ys) {
 			if (seen.get(y)?.id !== '0') { throw new Error(`The band was not reported as hovered at y ${y}: ${seen.get(y)?.id}`); }
 		}
-		const extra = draws - seen.get(ys[2]).draws;
+		const extra = draws - seen.get(ys[1]).draws;
 		if (extra !== 0) { throw new Error(`Moving within the hovered band repainted the series ${extra} time(s)`); }
 	};
 }
