@@ -7,8 +7,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 1.1.0 - 2026-10-08
 
-Helpers extracted from the scatter series plugin, which other plugins had been
-writing for themselves.
+Helpers extracted from the scatter series plugin and from the custom series
+plugins, which had been writing them for themselves.
 
 ### Added
 
@@ -54,6 +54,22 @@ writing for themselves.
 - `numbers` — `isFiniteNumber`, `finiteOr`, `nonNegativeOr`, `clampOpacity`:
   checks for numeric options from JavaScript callers, since the canvas ignores
   a `NaN` width or opacity without a word.
+- `custom-series/compat` — `CustomSeriesHitTestResult`, `ConflationContext`:
+  structural copies of the library's hit test result, exported from 5.2, and
+  conflation context, from 5.1. Types only, so that a plugin can implement
+  `hitTest` and `conflationReducer` and keep 5.0 as its floor.
+- `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`,
+  `nearestVerticalRange`, `createHitTestDataCache`, `VerticalSpan`,
+  `NearestBarHit`, `HitTestDataCache`: the parts of a renderer's `hitTest` for
+  bars that span a vertical range. The series' `hitTestTolerance`, 8 px when
+  the option is missing; the visible bar nearest the pointer within it, found
+  by binary search, so the cost does not grow with the bars on screen; and one
+  `hitTestData` object per hovered item, so that the chart does not repaint on
+  every pointer move.
+- `custom-series/visible-bars` — `effectiveBarSpacing`: the bar spacing times
+  the conflation factor, so that a conflated bar is as wide as the slots it
+  covers. Only for a series with a `conflationReducer`: the chart reports the
+  factor to every custom series but conflates only those.
 
 ### Changed
 

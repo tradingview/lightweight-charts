@@ -218,3 +218,18 @@ export function barCoordinate(bar: TimeIndexed, anchor: TimeIndexed & { x: numbe
 export function getConflationFactor(data: { barSpacing: number; conflationFactor?: number }): number {
 	return Math.max(1, data.conflationFactor ?? 1);
 }
+
+/**
+ * The space a rendered bar covers: `barSpacing` times the conflation factor,
+ * so that a column or candle standing for several conflated points is as wide
+ * as the slots it replaces. Hosts before 5.1 omit the factor, which counts as
+ * 1.
+ *
+ * Only correct for a series that has a `conflationReducer`. The chart reports
+ * the factor to every custom series but conflates only the ones with a
+ * reducer, so a series without one is still drawn one point per bar and has
+ * to size its items against `barSpacing` itself.
+ */
+export function effectiveBarSpacing(data: { barSpacing: number; conflationFactor?: number }): number {
+	return data.barSpacing * getConflationFactor(data);
+}

@@ -10,8 +10,10 @@ import {
 
 import {
 	barCoordinate,
+	effectiveBarSpacing,
 	extendRange,
 	forEachVisibleBar,
+	getConflationFactor,
 	mapVisibleBars,
 	visibleSegments,
 	whitespaceGapCheck,
@@ -318,5 +320,30 @@ void describe('whitespaceGapCheck', () => {
 		const after = makeBars(3, [0, 11, 13]);
 		expect(gap(after[0], after[1])).to.equal(false);
 		expect(gap(after[1], after[2])).to.equal(true);
+	});
+});
+
+void describe('getConflationFactor', () => {
+	void it('reads the factor the host reports', () => {
+		expect(getConflationFactor({ barSpacing: 0.5, conflationFactor: 4 })).to.equal(4);
+	});
+
+	void it('is 1 on hosts before 5.1, which report none', () => {
+		expect(getConflationFactor({ barSpacing: 6 })).to.equal(1);
+	});
+
+	void it('never goes below 1', () => {
+		expect(getConflationFactor({ barSpacing: 6, conflationFactor: 0 })).to.equal(1);
+	});
+});
+
+void describe('effectiveBarSpacing', () => {
+	void it('widens the bar spacing by the conflation factor', () => {
+		expect(effectiveBarSpacing({ barSpacing: 0.5, conflationFactor: 4 })).to.equal(2);
+	});
+
+	void it('is the bar spacing itself without a factor', () => {
+		expect(effectiveBarSpacing({ barSpacing: 6 })).to.equal(6);
+		expect(effectiveBarSpacing({ barSpacing: 6, conflationFactor: 1 })).to.equal(6);
 	});
 });

@@ -34,7 +34,7 @@ changes. Keep the last one, or return a primitive such as the item's index.
 
 Read: `stacked-bars-series/src/renderer.ts` (short), `hlc-area-series/src/renderer.ts`.
 
-### `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `visibleSegments`, `whitespaceGapCheck`, `barCoordinate`, `getConflationFactor`, `GapCheck`, `AcceptedInput`
+### `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `visibleSegments`, `whitespaceGapCheck`, `barCoordinate`, `getConflationFactor`, `effectiveBarSpacing`, `GapCheck`, `AcceptedInput`
 
 - `forEachVisibleBar(data, fn)` / `mapVisibleBars(data, fn)` visit only
   `data.visibleRange`; `fn` receives the bar and its *absolute* index into
@@ -54,8 +54,40 @@ Read: `stacked-bars-series/src/renderer.ts` (short), `hlc-area-series/src/render
   whose own `x` is stale (it was off screen) from a visible anchor bar.
 - `getConflationFactor(data)` is `data.conflationFactor`, or 1 on hosts
   before 5.1.
+- `effectiveBarSpacing(data)` is `barSpacing` times that factor: the width a
+  conflated column or candle covers. Use it only in a series with a
+  `conflationReducer`. The chart reports the factor to every custom series
+  but conflates only those with a reducer, so a series without one is still
+  drawn one point per bar and sizes against `barSpacing`.
 
 Read: `stacked-area-series/src/renderer.ts` for all of them together.
+
+### `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`, `nearestVerticalRange`, `createHitTestDataCache`
+
+For a renderer's `hitTest` (called from 5.2) over bars that each cover a
+vertical range: a column, a candle, a stem.
+
+- `seriesHitTestTolerance(options, fallback = 8)` reads the series'
+  `hitTestTolerance` option, in CSS pixels.
+- `nearestVerticalRange(data, x, y, halfWidth, tolerance, span)` returns
+  `{ index, distance }` for the visible bar whose box — `halfWidth` either
+  side of its `x`, between the two ends `span(bar, index)` returns — is
+  nearest the pointer and within `tolerance`, or `null`. It finds the bars
+  near `x` by binary search. Return `null` from `span` for a bar with
+  nothing to hit.
+- `distanceToRange(value, a, b)` is the distance to a range, `0` inside it:
+  build your own distance from it when the geometry is not one box per bar.
+- `createHitTestDataCache()` returns `get(key, create)`, which hands back the
+  same object while the same key is asked for. Use it for an object
+  `hitTestData`, keyed by the `objectId`: the chart compares `hitTestData` by
+  reference and repaints on every pointer move when it changes.
+
+Return the result typed as `CustomSeriesHitTestResult` from
+`custom-series/compat`, which also has `ConflationContext` for a
+`conflationReducer`'s arguments. Both are types only: the library exports its
+own from 5.2 and 5.1, and importing them would raise the plugin's floor.
+
+Read: `rounded-candles-series/src/renderer.ts`.
 
 ### `custom-series/options-aware-series` — `createOptionsAwareSeries`, `createWhitespaceSeries`, `OptionsAwareSeries`
 

@@ -46,6 +46,14 @@
 			"types": "./dist/closest-index.d.ts",
 			"default": "./dist/closest-index.js"
 		},
+		"./custom-series/compat": {
+			"types": "./dist/custom-series/compat.d.ts",
+			"default": "./dist/custom-series/compat.js"
+		},
+		"./custom-series/hit-test": {
+			"types": "./dist/custom-series/hit-test.d.ts",
+			"default": "./dist/custom-series/hit-test.js"
+		},
 		"./custom-series/line-paths": {
 			"types": "./dist/custom-series/line-paths.d.ts",
 			"default": "./dist/custom-series/line-paths.js"
