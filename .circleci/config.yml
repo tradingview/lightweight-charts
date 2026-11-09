@@ -33,6 +33,7 @@ aliases:
         - packages/lwc-plugin-dual-range-histogram-series/node_modules
         - packages/lwc-plugin-hlc-area-series/node_modules
         - packages/lwc-plugin-image-watermark/node_modules
+        - packages/lwc-plugin-lollipop-series/node_modules
         - packages/lwc-plugin-pretty-histogram-series/node_modules
         - packages/lwc-plugin-rounded-candles-series/node_modules
         - packages/lwc-plugin-scatter-series/node_modules
