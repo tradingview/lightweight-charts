@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moving the pointer within a segment no longer repaints the pane on every
   move: the hit test hands the chart the same `hitTestData` object for as long
   as the same segment stays hovered, as the chart expects.
+- The plot values no longer copy the series options for every point they
+  are built for, which happened on every `setData` and on most pointer moves;
+  one copy is kept until `applyOptions` (`@tradingview/lwc-toolkit` 1.1.0).
 
 ## 1.0.0 - 2026-09-16
 

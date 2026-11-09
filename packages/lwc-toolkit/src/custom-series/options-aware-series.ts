@@ -14,6 +14,11 @@ export type OptionsAwareSeries<H, D extends CustomData<H>, O extends CustomSerie
  * before the first setData, including on LWC 5.0. The factory receives a getter
  * bound to the resulting series, rather than waiting for a renderer update.
  *
+ * The getter keeps one copy of the series options, taken on its first call
+ * and dropped by applyOptions: the host's options() deep-copies them on every
+ * call, and a price-value builder runs once per data point, and again for the
+ * bars near the pointer whenever a renderer's hitTest finds nothing.
+ *
  * The returned API retains its identity in chart events. Its applyOptions
  * rebuilds stored plot values when one of priceOptions changes, preserving the
  * original data, whitespace, and custom fields. Other option changes do not
@@ -53,7 +58,15 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 		return low;
 	};
 	let series: OptionsAwareSeries<H, D, O> | undefined;
-	const view = createView(() => series?.options() ?? defaults, readInput);
+	let current: Readonly<O> | null = null;
+	const readOptions = (): Readonly<O> => {
+		if (series === undefined) {
+			return defaults;
+		}
+		current ??= series.options();
+		return current;
+	};
+	const view = createView(readOptions, readInput);
 	series = chart.addCustomSeries(view, options, paneIndex);
 	const api = series;
 	const key = (point: Point): number => chart.horzBehaviour().key(point.time);
@@ -138,9 +151,13 @@ export function createOptionsAwareSeries<H, D extends CustomData<H>, O extends C
 	}
 
 	api.applyOptions = (next: DeepPartial<O>): void => {
-		const before = priceOptions.map(option => api.options()[option]);
-		applyOptions(next);
-		if (priceOptions.some((option, index) => api.options()[option] !== before[index])) {
+		const before = priceOptions.map(option => readOptions()[option]);
+		try {
+			applyOptions(next);
+		} finally {
+			current = null;
+		}
+		if (priceOptions.some((option, index) => readOptions()[option] !== before[index])) {
 			refreshPending = true;
 			refresh();
 		}

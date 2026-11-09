@@ -84,6 +84,12 @@ plugins, which had been writing them for themselves.
   strokes with `butt` caps, so that a dotted run keeps its gaps. The context's
   dash and cap are put back afterwards, even when `styleAt` throws. Runs
   without one are stroked with the context's own dash and cap, as before.
+- `custom-series/options-aware-series`: the options getter handed to the
+  view keeps one copy of the series options, taken on its first call and
+  dropped by `applyOptions`. It called the series' `options()`, which
+  deep-copies them, every time: once per data point on `setData`, and for the
+  bars near the pointer on most pointer moves, where the chart falls back to
+  the plot values when a renderer's `hitTest` finds nothing.
 - `custom-series/renderer-base`: `CustomSeriesDrawArgs.hitTestData` documents
   that a renderer's `hitTest` has to return the same `hitTestData` object while
   the same item stays hovered. The chart compares it by reference and

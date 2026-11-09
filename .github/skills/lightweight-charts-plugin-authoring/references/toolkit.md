@@ -104,7 +104,10 @@ plain `ICustomSeriesPaneView` cannot:
   options, priceOptions, paneIndex?)` passes `createView` an options getter
   bound to the real series, and re-ingests the retained data whenever one of
   `priceOptions` changes through `applyOptions`. Use it whenever an option
-  changes what a value *means* — a base, percent mode, a scale mode.
+  changes what a value *means* — a base, percent mode, a scale mode. The
+  getter keeps one copy of the options until `applyOptions`, so a builder can
+  call it for every point; `series.options()` deep-copies on every call, so
+  never call that from a builder or a renderer.
 - **Know its own whitespace.** The wrapper retains a copy of the accepted
   input (the host's `data()` exposes fulfilled points only) as an
   `AcceptedInput`: a chronological array plus a `revision`, kept sorted
