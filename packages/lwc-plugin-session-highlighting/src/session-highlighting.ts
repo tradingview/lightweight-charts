@@ -27,8 +27,8 @@ export type { SessionHighlighter } from './highlights.js';
  *
  * The highlighter is asked once per bar when data is set and once for the last
  * bar when an incremental update appends or replaces it; popping bars does not
- * ask it, and a historical update that removes a bar asks it for every bar
- * again. Only the bars on screen are drawn.
+ * ask it, and a historical update that removes or inserts a bar asks it for
+ * every bar again. Only the bars on screen are drawn.
  */
 export class SessionHighlighting extends PluginBase {
 	private readonly _paneViews: readonly SessionHighlightingPaneView[];

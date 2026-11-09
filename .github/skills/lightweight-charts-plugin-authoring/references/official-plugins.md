@@ -127,9 +127,10 @@ color a user function returns for its time. Read for: deriving per-bar state
 from `series.data()` in `dataUpdated` and patching only the end of it on an
 `'update'` scope. The scope covers more than append and replace: `pop()` and
 an update that turns the last bar into whitespace shrink the data, and a
-historical update can remove a bar from the middle, so the bar count decides
-the case and a shrink is only cut back when the kept last entry still names
-the last bar (compared by the key `timestampOf` stores for each bar: numbers
+historical update can remove a bar from the middle or insert one there, so
+the bar count decides the case: a shrink is only cut back when the kept last
+entry still names the last bar, and a bar is only appended when it comes after
+the last entry (both compared by the key `timestampOf` stores for each bar: numbers
 pass through unchanged, as the time scale keys them, and business days and
 date strings become the UTC timestamp of their day, so how the time is written
 does not matter); otherwise every bar is recolored. Also read for mapping the

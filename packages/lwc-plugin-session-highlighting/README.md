@@ -107,8 +107,8 @@ for the last bar when `series.update()` appends or replaces it, so it can do
 real work per call; `series.pop()` drops the popped bars without calling it.
 Keep it a function of the time alone: a historical update, which is
 `series.update(bar, true)`, re-asks it for the last bar rather than for the
-bar it changed, and one that turns a bar into whitespace re-asks it for every
-bar. Translucent colors let the grid and the series show through; the shading
+bar it changed, and one that turns a bar into whitespace, or whitespace into a
+bar, re-asks it for every bar. Translucent colors let the grid and the series show through; the shading
 is drawn behind both by default.
 
 To remove the shading, detach it from the series:
