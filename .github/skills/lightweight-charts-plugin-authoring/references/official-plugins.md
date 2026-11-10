@@ -201,7 +201,9 @@ date strings become the UTC timestamp of their day, so how the time is written
 does not matter); otherwise every bar is recolored. Also read for mapping the
 visible logical range back to data indices by binary search over `timeToIndex`
 (so other series starting earlier do not shift the slice), `fullBarWidth` from
-the time scale's `barSpacing` so columns abut at any pixel ratio, and
+the time scale's `barSpacing` for columns as wide as the bar slots (each edge
+rounded on its own, so neighbors can leave a 1 px seam where an edge falls on
+a half pixel; `fullBarWidthAfter` rounds a shared edge once), and
 `zOrder: 'bottom'` for a background.
 
 ## Pane primitives

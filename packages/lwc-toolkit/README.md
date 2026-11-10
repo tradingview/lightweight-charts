@@ -53,7 +53,7 @@ setting ignores the `exports` field and will report the imports as unresolved.
 | `dimensions/columns` | `calculateColumnPositions`, `calculateColumnPositionsInPlace` — evenly spaced column bars with consistent gaps |
 | `dimensions/common` | `BitmapPositionLength` — the `{ position, length }` pair the other dimension helpers return |
 | `dimensions/crosshair-width` | `gridAndCrosshairMediaWidth`, `gridAndCrosshairBitmapWidth` — line widths matching the grid and crosshair |
-| `dimensions/full-width` | `fullBarWidth` — a bar spanning the whole slot, with no gap |
+| `dimensions/full-width` | `fullBarWidth`, `fullBarWidthAfter` — a bar spanning the whole slot, and one starting where its neighbor ended, so neighbors share an edge |
 | `dimensions/positions` | `positionsBox`, `positionsLine` — pixel-perfect boxes and lines from two coordinates |
 | `dom/media-query` | `subscribeMediaQuery`, `mediaQueryMatches`, `HIGH_CONTRAST_QUERIES`, `REDUCED_MOTION_QUERY` — shared, SSR-safe media query subscriptions |
 | `dom/pane-element` | `paneContentElement`, `chartTableElement` — the pane's canvas wrapper to append DOM overlays to, and the chart table |

@@ -68,6 +68,11 @@ plugins, which had been writing them for themselves.
   the bars near the pointer found by binary search, so the cost does not grow
   with the bars on screen; and one `hitTestData` object per hovered item, so
   that the chart does not repaint on every pointer move.
+- `dimensions/full-width` — `fullBarWidthAfter`: a full-width column that
+  starts where its neighbor's ended. `fullBarWidth` rounds the edge two
+  neighbors share once for each, and where the chart's inexact x coordinates
+  put it on a half pixel the two can round apart, leaving a 1 px seam or
+  overlap.
 - `custom-series/visible-bars` — `effectiveBarSpacing`: the bar spacing times
   the conflation factor, so that a conflated bar is as wide as the slots it
   covers. Only for a series with a `conflationReducer`: the chart reports the
