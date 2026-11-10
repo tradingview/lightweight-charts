@@ -17,11 +17,15 @@ const chart = createChart('chart', {
 
 // The scales spread their colors over the amounts in view.
 const scales: Record<string, HeatmapCellShader> = {
-	heat: createColorScale({ stops: ['rgba(41, 98, 255, 0.05)', 'rgba(41, 98, 255, 0.55)', '#F7A600', '#F23645'] }),
-	blue: createColorScale({ stops: ['rgba(41, 98, 255, 0.05)', 'rgba(41, 98, 255, 1)'], steps: 16 }),
+	// Through purple and red rather than straight from blue to orange, whose
+	// midpoint is a muddy gray.
+	heat: createColorScale({ stops: ['rgba(41, 98, 255, 0.12)', 'rgba(41, 98, 255, 0.8)', '#9C27B0', '#F23645', '#FF9800'] }),
+	blue: createColorScale({ stops: ['rgba(41, 98, 255, 0.1)', 'rgba(41, 98, 255, 1)'], steps: 16 }),
 };
 
-const { mid, book } = orderBookData(150);
+// 20 levels either side, a price unit apart, so the levels stay a few pixels
+// tall in the small catalog frame.
+const { mid, book } = orderBookData(150, 3, 20, 1);
 const heatmap = createHeatmapSeries(chart, { cellShader: scales.heat, cellGap: 0 });
 heatmap.setData(book);
 chart.addSeries(LineSeries, { color: '#131722', lineWidth: 2, priceLineVisible: false }).setData(mid);

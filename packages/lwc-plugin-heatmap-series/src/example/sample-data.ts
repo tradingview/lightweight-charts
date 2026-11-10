@@ -71,8 +71,9 @@ interface Wall {
 /**
  * A minute-by-minute order book, `levels` price levels either side of the mid
  * price, `tick` apart: a thin book near the price, thicker further out, and
- * large orders that rest at one level for a while and are taken out when the
- * price trades through them. The same for the same seed.
+ * large orders, several times the size of any level around them, that rest
+ * at one level for a while and are taken out when the price trades through
+ * them. The same for the same seed.
  */
 export function orderBookData(count: number, seed: number = 3, levels: number = 40, tick: number = 0.5): OrderBookSample {
 	const random = seededRandom(seed);
@@ -93,8 +94,11 @@ export function orderBookData(count: number, seed: number = 3, levels: number = 
 		if (random() < 0.12) {
 			const above = random() < 0.5;
 			const offset = Math.round(4 + random() * (levels - 8));
-			const level = Math.round(price / tick) + (above ? offset : -offset);
-			walls.push({ price: level * tick, above, from: i, to: i + 20 + Math.round(random() * 60), size: 50 + random() * 50 });
+			const wallPrice = (Math.round(price / tick) + (above ? offset : -offset)) * tick;
+			// One large order per level at a time.
+			if (!walls.some(wall => wall.price === wallPrice && i < wall.to)) {
+				walls.push({ price: wallPrice, above, from: i, to: i + 20 + Math.round(random() * 60), size: 100 + random() * 30 });
+			}
 		}
 		const center = Math.round(price / tick);
 		const cells: HeatmapCell[] = [];
