@@ -1,6 +1,7 @@
 import { CandlestickSeries, Time, createChart } from 'lightweight-charts';
 import { addRefreshButton, mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { SessionHighlighter, SessionHighlighting } from '../session-highlighting';
 import { generateCandleData } from './sample-data';
 
@@ -8,6 +9,7 @@ import { generateCandleData } from './sample-data';
 // door adds the layer, bar spacing, left price scale, second pane and
 // incremental-update controls.
 const chart = createChart('chart', { autoSize: true, timeScale: { barSpacing: 10 } });
+themeChart(chart);
 
 const dayOf = (time: Time) => new Date((time as number) * 1000).getUTCDay();
 
