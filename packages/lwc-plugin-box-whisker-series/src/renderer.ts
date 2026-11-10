@@ -1,299 +1,167 @@
+import { CustomBarItemData, PriceToCoordinateConverter, Time } from 'lightweight-charts';
+import { traceMarker } from '@tradingview/lwc-toolkit/canvas/markers';
+import { CustomSeriesHitTestResult } from '@tradingview/lwc-toolkit/custom-series/compat';
+import { nearestBar, seriesHitTestTolerance } from '@tradingview/lwc-toolkit/custom-series/hit-test';
 import {
 	BitmapCoordinatesRenderingScope,
-	CanvasRenderingTarget2D,
-} from 'fancy-canvas';
-import {
-	ICustomSeriesPaneRenderer,
-	PaneRendererCustomData,
-	PriceToCoordinateConverter,
-	Time,
-} from 'lightweight-charts';
-import { WhiskerData } from './sample-data';
-import { WhiskerBoxSeriesOptions } from './options';
-import { candlestickWidth } from '@tradingview/lwc-toolkit/dimensions/candles';
-import { gridAndCrosshairMediaWidth } from '@tradingview/lwc-toolkit/dimensions/crosshair-width';
+	CustomSeriesDrawArgs,
+	CustomSeriesRendererBase,
+} from '@tradingview/lwc-toolkit/custom-series/renderer-base';
+import { forEachVisibleBar } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { positionsBox, positionsLine } from '@tradingview/lwc-toolkit/dimensions/positions';
 
-interface DesiredWidths {
-	body: number;
-	medianLine: number;
-	extremeLines: number;
-	outlierRadius: number;
-}
+import { BoxWhiskerData } from './data';
+import { BoxWhiskerHit, boxWhiskerHit, boxWhiskerWidths, fiveNumbers } from './geometry';
+import { BoxWhiskerSeriesOptions } from './options';
 
-function desiredWidths(barSpacing: number): DesiredWidths {
-	// we want these in media coordinates so set pixelRatio to 1
-	const bodyWidth = candlestickWidth(barSpacing, 1);
-	const medianWidth = Math.floor(barSpacing);
-	const lineWidth = candlestickWidth(barSpacing / 2, 1);
-
-	return {
-		body: bodyWidth,
-		medianLine: Math.max(medianWidth, bodyWidth),
-		extremeLines: lineWidth,
-		outlierRadius: Math.min(bodyWidth, 4),
-	};
-}
-
-type QuartileTuple = [number, number, number, number, number];
-
-interface WhiskerBarItem {
-	quartilesY: QuartileTuple;
-	outliers: number[];
-	x: number;
-}
-
-export class WhiskerBoxSeriesRenderer<TData extends WhiskerData>
-	implements ICustomSeriesPaneRenderer
-{
-	_data: PaneRendererCustomData<Time, TData> | null = null;
-	_options: WhiskerBoxSeriesOptions | null = null;
-
-	draw(
-		target: CanvasRenderingTarget2D,
-		priceConverter: PriceToCoordinateConverter
-	): void {
-		target.useBitmapCoordinateSpace(scope =>
-			this._drawImpl(scope, priceConverter)
-		);
+/**
+ * The five numbers as y coordinates, or `null` while the chart cannot convert
+ * prices yet: the series has no first value.
+ */
+function coordinates(numbers: readonly number[], priceToCoordinate: PriceToCoordinateConverter): number[] | null {
+	const ys: number[] = [];
+	for (const price of numbers) {
+		const y = priceToCoordinate(price);
+		if (y === null) {
+			return null;
+		}
+		ys.push(y);
 	}
+	return ys;
+}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
-		options: WhiskerBoxSeriesOptions
-	): void {
-		this._data = data;
-		this._options = options;
-	}
-
-	_drawImpl(
-		renderingScope: BitmapCoordinatesRenderingScope,
+export class BoxWhiskerSeriesRenderer<
+	HorzScaleItem = Time,
+	TData extends BoxWhiskerData<HorzScaleItem> = BoxWhiskerData<HorzScaleItem>
+> extends CustomSeriesRendererBase<HorzScaleItem, TData, BoxWhiskerSeriesOptions> {
+	/**
+	 * Reports the part of the box plot under the cursor, within the series'
+	 * `hitTestTolerance`: `objectId` is `'box-<point>'`, `'median-<point>'`,
+	 * `'whisker-<point>'` or `'outlier-<point>-<index>'`, where `<point>` is the
+	 * point's position in `series.data()` and `<index>` the index into its
+	 * `outliers`. Called by the library from v5.2 onwards; older hosts never
+	 * call it.
+	 */
+	public hitTest(
+		x: number,
+		y: number,
 		priceToCoordinate: PriceToCoordinateConverter
-	): void {
-		if (
-			this._data === null ||
-			this._data.bars.length === 0 ||
-			this._data.visibleRange === null ||
-			this._options === null
-		) {
-			return;
+	): CustomSeriesHitTestResult | null {
+		const data = this.data;
+		const options = this.options;
+		if (data === null || options === null) {
+			return null;
 		}
-		const options = this._options;
-		const bars: WhiskerBarItem[] = this._data.bars.map(bar => {
-			return {
-				quartilesY: bar.originalData.quartiles.map(price => {
-					return (priceToCoordinate(price) ?? 0) as number;
-				}) as QuartileTuple,
-				outliers: (bar.originalData.outliers || []).map(price => {
-					return (priceToCoordinate(price) ?? 0) as number;
-				}),
-				x: bar.x,
-			};
-		});
-
-		const widths = desiredWidths(this._data.barSpacing);
-		const verticalLineWidth = gridAndCrosshairMediaWidth(
-			renderingScope.horizontalPixelRatio
-		);
-		const horizontalLineWidth = gridAndCrosshairMediaWidth(
-			renderingScope.verticalPixelRatio
-		);
-
-		for (
-			let i = this._data.visibleRange.from;
-			i < this._data.visibleRange.to;
-			i++
-		) {
-			const bar = bars[i];
-			if (widths.outlierRadius > 2) {
-				this._drawOutliers(
-					renderingScope.context,
-					bar,
-					widths.outlierRadius,
-					options,
-					renderingScope.horizontalPixelRatio,
-					renderingScope.verticalPixelRatio
-				);
+		// The chart hands a hit test media coordinates only, so the widths are
+		// taken at a pixel ratio of 1. The series has no conflation reducer, so
+		// the chart never conflates it and every bar is one bar spacing wide.
+		const widths = boxWhiskerWidths(data.barSpacing, 1, 1);
+		const tolerance = seriesHitTestTolerance(options);
+		const hitFor = (bar: CustomBarItemData<HorzScaleItem, TData>): BoxWhiskerHit | null => {
+			// The chart only hands over points that are not whitespace, so all
+			// five numbers are finite.
+			const point = bar.originalData;
+			const ys = coordinates(fiveNumbers(point), priceToCoordinate);
+			if (ys === null) {
+				return null;
 			}
-			this._drawWhisker(
-				renderingScope.context,
-				bar,
-				widths.extremeLines,
-				options,
-				renderingScope.horizontalPixelRatio,
-				renderingScope.verticalPixelRatio,
-				verticalLineWidth,
-				horizontalLineWidth
+			const outlierYs = (point.outliers ?? []).map((value: number) => (Number.isFinite(value) ? priceToCoordinate(value) : null) ?? Number.NaN);
+			return boxWhiskerHit(
+				{
+					x: bar.x,
+					ys,
+					outlierYs,
+					bodyWidth: widths.body,
+					capWidth: widths.cap,
+					medianWidth: widths.median,
+					whiskerWidth: widths.whisker,
+					lineWidth: widths.line,
+					outlierRadius: widths.outlierRadius,
+				},
+				x,
+				y
 			);
-			this._drawBox(
-				renderingScope.context,
-				bar,
-				widths.body,
-				options,
-				renderingScope.horizontalPixelRatio,
-				renderingScope.verticalPixelRatio
-			);
-			this._drawMedianLine(
-				renderingScope.context,
-				bar,
-				widths.medianLine,
-				options,
-				renderingScope.horizontalPixelRatio,
-				renderingScope.verticalPixelRatio,
-				horizontalLineWidth
-			);
-		}
-	}
-
-	_drawWhisker(
-		ctx: CanvasRenderingContext2D,
-		bar: WhiskerBarItem,
-		extremeLineWidth: number,
-		options: WhiskerBoxSeriesOptions,
-		horizontalPixelRatio: number,
-		verticalPixelRatio: number,
-		wickWidth: number,
-		horizontalWickWidth: number
-	) {
-		ctx.save();
-		ctx.fillStyle = options.whiskerColor;
-		const verticalLinePosition = positionsLine(
-			bar.x,
-			horizontalPixelRatio,
-			wickWidth
-		);
-		const topWhiskerYPositions = positionsBox(
-			bar.quartilesY[0],
-			bar.quartilesY[1],
-			verticalPixelRatio
-		);
-		ctx.fillRect(
-			verticalLinePosition.position,
-			topWhiskerYPositions.position,
-			verticalLinePosition.length,
-			topWhiskerYPositions.length
-		);
-
-		const bottomWhiskerYPositions = positionsBox(
-			bar.quartilesY[3],
-			bar.quartilesY[4],
-			verticalPixelRatio
-		);
-		ctx.fillRect(
-			verticalLinePosition.position,
-			bottomWhiskerYPositions.position,
-			verticalLinePosition.length,
-			bottomWhiskerYPositions.length
-		);
-
-		const horizontalLinePosition = positionsLine(
-			bar.x,
-			horizontalPixelRatio,
-			extremeLineWidth
-		);
-		const topWhiskerHorizontalYPosition = positionsLine(
-			bar.quartilesY[4],
-			verticalPixelRatio,
-			horizontalWickWidth
-		);
-		ctx.fillRect(
-			horizontalLinePosition.position,
-			topWhiskerHorizontalYPosition.position,
-			horizontalLinePosition.length,
-			topWhiskerHorizontalYPosition.length
-		);
-
-		const bottomWhiskerHorizontalYPosition = positionsLine(
-			bar.quartilesY[0],
-			verticalPixelRatio,
-			horizontalWickWidth
-		);
-		ctx.fillRect(
-			horizontalLinePosition.position,
-			bottomWhiskerHorizontalYPosition.position,
-			horizontalLinePosition.length,
-			bottomWhiskerHorizontalYPosition.length
-		);
-		ctx.restore();
-	}
-
-	_drawBox(
-		ctx: CanvasRenderingContext2D,
-		bar: WhiskerBarItem,
-		bodyWidth: number,
-		options: WhiskerBoxSeriesOptions,
-		horizontalPixelRatio: number,
-		verticalPixelRatio: number
-	) {
-		ctx.save();
-		const upperQuartileYPositions = positionsBox(
-			bar.quartilesY[2],
-			bar.quartilesY[3],
-			verticalPixelRatio
-		);
-		const lowerQuartileYPositions = positionsBox(
-			bar.quartilesY[1],
-			bar.quartilesY[2],
-			verticalPixelRatio
-		);
-		const xPositions = positionsLine(bar.x, horizontalPixelRatio, bodyWidth);
-		ctx.fillStyle = options.lowerQuartileFill;
-		ctx.fillRect(
-			xPositions.position,
-			lowerQuartileYPositions.position,
-			xPositions.length,
-			lowerQuartileYPositions.length
-		);
-		ctx.fillStyle = options.upperQuartileFill;
-		ctx.fillRect(
-			xPositions.position,
-			upperQuartileYPositions.position,
-			xPositions.length,
-			upperQuartileYPositions.length
-		);
-		ctx.restore();
-	}
-
-	_drawMedianLine(
-		ctx: CanvasRenderingContext2D,
-		bar: WhiskerBarItem,
-		medianLineWidth: number,
-		options: WhiskerBoxSeriesOptions,
-		horizontalPixelRatio: number,
-		verticalPixelRatio: number,
-		horizontalLineWidth: number
-	) {
-		const xPos = positionsLine(bar.x, horizontalPixelRatio, medianLineWidth);
-		const yPos = positionsLine(
-			bar.quartilesY[2],
-			verticalPixelRatio,
-			horizontalLineWidth
-		);
-		ctx.save();
-		ctx.fillStyle = options.whiskerColor;
-		ctx.fillRect(xPos.position, yPos.position, xPos.length, yPos.length);
-		ctx.restore();
-	}
-
-	_drawOutliers(
-		ctx: CanvasRenderingContext2D,
-		bar: WhiskerBarItem,
-		extremeLineWidth: number,
-		options: WhiskerBoxSeriesOptions,
-		horizontalPixelRatio: number,
-		verticalPixelRatio: number
-	) {
-		ctx.save();
-		const xPos = positionsLine(bar.x, horizontalPixelRatio, 1, true);
-		ctx.fillStyle = options.outlierColor;
-		ctx.lineWidth = 0;
-		bar.outliers.forEach(outlier => {
-			ctx.beginPath();
-			const yPos = positionsLine(outlier, verticalPixelRatio, 1, true);
-			ctx.arc(xPos.position, yPos.position, extremeLineWidth, 0, 2 * Math.PI);
-			ctx.fill();
-			ctx.closePath();
+		};
+		const reach = Math.max(widths.median, widths.outlierRadius * 2) / 2 + tolerance;
+		// The part hit on each bar measured, so the winner's is not worked out
+		// again.
+		const parts = new Map<number, BoxWhiskerHit>();
+		const hit = nearestBar(data, x, reach, tolerance, (bar, index) => {
+			const nearest = hitFor(bar);
+			if (nearest !== null) {
+				parts.set(index, nearest);
+			}
+			return nearest?.distance ?? null;
 		});
-		ctx.restore();
+		const part = hit === null ? undefined : parts.get(hit.index);
+		if (hit === null || part === undefined) {
+			return null;
+		}
+		const isOutlier = part.part.startsWith('outlier-');
+		return {
+			distance: hit.distance,
+			objectId: isOutlier ? `outlier-${hit.index}-${part.part.slice('outlier-'.length)}` : `${part.part}-${hit.index}`,
+			// The chart prefers a point hit to any other whatever the distance, so
+			// only an outlier dot is one; the box and the lines are ranges.
+			type: isOutlier ? 'point' : 'range',
+		};
+	}
+
+	protected drawImpl(
+		scope: BitmapCoordinatesRenderingScope,
+		{ data, options, priceToCoordinate }: CustomSeriesDrawArgs<HorzScaleItem, TData, BoxWhiskerSeriesOptions>
+	): void {
+		const { context: ctx, horizontalPixelRatio, verticalPixelRatio } = scope;
+		const widths = boxWhiskerWidths(data.barSpacing, horizontalPixelRatio, verticalPixelRatio);
+		forEachVisibleBar(data, bar => {
+			const point = bar.originalData;
+			const ys = coordinates(fiveNumbers(point), priceToCoordinate);
+			if (ys === null) {
+				return;
+			}
+			const [y0, y1, y2, y3, y4] = ys;
+			const whiskerX = positionsLine(bar.x, horizontalPixelRatio, widths.whisker, true);
+			const centerX = whiskerX.position + whiskerX.length / 2;
+
+			const outliers = point.outliers;
+			if (outliers !== undefined && outliers !== null && outliers.length > 0) {
+				// A point's outliers share a color, so they are filled as one path.
+				ctx.fillStyle = point.outlierColor ?? options.outlierColor;
+				ctx.beginPath();
+				for (const outlier of outliers) {
+					const outlierY = Number.isFinite(outlier) ? priceToCoordinate(outlier) : null;
+					if (outlierY !== null) {
+						traceMarker(ctx, 'circle', centerX, outlierY * verticalPixelRatio, widths.outlierRadius);
+					}
+				}
+				ctx.fill();
+			}
+
+			// The whisker runs from each end to the box; it is not drawn through
+			// the box itself.
+			ctx.fillStyle = point.whiskerColor ?? options.whiskerColor;
+			const lowerWhisker = positionsBox(y0, y1, verticalPixelRatio);
+			ctx.fillRect(whiskerX.position, lowerWhisker.position, whiskerX.length, lowerWhisker.length);
+			const upperWhisker = positionsBox(y3, y4, verticalPixelRatio);
+			ctx.fillRect(whiskerX.position, upperWhisker.position, whiskerX.length, upperWhisker.length);
+			const capX = positionsLine(bar.x, horizontalPixelRatio, widths.cap, true);
+			const lowerCap = positionsLine(y0, verticalPixelRatio, widths.line, true);
+			ctx.fillRect(capX.position, lowerCap.position, capX.length, lowerCap.length);
+			const upperCap = positionsLine(y4, verticalPixelRatio, widths.line, true);
+			ctx.fillRect(capX.position, upperCap.position, capX.length, upperCap.length);
+
+			const bodyX = positionsLine(bar.x, horizontalPixelRatio, widths.body, true);
+			const lower = positionsBox(y1, y2, verticalPixelRatio);
+			ctx.fillStyle = point.lowerBoxColor ?? options.lowerBoxColor;
+			ctx.fillRect(bodyX.position, lower.position, bodyX.length, lower.length);
+			const upper = positionsBox(y2, y3, verticalPixelRatio);
+			ctx.fillStyle = point.upperBoxColor ?? options.upperBoxColor;
+			ctx.fillRect(bodyX.position, upper.position, bodyX.length, upper.length);
+
+			const medianX = positionsLine(bar.x, horizontalPixelRatio, widths.median, true);
+			const medianY = positionsLine(y2, verticalPixelRatio, widths.line, true);
+			ctx.fillStyle = point.medianColor ?? options.medianColor;
+			ctx.fillRect(medianX.position, medianY.position, medianX.length, medianY.length);
+		});
 	}
 }

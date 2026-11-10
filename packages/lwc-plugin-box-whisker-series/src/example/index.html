@@ -3,22 +3,61 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Lightweight Charts - Box Whisker Series Plugin Example</title>
-		<link href="../../../examples-base.css" rel="stylesheet" />
+		<title>Box and whisker series Plugin Example</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				overflow: hidden;
+				background-color: rgba(248, 249, 253, 1);
+				color: rgba(19, 23, 34, 1);
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+					sans-serif;
+			}
+			#chart {
+				width: 100%;
+				height: 100%;
+			}
+			#controls {
+				position: absolute;
+				top: 12px;
+				left: 12px;
+				/* above the chart's own canvases, which sit at z-index 2 */
+				z-index: 10;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 12px;
+				align-items: center;
+				padding: 8px 12px;
+				border-radius: 6px;
+				background-color: rgba(255, 255, 255, 0.9);
+				box-shadow: 0 1px 4px rgba(19, 23, 34, 0.2);
+				font-size: 13px;
+			}
+			#controls label {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+			}
+			#hovered {
+				min-width: 9em;
+			}
+		</style>
 	</head>
 	<body>
-		<div id="chart"></div>
-		<div id="description">
-			<h1>Box Whisker Plot</h1>
-			<p>
-				A chart style often used in statistics. A box and whisker plot is a
-				visual representation of a data set that shows the distribution and
-				spread of the data. It consists of a box that represents the
-				interquartile range, with a line inside the box indicating the median,
-				and "whiskers" extending from the box to show the minimum and maximum
-				values. Outliers are shown as dots above and below the whiskers.
-			</p>
+		<div id="controls">
+			<label>
+				Colors
+				<select id="colors">
+					<option value="default">default</option>
+					<option value="mono">monochrome</option>
+				</select>
+			</label>
+			<span id="hovered"></span>
 		</div>
+		<div id="chart"></div>
 		<script type="module" src="./example.ts"></script>
 	</body>
 </html>
