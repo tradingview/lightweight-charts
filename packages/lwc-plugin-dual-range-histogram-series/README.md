@@ -210,7 +210,7 @@ In addition to the standard
 | `gap` | `number` | `0` | Gap between the upward and the downward half, in CSS pixels. |
 | `widthPercent` | `number` | `100` | Column width as a percentage of the bar spacing, `0`–`100`. |
 | `baseValue` | `number` | `0` | Price the columns are centered on. |
-| `highlightHovered` | `boolean` | `false` | Whether hovering the series fades every point except the one under the cursor. Requires Lightweight Charts 5.1 or later. |
+| `highlightHovered` | `boolean` | `false` | Whether hovering the series fades every point except the one under the cursor. Requires Lightweight Charts 5.2 or later. |
 
 ## Notes
 
@@ -226,7 +226,7 @@ In addition to the standard
   and the alignment is not carried across a gap of whitespace.
 - Values which are not finite are skipped, and nothing is drawn when there is
   no value to scale the columns against (an all-zero data set, say).
-- `hitTest` (which reports the hovered point through the crosshair as
-  `bar-<index>`) and `conflationReducer` are used by Lightweight Charts 5.1 and
-  later. On 5.0 they are simply never called, and `highlightHovered` has no
-  effect.
+- `hitTest`, which reports the hovered point through the crosshair as
+  `bar-<index>`, is used by Lightweight Charts 5.2 and later, and
+  `conflationReducer` from 5.1. Older versions simply never call them, and
+  `highlightHovered` has no effect before 5.2.

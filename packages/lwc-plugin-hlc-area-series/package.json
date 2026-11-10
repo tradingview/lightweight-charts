@@ -1,6 +1,6 @@
 {
 	"name": "@tradingview/lwc-plugin-hlc-area-series",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "High-low-close series: fills the band between highs and lows and draws the close as a line on top.",
 	"author": "TradingView",
 	"license": "Apache-2.0",

@@ -1,3 +1,4 @@
+import { ConflationContext } from '@tradingview/lwc-toolkit/custom-series/compat';
 import { createOptionsAwareSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
 import {
 	DeepPartial,
@@ -12,7 +13,6 @@ import {
 import { defaultOptions, PrettyHistogramSeriesOptions } from './options';
 import { PrettyHistogramSeriesRenderer } from './renderer';
 import { PrettyHistogramData } from './data';
-import { ConflationContext } from './compat';
 
 export class PrettyHistogramSeries<
 	HorzScaleItem = Time,

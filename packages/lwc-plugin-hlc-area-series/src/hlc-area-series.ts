@@ -1,3 +1,4 @@
+import { ConflationContext } from '@tradingview/lwc-toolkit/custom-series/compat';
 import { createWhitespaceSeries, OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
 import { GapCheck } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import {
@@ -15,13 +16,11 @@ import { HLCAreaSeriesRenderer } from './renderer';
 import { HLCAreaData } from './data';
 
 /**
- * One of the two data points a conflation reducer is handed. Declared here
- * rather than imported so that the package still typechecks against
- * `lightweight-charts` 5.0.0, which has no conflation.
+ * One of the two data points a conflation reducer is handed: the toolkit's
+ * structural copy of the library's `CustomConflationContext`, which only
+ * exists from `lightweight-charts` 5.1.
  */
-export interface HLCAreaConflationContext<TData> {
-	readonly data: TData;
-}
+export type HLCAreaConflationContext<TData> = ConflationContext<TData>;
 
 export class HLCAreaSeries<
 	HorzScaleItem = Time,

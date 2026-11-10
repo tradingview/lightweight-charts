@@ -1,6 +1,6 @@
 {
 	"name": "@tradingview/lwc-plugin-dual-range-histogram-series",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Histogram with two nested value ranges above and below a baseline. A compact overlay for buy and sell volumes or net flows.",
 	"author": "TradingView",
 	"license": "Apache-2.0",

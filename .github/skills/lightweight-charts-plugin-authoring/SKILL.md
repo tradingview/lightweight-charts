@@ -162,6 +162,9 @@ with the shape of each API and the official plugin that uses it.
 | write a custom series renderer without re-doing the data / range guards | `custom-series/renderer-base` — extend `CustomSeriesRendererBase`, implement `drawImpl(scope, args)` |
 | a series or pane primitive with the chart reference and `requestUpdate()` handled | `plugin-base` (`PluginBase`) / `pane-plugin-base` (`PanePluginBase`) |
 | draw only what is on screen, and reach the pane edge with a line | `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `barCoordinate` |
+| size a conflated bar to the slots it covers (only with a `conflationReducer`) | `effectiveBarSpacing` (`custom-series/visible-bars`) |
+| implement `hitTest` or `conflationReducer` and still support 5.0 | `custom-series/compat` (types only) — `CustomSeriesHitTestResult`, `ConflationContext` |
+| report the bar under the pointer from `hitTest` | `custom-series/hit-test` — `seriesHitTestTolerance`, `nearestVerticalRange` (boxes), `nearestBar` (any shape), `createHitTestDataCache` |
 | break a line at explicit whitespace, not at other series' timestamps | `createWhitespaceSeries` (`custom-series/options-aware-series`) + `visibleSegments` |
 | read options inside `priceValueBuilder` (autoscale that follows options) | `createOptionsAwareSeries` with the option names that affect plot values |
 | stacked values: band edges and autoscale extremes | `custom-series/stacking` — `stackLevels`, `stackedPlotValues` |
@@ -193,6 +196,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 | a line/area that must break at gaps, or survive conflation | `hlc-area-series`, `brushable-area-series` |
 | a series with its own pointer interaction | `brushable-area-series` (`BrushableAreaInteraction`) |
 | a replacement for a built-in series | `rounded-candles-series` (matches candlestick options and widths) |
+| a chart whose X axis is a number, not time (scatter, bubble) | `scatter-series` (`ScatterHorzScaleBehavior`, `createScatterChart`) |
 | a fixed-pixel-height overlay series | `dual-range-histogram-series` (`scaleMode`, `keepPixelSeriesInView`) |
 | a series primitive with an axis label and dragging | `vertical-line` |
 | an image or decoration behind a series or pane | `image-watermark` (both a series and a pane primitive) |

@@ -196,10 +196,10 @@ Per-point overrides, on the data item:
   `autoscaleInfoProvider` of its own for `percent` or a non-zero `base`.
 - The factory retains explicit whitespace, and `gapHandling` decides whether
   to break or bridge it. Timestamps from other series do not create gaps.
-- On `lightweight-charts` 5.1 and later the series reports the hovered band
+- On `lightweight-charts` 5.2 and later the series reports the hovered band
   through `hitTest` (the `objectId` is the index of the band) and dims the
-  other bands while one is hovered, and conflated points are merged by summing
-  each band. On 5.0.0 those hooks are simply never called.
+  other bands while one is hovered, and from 5.1 conflated points are merged
+  by summing each band. Older versions simply never call those hooks.
 
 ### Explicit whitespace
 

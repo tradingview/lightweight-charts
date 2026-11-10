@@ -154,8 +154,8 @@ overrides the built-in candlestick series supports.
   reverted that way.
 - Wicks are drawn above and below the body rather than as one bar behind it, so
   a translucent body does not show its own wick through itself.
-- On hosts that support them (Lightweight Charts™ 5.1 and later) the series
-  reports the candle under the cursor through `hitTest`, and conflated candles
-  are merged open-first, close-last with the extremes of both.
+- On Lightweight Charts™ 5.2 and later the series reports the candle under the
+  cursor through `hitTest`, and from 5.1 conflated candles are merged
+  open-first, close-last with the extremes of both.
 - Rounded corners use `CanvasRenderingContext2D.roundRect`, which every browser
   the library supports provides.

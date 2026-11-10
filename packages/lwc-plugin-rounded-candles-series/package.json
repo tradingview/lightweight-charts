@@ -1,6 +1,6 @@
 {
 	"name": "@tradingview/lwc-plugin-rounded-candles-series",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Candlestick series with rounded corners for a softer visual style. A drop-in replacement for the built-in candlestick series.",
 	"author": "TradingView",
 	"license": "Apache-2.0",

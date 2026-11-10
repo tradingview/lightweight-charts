@@ -5,10 +5,10 @@ All notable changes to this package are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.1.0 - 2026-10-08
+## 1.1.0 - Unreleased
 
-Helpers extracted from the scatter series plugin, which other plugins had been
-writing for themselves.
+Helpers extracted from the scatter series plugin and from the custom series
+plugins, which had been writing them for themselves.
 
 ### Added
 
@@ -54,6 +54,24 @@ writing for themselves.
 - `numbers` — `isFiniteNumber`, `finiteOr`, `nonNegativeOr`, `clampOpacity`:
   checks for numeric options from JavaScript callers, since the canvas ignores
   a `NaN` width or opacity without a word.
+- `custom-series/compat` — `CustomSeriesHitTestResult`, `ConflationContext`:
+  structural copies of the library's hit test result, exported from 5.2, and
+  conflation context, from 5.1. Types only, so that a plugin can implement
+  `hitTest` and `conflationReducer` and keep 5.0 as its floor.
+- `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`,
+  `nearestBar`, `nearestVerticalRange`, `createHitTestDataCache`,
+  `VerticalSpan`, `NearestBarHit`, `HitTestDataCache`: the parts of a
+  renderer's `hitTest`. The series' `hitTestTolerance`, or the library's
+  default of 3 px for an invalid value; the visible bar nearest the pointer
+  within it, measured by a distance the renderer gives (`nearestBar`) or to
+  the box of a bar that spans a vertical range (`nearestVerticalRange`), over
+  the bars near the pointer found by binary search, so the cost does not grow
+  with the bars on screen; and one `hitTestData` object per hovered item, so
+  that the chart does not repaint on every pointer move.
+- `custom-series/visible-bars` — `effectiveBarSpacing`: the bar spacing times
+  the conflation factor, so that a conflated bar is as wide as the slots it
+  covers. Only for a series with a `conflationReducer`: the chart reports the
+  factor to every custom series but conflates only those.
 
 ### Changed
 
@@ -66,6 +84,12 @@ writing for themselves.
   strokes with `butt` caps, so that a dotted run keeps its gaps. The context's
   dash and cap are put back afterwards, even when `styleAt` throws. Runs
   without one are stroked with the context's own dash and cap, as before.
+- `custom-series/options-aware-series`: the options getter handed to the
+  view keeps one copy of the series options, taken on its first call and
+  dropped by `applyOptions`. It called the series' `options()`, which
+  deep-copies them, every time: once per data point on `setData`, and for the
+  bars near the pointer on most pointer moves, where the chart falls back to
+  the plot values when a renderer's `hitTest` finds nothing.
 - `custom-series/renderer-base`: `CustomSeriesDrawArgs.hitTestData` documents
   that a renderer's `hitTest` has to return the same `hitTestData` object while
   the same item stays hovered. The chart compares it by reference and

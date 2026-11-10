@@ -86,6 +86,18 @@ the body, body and wick aligned on one pixel grid at every DPR,
 `upDownMode`, per-point overrides, `conflationFactor` widening candles under
 conflation, and a `radius` that may be a number or a function of bar spacing.
 
+### `scatter-series` — a numeric X axis instead of time
+
+Scatter and bubble charts. `createScatterChart` builds the chart on a custom
+horizontal scale behavior (`ScatterHorzScaleBehavior`) so that the X axis is a
+plain number, and `createScatterSeries` draws the whole data set as one custom
+series, in named groups with their own colors, marker shapes and connecting
+lines, with bubble sizes driven by a data value. Read for a custom horizontal
+scale, markers drawn and hit tested through `canvas/markers`, and a host API
+for the tooltip and legend the plugin leaves to the page: `hoveredInfo.objectId`,
+`pointById`, `subscribeHoveredPointChange`. The one official plugin that needs
+`lightweight-charts` 5.2 (`^5.2.0`).
+
 ## Series primitives
 
 ### `vertical-line` — the model series primitive

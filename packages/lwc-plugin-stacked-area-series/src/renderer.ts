@@ -11,12 +11,14 @@ import {
 	CustomSeriesRendererBase,
 } from '@tradingview/lwc-toolkit/custom-series/renderer-base';
 import { Position, areaBetween } from '@tradingview/lwc-toolkit/custom-series/line-paths';
+import { CustomSeriesHitTestResult } from '@tradingview/lwc-toolkit/custom-series/compat';
+import { createHitTestDataCache } from '@tradingview/lwc-toolkit/custom-series/hit-test';
 import { GapCheck, barCoordinate, extendRange, getConflationFactor, visibleSegments } from '@tradingview/lwc-toolkit/custom-series/visible-bars';
 import { LineStyle, setLineStyle } from '@tradingview/lwc-toolkit/line-style';
 import { stackLevels } from '@tradingview/lwc-toolkit/custom-series/stacking';
 
 import { StackedAreaColor, StackedAreaSeriesOptions, defaultOptions } from './options';
-import { StackedAreaHitTestResult, isHitTestData } from './compat';
+import { StackedAreaHitTestData, isHitTestData } from './hit-test-data';
 import { paddedValues, percentValues, styleRuns } from './stack';
 import { StackedAreaData } from './data';
 import { buildPath } from './paths';
@@ -80,20 +82,22 @@ export class StackedAreaSeriesRenderer<
 	TData extends StackedAreaData<HorzScaleItem> = StackedAreaData<HorzScaleItem>
 > extends CustomSeriesRendererBase<HorzScaleItem, TData, StackedAreaSeriesOptions>
 {
+	private readonly _hitTestData = createHitTestDataCache<StackedAreaHitTestData>();
+
 	public constructor(private readonly _isGap?: GapCheck<HorzScaleItem, TData>) {
 		super();
 	}
 
 	/**
-	 * Reports the band under the cursor. Optional on
-	 * `ICustomSeriesPaneRenderer` from `lightweight-charts` 5.1; on 5.0.0 it is
-	 * simply an extra method the chart never calls.
+	 * Reports the band under the cursor. Called by
+	 * `lightweight-charts` 5.2 and later; on older versions it is simply an
+	 * extra method the chart never calls.
 	 */
 	public hitTest(
 		x: number,
 		y: number,
 		priceToCoordinate: PriceToCoordinateConverter
-	): StackedAreaHitTestResult | null {
+	): CustomSeriesHitTestResult | null {
 		const data = this.data;
 		const options = this.options;
 		if (data === null || options === null || data.visibleRange === null) {
@@ -139,7 +143,7 @@ export class StackedAreaSeriesRenderer<
 					distance: 0,
 					objectId: String(band),
 					type: 'range',
-					hitTestData: { bandIndex: band },
+					hitTestData: this._hitTestData.get(band, () => ({ bandIndex: band })),
 				};
 			}
 		}

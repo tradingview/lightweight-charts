@@ -1,6 +1,6 @@
 {
 	"name": "@tradingview/lwc-plugin-brushable-area-series",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Area series that can style ranges of data differently. Pair it with your own pointer handling to build a brush selection.",
 	"author": "TradingView",
 	"license": "Apache-2.0",

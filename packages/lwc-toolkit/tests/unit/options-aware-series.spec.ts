@@ -14,10 +14,12 @@ const point = (day: number, value: number = day): Point => ({ time: `2024-01-0${
 function fixture() {
 	const defaults = { ...customSeriesDefaultOptions, base: 0 };
 	let builds = 0;
+	let optionCopies = 0;
 	let plot: number[] = [];
 	let suppliedData: Datum[] = [];
 	let registered: OptionsAwareSeries<Time, Point, Options> | undefined;
 	let readInput: () => AcceptedInput<Time, Point> = () => ({ points: [], revision: 0 });
+	let readOptions: () => Readonly<Options> = () => defaults;
 	const listeners = new Set<DataChangedHandler>();
 	const notify = (scope: 'full' | 'update'): void => { for (const listener of listeners) { listener(scope); } };
 	const chart = {
@@ -26,7 +28,11 @@ function fixture() {
 			const options = { ...defaults, ...supplied } as Options;
 			let data: Datum[] = [];
 			const api = {
-				options: () => options,
+				// The host hands out a copy on every call.
+				options: () => {
+					optionCopies++;
+					return { ...options };
+				},
 				applyOptions: (next: DeepPartial<Options>) => Object.assign(options, next),
 				subscribeDataChanged: (handler: DataChangedHandler) => listeners.add(handler),
 				unsubscribeDataChanged: (handler: DataChangedHandler) => listeners.delete(handler),
@@ -61,16 +67,47 @@ function fixture() {
 			return api;
 		},
 	} as unknown as IChartApiBase<Time>;
-	const series = createOptionsAwareSeries<Time, Point, Options>(chart, (readOptions, readAccepted) => {
+	const series = createOptionsAwareSeries<Time, Point, Options>(chart, (read, readAccepted) => {
 		readInput = readAccepted;
+		readOptions = read;
 		return {
-			priceValueBuilder: (item: Point) => [readOptions().base, item.value],
+			priceValueBuilder: (item: Point) => [read().base, item.value],
 		} as ICustomSeriesPaneView<Time, Point, Options>;
 	}, defaults, { base: 100 }, ['base']);
-	return { series, registered, readInput: () => readInput(), get builds() { return builds; }, get plot() { return plot; }, get input() { return suppliedData; } };
+	return {
+		series,
+		registered,
+		readInput: () => readInput(),
+		readOptions: () => readOptions(),
+		get builds() { return builds; },
+		get optionCopies() { return optionCopies; },
+		get plot() { return plot; },
+		get input() { return suppliedData; },
+	};
 }
 
 void describe('createOptionsAwareSeries', () => {
+	void it('copies the series options once, however often the view reads them', () => {
+		const f = fixture();
+		const copies = f.optionCopies;
+		for (let i = 0; i < 5; i++) {
+			expect(f.readOptions().base).to.equal(100);
+		}
+		expect(f.optionCopies - copies).to.equal(1);
+	});
+
+	void it('reads the options again after applyOptions, price option or not', () => {
+		const f = fixture();
+		f.readOptions();
+		f.series.applyOptions({ color: '#F23645' });
+		expect(f.readOptions().color).to.equal('#F23645');
+		f.series.applyOptions({ base: 7 });
+		const copies = f.optionCopies;
+		expect(f.readOptions().base).to.equal(7);
+		f.readOptions();
+		expect(f.optionCopies).to.equal(copies);
+	});
+
 	void it('binds initial options and retains the registered series identity', () => {
 		const f = fixture();
 		expect(f.series).to.equal(f.registered);

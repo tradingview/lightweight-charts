@@ -34,7 +34,7 @@ changes. Keep the last one, or return a primitive such as the item's index.
 
 Read: `stacked-bars-series/src/renderer.ts` (short), `hlc-area-series/src/renderer.ts`.
 
-### `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `visibleSegments`, `whitespaceGapCheck`, `barCoordinate`, `getConflationFactor`, `GapCheck`, `AcceptedInput`
+### `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `visibleSegments`, `whitespaceGapCheck`, `barCoordinate`, `getConflationFactor`, `effectiveBarSpacing`, `GapCheck`, `AcceptedInput`
 
 - `forEachVisibleBar(data, fn)` / `mapVisibleBars(data, fn)` visit only
   `data.visibleRange`; `fn` receives the bar and its *absolute* index into
@@ -54,8 +54,44 @@ Read: `stacked-bars-series/src/renderer.ts` (short), `hlc-area-series/src/render
   whose own `x` is stale (it was off screen) from a visible anchor bar.
 - `getConflationFactor(data)` is `data.conflationFactor`, or 1 on hosts
   before 5.1.
+- `effectiveBarSpacing(data)` is `barSpacing` times that factor: the width a
+  conflated column or candle covers. Use it only in a series with a
+  `conflationReducer`. The chart reports the factor to every custom series
+  but conflates only those with a reducer, so a series without one is still
+  drawn one point per bar and sizes against `barSpacing`.
 
 Read: `stacked-area-series/src/renderer.ts` for all of them together.
+
+### `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`, `nearestBar`, `nearestVerticalRange`, `createHitTestDataCache`
+
+For a renderer's `hitTest` (called from 5.2).
+
+- `seriesHitTestTolerance(options)` reads the series' `hitTestTolerance`
+  option, in CSS pixels, with the library's default of 3 for an invalid value.
+- `nearestVerticalRange(data, x, y, halfWidth, tolerance, span)` returns
+  `{ index, distance }` for the visible bar whose box — `halfWidth` either
+  side of its `x`, between the two ends `span(bar, index)` returns — is
+  nearest the pointer and within `tolerance`, or `null`. It finds the bars
+  near `x` by binary search. Return `null` from `span` for a bar with
+  nothing to hit.
+- `nearestBar(data, x, reach, tolerance, distance)` is the same search with
+  your own `distance(bar, index)`, for geometry that is not one box per bar:
+  a dot, a ring, a shape. Only the bars whose `x` is within `reach` of the
+  pointer are measured, so make `reach` the widest the geometry gets from a
+  bar's `x`, plus `tolerance`. Measure to the shape itself; picking the bar by
+  a box around it reports the wrong bar where neighboring shapes touch.
+- `distanceToRange(value, a, b)` is the distance to a range, `0` inside it.
+- `createHitTestDataCache()` returns `get(key, create)`, which hands back the
+  same object while the same key is asked for. Use it for an object
+  `hitTestData`, keyed by the `objectId`: the chart compares `hitTestData` by
+  reference and repaints on every pointer move when it changes.
+
+Return the result typed as `CustomSeriesHitTestResult` from
+`custom-series/compat`, which also has `ConflationContext` for a
+`conflationReducer`'s arguments. Both are types only: the library exports its
+own from 5.2 and 5.1, and importing them would raise the plugin's floor.
+
+Read: `rounded-candles-series/src/renderer.ts`.
 
 ### `custom-series/options-aware-series` — `createOptionsAwareSeries`, `createWhitespaceSeries`, `OptionsAwareSeries`
 
@@ -68,7 +104,10 @@ plain `ICustomSeriesPaneView` cannot:
   options, priceOptions, paneIndex?)` passes `createView` an options getter
   bound to the real series, and re-ingests the retained data whenever one of
   `priceOptions` changes through `applyOptions`. Use it whenever an option
-  changes what a value *means* — a base, percent mode, a scale mode.
+  changes what a value *means* — a base, percent mode, a scale mode. The
+  getter keeps one copy of the options until `applyOptions`, so a builder can
+  call it for every point; `series.options()` deep-copies on every call, so
+  never call that from a builder or a renderer.
 - **Know its own whitespace.** The wrapper retains a copy of the accepted
   input (the host's `data()` exposes fulfilled points only) as an
   `AcceptedInput`: a chronological array plus a `revision`, kept sorted

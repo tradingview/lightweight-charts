@@ -1,6 +1,6 @@
 {
 	"name": "@tradingview/lwc-plugin-pretty-histogram-series",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Histogram with rounded, evenly spaced columns for a more polished look than the built-in histogram.",
 	"author": "TradingView",
 	"license": "Apache-2.0",
