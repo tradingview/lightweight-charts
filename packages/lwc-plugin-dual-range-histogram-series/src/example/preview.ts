@@ -1,6 +1,7 @@
 import { BaselineSeries, createChart } from 'lightweight-charts';
 import { addRefreshButton, mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import {
 	DualRangeHistogramNormalize,
 	DualRangeHistogramScaleMode,
@@ -25,11 +26,25 @@ const chart = createChart('chart', {
 });
 
 const histogram = createDualRangeHistogramSeries(chart, {
-	color: 'black', // for the price line
 	priceLineVisible: false,
 	lastValueVisible: false,
 	highlightHovered: true,
 });
+// The library default pairs a pale outer column with a saturated inner one, so
+// on white the outer one recedes. On black the pale one would be the brightest
+// thing on the chart, so the dark theme takes a mid shade of the same hue
+// (TradingView's minty green and ripe red 600) and keeps the inner one, which
+// stays the brightest column as it is on white.
+// The series colour is only the price line's, which has to read on either
+// background.
+const columnColors = {
+	light: { upOuter: '#ACE5DC', upInner: '#42BDA8', downOuter: '#FCCACD', downInner: '#F77C80' },
+	dark: { upOuter: '#06806B', upInner: '#42BDA8', downOuter: '#CC2F3C', downInner: '#F77C80' },
+};
+themeChart(chart, theme => histogram.applyOptions({
+	color: theme === 'dark' ? 'white' : 'black',
+	colors: columnColors[theme],
+}));
 
 const baseline = chart.addSeries(BaselineSeries, {
 	baseValue: { type: 'price', price: 0 },

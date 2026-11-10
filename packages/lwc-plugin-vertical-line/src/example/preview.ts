@@ -1,6 +1,7 @@
 import { ISeriesApi, LineSeries, LineStyle, Time, createChart } from 'lightweight-charts';
 import { addRefreshButton, mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { VerticalLine } from '../vertical-line';
 import { VerticalLineSnap } from '../options';
 import { generateLineData } from './sample-data';
@@ -9,6 +10,7 @@ import { generateLineData } from './sample-data';
 // `snap: 'nearest'`. The dev demo next door keeps the between-bars line and the
 // one past the end of the data, which are there to show what is not drawn.
 const chart = createChart('chart', { autoSize: true });
+themeChart(chart);
 
 const series = chart.addSeries(LineSeries);
 let data = generateLineData(200);

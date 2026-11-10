@@ -1,7 +1,9 @@
 import { LineSeries, createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { type PreviewTheme, previewTheme, themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import imgUrl from './image.svg';
+import darkImgUrl from './image-dark.svg';
 import {
 	ImageWatermark,
 	WatermarkObjectFit,
@@ -13,7 +15,11 @@ import { generateLineData } from './sample-data';
 // door adds the left price scale and the second pane with ImageWatermarkPane.
 const chart = createChart('chart', { autoSize: true });
 
-const watermark = new ImageWatermark(imgUrl, {
+// The sample image is an opaque light card, which turns into a grey slab on
+// the dark background, so the dark theme gets its own card.
+const imageFor = (theme: PreviewTheme): string => (theme === 'dark' ? darkImgUrl : imgUrl);
+
+const watermark = new ImageWatermark(imageFor(previewTheme()), {
 	maxHeight: 400,
 	maxWidth: 400,
 	padding: 20,
@@ -23,6 +29,16 @@ const watermark = new ImageWatermark(imgUrl, {
 const series = chart.addSeries(LineSeries);
 series.setData(generateLineData());
 series.attachPrimitive(watermark);
+// Created with the current theme's image above, so this only swaps it on a
+// later switch; the same URL again is a no-op.
+themeChart(chart, theme => watermark.setImage(imageFor(theme)));
+
+// A new URL clears the drawn image until it has loaded, so the other theme's
+// image is fetched and decoded up front: the first switch then finds it in
+// the browser's cache instead of leaving the chart without a watermark.
+const otherImage = new Image();
+otherImage.src = imageFor(previewTheme() === 'dark' ? 'light' : 'dark');
+void otherImage.decode().catch(() => {});
 let attached = true;
 
 mountControls([

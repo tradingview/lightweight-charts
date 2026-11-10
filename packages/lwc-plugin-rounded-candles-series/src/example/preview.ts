@@ -1,6 +1,7 @@
 import { createChart } from 'lightweight-charts';
 import { addRefreshButton, mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { type PreviewTheme, previewTheme, themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { RoundedCandleRadius } from '../radius';
 import { RoundedCandleSeries } from '../rounded-candles-series';
 import { generateAlternativeCandleData } from './sample-data';
@@ -11,6 +12,25 @@ import { generateAlternativeCandleData } from './sample-data';
 const chart = createChart('chart', { autoSize: true });
 
 const series = chart.addCustomSeries(new RoundedCandleSeries(), {});
+
+type Borders = 'matching' | 'contrast' | 'none';
+let borders: Borders = 'matching';
+
+/**
+ * Contrasting borders step away from the body towards the background's
+ * opposite: darker on light, lighter on dark.
+ */
+function applyBorders(theme: PreviewTheme): void {
+	const contrast = theme === 'dark'
+		? { up: '#B2DFDB', down: '#FFCDD2' }
+		: { up: '#00695C', down: '#B71C1C' };
+	series.applyOptions({
+		borderVisible: borders !== 'none',
+		borderUpColor: borders === 'contrast' ? contrast.up : '#26a69a',
+		borderDownColor: borders === 'contrast' ? contrast.down : '#ef5350',
+	});
+}
+themeChart(chart, applyBorders);
 
 function fill(): void {
 	series.setData(generateAlternativeCandleData(60));
@@ -43,11 +63,10 @@ mountControls([
 			{ value: 'contrast', label: 'Contrasting' },
 			{ value: 'none', label: 'None' },
 		],
-		onChange: value => series.applyOptions({
-			borderVisible: value !== 'none',
-			borderUpColor: value === 'contrast' ? '#00695C' : '#26a69a',
-			borderDownColor: value === 'contrast' ? '#B71C1C' : '#ef5350',
-		}),
+		onChange: value => {
+			borders = value as Borders;
+			applyBorders(previewTheme());
+		},
 	},
 ]);
 

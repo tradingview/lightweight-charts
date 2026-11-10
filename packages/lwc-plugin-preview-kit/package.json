@@ -11,6 +11,10 @@
 		"./preview-controls": {
 			"types": "./dist/preview-controls.d.ts",
 			"default": "./dist/preview-controls.js"
+		},
+		"./preview-theme": {
+			"types": "./dist/preview-theme.d.ts",
+			"default": "./dist/preview-theme.js"
 		}
 	},
 	"scripts": {

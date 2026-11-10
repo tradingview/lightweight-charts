@@ -1,6 +1,7 @@
 import { LineStyle, createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { createHLCAreaSeries } from '../hlc-area-series';
 import { HLCAreaLineType } from '../options';
 import { generateAlternativeCandleData } from './sample-data';
@@ -8,6 +9,7 @@ import { generateAlternativeCandleData } from './sample-data';
 // The catalogue preview: the whole band in view, no whitespace run. The dev
 // demo next door keeps the gap and the zoomed-in range.
 const chart = createChart('chart', { autoSize: true });
+themeChart(chart);
 
 const series = createHLCAreaSeries(chart, {});
 series.setData(generateAlternativeCandleData(250));

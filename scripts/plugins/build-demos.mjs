@@ -28,6 +28,16 @@ import { catalogSlugOf as slugOf, loadTargetPlugins } from './utils.mjs';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const staticDir = path.join(repoRoot, 'website', 'static');
 
+/**
+ * Inlined into every preview page's `<head>`: sets the page's theme before its
+ * first paint, which the page's own module script cannot promise. See the file
+ * itself. Its header comment is dropped, so the inlined script stays small.
+ */
+const themeBootSource = fs.readFileSync(
+	path.join(repoRoot, 'packages', 'lwc-plugin-preview-kit', 'src', 'theme-boot.js'),
+	'utf8'
+).replace(/^\s*\/\*[\s\S]*?\*\/\s*/, '');
+
 /** Where each declared page is deployed, by `lwcPlugin` field. */
 const outputs = {
 	demo: 'plugin-demos',
@@ -69,9 +79,10 @@ function buildDependencies() {
 /**
  * Builds one page of one package into `outDir`. The page's own folder is the
  * Vite root, and the emitted HTML is renamed to `index.html` so that the
- * deployed folder is addressable without a file name.
+ * deployed folder is addressable without a file name. With `themeBoot`, the
+ * preview kit's theme-boot script is inlined into `<head>`.
  */
-async function buildPage(vite, packageDir, page, outDir) {
+async function buildPage(vite, packageDir, page, outDir, { themeBoot = false } = {}) {
 	const entry = path.resolve(packageDir, page);
 	if (!fs.existsSync(entry)) {
 		throw new Error(`Declared page '${page}' does not exist in ${packageDir}`);
@@ -82,6 +93,27 @@ async function buildPage(vite, packageDir, page, outDir) {
 		base: './',
 		publicDir: false,
 		logLevel: 'warn',
+		plugins: themeBoot
+			? [{
+				name: 'lwc-preview-theme-boot',
+				// Straight after `<meta charset>`, which has to stay within the
+				// first 1024 bytes, and ahead of everything else. `pre` runs
+				// before Vite adds the bundle and its stylesheet, which it
+				// appends to the end of `<head>`, so the script precedes both.
+				transformIndexHtml: {
+					order: 'pre',
+					handler: html => {
+						const script = `<script>${themeBootSource}</script>`;
+						const charset = /<meta\s+charset[^>]*>/i.exec(html);
+						if (charset === null) {
+							throw new Error('A preview page needs <meta charset> in its <head>.');
+						}
+						const end = charset.index + charset[0].length;
+						return `${html.slice(0, end)}\n\t\t${script}${html.slice(end)}`;
+					},
+				},
+			}]
+			: [],
 		build: {
 			outDir,
 			// Outside the Vite root, so emptying it has to be asked for.
@@ -135,7 +167,7 @@ Options:
 				continue;
 			}
 			const outDir = path.join(staticDir, folder, slug);
-			await buildPage(vite, plugin.dir, page, outDir);
+			await buildPage(vite, plugin.dir, page, outDir, { themeBoot: field === 'preview' });
 			built.push(`/${folder}/${slug}/`);
 			console.log(`  ✅ ${plugin.name} ${field} → /${folder}/${slug}/`);
 		}

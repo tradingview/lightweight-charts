@@ -2,11 +2,14 @@
 // (`lwcPlugin.preview`) or the full demo (`lwcPlugin.demo`) — both built into
 // the site by `pnpm plugins:build-demos`.
 //
-// The page is self-contained: it carries its own light `color-scheme`, its own
-// background and a layout that fills whatever frame it is given. Nothing is
-// restyled after load, which is what used to make the chart jump — it was
-// created at the page's own fixed height and only resized once the injected
-// stylesheet landed.
+// The page is self-contained: it carries its own background and a layout that
+// fills whatever frame it is given. Nothing is restyled after load, which is
+// what used to make the chart jump — it was created at the page's own fixed
+// height and only resized once the injected stylesheet landed.
+//
+// It also follows the site's light/dark theme by itself: the preview kit reads
+// this page's `data-theme` through the same-origin frame and keeps watching it,
+// so a theme toggle restyles the running preview without reloading it.
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import React from 'react';
 
