@@ -176,7 +176,7 @@ series' price line.
   `timeScale.enableConflation` on, the chart still draws every point.
 - On `lightweight-charts` 5.2 and later the series reports the column nearest
   the pointer through `hitTest`, within the series' `hitTestTolerance` (3 px
-  by default): the crosshair event's `hoveredObjectId` is
+  by default): the crosshair event's `hoveredInfo.objectId` is
   `'column-<point>-<index>'`, where `<point>` is the point's position in
   `series.data()` and `<index>` the column's index in its `values`. The
   nearest column can belong to the next point, so read the point from

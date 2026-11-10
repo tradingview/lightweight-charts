@@ -55,7 +55,8 @@ base.addEventListener('input', () => series.applyOptions({ base: Number(base.val
 // The series reports the column under the pointer on Lightweight Charts 5.2
 // and later: `objectId` is 'column-<point>-<index>'.
 chart.subscribeCrosshairMove(param => {
-	hovered.textContent = param.hoveredSeries === series && param.hoveredObjectId !== undefined
-		? `Hovered column: ${String(param.hoveredObjectId)}`
+	const info = param.hoveredInfo;
+	hovered.textContent = info !== undefined && info.series === series && info.objectId !== undefined
+		? `Hovered column: ${String(info.objectId)}`
 		: '';
 });
