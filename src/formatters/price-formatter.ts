@@ -97,8 +97,8 @@ export class PriceFormatter extends FormatterBase implements IPriceFormatter {
 
 			fracString = formatterOptions.decimalSign + numberToStringWithLeadingZero(+fracPart.toFixed(this._fractionalLength) * this._minMove, fracLength);
 		} else {
-			// should round int part to min move
-			intPart = Math.round(intPart * base) / base;
+			// should round price to min move (and not the already truncated integer part, otherwise 12.6 with minMove=1 becomes 12)
+			intPart = Math.round(price * base) / base;
 			// if min move > 1, fractional part is always = 0
 			if (fracLength > 0) {
 				fracString = formatterOptions.decimalSign + numberToStringWithLeadingZero(0, fracLength);

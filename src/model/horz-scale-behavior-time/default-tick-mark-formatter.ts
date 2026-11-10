@@ -3,7 +3,9 @@ import { ensureNever } from '../../helpers/assertions';
 import { TickMarkType, TimePoint } from './types';
 
 export function defaultTickMarkFormatter(timePoint: TimePoint, tickMarkType: TickMarkType, locale: string): string {
-	const formatOptions: Intl.DateTimeFormatOptions = {};
+	// the given time is a UTC date or timestamp, so format it in UTC rather than
+	// shifting it to a local date, which can land in a daylight saving time gap
+	const formatOptions: Intl.DateTimeFormatOptions = { timeZone: 'UTC' };
 
 	switch (tickMarkType) {
 		case TickMarkType.Year:
@@ -39,17 +41,5 @@ export function defaultTickMarkFormatter(timePoint: TimePoint, tickMarkType: Tic
 		? new Date(timePoint.timestamp * 1000)
 		: new Date(Date.UTC(timePoint.businessDay.year, timePoint.businessDay.month - 1, timePoint.businessDay.day));
 
-	// from given date we should use only as UTC date or timestamp
-	// but to format as locale date we can convert UTC date to local date
-	const localDateFromUtc = new Date(
-		date.getUTCFullYear(),
-		date.getUTCMonth(),
-		date.getUTCDate(),
-		date.getUTCHours(),
-		date.getUTCMinutes(),
-		date.getUTCSeconds(),
-		date.getUTCMilliseconds()
-	);
-
-	return localDateFromUtc.toLocaleString(locale, formatOptions);
+	return date.toLocaleString(locale, formatOptions);
 }
