@@ -3,8 +3,9 @@ import { HeatmapCellShader, HeatmapData, createColorScale, createHeatmapSeries, 
 import { orderBookData, priceData, profileData, turboColor } from './sample-data';
 
 const shaders: Record<string, HeatmapCellShader> = {
-	// Spread over the amounts in view, in 32 steps.
-	turbo: createColorScale({ stops: Array.from({ length: 9 }, (_, i) => turboColor(i / 8)) }),
+	// Spread over the amounts in view, in 32 steps. The turbo map starts near
+	// black, so the scale starts a tenth of the way in, at a deep blue.
+	turbo: createColorScale({ stops: Array.from({ length: 9 }, (_, i) => turboColor(0.1 + (i / 8) * 0.9)) }),
 	green: defaultOptions.cellShader,
 	// A shader of its own, reading the range of the amounts in view.
 	purple: (amount, range) => {
