@@ -116,6 +116,24 @@ is *not* part of the autoscale: `keepPixelSeriesInView(chart, series)` reserves
 room on the price scale and keeps doing so on resize. Also generic horizontal
 scale support, role-keyed `colors`/`borderRadius`, and `normalize`.
 
+### `background-shade-series` — a series that is only a background
+
+Full-height columns behind each bar, colored by where the bar's value sits
+between two colors. Read for: a custom series that stays out of the price
+scale (`priceValueBuilder` returns `[NaN]`, so it never changes the autoscale
+range, has no last value and is never hovered) and sits on an overlay price
+scale of its own, set in `defaultOptions`, since a series at the bottom of the
+order would otherwise set the number format of a shared axis; columns from
+`fullBarWidthAfter`, each starting where the previous one ends, since two
+edges rounded on their own can leave a seam; shades looked up in a table built when the
+colors change, so no color string is made while drawing; parsing a CSS color
+through a scratch canvas of its own (never the chart's context, whose
+`fillStyle` a check would change), and spotting an invalid one; mixing colors
+with premultiplied alpha; a factory that moves the series behind the others
+with `setSeriesOrder(0)` where the host has it; and `globalAlpha` set inside
+`save`/`restore`. Its `price-format-kept` interaction test compares two
+charts, since a price axis never narrows once it has grown.
+
 ### `box-whisker-series` — a statistical shape on the candle grid
 
 A box plot per point from named fields (`min`, `q1`, `median`, `q3`, `max`)
@@ -226,7 +244,7 @@ interaction tests show how to assert on DOM state.
 Upstream `plugin-examples/src/plugins/` holds unpublished proof-of-concept
 plugins: tooltips and delta tooltips, a rectangle drawing tool, trend lines,
 a heatmap series,
-background shading, price alerts, a volume profile, a partial price line,
+price alerts, a volume profile, a partial price line,
 and crosshair highlighting. Good for seeing the shape of an
 idea; they predate the toolkit and skip the tests and README the packages
 carry, so use the official plugins for *how* and these for *what*. The

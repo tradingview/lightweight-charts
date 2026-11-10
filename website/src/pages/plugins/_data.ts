@@ -54,6 +54,7 @@ export interface Plugin {
 export const CATALOGUE_CATEGORIES: ReadonlyMap<string, string> = new Map([
 	['accessibility', 'UX & accessibility'],
 	['anchored-text', 'Overlays'],
+	['background-shade-series', 'Series types'],
 	['box-whisker-series', 'Series types'],
 	['brushable-area-series', 'Series types'],
 	['dual-range-histogram-series', 'Series types'],
