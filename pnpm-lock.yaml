@@ -779,8 +779,8 @@ importers:
         specifier: 1.5.0
         version: 1.5.0
       lightweight-charts:
-        specifier: 5.2.1
-        version: 5.2.1
+        specifier: 5.3.0
+        version: 5.3.0
       lightweight-charts-3.8:
         specifier: npm:lightweight-charts@~3.8.0
         version: lightweight-charts@3.8.0
@@ -802,6 +802,9 @@ importers:
       lightweight-charts-5.2:
         specifier: npm:lightweight-charts@5.2.1
         version: lightweight-charts@5.2.1
+      lightweight-charts-5.3:
+        specifier: npm:lightweight-charts@5.3.0
+        version: lightweight-charts@5.3.0
       lightweight-charts-local:
         specifier: workspace:lightweight-charts@*
         version: link:..
@@ -6689,6 +6692,9 @@ packages:
 
   lightweight-charts@5.2.1:
     resolution: {integrity: sha512-IVwoK1RLFiLPubaKIjNbtjWLnpPMqiABSrTay6whmNa8L1+19292VtHJ+BWyPUuLCwF0tcQlhEWd1CLB2a1nsQ==}
+
+  lightweight-charts@5.3.0:
+    resolution: {integrity: sha512-w16fu2/FteUkIJdgc9G2tOCKs1fwFSqnqF8+kMgHGv0uGIfcfpEJhziSaQbML1yrkbeg4nQXV3msjmhBzhLNhw==}
 
   lilconfig@3.1.3:
     resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
@@ -17447,6 +17453,10 @@ snapshots:
       fancy-canvas: 2.1.0
 
   lightweight-charts@5.2.1:
+    dependencies:
+      fancy-canvas: 2.1.0
+
+  lightweight-charts@5.3.0:
     dependencies:
       fancy-canvas: 2.1.0
 
