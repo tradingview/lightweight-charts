@@ -5,7 +5,7 @@ import { createBackgroundShadeSeries } from '../background-shade-series';
 import { candleData, upShare } from './sample-data';
 
 // The catalog preview: candles over a shading from the share of up-closing
-// bars. The dev demo next door adds a whitespace gap.
+// bars. The dev demo next door adds a whitespace gap and a per-bar color.
 const chart = createChart('chart', { autoSize: true });
 
 const candles = candleData(120);
