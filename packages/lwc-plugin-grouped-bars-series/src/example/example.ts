@@ -6,33 +6,31 @@ import { groupedBarsData } from './sample-data';
 
 type DemoData = GroupedBarsData | CustomSeriesWhitespaceData<Time>;
 
-// A run of whitespace that leaves a gap, a stretch where the first value turns
-// negative, and one point that overrides the color of its second column.
+// The first value is a net figure that swings above and below zero, the others
+// stay positive; a run of whitespace leaves a gap, and one point overrides the
+// color of its second column.
 function demoData(groups: number): DemoData[] {
 	return groupedBarsData(groups, 90).map((point: GroupedBarsData, index: number): DemoData => {
-		if (index >= 30 && index < 34) {
+		if (index >= 64 && index < 67) {
 			return { time: point.time };
 		}
-		if (index >= 50 && index < 60) {
-			return { ...point, values: point.values.map((value, column) => (column === 0 && value !== null ? -value : value)) };
-		}
-		if (index === 70) {
-			return { ...point, colors: [undefined, '#131722'] };
-		}
-		return point;
+		const net = Math.round((Math.sin(index / 6) * 14 + Math.sin(index / 2.3) * 4) * 10) / 10;
+		const values = [net, ...point.values.slice(1)];
+		return index === 80 ? { ...point, values, colors: [undefined, '#131722'] } : { ...point, values };
 	});
 }
 
+// The latest points at a spacing where the columns of a group stand apart;
+// scroll back or zoom out for the rest.
 const chart = createChart('chart', {
 	autoSize: true,
-	timeScale: { barSpacing: 18, minBarSpacing: 6 },
+	timeScale: { barSpacing: 26, minBarSpacing: 6 },
 });
 
 const series = createGroupedBarsSeries(chart, {
 	color: 'black', // for the price line
 });
 series.setData(demoData(3));
-chart.timeScale().fitContent();
 
 const groups = document.getElementById('groups') as HTMLSelectElement;
 const widthMode = document.getElementById('width-mode') as HTMLSelectElement;
