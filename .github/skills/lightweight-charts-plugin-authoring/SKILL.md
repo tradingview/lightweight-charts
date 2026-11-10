@@ -199,6 +199,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 | a chart whose X axis is a number, not time (scatter, bubble) | `scatter-series` (`ScatterHorzScaleBehavior`, `createScatterChart`) |
 | point markers on a series, hovered by their drawn shape | `lollipop-series` (`canvas/markers` dots, `nearestVerticalRange` and `markerDistance` in `hitTest`), `scatter-series` |
 | a shape built from several values per point, on the candle grid | `box-whisker-series` (named fields, per-point colors, part names in `objectId`) |
+| many colored cells per point, an order book or volume profile | `heatmap-series` (fills batched by color, `createColorScale`, a cell-level `hitTest`) |
 | a fixed-pixel-height overlay series | `dual-range-histogram-series` (`scaleMode`, `keepPixelSeriesInView`) |
 | a series primitive with an axis label and dragging | `vertical-line` |
 | an image or decoration behind a series or pane | `image-watermark` (both a series and a pane primitive) |
@@ -211,7 +212,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 `plugin-examples/src/plugins/` in the repository
 (`https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples`)
 holds a further set of proof-of-concept plugins — tooltips, drawing tools,
-heatmaps, … — good for breadth and ideas, but they are
+a volume profile, … — good for breadth and ideas, but they are
 unpublished starting points, not the standard to match. The graduated
 plugins' folders there are redirects to the packages.
 

@@ -59,6 +59,7 @@ export const CATALOGUE_CATEGORIES: ReadonlyMap<string, string> = new Map([
 	['brushable-area-series', 'Series types'],
 	['dual-range-histogram-series', 'Series types'],
 	['grouped-bars-series', 'Series types'],
+	['heatmap-series', 'Series types'],
 	['hlc-area-series', 'Series types'],
 	['image-watermark', 'Overlays'],
 	['lollipop-series', 'Series types'],
