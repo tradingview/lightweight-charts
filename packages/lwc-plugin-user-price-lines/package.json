@@ -1,7 +1,7 @@
 {
 	"name": "@tradingview/lwc-plugin-user-price-lines",
 	"version": "1.0.0",
-	"description": "Series primitive with a button at the right edge of the pane that adds a price line where the user clicks it.",
+	"description": "Lets users add price lines by clicking a + button that follows the pointer at the right edge of the pane, with an API to add, list and remove them.",
 	"author": "TradingView",
 	"license": "Apache-2.0",
 	"type": "module",
