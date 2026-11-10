@@ -88,8 +88,8 @@ void describe('Interactions tests', () => {
 				await page.setViewport({ width: 600, height: 600 });
 
 				const errors: string[] = [];
-				page.on('pageerror', (error: Error) => {
-					errors.push(error.message);
+				page.on('pageerror', (error: unknown) => {
+					errors.push(error instanceof Error ? error.message : String(error));
 				});
 
 				page.on('response', (response: HTTPResponse) => {

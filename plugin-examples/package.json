@@ -11,7 +11,7 @@
     },
     "devDependencies": {
         "typescript": "5.9.3",
-        "vite": "7.2.0"
+        "vite": "7.3.8"
     },
     "dependencies": {
         "@tradingview/lwc-plugin-brushable-area-series": "workspace:*",
