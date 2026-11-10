@@ -22,7 +22,8 @@ collection of the Lightweight Charts™ repository.
   the defaults exported as `defaultOptions`. The colors can be hex, `rgb()`,
   `rgba()`, `hsl()` or named colors, alpha included, and are mixed with
   premultiplied alpha.
-- A point without a finite `value`, `null` included, read as whitespace.
+- A per-point `color` shading that bar with its own color, and a point
+  without a finite `value`, `null` included, read as whitespace.
 - Shades taken from 256 steps between the two end colors, worked out when the
   colors change rather than for every bar on every frame.
 - The series sits on a price scale of its own, takes no part in any other and

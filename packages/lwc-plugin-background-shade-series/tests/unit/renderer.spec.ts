@@ -9,7 +9,7 @@ import { defaultOptions } from '../../src/options';
  * value it cannot parse, and records the rectangles drawn.
  */
 class RecordingContext {
-	public rects: { left: number; width: number }[] = [];
+	public rects: { left: number; width: number; fill: string }[] = [];
 	public globalAlpha = 1;
 	private _fillStyle = '#000000';
 
@@ -24,7 +24,7 @@ class RecordingContext {
 	}
 
 	public fillRect(left: number, _top: number, width: number): void {
-		this.rects.push({ left, width });
+		this.rects.push({ left, width, fill: this._fillStyle });
 	}
 
 	public save(): void {}
@@ -38,9 +38,11 @@ class RecordingContext {
 	createElement: () => ({ getContext: () => new RecordingContext() }),
 };
 
-function drawColumns(xs: number[], barSpacing: number): { left: number; width: number }[] {
+function drawColumns(xs: number[], barSpacing: number, barColors: string[] = []): { left: number; width: number; fill: string }[] {
 	const renderer = new BackgroundShadeSeriesRenderer();
-	const bars = xs.map((x, index) => ({ x, time: index, barColor: '#000000', originalData: { time: index, value: 50 } }));
+	// The chart hands each bar the point's color, or the series color, which
+	// is empty by default.
+	const bars = xs.map((x, index) => ({ x, time: index, barColor: barColors[index] ?? '', originalData: { time: index, value: 150 } }));
 	renderer.update(
 		{ bars, barSpacing, visibleRange: { from: 0, to: bars.length }, conflationFactor: 1 } as never,
 		defaultOptions
@@ -67,5 +69,19 @@ void describe('BackgroundShadeSeriesRenderer', () => {
 		const rects = drawColumns([9.8499999, 11.1500001], 1.3);
 		expect(rects).to.have.length(2);
 		expect(rects[1].left).to.equal(rects[0].left + rects[0].width);
+	});
+
+	void it('shades a bar with its point color, and one with an invalid point color from its value', () => {
+		// All values are past highValue, so every bar shaded from its value gets
+		// the high color. The invalid color is checked on another context, so
+		// the chart's fillStyle still holds the previous fill when it is drawn.
+		const rects = drawColumns([10, 20, 30, 40], 10, ['', '#00ff00', 'not-a-color', '']);
+		expect(rects.map(rect => rect.fill)).to.deep.equal([
+			rects[0].fill,
+			'#00ff00',
+			rects[0].fill,
+			rects[0].fill,
+		]);
+		expect(rects[0].fill).to.match(/^rgba\(255, 50, 50/);
 	});
 });
