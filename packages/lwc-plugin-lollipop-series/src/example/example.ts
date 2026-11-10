@@ -41,7 +41,8 @@ markerSize.addEventListener('input', applyControls);
 // The series reports the lollipop under the pointer on Lightweight Charts 5.2
 // and later.
 chart.subscribeCrosshairMove(param => {
-	hovered.textContent = param.hoveredSeries === series && param.hoveredObjectId !== undefined
-		? `Hovered: ${String(param.hoveredObjectId)}`
+	const info = param.hoveredInfo;
+	hovered.textContent = info !== undefined && info.series === series && info.objectId !== undefined
+		? `Hovered: ${String(info.objectId)}`
 		: '';
 });

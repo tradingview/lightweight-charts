@@ -148,7 +148,7 @@ The standard `color` option colors the stems, the dots and the price line.
   `timeScale.enableConflation` on, the chart still draws every point.
 - On `lightweight-charts` 5.2 and later the series reports the lollipop under
   the pointer through `hitTest`, within the series' `hitTestTolerance` (3 px
-  by default): the crosshair event's `hoveredObjectId` is `bar-<index>`,
+  by default): the crosshair event's `hoveredInfo.objectId` is `bar-<index>`,
   where `<index>` is the point's position in `series.data()`. The dot is
   reported as a point and the stem as a range, like a column, so a candle body
   the pointer is inside wins over a stem the pointer is only near. Elsewhere

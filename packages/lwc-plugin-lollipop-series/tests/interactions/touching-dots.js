@@ -39,7 +39,7 @@ async function beforeInteractions(container) {
 	const higher = 50 + 6 / (series.priceToCoordinate(50) - series.priceToCoordinate(51));
 	series.setData(times.map((time, i) => ({ time, value: i % 2 === 0 ? 50 : higher })));
 	chart.subscribeCrosshairMove(param => {
-		lastId = param.hoveredSeries === series ? param.hoveredObjectId : undefined;
+		lastId = param.hoveredInfo?.series === series ? param.hoveredInfo.objectId : undefined;
 	});
 	await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 

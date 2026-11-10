@@ -21,8 +21,8 @@ export class LollipopSeriesRenderer<
 	/**
 	 * Reports the lollipop under the cursor, within the series'
 	 * `hitTestTolerance`, so that the chart can report it through the crosshair
-	 * as `hoveredObjectId`. Called by the library from v5.2 onwards; older hosts
-	 * never call it.
+	 * as `hoveredInfo.objectId`. Called by the library from v5.2 onwards;
+	 * older hosts never call it.
 	 */
 	public hitTest(
 		x: number,
