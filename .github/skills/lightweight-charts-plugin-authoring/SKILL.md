@@ -198,6 +198,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 | a replacement for a built-in series | `rounded-candles-series` (matches candlestick options and widths) |
 | a chart whose X axis is a number, not time (scatter, bubble) | `scatter-series` (`ScatterHorzScaleBehavior`, `createScatterChart`) |
 | point markers on a series, hovered by their drawn shape | `lollipop-series` (`canvas/markers` dots, `nearestVerticalRange` and `markerDistance` in `hitTest`), `scatter-series` |
+| a shape built from several values per point, on the candle grid | `box-whisker-series` (named fields, per-point colors, part names in `objectId`) |
 | a fixed-pixel-height overlay series | `dual-range-histogram-series` (`scaleMode`, `keepPixelSeriesInView`) |
 | a series primitive with an axis label and dragging | `vertical-line` |
 | an image or decoration behind a series or pane | `image-watermark` (both a series and a pane primitive) |

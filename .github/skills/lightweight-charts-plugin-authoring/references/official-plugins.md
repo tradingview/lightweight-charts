@@ -116,6 +116,21 @@ is *not* part of the autoscale: `keepPixelSeriesInView(chart, series)` reserves
 room on the price scale and keeps doing so on resize. Also generic horizontal
 scale support, role-keyed `colors`/`borderRadius`, and `normalize`.
 
+### `box-whisker-series` — a statistical shape on the candle grid
+
+A box plot per point from named fields (`min`, `q1`, `median`, `q3`, `max`)
+and `outliers`, with the five colors overridable on each point. Read for:
+sizing every part from `candlestickWidth` and the grid line width in bitmap
+pixels, with the same parity as the whisker so each part is centered on it;
+the outliers in the autoscale values, so every dot stays in view; malformed
+points (a non-finite or `null` number) read as whitespace in `isWhitespace`,
+so they never reach the price scale; a factory that is a typed
+`chart.addCustomSeries`, since no option changes the plot values; and a
+`hitTest` on `nearestBar` that names the part and the point under the pointer
+(`'box-<point>'`, `'outlier-<point>-<index>'`, …) in `objectId`, an outlier
+reported as a `'point'` and the rest as `'range'`. It has no
+`conflationReducer`: merging two box plots has no clear meaning.
+
 ### `rounded-candles-series` — a drop-in replacement for a built-in
 
 Candlesticks with rounded bodies. Read for how to *match* the built-in:
@@ -208,7 +223,7 @@ interaction tests show how to assert on DOM state.
 
 Upstream `plugin-examples/src/plugins/` holds unpublished proof-of-concept
 plugins: tooltips and delta tooltips, a rectangle drawing tool, trend lines,
-a heatmap series, box-whisker,
+a heatmap series,
 background shading, price alerts, a volume profile, a partial price line,
 and crosshair highlighting. Good for seeing the shape of an
 idea; they predate the toolkit and skip the tests and README the packages
