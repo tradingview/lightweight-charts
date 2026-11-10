@@ -21,8 +21,16 @@ const shade = createBackgroundShadeSeries(chart, {
 	...palettes['blue-red'],
 	opacity: 0.3,
 });
-// The share of up-closing bars over the last 14, with a gap of whitespace.
-shade.setData(upShare(candles).map((point, index) => (index >= 120 && index < 126 ? { time: point.time } : point)));
+// The share of up-closing bars over the last 14, with a gap of whitespace and
+// one bar given its own color.
+shade.setData(
+	upShare(candles).map((point, index) => {
+		if (index >= 120 && index < 126) {
+			return { time: point.time };
+		}
+		return index === 150 ? { ...point, color: '#131722' } : point;
+	})
+);
 chart.timeScale().fitContent();
 
 const colors = document.getElementById('colors') as HTMLSelectElement;

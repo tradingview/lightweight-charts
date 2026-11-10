@@ -126,7 +126,10 @@ scale of its own, set in `defaultOptions`, since a series at the bottom of the
 order would otherwise set the number format of a shared axis; columns from
 `fullBarWidthAfter`, each starting where the previous one ends, since two
 edges rounded on their own can leave a seam; shades looked up in a table built when the
-colors change, so no color string is made while drawing; parsing a CSS color
+colors change, so no color string is made while drawing; a per-point `color`
+read from `bar.barColor`, since the chart keeps `color` out of
+`originalData` and merges it with the series `color`, which the package
+therefore leaves empty; parsing a CSS color
 through a scratch canvas of its own (never the chart's context, whose
 `fillStyle` a check would change), and spotting an invalid one; mixing colors
 with premultiplied alpha; a factory that moves the series behind the others

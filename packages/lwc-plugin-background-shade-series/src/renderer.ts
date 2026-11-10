@@ -27,6 +27,9 @@ interface Palette {
  */
 const SHADE_STEPS = 256;
 
+/** How many point colors the renderer remembers the validity of. */
+const VALID_COLORS_CACHE_SIZE = 256;
+
 /**
  * Parses a CSS color through the canvas. Returns `null` for an invalid color,
  * and for a color the canvas keeps in another color space, such as `oklch()`.
@@ -41,6 +44,8 @@ export class BackgroundShadeSeriesRenderer<
 	TData extends BackgroundShadeData<HorzScaleItem> = BackgroundShadeData<HorzScaleItem>
 > extends CustomSeriesRendererBase<HorzScaleItem, TData, BackgroundShadeSeriesOptions> {
 	private _palette: Palette | null = null;
+	/** Whether the canvas accepts a point color, by color string. */
+	private readonly _validColors = new Map<string, boolean>();
 
 	protected drawImpl(
 		scope: BitmapCoordinatesRenderingScope,
@@ -60,8 +65,13 @@ export class BackgroundShadeSeriesRenderer<
 		let previousTime = Number.NaN;
 		let previousRight: number | null = null;
 		forEachVisibleBar(data, bar => {
-			// The chart hands over no whitespace, so every value is finite.
-			const fill = shades[Math.round(shadeRatio(bar.originalData.value, lowValue, highValue) * (SHADE_STEPS - 1))];
+			// A point's own color reaches the renderer as `barColor`, which is the
+			// series color for a point without one: the chart keeps `color` out of
+			// `originalData`. The chart hands over no whitespace, so every value is
+			// finite.
+			const fill = bar.barColor !== options.color && this._isValidColor(bar.barColor)
+				? bar.barColor
+				: shades[Math.round(shadeRatio(bar.originalData.value, lowValue, highValue) * (SHADE_STEPS - 1))];
 			// A bar right after the previous one starts where that one ended, so
 			// the shared edge is rounded once and leaves no seam. A conflated bar
 			// is indexed by its first point, so after whitespace two neighbors
@@ -81,6 +91,24 @@ export class BackgroundShadeSeriesRenderer<
 			ctx.fillRect(column.position, 0, column.length, bitmapSize.height);
 		});
 		ctx.restore();
+	}
+
+	/**
+	 * Whether the canvas accepts a point color. An invalid one would be ignored
+	 * by `fillStyle` and leave the previous bar's fill in place, so such a bar
+	 * is shaded from its value instead. The answers are remembered for the
+	 * first colors seen, up to a limit, so that colors computed per point cannot
+	 * grow the cache without bound.
+	 */
+	private _isValidColor(color: string): boolean {
+		let valid = this._validColors.get(color);
+		if (valid === undefined) {
+			valid = normalizeCssColor(color) !== null;
+			if (this._validColors.size < VALID_COLORS_CACHE_SIZE) {
+				this._validColors.set(color, valid);
+			}
+		}
+		return valid;
 	}
 
 	/**

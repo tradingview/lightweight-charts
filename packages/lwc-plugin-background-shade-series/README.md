@@ -109,7 +109,7 @@ shade.setData([
     { time: '2024-04-22', value: 35 },
     { time: '2024-04-23', value: 120 },
     { time: '2024-04-24' },
-    { time: '2024-04-25', value: 50 },
+    { time: '2024-04-25', value: 50, color: '#131722' },
 ]);
 ```
 
@@ -122,8 +122,10 @@ Each data point is `{ time, value }`:
   threshold: values below it get `lowColor` and the rest `highColor`.
 - A point without a finite `value`, `null` and `NaN` included, is whitespace
   and leaves its slot unshaded.
-- The `color` every custom series point can carry is not used: the chart
-  keeps it out of the data a custom series draws from.
+- A `color` on a point shades that bar with it, whatever its value. A color
+  the canvas does not accept is ignored, and the bar is shaded from its value.
+  The series' own `color` option is not drawn; it is empty by default, and a
+  point whose `color` equals it is shaded from its value.
 
 `lowColor` and `highColor` can be hex, `rgb()`, `rgba()`, `hsl()` or named
 colors. They are mixed with premultiplied alpha, as CSS gradients are, so a
