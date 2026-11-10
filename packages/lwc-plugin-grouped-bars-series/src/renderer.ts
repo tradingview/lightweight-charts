@@ -79,7 +79,10 @@ export class GroupedBarsSeriesRenderer<
 		const columnWidth = (2 * halfWidth) / count;
 		const tolerance = seriesHitTestTolerance(options);
 		// Every column of a group, not only the one under the pointer: a
-		// neighbor can be nearer, and an empty column is skipped on its own.
+		// neighbor can be nearer, and an empty column is skipped on its own. The
+		// columns are measured across the full group width; in `histogram` mode
+		// the drawn group is the built-in histogram's column, up to a pixel
+		// narrower, well within the tolerance.
 		const nearestColumn = (bar: CustomBarItemData<HorzScaleItem, TData>): ColumnHit | null => {
 			const values = bar.originalData.values;
 			let best: ColumnHit | null = null;
@@ -99,9 +102,18 @@ export class GroupedBarsSeriesRenderer<
 			}
 			return best;
 		};
-		const hit = nearestBar(data, x, halfWidth + tolerance, tolerance, bar => nearestColumn(bar)?.distance ?? null);
-		const column = hit === null ? null : nearestColumn(data.bars[hit.index]);
-		if (hit === null || column === null) {
+		// The nearest column of each bar measured, so the winner's is not
+		// measured again.
+		const columns = new Map<number, ColumnHit>();
+		const hit = nearestBar(data, x, halfWidth + tolerance, tolerance, (bar, index) => {
+			const nearest = nearestColumn(bar);
+			if (nearest !== null) {
+				columns.set(index, nearest);
+			}
+			return nearest?.distance ?? null;
+		});
+		const column = hit === null ? undefined : columns.get(hit.index);
+		if (hit === null || column === undefined) {
 			return null;
 		}
 		return {
@@ -140,12 +152,16 @@ export class GroupedBarsSeriesRenderer<
 			Math.round(groupWidth(options, data.barSpacing) * horizontalPixelRatio),
 			Math.floor(data.barSpacing * horizontalPixelRatio)
 		));
+		// In `percent` mode every group is as wide, so its columns are split
+		// once per paint and shifted to each group.
+		const percentSpans = histogram ? null : splitGroup(0, percentWidth, count);
 		const boxes: ColumnBox[] = [];
 		for (const item of items) {
 			const group = histogram && item.column !== undefined
 				? { left: item.column.left, width: item.column.right - item.column.left + 1 }
 				: lineSpan(positionsLine(item.x, horizontalPixelRatio, percentWidth, true));
-			const spans = splitGroup(group.left, group.width, count);
+			const spans = percentSpans ?? splitGroup(group.left, group.width, count);
+			const shift = percentSpans === null ? 0 : group.left;
 			boxes.length = 0;
 			for (let column = 0; column < Math.min(item.values.length, count); column++) {
 				const value = item.values[column];
@@ -162,7 +178,7 @@ export class GroupedBarsSeriesRenderer<
 			}
 			for (const { column, box } of boxes) {
 				ctx.fillStyle = item.colors?.[column] ?? palette[column % palette.length];
-				ctx.fillRect(spans[column].left, box.position, spans[column].width, box.length);
+				ctx.fillRect(spans[column].left + shift, box.position, spans[column].width, box.length);
 			}
 		}
 	}

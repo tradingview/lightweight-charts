@@ -160,7 +160,7 @@ Per-point overrides, on the data item:
 `values` is typed `(number | null)[]`.
 
 The standard `color` option is not used for the columns; it colors the
-series' price line.
+series' price line and last value label.
 
 ## Notes
 
