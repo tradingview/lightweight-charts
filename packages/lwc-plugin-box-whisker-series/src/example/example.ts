@@ -43,10 +43,26 @@ colors.addEventListener('change', () => series.applyOptions(palettes[colors.valu
 
 // The series reports the part under the pointer on Lightweight Charts 5.2 and
 // later: 'box-<point>', 'median-<point>', 'whisker-<point>' or
-// 'outlier-<point>-<index>'.
+// 'outlier-<point>-<index>', where <point> is the point's position in
+// series.data(). The readout shows the values of that part.
 chart.subscribeCrosshairMove(param => {
 	const info = param.hoveredInfo;
-	hovered.textContent = info !== undefined && info.series === series && info.objectId !== undefined
-		? `Hovered: ${String(info.objectId)}`
-		: '';
+	const id = info !== undefined && info.series === series ? info.objectId : undefined;
+	if (typeof id !== 'string') {
+		hovered.textContent = '';
+		return;
+	}
+	const [part, point, outlier] = id.split('-');
+	const data = series.data()[Number(point)] as Partial<BoxWhiskerData> | undefined;
+	if (data === undefined) {
+		hovered.textContent = '';
+		return;
+	}
+	hovered.textContent = part === 'box'
+		? `Box: ${data.q1} to ${data.q3}`
+		: part === 'median'
+			? `Median: ${data.median}`
+			: part === 'whisker'
+				? `Whiskers: ${data.min} to ${data.max}`
+				: `Outlier: ${data.outliers?.[Number(outlier)]}`;
 });
