@@ -24,16 +24,16 @@ export function createBoundCanvas(parentElement: HTMLElement, canvasSize: Size):
 }
 
 export function canvasBitmapSize(bitmapSize: Size, canvasElementClientSize: Size, pixelRatio: number): Size {
-	// A canvas that is not rendered (e.g. in a hidden pane) reports a 0x0 box; size it for the current ratio so it is sharp when shown.
-	if (bitmapSize.width === 0 && bitmapSize.height === 0) {
-		return size({
+	// A canvas that is not rendered (e.g. in a hidden pane) reports a 0x0 box; predict it from the current ratio so it is sharp when shown.
+	const observedSize = bitmapSize.width === 0 && bitmapSize.height === 0
+		? size({
 			width: Math.round(canvasElementClientSize.width * pixelRatio),
 			height: Math.round(canvasElementClientSize.height * pixelRatio),
-		});
-	}
+		})
+		: bitmapSize;
 	return size({
-		width: Math.max(bitmapSize.width, canvasElementClientSize.width),
-		height: Math.max(bitmapSize.height, canvasElementClientSize.height),
+		width: Math.max(observedSize.width, canvasElementClientSize.width),
+		height: Math.max(observedSize.height, canvasElementClientSize.height),
 	});
 }
 
