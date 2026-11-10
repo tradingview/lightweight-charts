@@ -54,9 +54,10 @@ async function dragVisibleSeparator(deltaY) {
 
 async function beforeInteractions(container) {
 	chart = LightweightCharts.createChart(container, { layout: { attributionLogo: false } });
-	chart.addSeries(LightweightCharts.LineSeries).setData(simpleData(10));
-	chart.addSeries(LightweightCharts.LineSeries, {}, 1).setData(simpleData(1000000));
-	chart.addSeries(LightweightCharts.LineSeries, {}, 2).setData(simpleData(30));
+	chart.addSeries(LightweightCharts.LineSeries).setData(simpleData(1000000));
+	chart.addSeries(LightweightCharts.LineSeries, {}, 1).setData(simpleData(10));
+	const pane2Series = chart.addSeries(LightweightCharts.LineSeries, {}, 2);
+	pane2Series.setData(simpleData(30));
 	await nextFrame();
 
 	const panes = chart.panes();
@@ -72,7 +73,12 @@ async function beforeInteractions(container) {
 	check(timeAxisTop() === initialAxisTop, `time axis moved from ${initialAxisTop} to ${timeAxisTop()}`);
 	check(panes[1].getHeight() === 0, `hidden pane height should be 0, got ${panes[1].getHeight()}`);
 	check(chart.paneSize(1).height === 0, `hidden paneSize height should be 0, got ${chart.paneSize(1).height}`);
-	check(chart.priceScale('right').width() < initialAxisWidth, 'a hidden pane should not widen the price axis');
+	const initialChartRect = chart.chartElement().getBoundingClientRect();
+	chart.resize(initialChartRect.width - 50, initialChartRect.height);
+	await nextFrame();
+	check(chart.paneSize(1).width === chart.paneSize(0).width, 'hidden paneSize width should follow a resize');
+	chart.resize(initialChartRect.width, initialChartRect.height);
+	await nextFrame();
 
 	panes[1].setVisible(true);
 	await nextFrame();
@@ -101,6 +107,16 @@ async function beforeInteractions(container) {
 	await nextFrame();
 	check(visibleSeparatorCount() === 0, `expected no separators, got ${visibleSeparatorCount()}`);
 	check(timeAxisTop() === initialAxisTop, 'time axis moved with only the last pane shown');
+	check(chart.priceScale('right').width() < initialAxisWidth, 'a hidden pane should not widen the price axis');
+
+	panes[2].setVisible(false);
+	check(panes[2].visible(), 'the last visible pane cannot be hidden');
+	chart.removePane(2);
+	check(chart.panes().length === 3, 'the last visible pane cannot be removed');
+	chart.removeSeries(pane2Series);
+	check(chart.panes().length === 3, 'removing its last series keeps the last visible pane');
+	chart.addSeries(LightweightCharts.LineSeries, {}, 2).setData(simpleData(30));
+	await nextFrame();
 
 	const chartRect = chart.chartElement().getBoundingClientRect();
 	const shot = chart.takeScreenshot();
@@ -118,6 +134,15 @@ async function beforeInteractions(container) {
 		const expected = totalHeight * pane.getStretchFactor() / totalStretch;
 		check(Math.abs(pane.getHeight() - expected) <= 1, `pane ${index} should be ${expected}px, got ${pane.getHeight()}`);
 	});
+
+	chart.applyOptions({ layout: { attributionLogo: true } });
+	panes[2].setVisible(false);
+	await nextFrame();
+	const logo = chart.chartElement().querySelector('#tv-attr-logo');
+	check(logo !== null && panes[1].getHTMLElement().contains(logo), 'the logo should move to the last visible pane');
+	panes[2].setVisible(true);
+	await nextFrame();
+	check(panes[2].getHTMLElement().contains(chart.chartElement().querySelector('#tv-attr-logo')), 'the logo should return to the last pane');
 }
 
 function afterInitialInteractions() {

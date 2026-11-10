@@ -1,6 +1,7 @@
 import { IChartWidgetBase } from '../gui/chart-widget';
 
 import { assert } from '../helpers/assertions';
+import { warn } from '../helpers/logger';
 
 import { CustomData, ICustomSeriesPaneView } from '../model/icustom-series';
 import { IPanePrimitiveBase } from '../model/ipane-primitive';
@@ -112,6 +113,10 @@ export class PaneApi<HorzScaleItem> implements IPaneApi<HorzScaleItem> {
 	}
 
 	public setVisible(visible: boolean): void {
+		if (!visible && this._chartWidget.model().isLastVisiblePane(this._pane)) {
+			warn('The last visible pane cannot be hidden.');
+			return;
+		}
 		this._pane.setVisible(visible);
 		this._chartWidget.model().fullUpdate();
 	}

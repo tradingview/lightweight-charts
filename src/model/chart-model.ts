@@ -489,6 +489,7 @@ export interface IChartModelBase {
 	swapPanes(first: number, second: number): void;
 	movePane(from: number, to: number): void;
 	removePane(index: number): void;
+	isLastVisiblePane(pane: Pane): boolean;
 	changePanesHeight(paneIndex: number, height: number): void;
 
 	colorParser(): ColorParser;
@@ -715,9 +716,16 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		}
 
 		assert(index >= 0 && index < this._panes.length, 'Invalid pane index');
+		if (this.isLastVisiblePane(this._panes[index])) {
+			return;
+		}
 
 		this._panes.splice(index, 1);
 		this.fullUpdate();
+	}
+
+	public isLastVisiblePane(pane: Pane): boolean {
+		return pane.visible() && this._panes.every((other: Pane) => other === pane || !other.visible());
 	}
 
 	public changePanesHeight(paneIndex: number, height: number): void {
@@ -1286,7 +1294,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	private _cleanupIfPaneIsEmpty(pane: Pane): boolean {
-		if (!pane.preserveEmptyPane() && (pane.dataSources().length === 0 && this._panes.length > 1)) {
+		if (!pane.preserveEmptyPane() && (pane.dataSources().length === 0 && this._panes.length > 1) && !this.isLastVisiblePane(pane)) {
 			this._panes.splice(this.getPaneIndex(pane), 1);
 			this.fullUpdate();
 			return true;

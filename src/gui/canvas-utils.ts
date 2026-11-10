@@ -16,10 +16,19 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 		options: {
 			allowResizeObserver: true,
 		},
-		transform: (bitmapSize: Size, canvasElementClientSize: Size) => ({
-			width: Math.max(bitmapSize.width, canvasElementClientSize.width),
-			height: Math.max(bitmapSize.height, canvasElementClientSize.height),
-		}),
+		transform: (bitmapSize: Size, canvasElementClientSize: Size) => {
+			// A canvas that is not rendered (e.g. in a hidden pane) reports a 0x0 box; size it for the current ratio so it is sharp when shown.
+			if (bitmapSize.width === 0 && bitmapSize.height === 0) {
+				return {
+					width: Math.round(canvasElementClientSize.width * window.devicePixelRatio),
+					height: Math.round(canvasElementClientSize.height * window.devicePixelRatio),
+				};
+			}
+			return {
+				width: Math.max(bitmapSize.width, canvasElementClientSize.width),
+				height: Math.max(bitmapSize.height, canvasElementClientSize.height),
+			};
+		},
 	});
 	binding.resizeCanvasElement(size);
 	return binding;

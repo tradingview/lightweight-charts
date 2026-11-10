@@ -309,17 +309,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			return 0;
 		}
 
-		if (this._paneWidgets.length === 0) {
-			return 0;
-		}
-
-		// we don't need to worry about exactly pane widget here
-		// because all pane widgets have the same width of price axis widget
-		// see _adjustSizeImpl
-		const priceAxisWidget = position === DefaultPriceScaleId.Left
-			? this._paneWidgets[0].leftPriceAxisWidget()
-			: this._paneWidgets[0].rightPriceAxisWidget();
-		return ensureNotNull(priceAxisWidget).getWidth();
+		return position === DefaultPriceScaleId.Left ? this._leftPriceAxisWidth : this._rightPriceAxisWidth;
 	}
 
 	public autoSizeActive(): boolean {
@@ -345,8 +335,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 	public paneSize(paneIndex: number): Size {
 		const paneWidget = ensureDefined(this._paneWidgets[paneIndex]);
-		const paneSize = paneWidget.getSize();
-		return paneWidget.state().visible() ? paneSize : size({ width: paneSize.width, height: 0 });
+		return paneWidget.state().visible() ? paneWidget.getSize() : size({ width: this._firstVisiblePaneWidget().getSize().width, height: 0 });
 	}
 
 	private _applyPanesOptions(): void {
@@ -539,6 +528,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		for (let paneIndex = 0; paneIndex < this._paneWidgets.length; ++paneIndex) {
 			const paneWidget = this._paneWidgets[paneIndex];
 			paneWidget.setState(this._model.panes()[paneIndex]);
+			paneWidget.updateAttributionLogo(paneIndex === lastVisiblePaneIndex);
 			paneWidget.getElement().style.display = panes[paneIndex].visible() ? '' : 'none';
 			if (!panes[paneIndex].visible()) {
 				continue;

@@ -1,5 +1,6 @@
 import { Size, size } from 'fancy-canvas';
 
+import { assert } from '../helpers/assertions';
 import { IDestroyable } from '../helpers/idestroyable';
 import { clamp } from '../helpers/mathex';
 
@@ -171,12 +172,12 @@ export class PaneSeparator implements IDestroyable {
 	}
 	private _visiblePaneAbove(): PaneWidget {
 		const paneWidgets = this._chartWidget.paneWidgets();
-		for (let paneIndex = paneWidgets.indexOf(this._topPane); paneIndex > 0; paneIndex--) {
-			if (paneWidgets[paneIndex].state().visible()) {
-				return paneWidgets[paneIndex];
-			}
+		let paneIndex = paneWidgets.indexOf(this._topPane);
+		while (paneIndex >= 0 && !paneWidgets[paneIndex].state().visible()) {
+			paneIndex--;
 		}
-		return paneWidgets[0];
+		assert(paneIndex >= 0, 'A visible separator has a visible pane above it');
+		return paneWidgets[paneIndex];
 	}
 
 	private _updateBorderColor(): void {
