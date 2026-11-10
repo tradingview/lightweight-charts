@@ -2,8 +2,8 @@
 
 A map of all documentation pages with their headings, for navigation by LLMs and tools. Every page is available as Markdown at the linked URL.
 
-> Version: 5.2 (latest released)
-> Last updated: 2026-11-10 11:44:41 UTC
+> Version: 5.3 (latest released)
+> Last updated: 2026-11-10 14:51:42 UTC
 
 This map uses a hierarchical structure:
 
@@ -82,6 +82,7 @@ This map uses a hierarchical structure:
   - Usage
   - How to run the provided example
 - [Release Notes](https://tradingview.github.io/lightweight-charts/docs/release-notes.md)
+  - 5.3.0
   - 5.2.1
   - 5.2.0
   - 5.1.0

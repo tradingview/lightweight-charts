@@ -41,7 +41,7 @@ To remove an overlay price scale, remove all series attached to this price scale
 
 ---
 
-Documentation for Lightweight Charts™ v5.2 (latest released version).
+Documentation for Lightweight Charts™ v5.3 (latest released version).
 
 ## Sitemap
 

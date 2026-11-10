@@ -142,7 +142,7 @@ Each chart type provides specific functionality and is optimized for different u
 
 ---
 
-Documentation for Lightweight Charts™ v5.2 (latest released version).
+Documentation for Lightweight Charts™ v5.3 (latest released version).
 
 ## Sitemap
 

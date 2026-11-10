@@ -21,7 +21,7 @@ While the specific methods to manipulate panes are covered in the detailed [exam
 
 ---
 
-Documentation for Lightweight Charts™ v5.2 (latest released version).
+Documentation for Lightweight Charts™ v5.3 (latest released version).
 
 ## Sitemap
 

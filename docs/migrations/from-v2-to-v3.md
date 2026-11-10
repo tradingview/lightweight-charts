@@ -159,7 +159,7 @@ New version does not support this case via the old API, so, if you use it, you s
 
 ---
 
-Documentation for Lightweight Charts™ v5.2 (latest released version).
+Documentation for Lightweight Charts™ v5.3 (latest released version).
 
 ## Sitemap
 

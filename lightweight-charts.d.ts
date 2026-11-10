@@ -1,5 +1,5 @@
 /**
- * TradingView Lightweight Charts™ v5.2
+ * TradingView Lightweight Charts™ v5.3
  * TypeScript declarations for the `lightweight-charts` package.
  * Documentation: https://tradingview.github.io/lightweight-charts
  */
@@ -2265,6 +2265,8 @@ export interface IPriceScaleApi {
 	/**
 	 * Returns currently applied options of the price scale
 	 *
+	 * For an overlay price scale that has no series yet, returns the `overlayPriceScales` defaults.
+	 *
 	 * @returns Full set of currently applied options, including defaults
 	 */
 	options(): Readonly<PriceScaleOptions>;
@@ -2482,22 +2484,30 @@ export interface ISeriesApi<TSeriesType extends SeriesType, HorzScaleItem = Time
 	/**
 	 * Returns a bar data by provided logical index.
 	 *
+	 * The returned item is a copy rebuilt from the series' internal data, so it is not the same object passed to `setData` or `update`.
+	 * For built-in series types it contains only the fields the series supports; any other fields are dropped.
+	 * Custom series return all fields of the original item.
+	 *
 	 * @param logicalIndex - Logical index
 	 * @param mismatchDirection - Search direction if no data found at provided logical index.
-	 * @returns Original data item provided via setData or update methods.
+	 * @returns The data item at the logical index, or `null` if there is none.
 	 * @example
 	 * ```js
-	 * const originalData = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
+	 * const data = series.dataByIndex(10, LightweightCharts.MismatchDirection.NearestLeft);
 	 * ```
 	 */
 	dataByIndex(logicalIndex: number, mismatchDirection?: MismatchDirection): TData | null;
 	/**
 	 * Returns all the bar data for the series.
 	 *
-	 * @returns Original data items provided via setData or update methods.
+	 * The returned items are copies rebuilt from the series' internal data, not the objects passed to `setData` or `update`.
+	 * Whitespace items are excluded. For built-in series types each item contains only the fields the series supports;
+	 * any other fields are dropped. Custom series return all fields of the original items.
+	 *
+	 * @returns Data items of the series, excluding whitespace items.
 	 * @example
 	 * ```js
-	 * const originalData = series.data();
+	 * const data = series.data();
 	 * ```
 	 */
 	data(): readonly TData[];
@@ -2568,7 +2578,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType, HorzScaleItem = Time
 	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.seriesType()); // "Line"
 	 *
-	 * const candlestickSeries = chart.addCandlestickSeries();
+	 * const candlestickSeries = chart.addSeries(CandlestickSeries);
 	 * console.log(candlestickSeries.seriesType()); // "Candlestick"
 	 * ```
 	 */
@@ -2583,7 +2593,7 @@ export interface ISeriesApi<TSeriesType extends SeriesType, HorzScaleItem = Time
 	 * const lineSeries = chart.addSeries(LineSeries);
 	 * console.log(lineSeries.lastValueData(true)); // { noData: false, price: 24.11, color: '#000000' }
 	 *
-	 * const candlestickSeries = chart.addCandlestickSeries();
+	 * const candlestickSeries = chart.addSeries(CandlestickSeries);
 	 * console.log(candlestickSeries.lastValueData(false)); // { noData: false, price: 145.72, color: '#000000' }
 	 * ```
 	 */
@@ -3343,9 +3353,11 @@ export interface LocalizationOptions<HorzScaleItem> extends LocalizationOptionsB
 	/**
 	 * Override formatting of the time scale crosshair label.
 	 *
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
+	 *
 	 * @defaultValue `undefined`
 	 */
-	timeFormatter?: TimeFormatterFn<HorzScaleItem>;
+	timeFormatter?: TimeFormatterFn<HorzScaleItem> | null;
 	/**
 	 * Date formatting string.
 	 *
@@ -3371,28 +3383,36 @@ export interface LocalizationOptionsBase {
 	/**
 	 * Override formatting of the price scale tick marks, labels and crosshair labels. Can be used for cases that can't be covered with built-in price formats.
 	 *
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
+	 *
 	 * @see {@link PriceFormatCustom}
 	 * @defaultValue `undefined`
 	 */
-	priceFormatter?: PriceFormatterFn;
+	priceFormatter?: PriceFormatterFn | null;
 	/**
 	 * Overrides the formatting of price scale tick marks. Use this to define formatting rules based on all provided price values.
 	 *
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
+	 *
 	 * @defaultValue `undefined`
 	 */
-	tickmarksPriceFormatter?: TickmarksPriceFormatterFn;
+	tickmarksPriceFormatter?: TickmarksPriceFormatterFn | null;
 	/**
 	 * Overrides the formatting of percentage scale tick marks.
 	 *
-	 * @defaultValue `undefined`
-	 */
-	percentageFormatter?: PercentageFormatterFn;
-	/**
-	 * Override formatting of the percentage scale tick marks. Can be used if formatting should be adjusted based on all the values being formatted
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
 	 *
 	 * @defaultValue `undefined`
 	 */
-	tickmarksPercentageFormatter?: TickmarksPercentageFormatterFn;
+	percentageFormatter?: PercentageFormatterFn | null;
+	/**
+	 * Override formatting of the percentage scale tick marks. Can be used if formatting should be adjusted based on all the values being formatted
+	 *
+	 * Set to `null` to remove a previously set formatter and fall back to the built-in formatting.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	tickmarksPercentageFormatter?: TickmarksPercentageFormatterFn | null;
 }
 export interface MouseEventParams<HorzScaleItem = Time> {
 	/**
@@ -3682,6 +3702,16 @@ export interface PriceLineOptions {
 	 * @defaultValue `''`
 	 */
 	axisLabelTextColor: string;
+	/**
+	 * Hit-test tolerance in pixels, added on each side of the line (in addition to its
+	 * {@link lineWidth}) when determining whether a pointer event hits this price line.
+	 * Lower values require more precise pointing; `0` limits hits to the line itself.
+	 * Useful on desktop where the default tolerance can cause nearby price lines to
+	 * register as the same hit.
+	 *
+	 * @defaultValue `7`
+	 */
+	hitTestTolerance: number;
 }
 /**
  * Represents a price range.
@@ -4167,8 +4197,10 @@ export interface SeriesOptionsCommon {
 	 *     },
 	 * });
 	 * ```
+	 *
+	 * Set to `null` to remove a previously set provider and fall back to the built-in autoscaling.
 	 */
-	autoscaleInfoProvider?: AutoscaleInfoProvider;
+	autoscaleInfoProvider?: AutoscaleInfoProvider | null;
 	/**
 	 * Conflation smoothing factor for this series. Overrides the global time scale option.
 	 * Controls how aggressively conflation is applied specifically to this series.
@@ -4980,7 +5012,11 @@ export type TickmarksPriceFormatterFn = (priceValue: BarPrice[]) => string[];
 /**
  * The Time type is used to represent the time of data items.
  *
- * Values can be a {@link UTCTimestamp}, a {@link BusinessDay}, or a business day string in ISO format.
+ * Values can be a {@link UTCTimestamp}, a {@link BusinessDay}, or a business day string in `YYYY-MM-DD` format.
+ *
+ * Business day strings must be exactly `YYYY-MM-DD` with zero-padded month and day (for example `'2021-02-03'`).
+ * Any other string, such as `'2021-2-3'`, `'2021/02/03'` or `'Feb 3 2021'`, throws an error.
+ * If your dates are not in this format, use a {@link BusinessDay} object instead.
  *
  * @example
  * ```js

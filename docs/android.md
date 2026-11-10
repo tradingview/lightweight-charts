@@ -108,7 +108,7 @@ You can run the example (LighweightCharts.app) by cloning the repository and ope
 
 ---
 
-Documentation for Lightweight Charts™ v5.2 (latest released version).
+Documentation for Lightweight Charts™ v5.3 (latest released version).
 
 ## Sitemap
 

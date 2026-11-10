@@ -87,7 +87,7 @@ Refer to the following pages for functions defining the default widths of shapes
 
 ---
 
-Documentation for Lightweight Charts™ v5.2 (latest released version).
+Documentation for Lightweight Charts™ v5.3 (latest released version).
 
 ## Sitemap
 

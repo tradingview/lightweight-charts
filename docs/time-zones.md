@@ -124,7 +124,7 @@ The chart shows times exactly as you pass them and leaves the conversion to your
 
 ---
 
-Documentation for Lightweight Charts™ v5.2 (latest released version).
+Documentation for Lightweight Charts™ v5.3 (latest released version).
 
 ## Sitemap
 

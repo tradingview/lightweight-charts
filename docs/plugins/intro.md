@@ -52,7 +52,7 @@ Series primitives can also render on the price and time scales; pane primitives 
 
 ---
 
-Documentation for Lightweight Charts™ v5.2 (latest released version).
+Documentation for Lightweight Charts™ v5.3 (latest released version).
 
 ## Sitemap
 
