@@ -484,6 +484,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			this.recalculatePriceScales();
 		}
 
+		// Price scales and views stay current while hidden; only drawing is skipped. Showing the pane triggers a full update.
+		if (!this._state.visible()) {
+			return;
+		}
+
 		if (this._leftPriceAxisWidget !== null) {
 			this._leftPriceAxisWidget.paint(type);
 		}
