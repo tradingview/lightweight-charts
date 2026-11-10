@@ -22,7 +22,7 @@ async function beforeInteractions(container) {
 	const seen = new Map();
 	chart.subscribeCrosshairMove(event => {
 		if (event.point !== undefined) {
-			seen.set(Math.round(event.point.y), { draws, id: event.hoveredSeries === series ? event.hoveredObjectId : undefined });
+			seen.set(Math.round(event.point.y), { draws, id: event.hoveredInfo?.series === series ? event.hoveredInfo.objectId : undefined });
 		}
 	});
 	const canvas = chart.panes()[0].getHTMLElement().querySelector('td[style*="relative"] canvas');

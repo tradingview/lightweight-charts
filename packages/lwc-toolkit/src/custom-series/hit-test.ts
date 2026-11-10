@@ -105,11 +105,11 @@ export function nearestVerticalRange<HorzScaleItem, TData extends CustomData<Hor
 	// nearestBar only measures the bars whose `x` is within `halfWidth +
 	// tolerance` of the pointer, so `dx` is never beyond the tolerance.
 	return nearestBar(data, x, halfWidth + tolerance, tolerance, (bar, index) => {
-		const dx = distanceToRange(x, bar.x - halfWidth, bar.x + halfWidth);
 		const extent = span(bar, index);
 		if (extent === null) {
 			return null;
 		}
+		const dx = distanceToRange(x, bar.x - halfWidth, bar.x + halfWidth);
 		const dy = distanceToRange(y, extent[0], extent[1]);
 		return Math.sqrt(dx * dx + dy * dy);
 	});

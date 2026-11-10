@@ -13,7 +13,7 @@ async function beforeInteractions(container) {
 	const ids = new Map();
 	chart.subscribeCrosshairMove(event => {
 		if (event.point !== undefined) {
-			ids.set(Math.round(event.point.x), event.hoveredSeries === series ? event.hoveredObjectId : undefined);
+			ids.set(Math.round(event.point.x), event.hoveredInfo?.series === series ? event.hoveredInfo.objectId : undefined);
 		}
 	});
 	const canvas = chart.panes()[0].getHTMLElement().querySelector('td[style*="relative"] canvas');
