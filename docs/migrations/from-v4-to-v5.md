@@ -45,7 +45,7 @@ const lineSeries = chart.addSeries(LineSeries, { color: 'red' });
 Here's how to migrate each series type:
 
 | v4 Method | v5 Method |
-|-----------|-----------|
+| --------- | --------- |
 | `chart.addLineSeries(options)` | `chart.addSeries(LineSeries, options)` |
 | `chart.addAreaSeries(options)` | `chart.addSeries(AreaSeries, options)` |
 | `chart.addBarSeries(options)` | `chart.addSeries(BarSeries, options)` |

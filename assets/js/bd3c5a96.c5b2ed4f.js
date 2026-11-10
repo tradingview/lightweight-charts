@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklightweight_charts_website=self.webpackChunklightweight_charts_website||[]).push([["15957"],{33081(e){e.exports=JSON.parse('{"name":"lwc-plugin-catalogue","id":"default"}')}}]);

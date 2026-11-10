@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunklightweight_charts_website=self.webpackChunklightweight_charts_website||[]).push([["51059"],{55863:function(e,t,h){h.r(t)}}]);
