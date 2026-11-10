@@ -1,53 +1,80 @@
 import {
 	CustomSeriesPricePlotValues,
+	CustomSeriesWhitespaceData,
+	IChartApiBase,
+	ICustomSeriesPaneRenderer,
 	ICustomSeriesPaneView,
+	ISeriesApi,
 	PaneRendererCustomData,
-	WhitespaceData,
 	Time,
 } from 'lightweight-charts';
-import { HeatMapSeriesOptions, defaultOptions } from './options';
-import { HeatMapSeriesRenderer } from './renderer';
-import { HeatMapData } from './data';
 
-export class HeatMapSeries<TData extends HeatMapData>
-	implements ICustomSeriesPaneView<Time, TData, HeatMapSeriesOptions>
-{
-	_renderer: HeatMapSeriesRenderer<TData>;
+import { HeatmapData } from './data';
+import { hasDrawnCell, heatmapPlotValues } from './geometry';
+import { HeatmapSeriesOptions, HeatmapSeriesPartialOptions, defaultOptions } from './options';
+import { HeatmapSeriesRenderer } from './renderer';
 
-	constructor() {
-		this._renderer = new HeatMapSeriesRenderer();
+export class HeatmapSeries<
+	HorzScaleItem = Time,
+	TData extends HeatmapData<HorzScaleItem> = HeatmapData<HorzScaleItem>
+> implements ICustomSeriesPaneView<HorzScaleItem, TData, HeatmapSeriesOptions> {
+	private readonly _renderer: HeatmapSeriesRenderer<HorzScaleItem, TData> = new HeatmapSeriesRenderer();
+
+	/**
+	 * The lowest and the highest cell edge, so the whole column stays in view,
+	 * and their middle last, which is the value the price line and the last
+	 * value label show.
+	 */
+	public priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
+		return heatmapPlotValues(plotRow.cells);
 	}
 
-	priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {
-		if (plotRow.cells.length < 1) {
-			return [NaN];
-		}
-		let low = Infinity;
-		let high = - Infinity;
-		plotRow.cells.forEach(cell => {
-			if (cell.low < low) low = cell.low;
-			if (cell.high > high) high = cell.high;
-		});
-		const mid = low + (high - low) / 2;
-		return [low, high, mid];
+	/**
+	 * A point with no cell that can be drawn is whitespace: it keeps its place
+	 * on the time scale and stays out of the price scale. That covers `cells`
+	 * that is missing, `null` or empty, and cells that are all `null` or hold
+	 * a number that is not finite.
+	 */
+	public isWhitespace(data: TData | CustomSeriesWhitespaceData<HorzScaleItem>): data is CustomSeriesWhitespaceData<HorzScaleItem> {
+		return !hasDrawnCell((data as Partial<TData>).cells);
 	}
 
-	isWhitespace(data: TData | WhitespaceData): data is WhitespaceData {
-		return (data as Partial<TData>).cells === undefined || (data as Partial<TData>).cells!.length < 1;
-	}
-
-	renderer(): HeatMapSeriesRenderer<TData> {
+	public renderer(): ICustomSeriesPaneRenderer {
 		return this._renderer;
 	}
 
-	update(
-		data: PaneRendererCustomData<Time, TData>,
-		options: HeatMapSeriesOptions
+	public update(
+		data: PaneRendererCustomData<HorzScaleItem, TData>,
+		options: HeatmapSeriesOptions
 	): void {
 		this._renderer.update(data, options);
 	}
 
-	defaultOptions() {
+	public defaultOptions(): HeatmapSeriesOptions {
 		return defaultOptions;
 	}
+}
+
+export { createColorScale } from './color-scale';
+export type { ColorScaleOptions } from './color-scale';
+export type { HeatmapCell, HeatmapData } from './data';
+export type { HeatmapAmountRange, HeatmapCellShader, HeatmapSeriesOptions, HeatmapSeriesPartialOptions } from './options';
+export { defaultOptions } from './options';
+
+/** The series API `createHeatmapSeries` returns, with the plugin's data and options types. */
+export type HeatmapSeriesApi<H = Time, D extends HeatmapData<H> = HeatmapData<H>> =
+	ISeriesApi<'Custom', H, D | CustomSeriesWhitespaceData<H>, HeatmapSeriesOptions, HeatmapSeriesPartialOptions>;
+
+/**
+ * Adds a heatmap series to the chart. The same as
+ * `chart.addCustomSeries(new HeatmapSeries(), options, paneIndex)`, except
+ * that the options, here and in `applyOptions`, keep `cellShader` a function
+ * type, so an inline shader gets its parameters typed.
+ */
+export function createHeatmapSeries<H = Time, D extends HeatmapData<H> = HeatmapData<H>>(
+	chart: IChartApiBase<H>,
+	options: HeatmapSeriesPartialOptions = {},
+	paneIndex: number = 0
+): HeatmapSeriesApi<H, D> {
+	return chart.addCustomSeries<D, HeatmapSeriesOptions, HeatmapSeriesPartialOptions>(new HeatmapSeries<H, D>(), options, paneIndex);
 }
