@@ -104,7 +104,16 @@ function setTheme(theme: PreviewTheme): void {
 		return;
 	}
 	current = theme;
-	listeners.forEach((listener: ThemeListener) => listener(theme));
+	listeners.forEach((listener: ThemeListener) => {
+		try {
+			listener(theme);
+		} catch (error) {
+			// Reported, but the other listeners still run.
+			queueMicrotask(() => {
+				throw error;
+			});
+		}
+	});
 }
 
 document.documentElement.setAttribute('data-theme', current);
