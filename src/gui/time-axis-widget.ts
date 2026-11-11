@@ -364,7 +364,9 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	}
 
 	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
-		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, this._chart.model().backgroundBottomColor());
+		const model = this._chart.model();
+		const backgroundColor = this._chart.options().timeScale.position === 'top' ? model.backgroundTopColor() : model.backgroundBottomColor();
+		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, backgroundColor);
 	}
 
 	private _drawBorder({ context: ctx, bitmapSize, verticalPixelRatio }: BitmapCoordinatesRenderingScope): void {
@@ -549,7 +551,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			return options.leftPriceScale.borderVisible && model.timeScale().options().borderVisible;
 		};
 
-		const bottomColorGetter = () => model.backgroundBottomColor();
+		const bottomColorGetter = () => model.options().timeScale.position === 'top' ? model.backgroundTopColor() : model.backgroundBottomColor();
 
 		if (options.leftPriceScale.visible && this._leftStub === null) {
 			this._leftStub = new PriceAxisStub('left', options, params, borderVisibleGetter, bottomColorGetter);

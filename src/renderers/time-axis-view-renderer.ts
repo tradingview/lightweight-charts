@@ -80,12 +80,22 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			const y2scaled = positionTop ? bitmapSize.height : scaledLabelHeight;
 			const radiusScaled = Math.round(radius * horizontalPixelRatio);
 			ctx.beginPath();
-			ctx.moveTo(x1scaled, y1scaled);
-			ctx.lineTo(x1scaled, y2scaled - radiusScaled);
-			ctx.arcTo(x1scaled, y2scaled, x1scaled + radiusScaled, y2scaled, radiusScaled);
-			ctx.lineTo(x2scaled - radiusScaled, y2scaled);
-			ctx.arcTo(x2scaled, y2scaled, x2scaled, y2scaled - radiusScaled, radiusScaled);
-			ctx.lineTo(x2scaled, y1scaled);
+			if (positionTop) {
+				// rounded corners on the free (top) end, square at the attachment (bottom) edge
+				ctx.moveTo(x1scaled, y2scaled);
+				ctx.lineTo(x1scaled, y1scaled + radiusScaled);
+				ctx.arcTo(x1scaled, y1scaled, x1scaled + radiusScaled, y1scaled, radiusScaled);
+				ctx.lineTo(x2scaled - radiusScaled, y1scaled);
+				ctx.arcTo(x2scaled, y1scaled, x2scaled, y1scaled + radiusScaled, radiusScaled);
+				ctx.lineTo(x2scaled, y2scaled);
+			} else {
+				ctx.moveTo(x1scaled, y1scaled);
+				ctx.lineTo(x1scaled, y2scaled - radiusScaled);
+				ctx.arcTo(x1scaled, y2scaled, x1scaled + radiusScaled, y2scaled, radiusScaled);
+				ctx.lineTo(x2scaled - radiusScaled, y2scaled);
+				ctx.arcTo(x2scaled, y2scaled, x2scaled, y2scaled - radiusScaled, radiusScaled);
+				ctx.lineTo(x2scaled, y1scaled);
+			}
 			ctx.fill();
 
 			if (data.tickVisible) {
@@ -105,8 +115,10 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			const data = ensureNotNull(this._data);
 
 			const yBox = positionTop ? mediaSize.height - labelHeight : 0;
-			const yText =
-				yBox +
+			// mirrored vertical stack for position='top': [paddingBottom, text, paddingTop, tick, border]
+			const yText = positionTop
+				? yBox + rendererOptions.paddingBottom + rendererOptions.fontSize / 2
+				: yBox +
 				rendererOptions.borderSize +
 				rendererOptions.tickLength +
 				rendererOptions.paddingTop +
