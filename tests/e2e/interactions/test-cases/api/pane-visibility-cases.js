@@ -141,6 +141,43 @@ async function paneSwappedIntoViewIsPainted(container) {
 	chart.remove();
 }
 
+function dragSeparator(chart, separatorIndex, deltaY) {
+	const handle = Array.from(chart.chartElement().querySelectorAll('div'))
+		.filter(div => div.style.cursor === 'row-resize' && div.style.zIndex === '50')[separatorIndex];
+	const rect = handle.getBoundingClientRect();
+	const x = rect.left + rect.width / 2;
+	const y = rect.top + rect.height / 2;
+	const sourceCapabilities = new window.InputDeviceCapabilities({ firesTouchEvents: false });
+	const mouse = (type, clientY) => new MouseEvent(type, { bubbles: true, cancelable: true, button: 0, buttons: type === 'mouseup' ? 0 : 1, clientX: x, clientY, sourceCapabilities });
+	handle.dispatchEvent(mouse('mousedown', y));
+	document.documentElement.dispatchEvent(mouse('mousemove', y + deltaY));
+	document.documentElement.dispatchEvent(mouse('mouseup', y + deltaY));
+}
+
+async function separatorPressNextToJustHiddenPaneIsIgnored(container) {
+	const { chart } = createTestChart(container, [10, 20, 30]);
+	await nextFrame();
+	const panes = chart.panes();
+	const stretchFactors = () => panes.map(pane => pane.getStretchFactor()).join();
+	const initialStretchFactors = stretchFactors();
+	const errors = [];
+	const onError = event => errors.push(event.message);
+	window.addEventListener('error', onError);
+
+	// A hidden pane's separator stays displayed until the next layout, so these presses still reach it.
+	panes[1].setVisible(false);
+	dragSeparator(chart, 0, 40);
+	check(stretchFactors() === initialStretchFactors, `a press with the pane below hidden should be ignored, got ${stretchFactors()}`);
+
+	panes[1].setVisible(true);
+	await nextFrame();
+	panes[0].setVisible(false);
+	dragSeparator(chart, 0, 40);
+	window.removeEventListener('error', onError);
+	check(errors.length === 0, `a press with no visible pane above should be ignored, got ${errors.join()}`);
+	chart.remove();
+}
+
 async function beforeInteractions(container) {
 	await logoFollowsLastVisiblePane(container);
 	await priceAxisWidthIgnoresHiddenFirstPane(container);
@@ -148,6 +185,7 @@ async function beforeInteractions(container) {
 	await hiddenPaneSizeFollowsResize(container);
 	await hiddenPaneIsNotPaintedUntilShown(container);
 	await paneSwappedIntoViewIsPainted(container);
+	await separatorPressNextToJustHiddenPaneIsIgnored(container);
 }
 
 function afterInitialInteractions() {
