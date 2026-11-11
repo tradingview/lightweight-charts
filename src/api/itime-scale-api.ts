@@ -135,16 +135,25 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	coordinateToTime(x: number): HorzScaleItem | null;
 
 	/**
-	 * Returns a width of the time scale.
+	 * Returns the width of the time scale.
 	 *
-	 * The width equals the pane width, so it is known even while the time
-	 * scale is hidden or its visibility was changed in the same call stack
-	 * (before the next render).
+	 * Returns `0` while the time scale is hidden (`timeScale.visible: false`).
+	 * Sizes are calculated during the next render, so after changing options
+	 * that affect the layout (for example toggling `timeScale.visible`) the
+	 * returned value may be out of date until the next animation frame.
+	 *
+	 * To get the width that the time scale occupies (or would occupy if it
+	 * were visible), use {@link IChartApiBase.paneSize} - the time scale
+	 * width is always equal to the pane width.
 	 */
 	width(): number;
 
 	/**
-	 * Returns a height of the time scale.
+	 * Returns the height of the time scale.
+	 *
+	 * Returns `0` while the time scale is hidden (`timeScale.visible: false`).
+	 * Like {@link width}, the value is updated during the next render after
+	 * a layout-affecting options change.
 	 */
 	height(): number;
 
