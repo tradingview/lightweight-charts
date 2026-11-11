@@ -16,6 +16,69 @@ toc_max_heading_level: 2
 
 <!-- markdownlint-disable no-emphasis-as-heading -->
 <!-- ^ using emphasis as headings so we don't have duplicate headers -->
+## 5.3.0
+
+**Enhancements**
+
+- Added `hitTestTolerance` option to `PriceLineOptions`, which controls how many pixels beyond a price line's stroke still count as a hit when hovering. This was previously fixed at 7px, so closely stacked price lines could register hovers for their neighbours. The default stays at `7`, matching the previous behaviour, and the name matches the series-level `hitTestTolerance` option. (PR [#2081](https://github.com/tradingview/lightweight-charts/pull/2081), fixes [#1610](https://github.com/tradingview/lightweight-charts/issues/1610), contributed by [@sahil-tandon](https://github.com/sahil-tandon))
+- Improved curved line rendering (`LineType.Curved`) by replacing the Catmull-Rom interpolation with the Fritsch-Carlson monotone algorithm. The curve no longer overshoots the values of neighbouring points, so flat sections stay flat without spikes. Curved lines will look slightly different from previous versions. (PR [#2108](https://github.com/tradingview/lightweight-charts/pull/2108), fixes [#1680](https://github.com/tradingview/lightweight-charts/issues/1680), contributed by [@edew](https://github.com/edew))
+
+**Bug Fixes**
+
+- Business day strings must now be in the zero-padded `YYYY-MM-DD` format in all builds. The production build previously skipped the format check that the development build performs, and the browser parsed strings such as `'2024-1-5'`, `'2024/01/05'` or `'Jan 5 2024'` as local time. For users in timezones ahead of UTC, these points were plotted one day early. Such strings now throw an error in all builds, as they already did in development builds. If your data uses these formats, zero-pad it to `'YYYY-MM-DD'` or pass a `BusinessDay` object (`{ year, month, day }`) instead. (PR [#2189](https://github.com/tradingview/lightweight-charts/pull/2189))
+- Fixed `series.update(item, true)` (historical update) overwriting the next bar when the series had no bar at the target time, for example when that time was a whitespace item or only existed because another series had a bar there. The new bar is now inserted at the target time, and a whitespace update at such a time no longer removes the next bar. (PR [#2194](https://github.com/tradingview/lightweight-charts/pull/2194))
+- Fixed the time scale jumping when new bars are added while the user is dragging the chart. (PR [#2157](https://github.com/tradingview/lightweight-charts/pull/2157), fixes [#1521](https://github.com/tradingview/lightweight-charts/issues/1521))
+- Fixed animated time scale scrolls (`scrollToRealTime()`, `scrollToPosition(x, true)`) stopping one frame short of their target. The final position varied between runs and, if the first animation frame arrived after the whole duration (for example in a background tab), the view didn't move at all. Kinetic scrolling had the same final-frame skip. (PR [#2174](https://github.com/tradingview/lightweight-charts/pull/2174))
+- Fixed `setVisibleLogicalRange()` and `setVisibleRange()` collapsing the requested range when zoomed in to fewer bars than the minimum visible bars count (only possible with an increased `maxBarSpacing`). (PR [#2155](https://github.com/tradingview/lightweight-charts/pull/2155), fixes [#1924](https://github.com/tradingview/lightweight-charts/issues/1924), contributed by [@komagic](https://github.com/komagic))
+- Fixed the chart becoming empty, with `getVisibleLogicalRange()` returning `null`. This happened when `setData()` was called twice with identical times on the only series, and then a second series was added and `setData()` was called again. (PR [#2158](https://github.com/tradingview/lightweight-charts/pull/2158), fixes [#2154](https://github.com/tradingview/lightweight-charts/issues/2154), contributed by [@YodHeVauHe](https://github.com/YodHeVauHe))
+- Fixed a series not being drawn when all of its visible values were equal and very large (around `1e15` and above). The range extension used to keep the price scale usable was smaller than the floating-point spacing at that magnitude, so the range stayed empty. (PR [#2192](https://github.com/tradingview/lightweight-charts/pull/2192), fixes [#1650](https://github.com/tradingview/lightweight-charts/issues/1650), contributed by [@hakarrr](https://github.com/hakarrr))
+- Fixed custom localization formatters (`priceFormatter`, `percentageFormatter`, `timeFormatter`, and the tick mark formatters) not being removed when set back to `undefined` via `applyOptions`. (PR [#2156](https://github.com/tradingview/lightweight-charts/pull/2156), fixes [#1909](https://github.com/tradingview/lightweight-charts/issues/1909))
+- Fixed an error when requesting `options()` of an overlay price scale that doesn't have any series yet. It now returns the options that the scale will be created with, based on the chart's `overlayPriceScales` option. (PR [#2152](https://github.com/tradingview/lightweight-charts/pull/2152), fixes [#1092](https://github.com/tradingview/lightweight-charts/issues/1092))
+- Fixed the default price formatter truncating prices instead of rounding them when `minMove` is `1` or greater. For example, with `{ precision: 0, minMove: 1 }`, `12.6` was displayed as `12` instead of `13`. (PR [#2176](https://github.com/tradingview/lightweight-charts/pull/2176), contributed by [@l3xxxy](https://github.com/l3xxxy))
+- Fixed the `precision` option being ignored for the `'percent'` price format. With the default precision, `12.345` was displayed as `12.1%` instead of `12.35%`, and `precision: 0` displayed `NaN%`. (PR [#2191](https://github.com/tradingview/lightweight-charts/pull/2191), contributed by [@wavebyrd](https://github.com/wavebyrd))
+- Fixed time scale labels during the hour skipped when daylight saving time starts. The default tick mark formatter showed these times an hour later for users in DST timezones, so neighbouring ticks could share a label and disagree with the crosshair label. (PR [#2175](https://github.com/tradingview/lightweight-charts/pull/2175), contributed by [@b84330808](https://github.com/b84330808))
+- Fixed panes, separators and the time axis adding up to more than the chart height at fractional device pixel ratios (such as 1.25 or 1.5), which caused the time axis to move by a pixel when a pane was added or removed. (PR [#2184](https://github.com/tradingview/lightweight-charts/pull/2184), contributed by [@Cujuju](https://github.com/Cujuju))
+- Fixed `precomputeConflationOnInit` never using `scheduler.postTask`, which meant `precomputeConflationPriority` had no effect. The production build was renaming the Prioritized Task Scheduling API properties. (PR [#2148](https://github.com/tradingview/lightweight-charts/pull/2148), fixes [#2146](https://github.com/tradingview/lightweight-charts/issues/2146))
+- Fixed a crash in environments where `navigator.userAgentData.brands` is undefined, such as some WebView and privacy-restricted browsers. (PR [#2058](https://github.com/tradingview/lightweight-charts/pull/2058), fixes [#2046](https://github.com/tradingview/lightweight-charts/issues/2046), contributed by [@Rossonero](https://github.com/Rossonero))
+- Fixed `createChart()` throwing when the options object contains its own `hasOwnProperty` key, for example options parsed from JSON. (PR [#2187](https://github.com/tradingview/lightweight-charts/pull/2187))
+- Fixed Area and Baseline series throwing an error on every redraw when given a fill colour that can't be parsed. Such colours are now drawn as transparent. (PR [#2171](https://github.com/tradingview/lightweight-charts/pull/2171), contributed by [@jeewanbhatta](https://github.com/jeewanbhatta))
+- The pane separator colour (`layout.panes.separatorColor`) is now applied as `background-color` instead of the `background` shorthand, so only colour values are accepted. (PR [#2170](https://github.com/tradingview/lightweight-charts/pull/2170), contributed by [@jeewanbhatta](https://github.com/jeewanbhatta))
+- Capped the whitespace generated by a yield curve chart's `minimumTimeRange` option at 100,000 points. Very large values previously froze the page while allocating memory. (PR [#2172](https://github.com/tradingview/lightweight-charts/pull/2172), contributed by [@jeewanbhatta](https://github.com/jeewanbhatta))
+- Fixed the descriptions of `ISeriesApi.data()` and `dataByIndex()`. The returned items are rebuilt from the series' internal data rather than being the original objects, `data()` doesn't include whitespace items, and built-in series types only keep the fields that they support. (PR [#2164](https://github.com/tradingview/lightweight-charts/pull/2164), fixes [#1649](https://github.com/tradingview/lightweight-charts/issues/1649))
+
+**Development**
+
+- Switched the repository to a pnpm workspace. (PR [#2114](https://github.com/tradingview/lightweight-charts/pull/2114))
+
+**Documentation Updates**
+
+- Added an [Examples](https://tradingview.github.io/lightweight-charts/examples) gallery with live demos and ready-to-copy code for series types, panes, markers, tooltips, real-time updates, and more.
+- Added a [Build with AI](https://tradingview.github.io/lightweight-charts/docs/ai) section that explains how to set up Agent Skills for AI coding assistants and use machine-readable docs such as `llms.txt` and per-page Markdown.
+- Added a [product comparison](https://tradingview.github.io/lightweight-charts/docs/product-comparison) article that helps choose between Lightweight Charts, Advanced Charts, Trading Platform, and Widgets, and maps Lightweight Charts APIs to their Advanced Charts equivalents.
+- Added a note on estimating the [number of visible bars](https://tradingview.github.io/lightweight-charts/docs/time-scale#number-of-visible-bars).
+- Removed outdated references to v4 methods.
+- Updated the iOS and Android wrapper articles.
+- Refreshed the community React wrapper links.
+
+**Contributors**
+
+We'd like to thank our external contributors for their valuable contributions to this release:
+
+- [@b84330808](https://github.com/b84330808)
+- [@Cujuju](https://github.com/Cujuju)
+- [@edew](https://github.com/edew)
+- [@hakarrr](https://github.com/hakarrr)
+- [@jeewanbhatta](https://github.com/jeewanbhatta)
+- [@komagic](https://github.com/komagic)
+- [@l3xxxy](https://github.com/l3xxxy)
+- [@Rossonero](https://github.com/Rossonero)
+- [@sahil-tandon](https://github.com/sahil-tandon)
+- [@ukorvl](https://github.com/ukorvl)
+- [@wavebyrd](https://github.com/wavebyrd)
+- [@YodHeVauHe](https://github.com/YodHeVauHe)
+
+[Changes since the last published version](https://github.com/tradingview/lightweight-charts/compare/v5.2.1..v5.3.0).
+
 ## 5.2.1
 
 **Enhancements**
@@ -1088,4 +1151,4 @@ See [issues assigned to this version’s milestone](https://github.com/tradingvi
 
 The first release.
 
-The docs for this version are available [here](https://github.com/tradingview/lightweight-charts/tree/v1.0.0/docs).
+The docs for this version are available in the [v1.0.0 docs on GitHub](https://github.com/tradingview/lightweight-charts/tree/v1.0.0/docs).
