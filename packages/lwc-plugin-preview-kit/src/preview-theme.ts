@@ -13,7 +13,7 @@
  *
  * The page's root element carries the theme as `data-theme`, which is what
  * `preview.css` keys its colours on. On a built page `theme-boot.js` sets it
- * before the first paint, and this module starts from that value.
+ * before the first paint, and this module takes it over.
  */
 
 export type PreviewTheme = 'light' | 'dark';
@@ -54,7 +54,7 @@ interface CrosshairLineThemeOptions {
 	labelBackgroundColor: string;
 }
 
-/** The chart options set here, typed so that a misspelled key fails to compile. */
+/** The chart options set here, copied by hand from `lightweight-charts` and not checked against it. */
 export interface ChartThemeOptions {
 	layout: {
 		background: { type: 'solid'; color: string };
@@ -120,10 +120,10 @@ function framingRoot(): HTMLElement | null {
 const listeners = new Set<ThemeListener>();
 const pinned = asTheme(new URLSearchParams(window.location.search).get('theme'));
 const framing = pinned === null ? framingRoot() : null;
-// Set by theme-boot.js; the rest is for an unbuilt dev page, which has none.
-let current: PreviewTheme = asTheme(document.documentElement.getAttribute('data-theme'))
+// The framing page first: it may have switched since theme-boot.js ran.
+let current: PreviewTheme = asTheme(framing?.getAttribute('data-theme'))
+	?? asTheme(document.documentElement.getAttribute('data-theme'))
 	?? pinned
-	?? asTheme(framing?.getAttribute('data-theme'))
 	?? 'light';
 
 function setTheme(theme: PreviewTheme): void {
@@ -153,8 +153,13 @@ if (framing !== null) {
 		}
 	});
 	observer.observe(framing, { attributes: true, attributeFilter: ['data-theme'] });
-	// The framing page outlives this frame and would keep it in memory.
-	window.addEventListener('pagehide', () => observer.disconnect(), { once: true });
+	// The framing page outlives this frame and would keep it in memory. Not on
+	// the way into the back/forward cache, though: the frame comes back from it.
+	window.addEventListener('pagehide', (event: PageTransitionEvent) => {
+		if (!event.persisted) {
+			observer.disconnect();
+		}
+	});
 }
 
 /** The theme the page is drawn in right now. */
