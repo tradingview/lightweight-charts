@@ -7,6 +7,7 @@ import {
 } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { addAccessibilityPlugin, createToneSonifier, esMessages } from '../accessibility';
 import { generateLineData } from './sample-data';
 
@@ -44,6 +45,7 @@ const chart = createChart('chart', {
 	autoSize: true,
 	timeScale: { rightOffset: 10, barSpacing: 8 },
 });
+themeChart(chart);
 
 const priceData = generateLineData(200);
 

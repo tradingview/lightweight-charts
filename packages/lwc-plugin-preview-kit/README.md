@@ -11,13 +11,21 @@ negative values and every option the plugin has. A preview is what the
 catalog frames next to the README, so it shows the plugin at its best in a
 short frame and nothing else.
 
-Two entry points:
+Three entry points:
 
 - `@tradingview/lwc-plugin-preview-kit/preview.css` — the whole layout. One
   compact `#controls` row above a `#chart` that fills the rest of the frame.
-  Light only (`color-scheme: light`), because the page is framed inside a site
-  that also has a dark theme. Nothing is restyled after load, so the chart is
-  created at its final size and does not jump.
+  Light and dark, keyed on the root element's `data-theme`. Nothing is
+  restyled after load, so the chart is created at its final size and does not
+  jump.
+- `@tradingview/lwc-plugin-preview-kit/preview-theme` — follows the theme of
+  the docs page that frames the preview, live: toggling the site theme
+  restyles the running preview without reloading it. `?theme=light|dark` in
+  the page URL pins a theme instead (a page opened on its own is light).
+  `themeChart(chart, onTheme?)` themes the chart's background, text, grid,
+  scale borders and crosshair labels now and on every switch; `onTheme` is
+  where a preview recolours anything of its own that would not read on the
+  other background.
 - `@tradingview/lwc-plugin-preview-kit/preview-controls` — `mountControls(defs)`
   builds the control row from `select`, `checkbox` and `button` declarations,
   and `addRefreshButton(onRefresh)` adds a "New data" button for the previews
@@ -31,6 +39,13 @@ A preview page is therefore two elements and a script:
 <script type="module" src="./preview.ts"></script>
 ```
 
-Add it to a package with `@tradingview/lwc-plugin-preview-kit: workspace:*` in
+The page script is a module and can run after the first paint, so
+`src/theme-boot.js` sets the theme before it: `pnpm plugins:build-demos`
+inlines it straight after `<meta charset>` of every built preview page (the
+build fails without one), which is why a preview page needs no script of its
+own in its HTML. It applies the same rules as `preview-theme`; change them in
+both places.
+
+Add the kit to a package with `@tradingview/lwc-plugin-preview-kit: workspace:*` in
 `devDependencies` — `create-lwc-plugin --workspace` does this for you — and
 declare `lwcPlugin.preview` (and `previewHeight`, when 330 px is not enough).

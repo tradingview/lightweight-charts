@@ -1,6 +1,7 @@
 import { Time, createChart } from 'lightweight-charts';
 import { addRefreshButton, mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { PrettyHistogramData } from '../data';
 import { createPrettyHistogramSeries } from '../pretty-histogram-series';
 import { generateLineData } from './sample-data';
@@ -16,6 +17,7 @@ function buildData(): PrettyHistogramData<Time>[] {
 }
 
 const chart = createChart('chart', { autoSize: true });
+themeChart(chart);
 
 const series = createPrettyHistogramSeries(chart, {
 	radius: 4,
