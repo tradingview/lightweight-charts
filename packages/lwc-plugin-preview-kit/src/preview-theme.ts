@@ -46,14 +46,42 @@ const palette = {
 	},
 } as const;
 
+interface ScaleThemeOptions {
+	borderColor: string;
+}
+
+interface CrosshairLineThemeOptions {
+	labelBackgroundColor: string;
+}
+
+/** The chart options set here, typed so that a misspelled key fails to compile. */
+export interface ChartThemeOptions {
+	layout: {
+		background: { type: 'solid'; color: string };
+		textColor: string;
+		panes: { separatorColor: string };
+	};
+	grid: {
+		vertLines: { color: string };
+		horzLines: { color: string };
+	};
+	rightPriceScale: ScaleThemeOptions;
+	leftPriceScale: ScaleThemeOptions;
+	timeScale: ScaleThemeOptions;
+	crosshair: {
+		vertLine: CrosshairLineThemeOptions;
+		horzLine: CrosshairLineThemeOptions;
+	};
+}
+
 /**
  * The chart options that differ between the two themes. Light restates the
  * library defaults, so switching back from dark leaves no dark colour behind.
  */
-export function chartThemeOptions(theme: PreviewTheme): object {
+export function chartThemeOptions(theme: PreviewTheme): ChartThemeOptions {
 	const colors = palette[theme];
-	const scale = { borderColor: colors.border };
-	const crosshairLine = { labelBackgroundColor: colors.crosshairLabel };
+	const scale: ScaleThemeOptions = { borderColor: colors.border };
+	const crosshairLine: CrosshairLineThemeOptions = { labelBackgroundColor: colors.crosshairLabel };
 	return {
 		layout: {
 			background: { type: 'solid', color: colors.background },
