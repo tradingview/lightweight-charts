@@ -136,6 +136,10 @@ export interface ITimeScaleApi<HorzScaleItem> {
 
 	/**
 	 * Returns a width of the time scale.
+	 *
+	 * The width equals the pane width, so it is known even while the time
+	 * scale is hidden or its visibility was changed in the same call stack
+	 * (before the next render).
 	 */
 	width(): number;
 

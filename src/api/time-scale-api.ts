@@ -162,7 +162,11 @@ export class TimeScaleApi<HorzScaleItem> implements ITimeScaleApi<HorzScaleItem>
 	}
 
 	public width(): number {
-		return this._timeAxisWidget.getSize().width;
+		// the widget size is 0 while the time scale is hidden and is only
+		// updated on the next render after a visibility change, whereas the
+		// model always tracks the current pane width (which is the width the
+		// time scale has, or would have if it were visible)
+		return this._timeScale.width();
 	}
 
 	public height(): number {
