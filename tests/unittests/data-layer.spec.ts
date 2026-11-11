@@ -1050,6 +1050,138 @@ describe('DataLayer', () => {
 			expect((seriesUpdate.data[1].time as unknown as TimePoint).timestamp).to.be.equal(4000 as UTCTimestamp);
 		});
 
+		it('should insert a bar when a historical update replaces a whitespace in the middle', () => {
+			const dataLayer = new DataLayer<Time>(behavior);
+
+			const series = createSeriesMock();
+
+			dataLayer.setSeriesData(series, [
+				dataItemAt(1000 as UTCTimestamp),
+				whitespaceItemAt(2000 as UTCTimestamp),
+				dataItemAt(3000 as UTCTimestamp),
+			]);
+
+			const updateResult = dataLayer.updateSeriesData(series, dataItemAt(2000 as UTCTimestamp), true);
+
+			expect(updateResult.timeScale.baseIndex).to.be.equal(2 as TimePointIndex);
+			expect(updateResult.timeScale.points).to.be.equal(undefined);
+			expect(updateResult.series.size).to.be.equal(1);
+
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
+			expect(seriesUpdate.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
+				{ index: 0, time: { timestamp: 1000 } },
+				{ index: 1, time: { timestamp: 2000 } },
+				{ index: 2, time: { timestamp: 3000 } },
+			]);
+		});
+
+		it('should insert a bar when a historical update targets a time point only another series has', () => {
+			const dataLayer = new DataLayer<Time>(behavior);
+
+			const series1 = createSeriesMock();
+			const series2 = createSeriesMock();
+
+			dataLayer.setSeriesData(series1, [
+				dataItemAt(1000 as UTCTimestamp),
+				dataItemAt(2000 as UTCTimestamp),
+				dataItemAt(3000 as UTCTimestamp),
+			]);
+			dataLayer.setSeriesData(series2, [
+				dataItemAt(1000 as UTCTimestamp),
+				dataItemAt(3000 as UTCTimestamp),
+			]);
+
+			const updateResult = dataLayer.updateSeriesData(series2, dataItemAt(2000 as UTCTimestamp), true);
+
+			expect(updateResult.timeScale.points).to.be.equal(undefined);
+
+			const seriesUpdate = updateResult.series.get(series2) as SeriesChanges;
+			expect(seriesUpdate.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
+				{ index: 0, time: { timestamp: 1000 } },
+				{ index: 1, time: { timestamp: 2000 } },
+				{ index: 2, time: { timestamp: 3000 } },
+			]);
+		});
+
+		it('should not remove a bar when a historical update sets whitespace where the series has no bar', () => {
+			const dataLayer = new DataLayer<Time>(behavior);
+
+			const series = createSeriesMock();
+
+			dataLayer.setSeriesData(series, [
+				dataItemAt(1000 as UTCTimestamp),
+				whitespaceItemAt(2000 as UTCTimestamp),
+				dataItemAt(3000 as UTCTimestamp),
+			]);
+
+			const updateResult = dataLayer.updateSeriesData(series, whitespaceItemAt(2000 as UTCTimestamp), true);
+
+			const seriesUpdate = updateResult.series.get(series) as SeriesChanges;
+			expect(seriesUpdate.data).excludingEvery(['value', 'originalTime']).to.have.deep.members([
+				{ index: 0, time: { timestamp: 1000 } },
+				{ index: 2, time: { timestamp: 3000 } },
+			]);
+		});
+
+		it('should keep appending in order after a historical update inserts a new last bar', () => {
+			const dataLayer = new DataLayer<Time>(behavior);
+
+			const series1 = createSeriesMock();
+			const series2 = createSeriesMock();
+
+			dataLayer.setSeriesData(series1, [
+				dataItemAt(1000 as UTCTimestamp),
+				dataItemAt(2000 as UTCTimestamp),
+			]);
+			dataLayer.setSeriesData(series2, [
+				dataItemAt(1000 as UTCTimestamp),
+				dataItemAt(3000 as UTCTimestamp),
+			]);
+
+			dataLayer.updateSeriesData(series1, dataItemAt(3000 as UTCTimestamp), true);
+			const updateResult = dataLayer.updateSeriesData(series1, dataItemAt(4000 as UTCTimestamp), false);
+
+			const seriesUpdate = updateResult.series.get(series1) as SeriesChanges;
+			expect(seriesUpdate.data.map((row: SeriesChanges['data'][number]) => row.index)).to.be.deep.equal([0, 1, 2, 3]);
+			expect(seriesUpdate.data.map((row: SeriesChanges['data'][number]) => (row.time as unknown as TimePoint).timestamp)).to.be.deep.equal([1000, 2000, 3000, 4000]);
+		});
+
+		it('should not move the last time back when a historical update inserts a bar before trailing whitespace', () => {
+			const dataLayer = new DataLayer<Time>(behavior);
+
+			const series = createSeriesMock();
+
+			dataLayer.setSeriesData(series, [
+				dataItemAt(1000 as UTCTimestamp),
+				whitespaceItemAt(2000 as UTCTimestamp),
+				whitespaceItemAt(3000 as UTCTimestamp),
+			]);
+
+			dataLayer.updateSeriesData(series, dataItemAt(2000 as UTCTimestamp), true);
+
+			// same as after setData([1000, 2000, whitespace 3000]): the last time is still 3000
+			expect(() => dataLayer.updateSeriesData(series, dataItemAt(2500 as UTCTimestamp), false)).to.throw('Cannot update oldest data');
+			expect(() => dataLayer.updateSeriesData(series, dataItemAt(2000 as UTCTimestamp), false)).to.throw('Cannot update oldest data');
+		});
+
+		it('should move the last time forward when a historical update sets whitespace after the last bar', () => {
+			const dataLayer = new DataLayer<Time>(behavior);
+
+			const series1 = createSeriesMock();
+			const series2 = createSeriesMock();
+
+			dataLayer.setSeriesData(series1, [dataItemAt(1000 as UTCTimestamp)]);
+			dataLayer.setSeriesData(series2, [
+				dataItemAt(1000 as UTCTimestamp),
+				dataItemAt(3000 as UTCTimestamp),
+			]);
+
+			dataLayer.updateSeriesData(series1, whitespaceItemAt(3000 as UTCTimestamp), true);
+
+			// same as after setData([1000, whitespace 3000]): the last time is 3000
+			expect(() => dataLayer.updateSeriesData(series1, dataItemAt(2000 as UTCTimestamp), false)).to.throw('Cannot update oldest data');
+		});
+
 		it('should generate full update if whitespace extends timescale', () => {
 			const dataLayer = new DataLayer<Time>(behavior);
 

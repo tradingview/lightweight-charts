@@ -407,17 +407,34 @@ export class DataLayer<HorzScaleItem> {
 	}
 
 	private _updateHistoricalSeriesRow(series: Series<SeriesType>, plotRow: SeriesPlotRow<SeriesType> | WhitespacePlotRow, pointDataIndex: number): void {
-		const seriesData = this._seriesRowsBySeries.get(series);
+		let seriesData = this._seriesRowsBySeries.get(series);
 		if (seriesData === undefined) {
-			return;
+			seriesData = [];
+			this._seriesRowsBySeries.set(series, seriesData);
 		}
-		// binary search for actual index in array.
+		// binary search for the first row at or after the point index
 		const index = lowerBound(seriesData, pointDataIndex, (row: SeriesPlotRow<SeriesType>, currentIndex: number): boolean =>
 			row.index < currentIndex
 		);
+		// the series has no row at this time point when it holds a whitespace item there,
+		// or when the time point exists only because another series has a bar at it
+		const rowExists = index < seriesData.length && seriesData[index].index === pointDataIndex;
+
+		// the last time counts whitespace (as in setData and the last-row path), so it only moves
+		// forward here: a bar inserted before trailing whitespace must not move it back
+		const lastTime = this._seriesLastTimePoint.get(series);
+		if (lastTime === undefined || this._horzScaleBehavior.key(plotRow.time) > this._horzScaleBehavior.key(lastTime)) {
+			this._seriesLastTimePoint.set(series, plotRow.time);
+		}
+
 		if (isSeriesPlotRow(plotRow)) {
-			seriesData[index] = plotRow;
-		} else {
+			if (rowExists) {
+				seriesData[index] = plotRow;
+			} else {
+				// insert instead of overwriting the next row
+				seriesData.splice(index, 0, plotRow);
+			}
+		} else if (rowExists) {
 			seriesData.splice(index, 1);
 		}
 	}
