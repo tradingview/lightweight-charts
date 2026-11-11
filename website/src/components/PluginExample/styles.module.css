@@ -8,7 +8,7 @@
 	background: #ffffff;
 }
 
-:global(html[data-theme='dark']) .frameBare {
+:global(html[data-theme='dark']) .themed {
 	background: #000000;
 }
 
