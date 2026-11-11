@@ -144,7 +144,7 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 *
 	 * To get the width that the time scale occupies (or would occupy if it
 	 * were visible), use {@link IChartApiBase.paneSize} - the time scale
-	 * width is always equal to the pane width.
+	 * spans the full pane width when visible.
 	 */
 	width(): number;
 
