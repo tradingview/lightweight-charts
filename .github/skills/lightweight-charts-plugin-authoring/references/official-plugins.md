@@ -38,6 +38,24 @@ a gradient. Shows `canvas/round-rect` with clamped radii, `base` reported in
 dimming, a `conflationReducer` that keeps the later value, and the guard for
 an empty visible range.
 
+### `lollipop-series` — markers on stems, sized by the bar spacing
+
+A dot at each value on a stem from `base`, drawn with `beginMarker` from
+`canvas/markers`. Read for: sizes that are options but capped by the bar
+spacing, and the dot also by a fixed maximum that keeps it within the price
+scale's margins in a pane at least 100 px tall, since autoscale only knows the
+values (`geometry.ts`, unit-tested); a stem kept at least one device pixel
+wide; centering the dot on the stem as it was snapped to the pixel grid; and a
+`hitTest` built on `custom-series/hit-test`: `nearestVerticalRange` for the
+stems and `nearestBar` with `markerDistance` for the dots, so that each dot is
+measured as drawn, reporting the dot as a `'point'` and the stem as a
+`'range'`, since the chart prefers any point hit to a range hit whatever the
+distance. It has no `conflationReducer`, so it sizes against `barSpacing`, not
+`effectiveBarSpacing`. Its `hover-empty-space` interaction test shows the
+library's own fallback: where the renderer's `hitTest` returns `null`, a
+pointer inside a bar's slot between its plot values still reports the series
+as hovered, without an `objectId`.
+
 ### `stacked-area-series` — bands, gaps and conflation together
 
 Cumulative bands from `values[]`, negatives folding back to the base,
@@ -170,7 +188,7 @@ interaction tests show how to assert on DOM state.
 
 Upstream `plugin-examples/src/plugins/` holds unpublished proof-of-concept
 plugins: tooltips and delta tooltips, a rectangle drawing tool, trend lines,
-a heatmap series, lollipop, grouped bars, box-whisker,
+a heatmap series, grouped bars, box-whisker,
 background shading, price alerts, a volume profile, a partial price line,
 and crosshair highlighting. Good for seeing the shape of an
 idea; they predate the toolkit and skip the tests and README the packages

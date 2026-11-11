@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Lollipop Series preview">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <g stroke="#2962ff" stroke-width="2">
+    <line x1="26" y1="90" x2="26" y2="62"/>
+    <line x1="50" y1="90" x2="50" y2="54"/>
+    <line x1="74" y1="90" x2="74" y2="70"/>
+    <line x1="98" y1="90" x2="98" y2="84"/>
+    <line x1="122" y1="90" x2="122" y2="104"/>
+    <line x1="146" y1="90" x2="146" y2="122"/>
+    <line x1="170" y1="90" x2="170" y2="112"/>
+    <line x1="194" y1="90" x2="194" y2="96"/>
+    <line x1="218" y1="90" x2="218" y2="74"/>
+    <line x1="242" y1="90" x2="242" y2="58"/>
+    <line x1="266" y1="90" x2="266" y2="66"/>
+    <line x1="290" y1="90" x2="290" y2="82"/>
+  </g>
+  <g fill="#2962ff">
+    <circle cx="26" cy="62" r="5"/>
+    <circle cx="50" cy="54" r="5"/>
+    <circle cx="74" cy="70" r="5"/>
+    <circle cx="98" cy="84" r="5"/>
+    <circle cx="122" cy="104" r="5"/>
+    <circle cx="146" cy="122" r="5"/>
+    <circle cx="170" cy="112" r="5"/>
+    <circle cx="194" cy="96" r="5"/>
+    <circle cx="218" cy="74" r="5"/>
+    <circle cx="242" cy="58" r="5"/>
+    <circle cx="266" cy="66" r="5"/>
+    <circle cx="290" cy="82" r="5"/>
+  </g>
+</svg>

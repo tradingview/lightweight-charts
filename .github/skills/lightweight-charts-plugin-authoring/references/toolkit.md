@@ -91,7 +91,8 @@ Return the result typed as `CustomSeriesHitTestResult` from
 `conflationReducer`'s arguments. Both are types only: the library exports its
 own from 5.2 and 5.1, and importing them would raise the plugin's floor.
 
-Read: `rounded-candles-series/src/renderer.ts`.
+Read: `rounded-candles-series/src/renderer.ts` (boxes), `lollipop-series/src/renderer.ts`
+(a stem and a dot).
 
 ### `custom-series/options-aware-series` — `createOptionsAwareSeries`, `createWhitespaceSeries`, `OptionsAwareSeries`
 
