@@ -7,16 +7,27 @@ packages:
 savePrefix: '~'
 preferOffline: true
 
-# Keep the versions that the pre-migration npm lockfile had:
-# - @types/express-serve-static-core: newer versions change the typing of
-#   express route params, which breaks tests/e2e. Remove this override when
-#   the test code is updated for the newer typings.
+# - @types/express-serve-static-core: kept at the version the pre-migration
+#   npm lockfile had. Newer versions change the typing of express route
+#   params, which breaks tests/e2e. Remove this override when the test code
+#   is updated for the newer typings.
 # - terser (a floating ^5.x dependency of @rollup/plugin-terser): a different
 #   minifier version changes the produced dist/*.production.* bundles. Bump
 #   it deliberately, not as a side effect of an install.
+#
+# Security fixes for transitive dependencies whose parents pin a vulnerable
+# version (found by `pnpm audit`). Remove each one when its parent catches up:
+# - minimatch 9.0.3: pinned exactly by @typescript-eslint/typescript-estree@6
+#   (through @typescript-eslint/eslint-plugin-tslint).
+# - qs: express@4 inside the docusaurus dev server.
+# - serialize-javascript@6: copy-webpack-plugin and css-minimizer-webpack-plugin
+#   in the docusaurus build. v7 only raises the minimum Node version.
 overrides:
   '@types/express-serve-static-core': 5.0.6
-  terser: 5.39.0
+  terser: 5.51.2
+  minimatch@9.0.3: 9.0.9
+  qs@<6.16.1: ^6.16.1
+  serialize-javascript@6: ^7.1.4
 
 # pnpm does not run lifecycle scripts of dependencies unless they are
 # explicitly allowed here, see https://pnpm.io/settings#onlybuiltdependencies

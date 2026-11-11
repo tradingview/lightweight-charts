@@ -192,7 +192,11 @@ const getConfig = async () => {
 		title: 'Lightweight Charts',
 		tagline: 'Small and fast financial charts',
 		onBrokenLinks: 'throw',
-		onBrokenMarkdownLinks: 'warn',
+		markdown: {
+			hooks: {
+				onBrokenMarkdownLinks: 'warn',
+			},
+		},
 		favicon: '/favicon.ico',
 		url: githubPagesUrl,
 		baseUrl: `/${projectName}/`,
@@ -201,9 +205,12 @@ const getConfig = async () => {
 		trailingSlash: false,
 
 		future: {
-			// @ts-ignore experimental property name
-			// eslint-disable-next-line camelcase
-			experimental_faster: true,
+			faster: true,
+			v4: {
+				// required by `faster.ssgWorkerThreads`; our only postBuild hook
+				// (plugins/docs-markdown) does not use the removed `head` attribute
+				removeLegacyPostBuildHeadAttribute: true,
+			},
 		},
 
 		headTags: [

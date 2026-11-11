@@ -46,8 +46,8 @@ export class Screenshoter {
 			page = await browser.newPage();
 
 			const errors: string[] = [];
-			page.on('pageerror', (error: Error) => {
-				errors.push(error.message);
+			page.on('pageerror', (error: unknown) => {
+				errors.push(error instanceof Error ? error.message : String(error));
 			});
 
 			page.on('console', (message: ConsoleMessage) => {
