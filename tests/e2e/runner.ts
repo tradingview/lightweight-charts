@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'node:path';
 import process from 'node:process';
-import { run } from 'node:test';
+import { EventData, run } from 'node:test';
 import { spec as Spec } from 'node:test/reporters';
 import { fileURLToPath } from 'node:url';
 
@@ -62,19 +62,18 @@ export async function runTests(
 
 	const summary: string[] = [];
 
-	testStream.on('test:fail', (data: TestFail) => {
+	testStream.on('test:fail', (data: EventData.TestFail) => {
 		exitCode = 1;
 		const error = data.details.error;
 
 		summary.push(
 			`${data.file} - "${data.name}" (${Math.round(
 				data.details.duration_ms
-			// eslint-disable-next-line @typescript-eslint/no-base-to-string
 			)}ms)\n${error.toString()} `
 		);
 	});
 
-	testStream.on('test:stderr', (data: TestStderr) => {
+	testStream.on('test:stderr', (data: EventData.TestStderr) => {
 		summary.push(`${data.file} - Error:\n${data.message} `);
 	});
 
