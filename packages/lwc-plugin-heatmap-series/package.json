@@ -49,14 +49,14 @@
 		"@arethetypeswrong/cli": "0.18.5",
 		"@tradingview/lwc-plugin-preview-kit": "workspace:*",
 		"@tradingview/lwc-toolkit": "workspace:*",
-		"@types/chai": "5.2.1",
-		"@types/node": "22.13.14",
+		"@types/chai": "5.2.3",
+		"@types/node": "22.20.5",
 		"chai": "5.2.0",
 		"dts-bundle-generator": "9.5.1",
 		"lightweight-charts": "workspace:*",
 		"publint": "0.3.14",
 		"typescript": "5.9.3",
-		"vite": "8.2.2"
+		"vite": "8.3.7"
 	},
 	"lwcPlugin": {
 		"title": "Heatmap series",

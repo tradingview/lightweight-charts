@@ -6,6 +6,7 @@ export type LightweightChartsApi42 = typeof import('lightweight-charts-4.2');
 export type LightweightChartsApi50 = typeof import('lightweight-charts-5.0');
 export type LightweightChartsApi51 = typeof import('lightweight-charts-5.1');
 export type LightweightChartsApi52 = typeof import('lightweight-charts-5.2');
+export type LightweightChartsApi53 = typeof import('lightweight-charts-5.3');
 export type LightweightChartsApiCurrent = typeof import('../../../../..');
 
 export interface LightweightChartsApiTypeMap {
@@ -16,6 +17,7 @@ export interface LightweightChartsApiTypeMap {
 	'5.0': LightweightChartsApi50;
 	'5.1': LightweightChartsApi51;
 	'5.2': LightweightChartsApi52;
+	'5.3': LightweightChartsApi53;
 	current: LightweightChartsApiCurrent;
 }
 
@@ -31,6 +33,7 @@ export interface LightweightChartsCreateChartTypeMap {
 	'5.0': LightweightChartsApi50['createChart'];
 	'5.1': LightweightChartsApi51['createChart'];
 	'5.2': LightweightChartsApi52['createChart'];
+	'5.3': LightweightChartsApi53['createChart'];
 	current: LightweightChartsApiCurrent['createChart'];
 }
 
@@ -194,6 +197,41 @@ export const importLightweightChartsVersion: LightweightChartsApiGetters = {
 	},
 	5.2: async (window: Window) => {
 		const module = await import('lightweight-charts-5.2');
+
+		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
+			const result = module.createChart(container, options);
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
+			return result;
+		};
+
+		const createChartEx = (container: string | HTMLElement, behaviour: Parameters<typeof module.createChartEx>[1], options?: Parameters<typeof module.createChartEx>[2]) => {
+			const result = module.createChartEx(container, behaviour, options);
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
+			return result;
+		};
+
+		const createYieldCurveChart = (container: string | HTMLElement, options?: Parameters<typeof module.createYieldCurveChart>[1]) => {
+			const result = module.createYieldCurveChart(container, options);
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
+			return result;
+		};
+
+		const createOptionsChart = (container: string | HTMLElement, options?: Parameters<typeof module.createOptionsChart>[1]) => {
+			const result = module.createOptionsChart(container, options);
+			addResizeHandler(window, container as HTMLElement, resizeUnlessAutoSized(result));
+			return result;
+		};
+
+		return {
+			module,
+			createChart,
+			createChartEx: createChartEx as typeof module.createChartEx,
+			createYieldCurveChart,
+			createOptionsChart,
+		};
+	},
+	5.3: async (window: Window) => {
+		const module = await import('lightweight-charts-5.3');
 
 		const createChart: typeof module.createChart = (container: string | HTMLElement, options?: Parameters<typeof module.createChart>[1]) => {
 			const result = module.createChart(container, options);

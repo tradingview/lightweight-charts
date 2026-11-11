@@ -1088,4 +1088,4 @@ See [issues assigned to this version’s milestone](https://github.com/tradingvi
 
 The first release.
 
-The docs for this version are available [here](https://github.com/tradingview/lightweight-charts/tree/v1.0.0/docs).
+The docs for this version are available in the [v1.0.0 docs on GitHub](https://github.com/tradingview/lightweight-charts/tree/v1.0.0/docs).
