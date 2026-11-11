@@ -107,12 +107,15 @@ function setTheme(theme: PreviewTheme): void {
 
 document.documentElement.setAttribute('data-theme', current);
 if (framing !== null) {
-	new MutationObserver(() => {
+	const observer = new MutationObserver(() => {
 		const theme = asTheme(framing.getAttribute('data-theme'));
 		if (theme !== null) {
 			setTheme(theme);
 		}
-	}).observe(framing, { attributes: true, attributeFilter: ['data-theme'] });
+	});
+	observer.observe(framing, { attributes: true, attributeFilter: ['data-theme'] });
+	// The framing page outlives this frame and would keep it in memory.
+	window.addEventListener('pagehide', () => observer.disconnect(), { once: true });
 }
 
 /** The theme the page is drawn in right now. */
