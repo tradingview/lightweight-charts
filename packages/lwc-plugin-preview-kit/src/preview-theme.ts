@@ -12,10 +12,8 @@
  * back to light.
  *
  * The page's root element carries the theme as `data-theme`, which is what
- * `preview.css` keys its colours on. A module script can run after the first
- * paint, so on the built pages `theme-boot.js` — injected into `<head>` by
- * `pnpm plugins:build-demos` — sets it first, with the same rules as here;
- * this module then keeps it current. Change the rules in both places.
+ * `preview.css` keys its colours on. On a built page `theme-boot.js` sets it
+ * before the first paint, and this module starts from that value.
  */
 
 export type PreviewTheme = 'light' | 'dark';
@@ -94,7 +92,11 @@ function framingRoot(): HTMLElement | null {
 const listeners = new Set<ThemeListener>();
 const pinned = asTheme(new URLSearchParams(window.location.search).get('theme'));
 const framing = pinned === null ? framingRoot() : null;
-let current: PreviewTheme = pinned ?? asTheme(framing?.getAttribute('data-theme')) ?? 'light';
+// Set by theme-boot.js; the rest is for an unbuilt dev page, which has none.
+let current: PreviewTheme = asTheme(document.documentElement.getAttribute('data-theme'))
+	?? pinned
+	?? asTheme(framing?.getAttribute('data-theme'))
+	?? 'light';
 
 function setTheme(theme: PreviewTheme): void {
 	document.documentElement.setAttribute('data-theme', theme);

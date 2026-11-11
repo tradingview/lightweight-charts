@@ -5,8 +5,8 @@
  * after `<meta charset>` of every built preview page. The page's own script is
  * a module, which can run after the browser has already painted the page
  * once; on a dark docs page that would be a flash of the light background.
- * `preview-theme.ts` applies the same rules once it runs and keeps following
- * the docs page from there; change the rules in both places.
+ * `preview-theme.ts` starts from the theme set here and keeps following the
+ * docs page from there.
  *
  * Plain script, no imports: it runs before anything else has loaded.
  */
