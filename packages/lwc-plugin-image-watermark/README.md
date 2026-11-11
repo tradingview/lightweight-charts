@@ -140,7 +140,9 @@ watermark.options(); // the current options, with the defaults filled in
 `undefined`, is left unchanged.
 
 The image is loaded when the primitive is attached and drawn once it has
-decoded; until then nothing is rendered. Any URL the browser can load into an
+decoded; until then nothing is rendered. A new image passed to `setImage` or
+`applyOptions` replaces the current one once it has decoded, so the watermark
+does not blink out in between. Any URL the browser can load into an
 `<img>` element works, including SVG and data URLs. Decoded images are cached
 by URL, so detaching and re-attaching a watermark — or using the same image
 twice — never loads it again.

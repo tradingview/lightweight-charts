@@ -32,13 +32,6 @@ series.attachPrimitive(watermark);
 // Created with the current theme's image above, so this only swaps it on a
 // later switch; the same URL again is a no-op.
 themeChart(chart, theme => watermark.setImage(imageFor(theme)));
-
-// A new URL clears the drawn image until it has loaded, so the other theme's
-// image is fetched and decoded up front: the first switch then finds it in
-// the browser's cache instead of leaving the chart without a watermark.
-const otherImage = new Image();
-otherImage.src = imageFor(previewTheme() === 'dark' ? 'light' : 'dark');
-void otherImage.decode().catch(() => {});
 let attached = true;
 
 mountControls([

@@ -47,6 +47,10 @@ export class ImageWatermarkCore {
 		this._attached = false;
 		this._cancelLoad();
 		// A decoded image is kept: re-attaching reuses it instead of refetching.
+		// Not one left on screen while its replacement was loading, though.
+		if (this._imageKey !== this._sourceKey()) {
+			this._clearImage();
+		}
 	}
 
 	public updateAllViews(): void {
@@ -67,10 +71,12 @@ export class ImageWatermarkCore {
 		this._options = mergeOptions(this._options, options);
 		if (this._sourceKey() !== previousKey) {
 			this._cancelLoad();
-			this._image = null;
-			this._imageKey = null;
-			if (this._attached) {
+			// The previous image stays drawn until the new one has loaded, so
+			// swapping images never leaves a frame without a watermark.
+			if (this._attached && this._options.imageUrl !== '') {
 				this._ensureImage();
+			} else {
+				this._clearImage();
 			}
 		}
 		this.updateAllViews();
@@ -113,6 +119,11 @@ export class ImageWatermarkCore {
 					return;
 				}
 				this._clearPending();
+				if (this._image !== null) {
+					this._clearImage();
+					this.updateAllViews();
+					this._requestUpdate();
+				}
 				const onError = this._options.onError;
 				if (onError) {
 					onError(error, url);
@@ -126,6 +137,11 @@ export class ImageWatermarkCore {
 			this._pendingLoad.abort();
 		}
 		this._clearPending();
+	}
+
+	private _clearImage(): void {
+		this._image = null;
+		this._imageKey = null;
 	}
 
 	private _clearPending(): void {
