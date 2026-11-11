@@ -59,25 +59,25 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 
 		const x2 = x1 + labelWidth;
 
-		const y1 = 0;
-		const y2 = Math.ceil(
-			y1 +
+		const labelHeight = Math.ceil(
 			rendererOptions.borderSize +
 			rendererOptions.tickLength +
 			rendererOptions.paddingTop +
 			rendererOptions.fontSize +
 			rendererOptions.paddingBottom
 		);
+		const positionTop = rendererOptions.position === 'top';
 
-		target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
+		target.useBitmapCoordinateSpace(({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
 			const data = ensureNotNull(this._data);
 
 			ctx.fillStyle = data.background;
 
 			const x1scaled = Math.round(x1 * horizontalPixelRatio);
-			const y1scaled = Math.round(y1 * verticalPixelRatio);
 			const x2scaled = Math.round(x2 * horizontalPixelRatio);
-			const y2scaled = Math.round(y2 * verticalPixelRatio);
+			const scaledLabelHeight = Math.round(labelHeight * verticalPixelRatio);
+			const y1scaled = positionTop ? bitmapSize.height - scaledLabelHeight : 0;
+			const y2scaled = positionTop ? bitmapSize.height : scaledLabelHeight;
 			const radiusScaled = Math.round(radius * horizontalPixelRatio);
 			ctx.beginPath();
 			ctx.moveTo(x1scaled, y1scaled);
@@ -90,8 +90,9 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 
 			if (data.tickVisible) {
 				const tickX = Math.round(data.coordinate * horizontalPixelRatio);
-				const tickTop = y1scaled;
-				const tickBottom = Math.round((tickTop + rendererOptions.tickLength) * verticalPixelRatio);
+				const tickLen = Math.round(rendererOptions.tickLength * verticalPixelRatio);
+				const tickTop = positionTop ? y2scaled - tickLen : y1scaled;
+				const tickBottom = positionTop ? y2scaled : y1scaled + tickLen;
 
 				ctx.fillStyle = data.color;
 				const tickWidth = Math.max(1, Math.floor(horizontalPixelRatio));
@@ -100,11 +101,12 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 			}
 		});
 
-		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
+		target.useMediaCoordinateSpace(({ context: ctx, mediaSize }: MediaCoordinatesRenderingScope) => {
 			const data = ensureNotNull(this._data);
 
+			const yBox = positionTop ? mediaSize.height - labelHeight : 0;
 			const yText =
-				y1 +
+				yBox +
 				rendererOptions.borderSize +
 				rendererOptions.tickLength +
 				rendererOptions.paddingTop +

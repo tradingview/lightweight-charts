@@ -19,6 +19,7 @@ export const timeScaleOptionsDefaults: HorzScaleOptions = {
 	ticksVisible: false,
 	uniformDistribution: false,
 	minimumHeight: 0,
+	position: 'bottom',
 	allowBoldLabels: true,
 	ignoreWhitespaceIndices: false,
 	enableConflation: false,

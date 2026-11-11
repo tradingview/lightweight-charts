@@ -372,8 +372,9 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			ctx.fillStyle = this._lineColor();
 
 			const borderSize = Math.max(1, Math.floor(this._getRendererOptions().borderSize * verticalPixelRatio));
+			const borderTop = this._chart.options().timeScale.position === 'top' ? bitmapSize.height - borderSize : 0;
 
-			ctx.fillRect(0, 0, bitmapSize.width, borderSize);
+			ctx.fillRect(0, borderTop, bitmapSize.width, borderSize);
 		}
 	}
 
@@ -391,7 +392,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 		const options = timeScale.options();
 		if (options.borderVisible && options.ticksVisible) {
-			target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
+			target.useBitmapCoordinateSpace(({ context: ctx, bitmapSize, horizontalPixelRatio, verticalPixelRatio }: BitmapCoordinatesRenderingScope) => {
 				ctx.strokeStyle = this._lineColor();
 				ctx.fillStyle = this._lineColor();
 
@@ -400,22 +401,24 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 				ctx.beginPath();
 				const tickLen = Math.round(rendererOptions.tickLength * verticalPixelRatio);
+				const tickTop = this._chart.options().timeScale.position === 'top' ? bitmapSize.height - tickLen : 0;
 				for (let index = tickMarks.length; index--;) {
 					const x = Math.round(tickMarks[index].coord * horizontalPixelRatio);
-					ctx.rect(x - tickOffset, 0, tickWidth, tickLen);
+					ctx.rect(x - tickOffset, tickTop, tickWidth, tickLen);
 				}
 
 				ctx.fill();
 			});
 		}
 
-		target.useMediaCoordinateSpace(({ context: ctx }: MediaCoordinatesRenderingScope) => {
-			const yText = (
+		target.useMediaCoordinateSpace(({ context: ctx, mediaSize }: MediaCoordinatesRenderingScope) => {
+			const labelOffset = (
 				rendererOptions.borderSize +
 				rendererOptions.tickLength +
 				rendererOptions.paddingTop +
 				rendererOptions.fontSize / 2
 			);
+			const yText = this._chart.options().timeScale.position === 'top' ? mediaSize.height - labelOffset : labelOffset;
 
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'middle';
@@ -497,10 +500,12 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 				font: '',
 				widthCache: new TextWidthCache(),
 				labelBottomOffset: 0,
+				position: 'bottom',
 			};
 		}
 
 		const rendererOptions = this._rendererOptions;
+		rendererOptions.position = this._chart.options().timeScale.position;
 		const newFont = this._baseFont();
 
 		if (rendererOptions.font !== newFont) {
