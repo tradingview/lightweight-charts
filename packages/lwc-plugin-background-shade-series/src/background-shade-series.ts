@@ -86,8 +86,11 @@ export function createBackgroundShadeSeries<H = Time, D extends BackgroundShadeD
 	paneIndex: number = 0
 ): OptionsAwareSeries<H, D, BackgroundShadeSeriesOptions> {
 	const series = chart.addCustomSeries(new BackgroundShadeSeries<H, D>(), options, paneIndex);
-	if (typeof series.setSeriesOrder === 'function') {
-		series.setSeriesOrder(0);
+	// Read through an optional method so that the package also compiles against
+	// the 5.0.0 typings, whose series API has no `setSeriesOrder`.
+	const orderable = series as unknown as { setSeriesOrder?: (order: number) => void };
+	if (typeof orderable.setSeriesOrder === 'function') {
+		orderable.setSeriesOrder(0);
 	}
 	return series;
 }
