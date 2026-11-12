@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Background shade series Plugin Example</title>
+		<style>html,body{color:#131722;background-color:#f8f9fd;height:100%;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;overflow:hidden}#chart{width:100%;height:100%}#controls{z-index:10;background-color:#ffffffe6;border-radius:6px;flex-wrap:wrap;align-items:center;gap:12px;padding:8px 12px;font-size:13px;display:flex;position:absolute;top:12px;left:12px;box-shadow:0 1px 4px #13172233}#controls label{align-items:center;gap:6px;display:flex}</style>
+		<script type="module" crossorigin src="./assets/main-bxrmtAY2.js"></script>
+	</head>
+	<body>
+		<div id="controls">
+			<label>
+				Colors
+				<select id="colors">
+					<option value="blue-red">blue → red</option>
+					<option value="red-green">red → green</option>
+					<option value="transparent-orange">transparent → orange</option>
+				</select>
+			</label>
+			<label>
+				Opacity
+				<input id="opacity" type="range" min="0" max="1" step="0.05" value="0.3" />
+			</label>
+			<label>
+				Range
+				<select id="range">
+					<option value="0-100">0–100</option>
+					<option value="30-70">30–70</option>
+				</select>
+			</label>
+		</div>
+		<div id="chart"></div>
+	</body>
+</html>
