@@ -178,6 +178,26 @@ async function separatorPressNextToJustHiddenPaneIsIgnored(container) {
 	chart.remove();
 }
 
+async function crosshairOnHiddenPaneIsCleared(container) {
+	const { chart, series } = createTestChart(container, [10, 20]);
+	await nextFrame();
+	const paneCell = chart.panes()[1].getHTMLElement().children[1].getBoundingClientRect();
+	const clientX = paneCell.left + chart.timeScale().timeToCoordinate('2020-01-02');
+	const clientY = paneCell.top + series[1].priceToCoordinate(24);
+	const sourceCapabilities = new window.InputDeviceCapabilities({ firesTouchEvents: false });
+	let lastMove = null;
+	chart.subscribeCrosshairMove(param => { lastMove = param; });
+	const target = document.elementFromPoint(clientX, clientY);
+	for (const type of ['mouseenter', 'mousemove']) {
+		target.dispatchEvent(new MouseEvent(type, { bubbles: true, clientX, clientY, sourceCapabilities }));
+	}
+	check(lastMove?.paneIndex === 1 && lastMove.hoveredSeries === series[1], 'the crosshair should be on the line in pane 1');
+
+	chart.panes()[1].setVisible(false);
+	check(lastMove.point === undefined && lastMove.hoveredSeries === undefined, 'hiding the crosshair\'s pane should clear the crosshair and hovered series');
+	chart.remove();
+}
+
 async function beforeInteractions(container) {
 	await logoFollowsLastVisiblePane(container);
 	await priceAxisWidthIgnoresHiddenFirstPane(container);
@@ -186,6 +206,7 @@ async function beforeInteractions(container) {
 	await hiddenPaneIsNotPaintedUntilShown(container);
 	await paneSwappedIntoViewIsPainted(container);
 	await separatorPressNextToJustHiddenPaneIsIgnored(container);
+	await crosshairOnHiddenPaneIsCleared(container);
 }
 
 function afterInitialInteractions() {
