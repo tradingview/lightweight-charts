@@ -245,13 +245,15 @@ a unit test.
 
 | Module | Export | Use |
 | --- | --- | --- |
+| `chart/compat` | `supportsSeriesOrder(series)` | calling `setSeriesOrder` (5.0.6) from a plugin whose floor is 5.0: the guard narrows the series, so the call compiles against the 5.0 typings and is skipped on a host without the method |
 | `chart/interaction-flags` | `canUserMoveTimeScale(chart.options())`, `TIME_SCALE_MOVE_FLAGS` | whether the user can scroll or zoom the time scale; with none of the flags on, the chart treats both edges as fixed |
 | `chart/lifecycle` | `isChartRemoved(chart)`, `isSeriesAttached(chart, series)` | for a plugin with its own API in front of a series: stop writing to a chart the host removed, or a series it took off with `chart.removeSeries`. Read-only; decide outside the chart's event dispatch what to release |
 | `chart/time-axis-labels` | `timeAxisLabelFont`, `tickMarkPixelsPerCharacter`, `tickMarkMaxLabelWidth`, `tickMarkCharactersForWidth` | the time axis' label font, and `timeScale.tickMarkMaxCharacterLength` to pixels and back |
 | `text/measure` | `textMeasureContext()`, `createTextWidthCache()` | measuring labels before painting (layout, overlap avoidance); `null` without a DOM |
 
 Read: `scatter-series/src/x-axis-controller.ts`, and `scatter-series-api.ts` for
-the lifecycle checks.
+the lifecycle checks; `background-shade-series/src/background-shade-series.ts`
+for `supportsSeriesOrder`.
 
 ## General
 

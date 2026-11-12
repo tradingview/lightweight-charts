@@ -58,6 +58,10 @@ plugins, which had been writing them for themselves.
   structural copies of the library's hit test result, exported from 5.2, and
   conflation context, from 5.1. Types only, so that a plugin can implement
   `hitTest` and `conflationReducer` and keep 5.0 as its floor.
+- `chart/compat` — `supportsSeriesOrder`: whether a series has
+  `setSeriesOrder`, added in 5.0.6, as a type guard, so that the call inside
+  stays typed and a plugin can use the method where the host has it and keep
+  5.0 as its floor.
 - `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`,
   `nearestBar`, `nearestVerticalRange`, `createHitTestDataCache`,
   `VerticalSpan`, `NearestBarHit`, `HitTestDataCache`: the parts of a
