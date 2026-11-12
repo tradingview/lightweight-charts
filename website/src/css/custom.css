@@ -167,8 +167,9 @@ html *:focus-visible {
 	white-space: nowrap;
 }
 
+/* Capped so the logo lines up with the docs sidebar instead of the landing's wide container */
 nav.navbar {
-	--ifm-navbar-padding-horizontal: var(--container-padding, 32px);
+	--ifm-navbar-padding-horizontal: min(var(--container-padding, 32px), 32px);
 }
 
 button.navbar__toggle {
