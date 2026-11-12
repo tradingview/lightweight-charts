@@ -192,7 +192,7 @@ plugin lines up with built-in series at every device pixel ratio.
 | `dimensions/positions` | `positionsLine(centre, pixelRatio, width)`, `positionsBox(a, b, pixelRatio)` | a crisp line of a given CSS width; a box between two coordinates |
 | `dimensions/columns` | `calculateColumnPositions(items, barSpacing, pixelRatio)`, `…InPlace` | evenly spaced columns with the histogram's gap; items may carry `time` (logical index) so a gap is not bridged |
 | `dimensions/candles` | `candlestickWidth(barSpacing, pixelRatio)` | the body width the built-in candlestick uses |
-| `dimensions/full-width` | `fullBarWidth(x, halfSpacing, pixelRatio)` | a bar filling its whole slot |
+| `dimensions/full-width` | `fullBarWidth(x, halfSpacing, pixelRatio)`, `fullBarWidthAfter(previousRight, x, halfSpacing, pixelRatio)` | a bar filling its whole slot; neighboring columns that share an edge, with no seam |
 | `dimensions/crosshair-width` | `gridAndCrosshairMediaWidth`, `gridAndCrosshairBitmapWidth` | line widths matching the grid |
 
 Read: `rounded-candles-series/src/renderer.ts`, `pretty-histogram-series/src/renderer.ts`.

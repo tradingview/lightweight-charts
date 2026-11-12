@@ -310,6 +310,42 @@ importers:
         specifier: 8.3.7
         version: 8.3.7(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.0)
 
+  packages/lwc-plugin-background-shade-series:
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 0.18.5
+        version: 0.18.5
+      '@tradingview/lwc-plugin-preview-kit':
+        specifier: workspace:*
+        version: link:../lwc-plugin-preview-kit
+      '@tradingview/lwc-toolkit':
+        specifier: workspace:*
+        version: link:../lwc-toolkit
+      '@types/chai':
+        specifier: 5.2.3
+        version: 5.2.3
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
+      chai:
+        specifier: 5.2.0
+        version: 5.2.0
+      dts-bundle-generator:
+        specifier: 9.5.1
+        version: 9.5.1
+      lightweight-charts:
+        specifier: workspace:*
+        version: link:../..
+      publint:
+        specifier: 0.3.14
+        version: 0.3.14
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.3.7
+        version: 8.3.7(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.0)
+
   packages/lwc-plugin-box-whisker-series:
     devDependencies:
       '@arethetypeswrong/cli':

@@ -202,6 +202,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 | a fixed-pixel-height overlay series | `dual-range-histogram-series` (`scaleMode`, `keepPixelSeriesInView`) |
 | a series primitive with an axis label and dragging | `vertical-line` |
 | an image or decoration behind a series or pane | `image-watermark` (both a series and a pane primitive) |
+| a background colored from data, outside the price scale | `background-shade-series` (`[NaN]` plot values, `setSeriesOrder(0)`) |
 | a text label anchored to a pane edge or corner | `anchored-text` (the smallest series + pane pair over one core) |
 | a background derived from each bar of a series | `session-highlighting` (per-bar state from `dataUpdated`, visible-range slice) |
 | a DOM layer on a pane, multi-pane lifecycle | `accessibility` |
