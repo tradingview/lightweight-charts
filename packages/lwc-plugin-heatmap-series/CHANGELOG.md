@@ -40,4 +40,3 @@ collection of the Lightweight Charts™ repository, where it was
   cell, whichever is the higher, and no edge that is not finite.
 - `hitTest` reporting the hovered cell, used by Lightweight Charts™ 5.2 and
   later. The package still runs on 5.0.0.
-
