@@ -164,6 +164,7 @@ with the shape of each API and the official plugin that uses it.
 | draw only what is on screen, and reach the pane edge with a line | `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `barCoordinate` |
 | size a conflated bar to the slots it covers (only with a `conflationReducer`) | `effectiveBarSpacing` (`custom-series/visible-bars`) |
 | implement `hitTest` or `conflationReducer` and still support 5.0 | `custom-series/compat` (types only) — `CustomSeriesHitTestResult`, `ConflationContext` |
+| call a series method newer than 5.0 (`setSeriesOrder`, 5.0.6) and still support 5.0 | `chart/compat` — `supportsSeriesOrder(series)` narrows the series, so the call stays typed |
 | report the bar under the pointer from `hitTest` | `custom-series/hit-test` — `seriesHitTestTolerance`, `nearestVerticalRange` (boxes), `nearestBar` (any shape), `createHitTestDataCache` |
 | break a line at explicit whitespace, not at other series' timestamps | `createWhitespaceSeries` (`custom-series/options-aware-series`) + `visibleSegments` |
 | read options inside `priceValueBuilder` (autoscale that follows options) | `createOptionsAwareSeries` with the option names that affect plot values |

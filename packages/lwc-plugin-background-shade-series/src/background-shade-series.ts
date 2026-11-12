@@ -1,3 +1,4 @@
+import { supportsSeriesOrder } from '@tradingview/lwc-toolkit/chart/compat';
 import { ConflationContext } from '@tradingview/lwc-toolkit/custom-series/compat';
 import { OptionsAwareSeries } from '@tradingview/lwc-toolkit/custom-series/options-aware-series';
 import { isFiniteNumber } from '@tradingview/lwc-toolkit/numbers';
@@ -86,11 +87,8 @@ export function createBackgroundShadeSeries<H = Time, D extends BackgroundShadeD
 	paneIndex: number = 0
 ): OptionsAwareSeries<H, D, BackgroundShadeSeriesOptions> {
 	const series = chart.addCustomSeries(new BackgroundShadeSeries<H, D>(), options, paneIndex);
-	// Read through an optional method so that the package also compiles against
-	// the 5.0.0 typings, whose series API has no `setSeriesOrder`.
-	const orderable = series as unknown as { setSeriesOrder?: (order: number) => void };
-	if (typeof orderable.setSeriesOrder === 'function') {
-		orderable.setSeriesOrder(0);
+	if (supportsSeriesOrder(series)) {
+		series.setSeriesOrder(0);
 	}
 	return series;
 }

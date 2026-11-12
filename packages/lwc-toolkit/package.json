@@ -30,6 +30,10 @@
 			"types": "./dist/canvas/round-rect.d.ts",
 			"default": "./dist/canvas/round-rect.js"
 		},
+		"./chart/compat": {
+			"types": "./dist/chart/compat.d.ts",
+			"default": "./dist/chart/compat.js"
+		},
 		"./chart/interaction-flags": {
 			"types": "./dist/chart/interaction-flags.d.ts",
 			"default": "./dist/chart/interaction-flags.js"
