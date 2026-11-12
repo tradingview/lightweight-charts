@@ -1,0 +1,1 @@
+function e(t){return Math.floor(t*.5)}function h(t,n,o=1,i){const s=Math.round(n*t),a=Math.round(o*n),c=e(a);return{position:s-c,length:a}}function u(t,n,o){const i=Math.round(o*t),s=Math.round(o*n);return{position:Math.min(i,s),length:Math.abs(s-i)+1}}export{u as a,h as p};
