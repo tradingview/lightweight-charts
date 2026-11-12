@@ -172,6 +172,11 @@ nav.navbar {
 	--ifm-navbar-padding-horizontal: min(var(--container-padding, 32px), 32px);
 }
 
+/* Keeps the logo from being squeezed by the tabs */
+.navbar__brand {
+	flex-shrink: 0;
+}
+
 button.navbar__toggle {
 	padding: 5px;
 	margin-right: 1rem;
