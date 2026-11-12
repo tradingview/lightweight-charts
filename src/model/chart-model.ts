@@ -70,6 +70,11 @@ export interface HandleScrollOptions {
 }
 
 /**
+ * A keyboard modifier key that can be required for mouse wheel scaling.
+ */
+export type MouseWheelModifierKey = 'ctrl' | 'alt' | 'shift' | 'meta';
+
+/**
  * Represents options for how the chart is scaled by the mouse and touch gestures.
  */
 export interface HandleScaleOptions {
@@ -79,6 +84,19 @@ export interface HandleScaleOptions {
 	 * @defaultValue `true`
 	 */
 	mouseWheel: boolean;
+
+	/**
+	 * Keyboard modifier key that must be held down for the mouse wheel to scale the chart.
+	 *
+	 * When set and the key isn't pressed, vertical wheel events aren't handled by the chart,
+	 * so the page can scroll normally over the chart. Has no effect if {@link mouseWheel} is `false`.
+	 *
+	 * Note that trackpad pinch gestures are reported by browsers as wheel events with `ctrlKey` set,
+	 * so `'ctrl'` also keeps trackpad pinch-to-zoom working.
+	 *
+	 * @defaultValue `null` (no modifier key required)
+	 */
+	mouseWheelModifierKey: MouseWheelModifierKey | null;
 
 	/**
 	 * Enable scaling with pinch/zoom gestures.
