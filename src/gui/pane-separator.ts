@@ -87,7 +87,7 @@ export class PaneSeparator implements IDestroyable {
 
 	public getSize(): Size {
 		return size({
-			width: this._topPane.getSize().width,
+			width: this._bottomPane.getSize().width,
 			height: SeparatorConstants.SeparatorHeight,
 		});
 	}
