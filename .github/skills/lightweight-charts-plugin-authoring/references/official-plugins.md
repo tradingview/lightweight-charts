@@ -152,6 +152,26 @@ so they never reach the price scale; a factory that is a typed
 reported as a `'point'` and the rest as `'range'`. It has no
 `conflationReducer`: merging two box plots has no clear meaning.
 
+### `heatmap-series` — many cells per point, filled by color
+
+A column of `{ low, high, amount }` cells per point, colored by a
+`cellShader(amount, range)` option. Read for: drawing many small shapes per
+frame by collecting them per color and filling one path per color, which a
+shader with few colors (`createColorScale` and its `steps`) makes pay off;
+handing a function option the range of the values in view, worked out over
+the visible bars, so colors need no maximum fixed in advance; checking a
+color a user function returns on a scratch canvas before drawing with it,
+since the canvas ignores an invalid fill and would reuse the last one;
+cells rounded to pixels edge by edge, so neighbors share an edge, columns
+from `fullBarWidthAfter`, and a gap and a border rounded per axis and left out
+of a cell too small for them; rows off the pane skipped; a function-valued
+option, and a factory options type that keeps it a function where the
+library's `DeepPartial` would not; a cell-level `hitTest` limited to the
+column whose slot holds the pointer, so its `objectId` indexes the point
+`param.seriesData` reports, with no `hitTestData` so a pointer moving within a
+cell repaints nothing (its `hover-stable` interaction test counts fills); and
+seeded sample data shared by the demo, the preview and the unit tests.
+
 ### `rounded-candles-series` — a drop-in replacement for a built-in
 
 Candlesticks with rounded bodies. Read for how to *match* the built-in:
@@ -246,7 +266,6 @@ interaction tests show how to assert on DOM state.
 
 Upstream `plugin-examples/src/plugins/` holds unpublished proof-of-concept
 plugins: tooltips and delta tooltips, a rectangle drawing tool, trend lines,
-a heatmap series,
 price alerts, a volume profile, a partial price line,
 and crosshair highlighting. Good for seeing the shape of an
 idea; they predate the toolkit and skip the tests and README the packages

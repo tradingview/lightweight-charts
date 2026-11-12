@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Heatmap Series preview">
+  <path fill="#2962ff" fill-opacity="0.08" d="M210 64h20v8h-20zM190 72h10v8h-10zM240 72h20v8h-20zM310 80h10v8h-10zM0 88h10v8h-10zM160 88h10v8h-10zM10 96h10v8h-10zM80 96h30v8h-30zM140 96h20v8h-20zM30 104h40v8h-40z"/>
+  <path fill="#2962ff" fill-opacity="0.18" d="M180 0h30v8h-30zM220 0h100v8h-100zM170 8h20v8h-20zM0 16h20v8h-20zM150 16h30v8h-30zM110 24h50v8h-50zM20 32h130v8h-130zM190 64h20v8h-20zM230 64h20v8h-20zM180 72h10v8h-10zM200 72h40v8h-40zM260 72h60v8h-60zM170 80h20v8h-20zM250 80h60v8h-60zM10 88h10v8h-10zM150 88h10v8h-10zM170 88h10v8h-10zM0 96h10v8h-10zM20 96h20v8h-20zM50 96h30v8h-30zM110 96h30v8h-30zM160 96h10v8h-10zM20 104h10v8h-10zM70 104h80v8h-80zM200 136h50v8h-50zM180 144h140v8h-140zM170 152h20v8h-20zM250 152h70v8h-70zM0 160h10v8h-10zM150 160h30v8h-30zM0 168h30v8h-30zM60 168h90v8h-90z"/>
+  <path fill="#2962ff" fill-opacity="0.3" d="M210 0h10v8h-10zM190 8h20v8h-20zM180 16h140v8h-140zM0 24h10v8h-10zM160 24h160v8h-160zM0 32h20v8h-20zM150 32h170v8h-170zM0 40h320v8h-320zM0 48h320v8h-320zM0 56h80v8h-80zM240 56h80v8h-80zM0 64h190v8h-190zM250 64h70v8h-70zM0 72h180v8h-180zM0 80h170v8h-170zM190 80h60v8h-60zM20 88h130v8h-130zM180 88h140v8h-140zM40 96h10v8h-10zM170 96h150v8h-150zM0 104h20v8h-20zM150 104h170v8h-170zM0 112h320v8h-320zM0 120h320v8h-320zM0 128h320v8h-320zM0 136h200v8h-200zM250 136h70v8h-70zM0 144h180v8h-180zM0 152h30v8h-30zM10 160h140v8h-140zM30 168h30v8h-30z"/>
+  <rect x="210" y="8" width="110" height="8" fill="#ff9800"/>
+  <rect x="10" y="24" width="100" height="8" fill="#f23645"/>
+  <rect x="80" y="56" width="160" height="8" fill="#f23645"/>
+  <rect x="30" y="152" width="140" height="8" fill="#ff9800"/>
+  <rect x="150" y="168" width="20" height="8" fill="#ff9800"/>
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <polyline points="0,90.0 10,96.5 20,102.0 30,105.8 40,107.7 50,107.7 60,106.4 70,104.4 80,102.7 90,101.8 100,101.8 110,102.6 120,103.5 130,104.0 140,103.1 150,100.6 160,96.2 170,90.5 180,84.0 190,77.9 200,73.0 210,69.9 220,69.0 230,70.1 240,72.5 250,75.4 260,78.1 270,80.0 280,80.9 290,80.9 300,80.7 310,80.9 320,82.2" fill="none" stroke="#2e2e2e" stroke-width="2" stroke-linejoin="round"/>
+</svg>
