@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<script>(function () {
+	var root = document.documentElement;
+	var theme = new URLSearchParams(window.location.search).get('theme');
+	if (theme !== 'light' && theme !== 'dark') {
+		try {
+			theme = window.parent === window
+				? null
+				: window.parent.document.documentElement.getAttribute('data-theme');
+		} catch (error) {
+			// Cross-origin parent: its document is not readable.
+			theme = null;
+		}
+	}
+	root.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+})();
+</script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Heatmap series preview</title>
+		<script type="module" crossorigin src="./assets/main-63853yMf.js"></script>
+		<link rel="stylesheet" crossorigin href="./assets/main-DxOAmYx-.css">
+	</head>
+	<body>
+		<!-- The controls are declared in preview.ts, through the preview kit. -->
+		<div id="controls"></div>
+		<div id="chart"></div>
+	</body>
+</html>
