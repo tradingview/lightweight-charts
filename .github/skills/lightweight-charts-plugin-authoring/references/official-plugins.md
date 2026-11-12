@@ -205,6 +205,32 @@ drag ownership — only one line per chart suspends the chart's own scroll and
 scale handling, and restores it exactly once. Its interaction tests cover
 drag cancel, disabling during a drag, overlapping lines and pointer scope.
 
+### `user-price-lines` — pointer-driven creation on a series
+
+A button at the right edge of the pane that follows the pointer and adds a
+price line where it is clicked. Read for: driving a tool from
+`subscribeCrosshairMove` and `subscribeClick`, ignoring events from other
+panes with `param.paneIndex` and asking for a repaint only when the button
+changes; moves with no `sourceEvent` (the chart's own, after
+`setCrosshairPosition`, on data and time scale changes) never bringing the
+button up; a click that only counts on the button where it is shown, so a
+touch tap away from it adds nothing (the chart reports no click after a
+drag); the pane's width from `chart.paneSize`, since
+`timeScale().width()` is 0 while the time axis is hidden; a geometric
+`hitTest` for the cursor and `hoveredObjectId` (the chart hit tests before it
+reports the move); setting a chart option (`CrosshairMode.Normal`) while
+attached and putting the old value back on detach only if it is still the one
+set, handed over between instances; one active instance per pane, kept in a
+module-level `WeakMap` by chart; letting go of the chart once
+`chart.removeSeries` or `chart.remove` has taken its series away (neither
+calls `detached`); tracking the lines it created by `id`, since
+`series.priceLines()` returns new objects on every call, and removing them on
+detach; and a deprecated constructor overload kept from the example. Its
+interaction tests wait out the chart's double-click window between clicks in
+one pane: a second click within 500 ms is otherwise swallowed, and a test
+asserting that it added nothing passes for the wrong reason. Its `price-zero`
+test builds a scale on which a whole pixel row is at exactly 0.
+
 ### `image-watermark` — the same idea as both primitive types
 
 `ImageWatermark` (series primitive) and `ImageWatermarkPane` (pane primitive)

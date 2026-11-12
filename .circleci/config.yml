@@ -44,6 +44,7 @@ aliases:
         - packages/lwc-plugin-session-highlighting/node_modules
         - packages/lwc-plugin-stacked-area-series/node_modules
         - packages/lwc-plugin-stacked-bars-series/node_modules
+        - packages/lwc-plugin-user-price-lines/node_modules
         - packages/lwc-plugin-vertical-line/node_modules
         # puppeteer browser cache (see .puppeteerrc.cjs)
         - .cache

@@ -202,6 +202,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 | many colored cells per point, an order book or volume profile | `heatmap-series` (fills batched by color, `createColorScale`, a cell-level `hitTest`) |
 | a fixed-pixel-height overlay series | `dual-range-histogram-series` (`scaleMode`, `keepPixelSeriesInView`) |
 | a series primitive with an axis label and dragging | `vertical-line` |
+| a tool the user clicks to add something to a series | `user-price-lines` (pointer events in its own pane, one active instance per pane, a chart option set and put back) |
 | an image or decoration behind a series or pane | `image-watermark` (both a series and a pane primitive) |
 | a background colored from data, outside the price scale | `background-shade-series` (`[NaN]` plot values, `setSeriesOrder(0)`) |
 | a text label anchored to a pane edge or corner | `anchored-text` (the smallest series + pane pair over one core) |
