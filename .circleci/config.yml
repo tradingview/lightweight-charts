@@ -31,6 +31,7 @@ aliases:
         - packages/lwc-plugin-anchored-text/node_modules
         - packages/lwc-plugin-brushable-area-series/node_modules
         - packages/lwc-plugin-dual-range-histogram-series/node_modules
+        - packages/lwc-plugin-grouped-bars-series/node_modules
         - packages/lwc-plugin-hlc-area-series/node_modules
         - packages/lwc-plugin-image-watermark/node_modules
         - packages/lwc-plugin-lollipop-series/node_modules

@@ -1,4 +1,4 @@
-import type { Time, WhitespaceData } from 'lightweight-charts';
+import type { Time } from 'lightweight-charts';
 
 type LineData = {
 	time: Time;
@@ -95,63 +95,6 @@ export function generateAlternativeCandleData(
 			high: candle.high,
 			open: candle.open,
 			close: candle.close,
-		};
-	});
-}
-
-export function shuffleValuesWithLimit<T extends WhitespaceData[]>(
-	arr: T,
-	limit: number
-): T {
-	const n = arr.length;
-	const originalTimes = arr.map(item => item.time);
-	for (let i = 0; i < n; i++) {
-		// Generate a random index within the limit
-		const j =
-			Math.floor(Math.random() * (Math.min(n - 1, i + limit) - i + 1)) + i;
-		// Swap the current element with the randomly selected element
-		[arr[i], arr[j]] = [arr[j], arr[i]];
-	}
-	arr.forEach((item, index) => {
-		item.time = originalTimes[index];
-	});
-	return arr;
-}
-
-function splitArrayIntoParts<T>(arr: T[], size: number): T[][] {
-	const result = [];
-	const length = arr.length;
-	let start = 0;
-	while (start < length) {
-		result.push(arr.slice(start, start + size));
-		start += size;
-	}
-	return result;
-}
-
-interface MultibarData extends WhitespaceData {
-	values: number[];
-}
-
-export function multipleBarData(
-	groups: number,
-	numberPoints: number,
-	shuffleLimit = 0
-): MultibarData[] {
-	const basePoints = generateLineData(groups * numberPoints).map(d => {
-		return {
-			...d,
-			value: Math.max(d.value, 0), // prevent negative numbers
-		};
-	});
-	let sets: LineData[][] = splitArrayIntoParts(basePoints, numberPoints);
-	if (shuffleLimit > 0) {
-		sets = sets.map(set => shuffleValuesWithLimit(set, shuffleLimit));
-	}
-	return sets[0].map((dataPoint, index) => {
-		return {
-			time: dataPoint.time,
-			values: sets.map(set => set[index].value),
 		};
 	});
 }
