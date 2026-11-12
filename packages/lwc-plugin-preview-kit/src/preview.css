@@ -4,10 +4,25 @@
  * short, so nothing here has an intrinsic height and nothing is restyled after
  * load — the chart is created at its final size and never resizes underneath.
  *
- * Light only, and explicitly so: the page is framed inside a site that has a
- * dark theme, and `color-scheme` keeps form controls and scrollbars light with
- * the rest of the page.
+ * Light and dark, keyed on the `data-theme` that `preview-theme` sets on the
+ * root element before anything is drawn (light when it is missing). The page is
+ * framed inside a docs site with both themes, and follows it; `color-scheme`
+ * keeps form controls and scrollbars in step with the rest of the page.
  */
+
+:root {
+	color-scheme: light;
+	--preview-background: rgba(248, 249, 253, 1);
+	--preview-text: rgba(19, 23, 34, 1);
+}
+
+/* TradingView cold grays, as on the docs site: the control row sits one step
+   above the chart's black, the way the light row sits just off the white. */
+:root[data-theme='dark'] {
+	color-scheme: dark;
+	--preview-background: #0f0f0f;
+	--preview-text: #dbdbdb;
+}
 
 html,
 body {
@@ -15,9 +30,8 @@ body {
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
-	color-scheme: light;
-	background-color: rgba(248, 249, 253, 1);
-	color: rgba(19, 23, 34, 1);
+	background-color: var(--preview-background);
+	color: var(--preview-text);
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu,
 		sans-serif;
 	font-size: 13px;

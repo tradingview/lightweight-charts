@@ -82,6 +82,7 @@ import { _CLASSNAME_ } from '../_ENTRYNAME_';
 import { generateSampleData } from '../sample-data';
 
 const chart = createChart('chart', { autoSize: true });
+themeChart(chart);
 
 const series = chart.addCustomSeries(new _CLASSNAME_(), {
 	/* Options */
@@ -94,6 +95,7 @@ import { _CLASSNAME_ } from '../_ENTRYNAME_';
 import { generateLineData } from '../sample-data';
 
 const chart = createChart('chart', { autoSize: true });
+themeChart(chart);
 
 const series = chart.addSeries(LineSeries, { color: '#2962FF' });
 const data = generateLineData(200);
@@ -112,6 +114,7 @@ import { _CLASSNAME_ } from '../_ENTRYNAME_';
 import { generateLineData } from '../sample-data';
 
 const chart = createChart('chart', { autoSize: true });
+themeChart(chart);
 
 const series = chart.addSeries(LineSeries, { color: '#2962FF' });
 series.setData(generateLineData(200));

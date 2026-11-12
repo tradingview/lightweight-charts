@@ -1,6 +1,7 @@
 import { createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { StackedBarsColumnWidthMode } from '../options';
 import { createStackedBarsSeries } from '../stacked-bars-series';
 import { multipleBarData } from './sample-data';
@@ -13,9 +14,11 @@ const chart = createChart('chart', {
 });
 
 const series = createStackedBarsSeries(chart, {
-	color: 'black', // for the price line
 	widthPercent: 60,
 });
+// The series colour is only the price line's, which has to read on either
+// background.
+themeChart(chart, theme => series.applyOptions({ color: theme === 'dark' ? 'white' : 'black' }));
 series.setData(multipleBarData(3, 120, 20));
 chart.timeScale().fitContent();
 

@@ -1,5 +1,6 @@
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { createScatterChart } from '../chart';
 import type { ScatterShape } from '../options';
 import { createScatterSeries } from '../scatter-series';
@@ -10,7 +11,12 @@ import { Trade, winLossTrades } from './sample-data';
 const chart = createScatterChart('chart', {
 	autoSize: true,
 	layout: { attributionLogo: false },
-	grid: { vertLines: { color: '#E0E3EB' }, horzLines: { color: '#E0E3EB' } },
+});
+// A lighter grid than the library default in light; the kit's own in dark.
+themeChart(chart, theme => {
+	if (theme === 'light') {
+		chart.applyOptions({ grid: { vertLines: { color: '#E0E3EB' }, horzLines: { color: '#E0E3EB' } } });
+	}
 });
 
 const series = createScatterSeries<Trade>(chart, {

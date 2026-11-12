@@ -1,6 +1,7 @@
 import { LineSeries, createChart } from 'lightweight-charts';
 import { addRefreshButton, mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import {
 	AnchoredText,
 	AnchoredTextHorzAlign,
@@ -9,6 +10,7 @@ import {
 import { generateLineData } from './sample-data';
 
 const chart = createChart('chart', { autoSize: true });
+themeChart(chart);
 
 const text = new AnchoredText({
 	text: 'BTC/USD · 1D',

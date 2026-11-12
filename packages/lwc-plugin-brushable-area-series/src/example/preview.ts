@@ -1,6 +1,7 @@
 import { LineStyle, createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { BrushableAreaInteraction } from '../interaction';
 import { BrushableAreaStyle } from '../options';
 import { createBrushableAreaSeries } from '../brushable-area-series';
@@ -19,6 +20,7 @@ const chart = createChart('chart', {
 	handleScale: false,
 	handleScroll: false,
 });
+themeChart(chart);
 
 const brushStyles: Record<string, Partial<BrushableAreaStyle>> = {
 	green: {

@@ -414,6 +414,7 @@ function PreviewBlock({ plugin }: { plugin: Plugin }): React.JSX.Element {
 						url={framed}
 						name={plugin.name}
 						bare
+						themed={plugin.previewUrl !== null}
 						height={plugin.previewHeight}
 					/>
 				)}

@@ -1,6 +1,7 @@
 import { createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { StackedAreaGapHandling, StackedAreaLineType } from '../options';
 import { createStackedAreaSeries } from '../stacked-area-series';
 import { multipleBarData } from './sample-data';
@@ -11,6 +12,7 @@ const chart = createChart('chart', {
 	autoSize: true,
 	rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } },
 });
+themeChart(chart);
 
 const series = createStackedAreaSeries(chart, {
 	// The gap handling only shows on data with whitespace, and this preview has
