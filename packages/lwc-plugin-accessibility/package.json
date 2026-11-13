@@ -1,6 +1,6 @@
 {
 	"name": "@tradingview/lwc-plugin-accessibility",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Drop-in accessibility layer built on pane primitives: adds semantic markup, keyboard navigation, and screen-reader support to help meet WCAG 2.1 AA.",
 	"author": "TradingView",
 	"license": "Apache-2.0",

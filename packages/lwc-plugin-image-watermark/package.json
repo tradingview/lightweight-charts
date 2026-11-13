@@ -1,6 +1,6 @@
 {
 	"name": "@tradingview/lwc-plugin-image-watermark",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Image watermark drawn behind a series or a pane, with position, object fit, size limits, padding, and opacity controls.",
 	"author": "TradingView",
 	"license": "Apache-2.0",
