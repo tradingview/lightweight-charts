@@ -10,6 +10,11 @@ export type DeepPartial<T> = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isMergeableObject(value: unknown): value is Record<string, any> {
+	return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function merge(dst: Record<string, any>, ...sources: Record<string, any>[]): Record<string, any> {
 	for (const src of sources) {
 		// eslint-disable-next-line no-restricted-syntax
@@ -22,11 +27,15 @@ export function merge(dst: Record<string, any>, ...sources: Record<string, any>[
 				continue;
 			}
 
-			if ('object' !== typeof src[i] || src[i] === null || dst[i] === undefined || Array.isArray(src[i])) {
-				dst[i] = src[i];
+			const srcValue: unknown = src[i];
+			// only an own property of dst may receive a nested merge: dst[i] would otherwise
+			// resolve through the prototype chain (e.g. Object.prototype.toString) and the merge
+			// would write into an object shared by the whole page
+			const dstValue: unknown = Object.prototype.hasOwnProperty.call(dst, i) ? dst[i] : undefined;
+			if (isMergeableObject(srcValue) && isMergeableObject(dstValue)) {
+				merge(dstValue, srcValue);
 			} else {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-				merge(dst[i], src[i]);
+				dst[i] = srcValue;
 			}
 		}
 	}
