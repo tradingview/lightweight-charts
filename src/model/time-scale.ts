@@ -57,6 +57,11 @@ export function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
 }
 
 /**
+ * The vertical position of the time scale on the chart.
+ */
+export type TimeScalePosition = 'top' | 'bottom';
+
+/**
  * Options for the time scale; the horizontal scale at the bottom of the chart that displays the time of data.
  */
 export interface HorzScaleOptions {
@@ -212,6 +217,13 @@ export interface HorzScaleOptions {
 	 * @defaultValue 0
 	 */
 	minimumHeight: number;
+
+	/**
+	 * The vertical position of the time scale on the chart.
+	 *
+	 * @defaultValue `'bottom'`
+	 */
+	position: TimeScalePosition;
 
 	/**
 	 * Allow major time scale labels to be rendered in a bolder font weight.

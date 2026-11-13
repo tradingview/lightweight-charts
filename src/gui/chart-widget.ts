@@ -266,6 +266,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			this._applyPanesOptions();
 		}
 		this._updateTimeAxisVisibility();
+		this._syncTimeAxisDomPosition();
 
 		this._applyAutoSizeOptions(options);
 	}
@@ -372,6 +373,36 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		}
 	}
 
+	private _timeAxisBitmapHeightOnTop(): number {
+		if (!this._options.timeScale.visible || this._options.timeScale.position !== 'top') {
+			return 0;
+		}
+		return this._timeAxisWidget.getBitmapSize().height;
+	}
+
+	private _drawTimeAxisComposite(ctx: CanvasRenderingContext2D | null, firstPane: PaneWidget, targetY: number, addTopLayer?: boolean): void {
+		if (ctx === null) {
+			return;
+		}
+		const drawStub = (position: 'left' | 'right', targetX: number): void => {
+			const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
+			stub.drawBitmap(ensureNotNull(ctx), targetX, targetY);
+		};
+
+		let targetX = 0;
+		if (this._isLeftAxisVisible()) {
+			drawStub('left', targetX);
+			targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getBitmapSize().width;
+		}
+
+		this._timeAxisWidget.drawBitmap(ctx, targetX, targetY, addTopLayer);
+		targetX += this._timeAxisWidget.getBitmapSize().width;
+
+		if (this._isRightAxisVisible()) {
+			drawStub('right', targetX);
+		}
+	}
+
 	/**
 	 * Traverses the widget's layout (pane and axis child widgets),
 	 * draws the screenshot (if rendering context is passed) and returns the screenshot bitmap size
@@ -385,9 +416,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		let totalHeight = 0;
 
 		const firstPane = this._paneWidgets[0];
+		const timeAxisBitmapHeight = this._timeAxisBitmapHeightOnTop();
 
 		const drawPriceAxises = (position: 'left' | 'right', targetX: number) => {
-			let targetY = 0;
+			let targetY = timeAxisBitmapHeight;
 			for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
 				const paneWidget = this._paneWidgets[paneIndex];
 				const priceAxisWidget = ensureNotNull(position === 'left' ? paneWidget.leftPriceAxisWidget() : paneWidget.rightPriceAxisWidget());
@@ -413,6 +445,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			const leftAxisBitmapWidth = ensureNotNull(firstPane.leftPriceAxisWidget()).getBitmapSize().width;
 			totalWidth += leftAxisBitmapWidth;
 		}
+		totalHeight += timeAxisBitmapHeight;
 		for (let paneIndex = 0; paneIndex < this._paneWidgets.length; paneIndex++) {
 			const paneWidget = this._paneWidgets[paneIndex];
 			const bitmapSize = paneWidget.getBitmapSize();
@@ -439,31 +472,14 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			totalWidth += rightAxisBitmapWidth;
 		}
 
-		const drawStub = (position: 'left' | 'right', targetX: number, targetY: number) => {
-			const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
-			stub.drawBitmap(ensureNotNull(ctx), targetX, targetY);
-		};
-
 		// draw time scale and stubs
 		if (this._options.timeScale.visible) {
-			const timeAxisBitmapSize = this._timeAxisWidget.getBitmapSize();
+			const timeAxisTargetY = timeAxisBitmapHeight > 0 ? 0 : totalHeight;
+			this._drawTimeAxisComposite(ctx, firstPane, timeAxisTargetY, addTopLayer);
 
-			if (ctx !== null) {
-				let targetX = 0;
-				if (this._isLeftAxisVisible()) {
-					drawStub('left', targetX, totalHeight);
-					targetX = ensureNotNull(firstPane.leftPriceAxisWidget()).getBitmapSize().width;
-				}
-
-				this._timeAxisWidget.drawBitmap(ctx, targetX, totalHeight, addTopLayer);
-				targetX += timeAxisBitmapSize.width;
-
-				if (this._isRightAxisVisible()) {
-					drawStub('right', targetX, totalHeight);
-				}
+			if (timeAxisBitmapHeight === 0) {
+				totalHeight += this._timeAxisWidget.getBitmapSize().height;
 			}
-
-			totalHeight += timeAxisBitmapSize.height;
 		}
 
 		return size({
@@ -770,11 +786,11 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			if (i > 0) {
 				const paneSeparator = new PaneSeparator(this, i - 1, i);
 				this._paneSeparators.push(paneSeparator);
-				this._tableElement.insertBefore(paneSeparator.getElement(), this._timeAxisWidget.getElement());
+				this._insertPaneElement(paneSeparator.getElement());
 			}
 
 			// insert paneWidget
-			this._tableElement.insertBefore(paneWidget.getElement(), this._timeAxisWidget.getElement());
+			this._insertPaneElement(paneWidget.getElement());
 		}
 
 		for (let i = 0; i < targetPaneWidgetsCount; i++) {
@@ -788,7 +804,27 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		}
 
 		this._updateTimeAxisVisibility();
+		this._syncTimeAxisDomPosition();
 		this._adjustSizeImpl();
+	}
+
+	private _insertPaneElement(element: HTMLElement): void {
+		if (this._options.timeScale.position === 'top') {
+			this._tableElement.appendChild(element);
+		} else {
+			this._tableElement.insertBefore(element, this._timeAxisWidget.getElement());
+		}
+	}
+
+	private _syncTimeAxisDomPosition(): void {
+		const timeAxisElement = this._timeAxisWidget.getElement();
+		if (this._options.timeScale.position === 'top') {
+			if (this._tableElement.firstElementChild !== timeAxisElement) {
+				this._tableElement.insertBefore(timeAxisElement, this._tableElement.firstElementChild);
+			}
+		} else if (this._tableElement.lastElementChild !== timeAxisElement) {
+			this._tableElement.appendChild(timeAxisElement);
+		}
 	}
 
 	private _getMouseEventParamsImpl(

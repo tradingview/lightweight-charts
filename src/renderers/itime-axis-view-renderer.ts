@@ -1,6 +1,7 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 
 import { TextWidthCache } from '../model/text-width-cache';
+import { TimeScalePosition } from '../model/time-scale';
 
 export interface TimeAxisViewRendererOptions {
 	baselineOffset: number;
@@ -13,6 +14,7 @@ export interface TimeAxisViewRendererOptions {
 	paddingHorizontal: number;
 	widthCache: TextWidthCache;
 	labelBottomOffset: number;
+	position: TimeScalePosition;
 }
 
 export interface ITimeAxisViewRenderer {
