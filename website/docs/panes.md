@@ -22,3 +22,14 @@ Lightweight Charts™ offers a few [customization options](/api/interfaces/Layou
 ## Managing Panes
 
 While the specific methods to manipulate panes are covered in the detailed [example](/examples/panes/multiple-panes), it's important to note that Lightweight Charts™ provides an [API for pane management](/api/interfaces/IPaneApi.md). This includes adding new panes, moving series between panes, adjusting pane height, and removing panes. The API ensures that developers have full control over the pane lifecycle and organization within their charts.
+
+### Hiding Panes
+
+To hide a pane without removing it, call [`setVisible(false)`](/api/interfaces/IPaneApi.md#setvisible) on it. The pane keeps its series and its stretch factor, and the visible panes share its height until you show it again with `setVisible(true)`. The last visible pane can't be hidden.
+
+```js
+const pane = chart.panes()[1];
+pane.setVisible(false);
+// later
+pane.setVisible(true);
+```
