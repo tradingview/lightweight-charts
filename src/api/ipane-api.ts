@@ -96,6 +96,7 @@ export interface IPaneApi<HorzScaleItem> {
 	 * While the pane is hidden:
 	 * - `getHeight()` and the height from `chart.paneSize()` return 0;
 	 * - `setHeight()` does nothing;
+	 * - `priceToCoordinate()` and `coordinateToPrice()` on its series still use the height the pane had before it was hidden;
 	 * - `setStretchFactor()` still stores the value for when the pane is shown.
 	 *
 	 * The last visible pane cannot be hidden, and `chart.removePane()` does not remove it.
