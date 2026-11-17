@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import { fullBarWidth } from '../../src/dimensions/full-width.js';
+import { fullBarWidth, fullBarWidthAfter } from '../../src/dimensions/full-width.js';
 
 void describe('fullBarWidth', () => {
 	void it('spans the whole bar slot at DPR 1', () => {
@@ -48,5 +48,24 @@ void describe('fullBarWidth', () => {
 
 	void it('returns a zero length for a zero half spacing', () => {
 		expect(fullBarWidth(10, 0, 1)).to.deep.equal({ position: 10, length: 0 });
+	});
+});
+
+void describe('fullBarWidthAfter', () => {
+	void it('is fullBarWidth for a bar with no neighbor before it', () => {
+		expect(fullBarWidthAfter(null, 10.5, 3, 1.25)).to.deep.equal(fullBarWidth(10.5, 3, 1.25));
+	});
+
+	void it('starts where the neighbor ended when their shared edge rounds apart', () => {
+		// Coordinates a hair off exact, as the chart's arithmetic produces: the
+		// edge the two bars share is 10.4999999 for the first and 10.5000001 for
+		// the second, so rounding each on its own leaves a 1 px seam at 10.
+		expect(fullBarWidth(9.8499999, 0.65, 1)).to.deep.equal({ position: 9, length: 1 });
+		expect(fullBarWidth(11.1500001, 0.65, 1)).to.deep.equal({ position: 11, length: 1 });
+		expect(fullBarWidthAfter(10, 11.1500001, 0.65, 1)).to.deep.equal({ position: 10, length: 2 });
+	});
+
+	void it('never returns a negative length', () => {
+		expect(fullBarWidthAfter(20, 10, 3, 1).length).to.equal(0);
 	});
 });

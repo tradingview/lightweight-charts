@@ -82,19 +82,21 @@ pnpm compile
 Check the output in the `compiled` folder, then:
 
 1. Copy the compiled plugin folder into your project, example:
-   `plugins/background-shade-series` (from `compiled/background-shade-series`)
+   `plugins/trend-line` (from `compiled/trend-line`)
 2. Within your project, you can import the class as follows:
 
    ```js
-   import { BackgroundShadeSeries } from '../plugins/background-shade-series/background-shade-series';
+   import { TrendLine } from '../plugins/trend-line/trend-line';
 
    // ...
 
-   const backgroundShadeSeriesPlugin = new BackgroundShadeSeries();
-   const myCustomSeries = chart.addCustomSeries(backgroundShadeSeriesPlugin, {
-       lowValue: 0,
-       highValue: 1000,
-   });
+   const trendLine = new TrendLine(
+       chart,
+       series,
+       { time: '2024-04-01', price: 100 },
+       { time: '2024-04-20', price: 120 }
+   );
+   series.attachPrimitive(trendLine);
    ```
 
 ## Create your own plugin

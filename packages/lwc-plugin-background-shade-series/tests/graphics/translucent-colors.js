@@ -1,0 +1,26 @@
+function generateData(count = 60, low = 0, high = 100) {
+	const res = [];
+	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
+	for (let i = 0; i < count; ++i) {
+		const ratio = (Math.sin(i / 6) + 1) / 2;
+		res.push({ time: time.getTime() / 1000, value: Math.round((low + ratio * (high - low)) * 100) / 100 });
+		time.setUTCDate(time.getUTCDate() + 1);
+	}
+	return res;
+}
+
+function lineData(shade) {
+	return shade.map((point, index) => ({ time: point.time, value: 100 + Math.sin(index / 3) * 10 }));
+}
+
+// An end color with its own alpha: transparent at lowValue, opaque orange at
+// highValue, at full opacity, so the grid shows through the low values.
+function runTestCase(container) {
+	const chart = (window.chart = LightweightCharts.createChart(container, {
+		layout: { attributionLogo: false },
+	}));
+	const shade = LwcPlugin.createBackgroundShadeSeries(chart, { lowColor: 'rgba(255, 152, 0, 0)', highColor: '#FF9800', opacity: 1 });
+	shade.setData(generateData());
+	chart.addSeries(LightweightCharts.LineSeries, { color: '#131722' }).setData(lineData(generateData()));
+	chart.timeScale().fitContent();
+}

@@ -186,8 +186,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		this.updatePriceAxisWidgetsStates();
+	}
 
-		if (this._chart.paneWidgets().indexOf(this) === this._chart.paneWidgets().length - 1) {
+	public updateAttributionLogo(shown: boolean): void {
+		if (shown) {
 			this._attributionLogoWidget = this._attributionLogoWidget ?? new AttributionLogoWidget(this._paneCell, this._chart);
 			this._attributionLogoWidget.update();
 		} else {
@@ -480,6 +482,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 		if (type > InvalidationLevel.Cursor) {
 			this.recalculatePriceScales();
+		}
+
+		// Price scales and views stay current while hidden; only drawing is skipped. Showing the pane triggers a full update.
+		if (!this._state.visible()) {
+			return;
 		}
 
 		if (this._leftPriceAxisWidget !== null) {

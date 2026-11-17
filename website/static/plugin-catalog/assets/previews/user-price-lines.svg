@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="User Price Lines preview">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <polyline points="0,92.0 10,80.5 20,73.1 30,71.1 40,72.3 50,72.8 60,70.4 70,66.5 80,64.6 90,68.2 100,77.3 110,88.9 120,98.4 130,103.3 140,104.5 150,105.5 160,109.3 170,115.8 180,121.7 190,122.9 200,117.9 210,108.4 220,98.8 230,92.6 240,90.1 250,88.5 260,84.2 270,76.3 280,67.1 290,61.0" fill="none" stroke="#8c8c8c" stroke-width="2" stroke-linejoin="round"/>
+  <g stroke="#f23645" stroke-width="2" stroke-dasharray="6 4">
+    <line x1="0" y1="62" x2="296" y2="62"/><line x1="0" y1="118" x2="296" y2="118"/>
+  </g>
+  <rect x="290" y="78" width="30" height="24" rx="6" fill="#f23645"/>
+  <g stroke="#ffffff" stroke-width="2" fill="none">
+    <circle cx="305" cy="90" r="8"/><line x1="301" y1="90" x2="309" y2="90"/><line x1="305" y1="86" x2="305" y2="94"/>
+  </g>
+</svg>

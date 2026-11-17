@@ -5,7 +5,7 @@ All notable changes to this package are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.1.0 - Unreleased
+## 1.1.0 - 2026-11-13
 
 Helpers extracted from the scatter series plugin and from the custom series
 plugins, which had been writing them for themselves.
@@ -58,6 +58,10 @@ plugins, which had been writing them for themselves.
   structural copies of the library's hit test result, exported from 5.2, and
   conflation context, from 5.1. Types only, so that a plugin can implement
   `hitTest` and `conflationReducer` and keep 5.0 as its floor.
+- `chart/compat` — `supportsSeriesOrder`: whether a series has
+  `setSeriesOrder`, added in 5.0.6, as a type guard, so that the call inside
+  stays typed and a plugin can use the method where the host has it and keep
+  5.0 as its floor.
 - `custom-series/hit-test` — `distanceToRange`, `seriesHitTestTolerance`,
   `nearestBar`, `nearestVerticalRange`, `createHitTestDataCache`,
   `VerticalSpan`, `NearestBarHit`, `HitTestDataCache`: the parts of a
@@ -68,6 +72,11 @@ plugins, which had been writing them for themselves.
   the bars near the pointer found by binary search, so the cost does not grow
   with the bars on screen; and one `hitTestData` object per hovered item, so
   that the chart does not repaint on every pointer move.
+- `dimensions/full-width` — `fullBarWidthAfter`: a full-width column that
+  starts where its neighbor's ended. `fullBarWidth` rounds the edge two
+  neighbors share once for each, and where the chart's inexact x coordinates
+  put it on a half pixel the two can round apart, leaving a 1 px seam or
+  overlap.
 - `custom-series/visible-bars` — `effectiveBarSpacing`: the bar spacing times
   the conflation factor, so that a conflated bar is as wide as the slots it
   covers. Only for a series with a `conflationReducer`: the chart reports the

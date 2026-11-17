@@ -334,6 +334,8 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	/**
 	 * Removes a pane with index
 	 *
+	 * Does nothing if the pane is the only pane, or the last visible one (see `IPaneApi.setVisible`).
+	 *
 	 * @param index - the pane to be removed
 	 */
 	removePane(index: number): void;
@@ -382,6 +384,8 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	/**
 	 * Returns the dimensions of the chart pane (the plot surface which excludes time and price scales).
 	 * This would typically only be useful for plugin development.
+	 *
+	 * A hidden pane (see `IPaneApi.setVisible`) has a height of 0.
 	 *
 	 * @param paneIndex - The index of the pane
 	 * @defaultValue `0`

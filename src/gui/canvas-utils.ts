@@ -1,12 +1,13 @@
 import {
 	bindCanvasElementBitmapSizeTo,
 	CanvasElementBitmapSizeBinding,
+	size,
 	Size,
 } from 'fancy-canvas';
 
 import { ensureNotNull } from '../helpers/assertions';
 
-export function createBoundCanvas(parentElement: HTMLElement, size: Size): CanvasElementBitmapSizeBinding {
+export function createBoundCanvas(parentElement: HTMLElement, canvasSize: Size): CanvasElementBitmapSizeBinding {
 	const doc = ensureNotNull(parentElement.ownerDocument);
 	const canvas = doc.createElement('canvas');
 	parentElement.appendChild(canvas);
@@ -16,13 +17,24 @@ export function createBoundCanvas(parentElement: HTMLElement, size: Size): Canva
 		options: {
 			allowResizeObserver: true,
 		},
-		transform: (bitmapSize: Size, canvasElementClientSize: Size) => ({
-			width: Math.max(bitmapSize.width, canvasElementClientSize.width),
-			height: Math.max(bitmapSize.height, canvasElementClientSize.height),
-		}),
+		transform: (bitmapSize: Size, canvasElementClientSize: Size) => canvasBitmapSize(bitmapSize, canvasElementClientSize, window.devicePixelRatio),
 	});
-	binding.resizeCanvasElement(size);
+	binding.resizeCanvasElement(canvasSize);
 	return binding;
+}
+
+export function canvasBitmapSize(bitmapSize: Size, canvasElementClientSize: Size, pixelRatio: number): Size {
+	// A canvas that is not rendered (e.g. in a hidden pane) reports a 0x0 box; predict it from the current ratio so it is sharp when shown.
+	const observedSize = bitmapSize.width === 0 && bitmapSize.height === 0
+		? size({
+			width: Math.round(canvasElementClientSize.width * pixelRatio),
+			height: Math.round(canvasElementClientSize.height * pixelRatio),
+		})
+		: bitmapSize;
+	return size({
+		width: Math.max(observedSize.width, canvasElementClientSize.width),
+		height: Math.max(observedSize.height, canvasElementClientSize.height),
+	});
 }
 
 export function releaseCanvas(canvas: HTMLCanvasElement): void {

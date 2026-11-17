@@ -91,7 +91,8 @@ Return the result typed as `CustomSeriesHitTestResult` from
 `conflationReducer`'s arguments. Both are types only: the library exports its
 own from 5.2 and 5.1, and importing them would raise the plugin's floor.
 
-Read: `rounded-candles-series/src/renderer.ts`.
+Read: `rounded-candles-series/src/renderer.ts` (boxes), `lollipop-series/src/renderer.ts`
+(a stem and a dot).
 
 ### `custom-series/options-aware-series` — `createOptionsAwareSeries`, `createWhitespaceSeries`, `OptionsAwareSeries`
 
@@ -191,7 +192,7 @@ plugin lines up with built-in series at every device pixel ratio.
 | `dimensions/positions` | `positionsLine(centre, pixelRatio, width)`, `positionsBox(a, b, pixelRatio)` | a crisp line of a given CSS width; a box between two coordinates |
 | `dimensions/columns` | `calculateColumnPositions(items, barSpacing, pixelRatio)`, `…InPlace` | evenly spaced columns with the histogram's gap; items may carry `time` (logical index) so a gap is not bridged |
 | `dimensions/candles` | `candlestickWidth(barSpacing, pixelRatio)` | the body width the built-in candlestick uses |
-| `dimensions/full-width` | `fullBarWidth(x, halfSpacing, pixelRatio)` | a bar filling its whole slot |
+| `dimensions/full-width` | `fullBarWidth(x, halfSpacing, pixelRatio)`, `fullBarWidthAfter(previousRight, x, halfSpacing, pixelRatio)` | a bar filling its whole slot; neighboring columns that share an edge, with no seam |
 | `dimensions/crosshair-width` | `gridAndCrosshairMediaWidth`, `gridAndCrosshairBitmapWidth` | line widths matching the grid |
 
 Read: `rounded-candles-series/src/renderer.ts`, `pretty-histogram-series/src/renderer.ts`.
@@ -244,13 +245,15 @@ a unit test.
 
 | Module | Export | Use |
 | --- | --- | --- |
+| `chart/compat` | `supportsSeriesOrder(series)` | calling `setSeriesOrder` (5.0.6) from a plugin whose floor is 5.0: the guard narrows the series, so the call compiles against the 5.0 typings and is skipped on a host without the method |
 | `chart/interaction-flags` | `canUserMoveTimeScale(chart.options())`, `TIME_SCALE_MOVE_FLAGS` | whether the user can scroll or zoom the time scale; with none of the flags on, the chart treats both edges as fixed |
 | `chart/lifecycle` | `isChartRemoved(chart)`, `isSeriesAttached(chart, series)` | for a plugin with its own API in front of a series: stop writing to a chart the host removed, or a series it took off with `chart.removeSeries`. Read-only; decide outside the chart's event dispatch what to release |
 | `chart/time-axis-labels` | `timeAxisLabelFont`, `tickMarkPixelsPerCharacter`, `tickMarkMaxLabelWidth`, `tickMarkCharactersForWidth` | the time axis' label font, and `timeScale.tickMarkMaxCharacterLength` to pixels and back |
 | `text/measure` | `textMeasureContext()`, `createTextWidthCache()` | measuring labels before painting (layout, overlap avoidance); `null` without a DOM |
 
 Read: `scatter-series/src/x-axis-controller.ts`, and `scatter-series-api.ts` for
-the lifecycle checks.
+the lifecycle checks; `background-shade-series/src/background-shade-series.ts`
+for `supportsSeriesOrder`.
 
 ## General
 

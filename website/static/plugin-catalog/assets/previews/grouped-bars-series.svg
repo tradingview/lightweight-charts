@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Grouped Bars Series preview">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/>
+  </g>
+  <line x1="0" y1="135" x2="320" y2="135" stroke="#8c8c8c" stroke-width="1.5"/>
+  <g fill="#1848cc">
+    <rect x="18" y="70" width="13" height="65"/>
+    <rect x="79" y="58" width="13" height="77"/>
+    <rect x="140" y="76" width="13" height="59"/>
+    <rect x="201" y="52" width="13" height="83"/>
+    <rect x="262" y="64" width="13" height="71"/>
+  </g>
+  <g fill="#2962ff">
+    <rect x="31" y="92" width="13" height="43"/>
+    <rect x="92" y="84" width="13" height="51"/>
+    <rect x="153" y="66" width="13" height="69"/>
+    <rect x="214" y="72" width="13" height="63"/>
+    <rect x="275" y="50" width="13" height="85"/>
+  </g>
+  <g fill="#90bff9">
+    <rect x="44" y="104" width="13" height="31"/>
+    <rect x="105" y="98" width="13" height="37"/>
+    <rect x="166" y="90" width="13" height="45"/>
+    <rect x="227" y="62" width="13" height="73"/>
+    <rect x="288" y="80" width="13" height="55"/>
+  </g>
+</svg>

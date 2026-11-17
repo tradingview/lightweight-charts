@@ -107,6 +107,54 @@ describe('Helpers', () => {
 			expect((Object.prototype as any).polluted).to.be.undefined;
 		});
 
+		it('should not merge into properties inherited by the destination', () => {
+			const objectPrototype = Object.prototype as Record<string, unknown>;
+			const inheritedNames = ['toString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'toLocaleString'];
+			const builtins = inheritedNames.map((name: string) => objectPrototype[name]);
+
+			for (const name of inheritedNames) {
+				const malicious = JSON.parse(`{ "${name}": { "call": "polluted", "polluted": true } }`) as Record<string, unknown>;
+				const result = merge({}, malicious);
+
+				// the inherited name becomes an own property of the destination only
+				expect(Object.prototype.hasOwnProperty.call(result, name)).to.be.true;
+				expect(result[name]).to.deep.equal({ call: 'polluted', polluted: true });
+			}
+
+			inheritedNames.forEach((name: string, index: number) => {
+				const builtin = objectPrototype[name] as Record<string, unknown>;
+				expect(builtin).to.equal(builtins[index]);
+				expect(builtin.call).to.equal(Function.prototype.call);
+				expect(Object.prototype.hasOwnProperty.call(builtin, 'call')).to.be.false;
+				expect(Object.prototype.hasOwnProperty.call(builtin, 'polluted')).to.be.false;
+			});
+		});
+
+		it('should not merge into properties inherited by a nested destination', () => {
+			const originalCall = Object.prototype.hasOwnProperty.call;
+			const malicious = JSON.parse('{ "layout": { "hasOwnProperty": { "call": "polluted" } } }') as Record<string, unknown>;
+
+			const result = merge({ layout: { textColor: 'black' } }, malicious);
+
+			expect(Object.prototype.hasOwnProperty.call).to.equal(originalCall);
+			expect(result.layout).to.deep.equal({ textColor: 'black', hasOwnProperty: { call: 'polluted' } });
+			// a later merge still works
+			expect(merge({ a: { b: 1 } }, { a: { c: 2 } })).to.deep.equal({ a: { b: 1, c: 2 } });
+		});
+
+		it('should not merge into a function-valued destination property', () => {
+			const formatter = (): string => 'formatted';
+			const result = merge({ formatter }, { formatter: { call: 'polluted' } });
+
+			expect(formatter.call).to.equal(Function.prototype.call);
+			expect(result.formatter).to.deep.equal({ call: 'polluted' });
+		});
+
+		it('should replace a null destination with a source object', () => {
+			const result = merge({ a: null }, { a: { b: 1 } });
+			expect(result).to.deep.equal({ a: { b: 1 } });
+		});
+
 		it('should assign null as a leaf value over a primitive', () => {
 			const result = merge({ a: 'str', b: 1 }, { a: null });
 			expect(result).to.deep.equal({ a: null, b: 1 });

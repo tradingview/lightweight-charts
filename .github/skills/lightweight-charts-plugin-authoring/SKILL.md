@@ -164,6 +164,7 @@ with the shape of each API and the official plugin that uses it.
 | draw only what is on screen, and reach the pane edge with a line | `custom-series/visible-bars` — `forEachVisibleBar`, `mapVisibleBars`, `extendRange`, `barCoordinate` |
 | size a conflated bar to the slots it covers (only with a `conflationReducer`) | `effectiveBarSpacing` (`custom-series/visible-bars`) |
 | implement `hitTest` or `conflationReducer` and still support 5.0 | `custom-series/compat` (types only) — `CustomSeriesHitTestResult`, `ConflationContext` |
+| call a series method newer than 5.0 (`setSeriesOrder`, 5.0.6) and still support 5.0 | `chart/compat` — `supportsSeriesOrder(series)` narrows the series, so the call stays typed |
 | report the bar under the pointer from `hitTest` | `custom-series/hit-test` — `seriesHitTestTolerance`, `nearestVerticalRange` (boxes), `nearestBar` (any shape), `createHitTestDataCache` |
 | break a line at explicit whitespace, not at other series' timestamps | `createWhitespaceSeries` (`custom-series/options-aware-series`) + `visibleSegments` |
 | read options inside `priceValueBuilder` (autoscale that follows options) | `createOptionsAwareSeries` with the option names that affect plot values |
@@ -192,14 +193,19 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 | Building… | Read |
 | --- | --- |
 | any custom series | `stacked-bars-series` (the simplest complete one), then `pretty-histogram-series` |
-| a series with several values per point | `stacked-area-series`, `stacked-bars-series` |
+| a series with several values per point | `stacked-area-series`, `stacked-bars-series`, `grouped-bars-series` (side by side) |
 | a line/area that must break at gaps, or survive conflation | `hlc-area-series`, `brushable-area-series` |
 | a series with its own pointer interaction | `brushable-area-series` (`BrushableAreaInteraction`) |
 | a replacement for a built-in series | `rounded-candles-series` (matches candlestick options and widths) |
 | a chart whose X axis is a number, not time (scatter, bubble) | `scatter-series` (`ScatterHorzScaleBehavior`, `createScatterChart`) |
+| point markers on a series, hovered by their drawn shape | `lollipop-series` (`canvas/markers` dots, `nearestVerticalRange` and `markerDistance` in `hitTest`), `scatter-series` |
+| a shape built from several values per point, on the candle grid | `box-whisker-series` (named fields, per-point colors, part names in `objectId`) |
+| many colored cells per point, an order book or volume profile | `heatmap-series` (fills batched by color, `createColorScale`, a cell-level `hitTest`) |
 | a fixed-pixel-height overlay series | `dual-range-histogram-series` (`scaleMode`, `keepPixelSeriesInView`) |
 | a series primitive with an axis label and dragging | `vertical-line` |
+| a tool the user clicks to add something to a series | `user-price-lines` (pointer events in its own pane, one active instance per pane, a chart option set and put back) |
 | an image or decoration behind a series or pane | `image-watermark` (both a series and a pane primitive) |
+| a background colored from data, outside the price scale | `background-shade-series` (`[NaN]` plot values, `setSeriesOrder(0)`) |
 | a text label anchored to a pane edge or corner | `anchored-text` (the smallest series + pane pair over one core) |
 | a background derived from each bar of a series | `session-highlighting` (per-bar state from `dataUpdated`, visible-range slice) |
 | a DOM layer on a pane, multi-pane lifecycle | `accessibility` |
@@ -208,7 +214,7 @@ README and the `dist/*.d.ts`, but not the source — fetch that from GitHub
 `plugin-examples/src/plugins/` in the repository
 (`https://github.com/tradingview/lightweight-charts/tree/master/plugin-examples`)
 holds a further set of proof-of-concept plugins — tooltips, drawing tools,
-heatmaps, … — good for breadth and ideas, but they are
+a volume profile, … — good for breadth and ideas, but they are
 unpublished starting points, not the standard to match. The graduated
 plugins' folders there are redirects to the packages.
 

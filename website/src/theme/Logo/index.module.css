@@ -25,9 +25,10 @@ html[data-theme='dark'] .Logo {
 }
 
 /*
-Small logo on tiny screen
+Small logo on tiny screens, and above the hamburger breakpoint where the full one doesn't fit beside the tabs.
+1199px = full logo + current navbar items; recheck it when the items change.
 */
-@media (max-width: 567px) {
+@media (max-width: 567px), (min-width: 997px) and (max-width: 1199px) {
 	.Logo {
 		background-image: var(--navbar-logo-url-mobile);
 		width: 36px;

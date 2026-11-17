@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Heatmap series Plugin Example</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				overflow: hidden;
+				background-color: rgba(248, 249, 253, 1);
+				color: rgba(19, 23, 34, 1);
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+					sans-serif;
+			}
+			#chart {
+				width: 100%;
+				height: 100%;
+			}
+			#controls {
+				position: absolute;
+				top: 12px;
+				left: 12px;
+				/* above the chart's own canvases, which sit at z-index 2 */
+				z-index: 10;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 12px;
+				align-items: center;
+				padding: 8px 12px;
+				border-radius: 6px;
+				background-color: rgba(255, 255, 255, 0.9);
+				box-shadow: 0 1px 4px rgba(19, 23, 34, 0.2);
+				font-size: 13px;
+			}
+			#controls label {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+			}
+			#hovered {
+				min-width: 9em;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="controls">
+			<label>
+				Data
+				<select id="data">
+					<option value="profile">volume profile</option>
+					<option value="book">order book</option>
+				</select>
+			</label>
+			<label>
+				Colors
+				<select id="shader">
+					<option value="turbo">turbo scale</option>
+					<option value="green">default green</option>
+					<option value="purple">translucent purple</option>
+				</select>
+			</label>
+			<label>
+				Gap
+				<select id="gap">
+					<option value="0">none</option>
+					<option value="1">1 px</option>
+					<option value="2">2 px</option>
+				</select>
+			</label>
+			<label>
+				Border
+				<select id="border">
+					<option value="0">none</option>
+					<option value="1 #FFFFFF">1 px white</option>
+					<option value="1 #131722">1 px dark</option>
+				</select>
+			</label>
+			<span id="hovered"></span>
+		</div>
+		<div id="chart"></div>
+		<script type="module" src="./example.ts"></script>
+	</body>
+</html>

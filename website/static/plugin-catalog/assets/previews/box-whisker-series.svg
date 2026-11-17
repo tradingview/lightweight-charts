@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Box and Whisker Series preview">
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <g stroke="#575757" stroke-width="1.5">
+    <line x1="35" y1="58" x2="35" y2="74"/><line x1="35" y1="98" x2="35" y2="120"/>
+    <line x1="28" y1="58" x2="42" y2="58"/><line x1="28" y1="120" x2="42" y2="120"/>
+    <line x1="85" y1="52" x2="85" y2="66"/><line x1="85" y1="90" x2="85" y2="112"/>
+    <line x1="78" y1="52" x2="92" y2="52"/><line x1="78" y1="112" x2="92" y2="112"/>
+    <line x1="135" y1="62" x2="135" y2="78"/><line x1="135" y1="100" x2="135" y2="124"/>
+    <line x1="128" y1="62" x2="142" y2="62"/><line x1="128" y1="124" x2="142" y2="124"/>
+    <line x1="185" y1="48" x2="185" y2="60"/><line x1="185" y1="84" x2="185" y2="104"/>
+    <line x1="178" y1="48" x2="192" y2="48"/><line x1="178" y1="104" x2="192" y2="104"/>
+    <line x1="235" y1="56" x2="235" y2="70"/><line x1="235" y1="94" x2="235" y2="118"/>
+    <line x1="228" y1="56" x2="242" y2="56"/><line x1="228" y1="118" x2="242" y2="118"/>
+    <line x1="285" y1="50" x2="285" y2="64"/><line x1="285" y1="88" x2="285" y2="110"/>
+    <line x1="278" y1="50" x2="292" y2="50"/><line x1="278" y1="110" x2="292" y2="110"/>
+  </g>
+  <rect x="23" y="74" width="24" height="12" fill="#2962ff"/>
+  <rect x="23" y="86" width="24" height="12" fill="#90bff9"/>
+  <rect x="73" y="66" width="24" height="14" fill="#2962ff"/>
+  <rect x="73" y="80" width="24" height="10" fill="#90bff9"/>
+  <rect x="123" y="78" width="24" height="10" fill="#2962ff"/>
+  <rect x="123" y="88" width="24" height="12" fill="#90bff9"/>
+  <rect x="173" y="60" width="24" height="12" fill="#2962ff"/>
+  <rect x="173" y="72" width="24" height="12" fill="#90bff9"/>
+  <rect x="223" y="70" width="24" height="12" fill="#2962ff"/>
+  <rect x="223" y="82" width="24" height="12" fill="#90bff9"/>
+  <rect x="273" y="64" width="24" height="12" fill="#2962ff"/>
+  <rect x="273" y="76" width="24" height="12" fill="#90bff9"/>
+  <g stroke="#ffffff" stroke-width="2">
+    <line x1="23" y1="86" x2="47" y2="86"/>
+    <line x1="73" y1="80" x2="97" y2="80"/>
+    <line x1="123" y1="88" x2="147" y2="88"/>
+    <line x1="173" y1="72" x2="197" y2="72"/>
+    <line x1="223" y1="82" x2="247" y2="82"/>
+    <line x1="273" y1="76" x2="297" y2="76"/>
+  </g>
+  <g fill="#8c8c8c">
+    <circle cx="85" cy="128" r="3"/><circle cx="235" cy="49" r="3"/>
+  </g>
+</svg>

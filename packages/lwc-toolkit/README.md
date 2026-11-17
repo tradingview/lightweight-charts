@@ -37,6 +37,7 @@ setting ignores the `exports` field and will report the imports as unresolved.
 | `axis-label-view` | `AxisLabelView`, `AxisLabelSource` — a price- or time-axis label over a source that may have no coordinate yet |
 | `canvas/markers` | `beginMarker`, `beginMarkerOffset`, `traceMarker`, `traceMarkerOffset`, `markerDistance`, `markerVertices`, `segmentDistance`, `MarkerShape` — circle, square, diamond and triangle markers, one per path (`begin*`, which start the path) or many to a path (`trace*`), the ring around them, and the distance to them as drawn, for hit testing, all from the same vertices |
 | `canvas/round-rect` | `drawRoundRect`, `drawRoundRectWithBorder`, `clampCornerRadius`, `CornerRadii` — rounded rectangles with an inset border |
+| `chart/compat` | `supportsSeriesOrder` — runtime checks for series methods newer than 5.0 (`setSeriesOrder`, 5.0.6) that narrow the series, so that a plugin calls them where the host has them and still supports 5.0 |
 | `chart/interaction-flags` | `canUserMoveTimeScale`, `TIME_SCALE_MOVE_FLAGS` — whether `handleScroll` / `handleScale` let the user scroll or zoom the time scale, by the library's own rule |
 | `chart/lifecycle` | `isChartRemoved`, `isSeriesAttached` — side-effect-free checks for a removed chart and a series taken off the chart |
 | `chart/time-axis-labels` | `timeAxisLabelFont`, `tickMarkPixelsPerCharacter`, `tickMarkMaxLabelWidth`, `tickMarkCharactersForWidth` — the time axis' label font, and `tickMarkMaxCharacterLength` to pixels and back |
@@ -53,7 +54,7 @@ setting ignores the `exports` field and will report the imports as unresolved.
 | `dimensions/columns` | `calculateColumnPositions`, `calculateColumnPositionsInPlace` — evenly spaced column bars with consistent gaps |
 | `dimensions/common` | `BitmapPositionLength` — the `{ position, length }` pair the other dimension helpers return |
 | `dimensions/crosshair-width` | `gridAndCrosshairMediaWidth`, `gridAndCrosshairBitmapWidth` — line widths matching the grid and crosshair |
-| `dimensions/full-width` | `fullBarWidth` — a bar spanning the whole slot, with no gap |
+| `dimensions/full-width` | `fullBarWidth`, `fullBarWidthAfter` — a bar spanning the whole slot, and one starting where its neighbor ended, so neighbors share an edge |
 | `dimensions/positions` | `positionsBox`, `positionsLine` — pixel-perfect boxes and lines from two coordinates |
 | `dom/media-query` | `subscribeMediaQuery`, `mediaQueryMatches`, `HIGH_CONTRAST_QUERIES`, `REDUCED_MOTION_QUERY` — shared, SSR-safe media query subscriptions |
 | `dom/pane-element` | `paneContentElement`, `chartTableElement` — the pane's canvas wrapper to append DOM overlays to, and the chart table |

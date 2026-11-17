@@ -29,16 +29,22 @@ aliases:
         - packages/lwc-toolkit/node_modules
         - packages/lwc-plugin-accessibility/node_modules
         - packages/lwc-plugin-anchored-text/node_modules
+        - packages/lwc-plugin-background-shade-series/node_modules
+        - packages/lwc-plugin-box-whisker-series/node_modules
         - packages/lwc-plugin-brushable-area-series/node_modules
         - packages/lwc-plugin-dual-range-histogram-series/node_modules
+        - packages/lwc-plugin-grouped-bars-series/node_modules
+        - packages/lwc-plugin-heatmap-series/node_modules
         - packages/lwc-plugin-hlc-area-series/node_modules
         - packages/lwc-plugin-image-watermark/node_modules
+        - packages/lwc-plugin-lollipop-series/node_modules
         - packages/lwc-plugin-pretty-histogram-series/node_modules
         - packages/lwc-plugin-rounded-candles-series/node_modules
         - packages/lwc-plugin-scatter-series/node_modules
         - packages/lwc-plugin-session-highlighting/node_modules
         - packages/lwc-plugin-stacked-area-series/node_modules
         - packages/lwc-plugin-stacked-bars-series/node_modules
+        - packages/lwc-plugin-user-price-lines/node_modules
         - packages/lwc-plugin-vertical-line/node_modules
         # puppeteer browser cache (see .puppeteerrc.cjs)
         - .cache

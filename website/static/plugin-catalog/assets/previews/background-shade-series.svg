@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Background Shade Series preview">
+  <rect x="0" y="0" width="10" height="180" fill="#089981" fill-opacity="0.12"/>
+  <rect x="10" y="0" width="10" height="180" fill="#089981" fill-opacity="0.2"/>
+  <rect x="20" y="0" width="10" height="180" fill="#089981" fill-opacity="0.27"/>
+  <rect x="30" y="0" width="10" height="180" fill="#089981" fill-opacity="0.34"/>
+  <rect x="40" y="0" width="10" height="180" fill="#089981" fill-opacity="0.39"/>
+  <rect x="50" y="0" width="10" height="180" fill="#089981" fill-opacity="0.43"/>
+  <rect x="60" y="0" width="10" height="180" fill="#089981" fill-opacity="0.46"/>
+  <rect x="70" y="0" width="10" height="180" fill="#089981" fill-opacity="0.47"/>
+  <rect x="80" y="0" width="10" height="180" fill="#089981" fill-opacity="0.46"/>
+  <rect x="90" y="0" width="10" height="180" fill="#089981" fill-opacity="0.44"/>
+  <rect x="100" y="0" width="10" height="180" fill="#089981" fill-opacity="0.4"/>
+  <rect x="110" y="0" width="10" height="180" fill="#089981" fill-opacity="0.34"/>
+  <rect x="120" y="0" width="10" height="180" fill="#089981" fill-opacity="0.28"/>
+  <rect x="130" y="0" width="10" height="180" fill="#089981" fill-opacity="0.21"/>
+  <rect x="140" y="0" width="10" height="180" fill="#089981" fill-opacity="0.13"/>
+  <rect x="150" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.19"/>
+  <rect x="160" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.26"/>
+  <rect x="170" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.33"/>
+  <rect x="180" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.38"/>
+  <rect x="190" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.43"/>
+  <rect x="200" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.46"/>
+  <rect x="210" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.47"/>
+  <rect x="220" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.46"/>
+  <rect x="230" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.44"/>
+  <rect x="240" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.4"/>
+  <rect x="250" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.35"/>
+  <rect x="260" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.29"/>
+  <rect x="270" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.22"/>
+  <rect x="280" y="0" width="10" height="180" fill="#f23645" fill-opacity="0.14"/>
+  <rect x="290" y="0" width="10" height="180" fill="#089981" fill-opacity="0.18"/>
+  <rect x="300" y="0" width="10" height="180" fill="#089981" fill-opacity="0.25"/>
+  <rect x="310" y="0" width="10" height="180" fill="#089981" fill-opacity="0.32"/>
+  <g stroke="#dbdbdb" stroke-width="1" opacity="0.6">
+    <line x1="0" y1="45" x2="320" y2="45"/><line x1="0" y1="90" x2="320" y2="90"/><line x1="0" y1="135" x2="320" y2="135"/>
+  </g>
+  <polyline points="0,106.9 10,96.2 20,92.1 30,91.4 40,85.9 50,74.3 60,64.9 70,63.9 80,66.4 90,64.2 100,57.9 110,56.2 120,63.1 130,72.1 140,75.3 150,75.1 160,79.8 170,91.6 180,102.6 190,106.0 200,105.6 210,109.8 220,118.9 230,124.4 240,121.1 250,114.7 260,113.4 270,115.8 280,113.2 290,102.7 300,91.6 310,87.3 320,86.7" fill="none" stroke="#575757" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>
