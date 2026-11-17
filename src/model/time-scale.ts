@@ -62,7 +62,7 @@ export function markWithGreaterWeight(a: TimeMark, b: TimeMark): TimeMark {
 export type TimeScalePosition = 'top' | 'bottom';
 
 /**
- * Options for the time scale; the horizontal scale at the bottom of the chart that displays the time of data.
+ * Options for the time scale; the horizontal scale at the bottom or top of the chart that displays the time of data.
  */
 export interface HorzScaleOptions {
 	/**
