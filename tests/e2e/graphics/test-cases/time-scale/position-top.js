@@ -1,3 +1,6 @@
+window.checkChartScreenshot = true;
+window.ignoreMouseMove = true;
+
 function generateData() {
 	const res = [];
 	const time = new Date(Date.UTC(2018, 0, 1, 0, 0, 0, 0));
@@ -28,6 +31,9 @@ async function runTestCase(container) {
 			ticksVisible: true,
 		},
 	});
+
+	// Leave room below the chart for the takeScreenshot comparison.
+	chart.resize(600, 240, true);
 
 	const mainSeries = chart.addSeries(LightweightCharts.LineSeries);
 	const data = generateData();
