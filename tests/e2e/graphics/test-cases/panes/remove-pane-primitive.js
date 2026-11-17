@@ -40,4 +40,4 @@ async function runTestCase(container) {
 	await new Promise(resolve => requestAnimationFrame(resolve));
 	chart.removePane(1);
 	await new Promise(resolve => requestAnimationFrame(resolve));
-                                        }
+}
