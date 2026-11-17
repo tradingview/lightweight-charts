@@ -30,7 +30,7 @@ import {
 } from '../model/series-options';
 import { createCustomSeriesDefinition } from '../model/series/custom-series';
 import { isSeriesDefinition, SeriesDefinition } from '../model/series/series-def';
-import { Logical } from '../model/time-data';
+import { Logical, TimePointIndex } from '../model/time-data';
 
 import { getSeriesDataCreator } from './get-series-data-creator';
 import { HoveredInfo, IChartApiBase, MouseEventHandler, MouseEventParams, PaneSize } from './ichart-api';
@@ -328,7 +328,58 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 	}
 
 	public removePane(index: number): void {
-		this._chartWidget.model().removePane(index);
+		const model = this._chartWidget.model();
+		const panes = model.panes();
+		if (panes.length === 1) {
+			return;
+		}
+		assert(index >= 0 && index < panes.length, 'Invalid pane index');
+		const pane = panes[index];
+		if (model.isLastVisiblePane(pane)) {
+			return;
+		}
+
+		const preserveEmptyPane = pane.preserveEmptyPane();
+		if (model.crosshairSource().pane() === pane) {
+			model.setHoveredSource(null);
+			model.clearCurrentPosition(true);
+		}
+		const removedSeries = [...pane.series()];
+		let update: DataUpdateResponse | undefined;
+		pane.setPreserveEmptyPane(true);
+		try {
+			for (const series of removedSeries) {
+				const seriesApi = ensureDefined(this._seriesMapReversed.get(series));
+				const nextUpdate = this._dataLayer.removeSeries(series);
+				if (update === undefined) {
+					update = nextUpdate;
+				} else {
+					for (const [changedSeries, changes] of nextUpdate.series) {
+						update.series.set(changedSeries, changes);
+					}
+					update.timeScale.baseIndex = nextUpdate.timeScale.baseIndex;
+					if (nextUpdate.timeScale.points !== undefined) {
+						update.timeScale.points = nextUpdate.timeScale.points;
+						update.timeScale.firstChangedPointIndex = Math.min(
+							update.timeScale.firstChangedPointIndex ?? Infinity,
+							ensureDefined(nextUpdate.timeScale.firstChangedPointIndex)
+						) as TimePointIndex;
+					}
+				}
+				model.removeSeries(series);
+				this._seriesMap.delete(seriesApi);
+				this._seriesMapReversed.delete(series);
+			}
+		} finally {
+			pane.setPreserveEmptyPane(preserveEmptyPane);
+		}
+		model.removePane(index);
+		if (update !== undefined) {
+			for (const series of removedSeries) {
+				update.series.delete(series);
+			}
+			this._sendUpdateToChart(update);
+		}
 	}
 
 	public swapPanes(first: number, second: number): void {
