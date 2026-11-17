@@ -2,11 +2,24 @@
 import { expect } from 'chai';
 import { describe, it } from 'node:test';
 
-import { TimeAxisViewRenderer, TimeAxisViewRendererData } from '../../src/renderers/time-axis-view-renderer';
-import { TimeAxisViewRendererOptions } from '../../src/renderers/itime-axis-view-renderer';
 import { TextWidthCache } from '../../src/model/text-width-cache';
+import { TimeAxisViewRendererOptions } from '../../src/renderers/itime-axis-view-renderer';
+import { TimeAxisViewRenderer, TimeAxisViewRendererData } from '../../src/renderers/time-axis-view-renderer';
 
-function fakeMeasureCtx() {
+interface MeasureContext {
+	measureText(text: string): Pick<TextMetrics, 'width' | 'actualBoundingBoxAscent' | 'actualBoundingBoxDescent'>;
+	save(): void;
+	restore(): void;
+	textBaseline: CanvasTextBaseline;
+	font: string;
+}
+
+interface FakeTarget {
+	useMediaCoordinateSpace(cb: (scope: { context: unknown; mediaSize: { height: number } }) => unknown): unknown;
+	useBitmapCoordinateSpace(cb: (scope: { context: unknown; bitmapSize: { height: number }; horizontalPixelRatio: number; verticalPixelRatio: number }) => unknown): unknown;
+}
+
+function fakeMeasureCtx(): MeasureContext {
 	return {
 		measureText: (text: string) => ({
 			width: text.length * 10,
@@ -27,7 +40,7 @@ interface Recorded {
 	textTranslateY?: number;
 }
 
-function fakeTarget(bitmapHeight: number, recorded: Recorded) {
+function fakeTarget(bitmapHeight: number, recorded: Recorded): FakeTarget {
 	const bitmapCtx = {
 		fillStyle: '',
 		beginPath: () => {},
