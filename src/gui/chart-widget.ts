@@ -365,11 +365,8 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		}
 	}
 
-	private _timeAxisBitmapHeightOnTop(): number {
-		if (!this._options.timeScale.visible || this._options.timeScale.position !== 'top') {
-			return 0;
-		}
-		return this._timeAxisWidget.getBitmapSize().height;
+	private _isTimeAxisOnTop(): boolean {
+		return this._options.timeScale.visible && this._options.timeScale.position === 'top';
 	}
 
 	private _drawTimeAxisComposite(ctx: CanvasRenderingContext2D | null, firstPane: PaneWidget, targetY: number, addTopLayer?: boolean): void {
@@ -378,7 +375,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		}
 		const drawStub = (position: 'left' | 'right', targetX: number): void => {
 			const stub = ensureNotNull(position === 'left' ? this._timeAxisWidget.leftStub() : this._timeAxisWidget.rightStub());
-			stub.drawBitmap(ensureNotNull(ctx), targetX, targetY);
+			stub.drawBitmap(ctx, targetX, targetY);
 		};
 
 		let targetX = 0;
@@ -408,7 +405,8 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		let totalHeight = 0;
 
 		const firstPane = this._firstVisiblePaneWidget();
-		const timeAxisBitmapHeight = this._timeAxisBitmapHeightOnTop();
+		const timeAxisOnTop = this._isTimeAxisOnTop();
+		const timeAxisBitmapHeight = timeAxisOnTop ? this._timeAxisWidget.getBitmapSize().height : 0;
 
 		const drawPriceAxises = (position: 'left' | 'right', targetX: number) => {
 			let targetY = timeAxisBitmapHeight;
@@ -470,10 +468,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 
 		// draw time scale and stubs
 		if (this._options.timeScale.visible) {
-			const timeAxisTargetY = timeAxisBitmapHeight > 0 ? 0 : totalHeight;
+			const timeAxisTargetY = timeAxisOnTop ? 0 : totalHeight;
 			this._drawTimeAxisComposite(ctx, firstPane, timeAxisTargetY, addTopLayer);
 
-			if (timeAxisBitmapHeight === 0) {
+			if (!timeAxisOnTop) {
 				totalHeight += this._timeAxisWidget.getBitmapSize().height;
 			}
 		}
@@ -767,6 +765,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	}
 
 	private _syncGuiWithModel(): void {
+		// Position the axis before inserting panes relative to it.
+		this._syncTimeAxisDomPosition();
+
 		const panes = this._model.panes();
 		const targetPaneWidgetsCount = panes.length;
 		const actualPaneWidgetsCount = this._paneWidgets.length;
@@ -992,4 +993,4 @@ function disableSelection(element: HTMLElement): void {
 
 function shouldSubscribeMouseWheel<HorzScaleItem>(options: ChartOptionsInternal<HorzScaleItem>): boolean {
 	return Boolean(options['handleScroll'].mouseWheel || options['handleScale'].mouseWheel);
-}
+		}
