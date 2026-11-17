@@ -352,7 +352,12 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return;
 		}
 
-		const zoomScale = (scale - this._prevPinchScale) * 5;
+		if (scale <= 0 || !Number.isFinite(scale)) {
+			return;
+		}
+
+		// Keep the same local sensitivity in both directions, independent of event frequency.
+		const zoomScale = (Math.sqrt(scale / this._prevPinchScale) - 1) * 10;
 		this._prevPinchScale = scale;
 
 		this._model().zoomTime(middlePoint.x as Coordinate, zoomScale);
