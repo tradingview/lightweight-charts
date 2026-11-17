@@ -363,9 +363,13 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		}
 	}
 
+	private _isPositionedOnTop(): boolean {
+		return this._chart.options().timeScale.position === 'top';
+	}
+
 	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
 		const model = this._chart.model();
-		const backgroundColor = this._chart.options().timeScale.position === 'top' ? model.backgroundTopColor() : model.backgroundBottomColor();
+		const backgroundColor = this._isPositionedOnTop() ? model.backgroundTopColor() : model.backgroundBottomColor();
 		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, backgroundColor);
 	}
 
@@ -374,7 +378,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			ctx.fillStyle = this._lineColor();
 
 			const borderSize = Math.max(1, Math.floor(this._getRendererOptions().borderSize * verticalPixelRatio));
-			const borderTop = this._chart.options().timeScale.position === 'top' ? bitmapSize.height - borderSize : 0;
+			const borderTop = this._isPositionedOnTop() ? bitmapSize.height - borderSize : 0;
 
 			ctx.fillRect(0, borderTop, bitmapSize.width, borderSize);
 		}
@@ -403,7 +407,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 
 				ctx.beginPath();
 				const tickLen = Math.round(rendererOptions.tickLength * verticalPixelRatio);
-				const tickTop = this._chart.options().timeScale.position === 'top' ? bitmapSize.height - tickLen : 0;
+				const tickTop = rendererOptions.position === 'top' ? bitmapSize.height - tickLen : 0;
 				for (let index = tickMarks.length; index--;) {
 					const x = Math.round(tickMarks[index].coord * horizontalPixelRatio);
 					ctx.rect(x - tickOffset, tickTop, tickWidth, tickLen);
@@ -420,7 +424,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 				rendererOptions.paddingTop +
 				rendererOptions.fontSize / 2
 			);
-			const yText = this._chart.options().timeScale.position === 'top' ? mediaSize.height - labelOffset : labelOffset;
+			const yText = rendererOptions.position === 'top' ? mediaSize.height - labelOffset : labelOffset;
 
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'middle';
@@ -551,14 +555,14 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			return options.leftPriceScale.borderVisible && model.timeScale().options().borderVisible;
 		};
 
-		const bottomColorGetter = () => model.options().timeScale.position === 'top' ? model.backgroundTopColor() : model.backgroundBottomColor();
+		const backgroundColorGetter = () => this._isPositionedOnTop() ? model.backgroundTopColor() : model.backgroundBottomColor();
 
 		if (options.leftPriceScale.visible && this._leftStub === null) {
-			this._leftStub = new PriceAxisStub('left', options, params, borderVisibleGetter, bottomColorGetter);
+			this._leftStub = new PriceAxisStub('left', options, params, borderVisibleGetter, backgroundColorGetter);
 			this._leftStubCell.appendChild(this._leftStub.getElement());
 		}
 		if (options.rightPriceScale.visible && this._rightStub === null) {
-			this._rightStub = new PriceAxisStub('right', options, params, borderVisibleGetter, bottomColorGetter);
+			this._rightStub = new PriceAxisStub('right', options, params, borderVisibleGetter, backgroundColorGetter);
 			this._rightStubCell.appendChild(this._rightStub.getElement());
 		}
 	}
