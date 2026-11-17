@@ -86,7 +86,7 @@ export abstract class PrimitiveWrapper<T extends ISeriesPrimitiveBase<TAttachedP
 		this._primitive.updateAllViews?.();
 	}
 
-	public paneViews(): readonly ISeriesPrimitivePaneViewWrapper[] | readonly PrimitivePaneViewWrapper[] {
+	public allPaneViews(): readonly PrimitivePaneViewWrapper[] {
 		const base = this._primitive.paneViews?.() ?? [];
 		if (this._paneViewsCache?.base === base) {
 			return this._paneViewsCache.wrapper;
@@ -109,10 +109,7 @@ export class PanePrimitiveWrapper extends PrimitiveWrapper<IPanePrimitiveBase<un
 		return [];
 	}
 
-	// Series keeps every view in paneViews() and filters by zOrder itself.
-	// Pane primitives are drawn straight from these methods, so an unsplit list
-	// paints top and bottom views on the series layer.
-	public override paneViews(): readonly PrimitivePaneViewWrapper[] {
+	public paneViews(): readonly PrimitivePaneViewWrapper[] {
 		return this._paneViewsByZOrder('normal');
 	}
 
@@ -125,7 +122,7 @@ export class PanePrimitiveWrapper extends PrimitiveWrapper<IPanePrimitiveBase<un
 	}
 
 	private _paneViewsByZOrder(zOrder: PrimitivePaneViewZOrder): readonly PrimitivePaneViewWrapper[] {
-		return (super.paneViews() as readonly PrimitivePaneViewWrapper[])
+		return this.allPaneViews()
 			.filter((view: PrimitivePaneViewWrapper) => view.zOrder() === zOrder);
 	}
 }

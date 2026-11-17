@@ -44,7 +44,7 @@ mainPane.detachPrimitive(myCustomPanePrimitive);
 Pane primitives follow the same model as
 [series primitives](./series-primitives.mdx) — views that return renderers,
 the `attached` / `detached` lifecycle, `updateAllViews`, and hit testing —
-with three differences:
+with four differences:
 
 - A pane primitive is attached to a pane, so
   [`paneViews`](../api/interfaces/IPanePrimitiveBase.md#paneviews) is its only
@@ -54,6 +54,7 @@ with three differences:
   [`{ chart, requestUpdate }`](../api/interfaces/PaneAttachedParameter.md)
   without a series reference.
 - There is no `autoscaleInfo`: a pane primitive is not tied to a price scale.
+- Within each `zOrder` layer, pane primitives are drawn before the series and their primitives, so a pane primitive on `'normal'` sits under the series. Use `'top'` to draw it above the series.
 
 ## Implementing a pane primitive
 
