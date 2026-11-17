@@ -993,4 +993,4 @@ function disableSelection(element: HTMLElement): void {
 
 function shouldSubscribeMouseWheel<HorzScaleItem>(options: ChartOptionsInternal<HorzScaleItem>): boolean {
 	return Boolean(options['handleScroll'].mouseWheel || options['handleScale'].mouseWheel);
-		}
+}
