@@ -1,6 +1,7 @@
 import { IChartApiBase } from '../../api/ichart-api';
 import { DataChangedHandler, DataChangedScope, ISeriesApi } from '../../api/iseries-api';
 import { ISeriesPrimitive, SeriesAttachedParameter } from '../../api/iseries-primitive-api';
+import { timeScalePointsGeneration } from '../../api/time-scale-points-generation';
 
 import { ensureNotNull } from '../../helpers/assertions';
 import { DeepPartial } from '../../helpers/strict-type-checks';
@@ -43,6 +44,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	private _markersPositions: MarkerPositions | null = null;
 	private _cachedBarSpacing: number | null = null;
 	private _recalculationRequired: boolean = true;
+	private _timeScalePointsGeneration: number | undefined;
 	private _options: SeriesMarkersOptions;
 
 	public constructor(options: DeepPartial<SeriesMarkersOptions>) {
@@ -172,17 +174,21 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 	}
 
 	private _recalculateMarkers(): void {
-		if (!this._recalculationRequired || !this._chart || !this._series) {
+		if (!this._chart || !this._series) {
 			return;
 		}
 		const timeScale = this._chart.timeScale();
-		const seriesData = this._series?.data();
-		if (timeScale.getVisibleLogicalRange() == null || !this._series || seriesData.length === 0) {
+		const generation = timeScalePointsGeneration(timeScale);
+		if (!this._recalculationRequired && generation !== undefined && generation === this._timeScalePointsGeneration) {
+			return;
+		}
+		const firstData = this._series.dataByIndex(0, MismatchDirection.NearestRight);
+		if (timeScale.getVisibleLogicalRange() == null || firstData === null) {
 			this._indexedMarkers = [];
 			return;
 		}
 
-		const firstDataIndex = timeScale.timeToIndex(ensureNotNull(seriesData[0].time), true) as unknown as Logical;
+		const firstDataIndex = timeScale.timeToIndex(ensureNotNull(firstData.time), true) as unknown as Logical;
 		this._indexedMarkers = this._markers.map<InternalSeriesMarker<TimePointIndex>>((marker: SeriesMarker<HorzScaleItem>, index: number) => {
 			const timePointIndex = timeScale.timeToIndex(marker.time, true) as unknown as Logical;
 			const searchMode = timePointIndex < firstDataIndex ? MismatchDirection.NearestRight : MismatchDirection.NearestLeft;
@@ -224,6 +230,7 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 				} satisfies InternalSeriesMarker<TimePointIndex>;
 			}
 		});
+		this._timeScalePointsGeneration = generation;
 		this._recalculationRequired = false;
 	}
 
@@ -241,4 +248,3 @@ export class SeriesMarkersPrimitive<HorzScaleItem> implements ISeriesPrimitive<H
 		this.requestUpdate();
 	}
 }
-
