@@ -816,7 +816,6 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		}
 
 		this._updateTimeAxisVisibility();
-		this._syncTimeAxisDomPosition();
 		this._adjustSizeImpl();
 	}
 
