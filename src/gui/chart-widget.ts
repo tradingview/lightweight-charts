@@ -59,6 +59,7 @@ export interface IChartWidgetBase {
 export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBase {
 	private readonly _options: ChartOptionsInternal<HorzScaleItem>;
 	private _paneWidgets: PaneWidget[] = [];
+	private _isDestroyed: boolean = false;
 	private _paneSeparators: PaneSeparator[] = [];
 	private readonly _model: ChartModel<HorzScaleItem>;
 	private _drawRafId: number = 0;
@@ -156,6 +157,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	}
 
 	public destroy(): void {
+		this._isDestroyed = true;
 		this._setMouseWheelEventListener(false);
 		if (this._drawRafId !== 0) {
 			window.cancelAnimationFrame(this._drawRafId);
@@ -287,6 +289,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		if (this._invalidateMask !== null) {
 			this._drawImpl(this._invalidateMask, performance.now());
 			this._invalidateMask = null;
+		}
+		if (this._isDestroyed) {
+			throw new Error('Cannot take a screenshot of a destroyed chart');
 		}
 
 		const screeshotBitmapSize = this._traverseLayout(null);
@@ -637,6 +642,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 		// actions for full invalidation ONLY (not shared with light)
 		if (invalidationType === InvalidationLevel.Full) {
 			this._updateGui();
+			if (this._isDestroyed) {
+				return;
+			}
 		}
 
 		// light or full invalidate actions
@@ -660,6 +668,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 				this._invalidateMask.merge(invalidateMask);
 
 				this._updateGui();
+				if (this._isDestroyed) {
+					return;
+				}
 
 				this._applyMomentaryAutoScale(this._invalidateMask);
 				this._applyTimeScaleInvalidations(this._invalidateMask, time);
@@ -729,6 +740,9 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 					const mask = this._invalidateMask;
 					this._invalidateMask = null;
 					this._drawImpl(mask, time);
+					if (this._isDestroyed) {
+						return;
+					}
 
 					for (const tsInvalidation of mask.timeScaleInvalidations()) {
 						if (tsInvalidation.type === TimeScaleInvalidationType.Animation && !tsInvalidation.value.finished(time)) {
@@ -751,9 +765,10 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 	}
 
 	private _syncGuiWithModel(): void {
-		const panes = this._model.panes();
+		const panes = this._model.panes().slice();
 		const targetPaneWidgetsCount = panes.length;
 		const actualPaneWidgetsCount = this._paneWidgets.length;
+		const removedPanes = this._paneWidgets.map((widget: PaneWidget) => widget.state()).filter((pane: Pane) => !panes.includes(pane));
 
 		// Remove (if needed) pane widgets and separators
 		for (let i = targetPaneWidgetsCount; i < actualPaneWidgetsCount; i++) {
@@ -761,6 +776,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			this._tableElement.removeChild(paneWidget.getElement());
 			paneWidget.clicked().unsubscribeAll(this);
 			paneWidget.dblClicked().unsubscribeAll(this);
+			paneWidget.setState(null);
 			paneWidget.destroy();
 
 			const paneSeparator = this._paneSeparators.pop();
@@ -796,6 +812,19 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 			} else {
 				paneWidget.updatePriceAxisWidgetsStates();
 			}
+		}
+
+		for (const pane of removedPanes) {
+			pane.destroy();
+		}
+
+		if (this._isDestroyed) {
+			return;
+		}
+		const currentPanes = this._model.panes();
+		if (currentPanes.length !== panes.length || currentPanes.some((pane: Pane, index: number) => pane !== panes[index])) {
+			this._syncGuiWithModel();
+			return;
 		}
 
 		this._updateTimeAxisVisibility();
