@@ -517,6 +517,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	private _width: number = 0;
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
+	private _crosshairIsSynthetic: boolean = false;
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null, TouchMouseEventData | null> = new Delegate();
 
 	private _backgroundTopColor: string;
@@ -899,6 +900,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, event: TouchMouseEventData | null, pane: Pane, skipEvent?: boolean): void {
+		this._crosshairIsSynthetic = skipEvent === true;
 		this._crosshair.saveOriginCoord(x, y);
 		let price = NaN;
 		let index = this._timeScale.coordinateToIndex(x, true);
@@ -943,6 +945,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public clearCurrentPosition(skipEvent?: boolean): void {
+		this._crosshairIsSynthetic = false;
 		const crosshair = this.crosshairSource();
 		crosshair.clearPosition();
 		this.cursorUpdate();
@@ -957,7 +960,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		if (pane !== null) {
 			const x = this._crosshair.originCoordX();
 			const y = this._crosshair.originCoordY();
-			this.setAndSaveCurrentPosition(x, y, null, pane);
+			this.setAndSaveCurrentPosition(x, y, null, pane, this._crosshairIsSynthetic);
 		}
 
 		this._crosshair.updateAllViews();

@@ -371,6 +371,9 @@ export interface IChartApiBase<HorzScaleItem = Time> {
 	 *
 	 * For example if you want to synchronise the crosshairs of two separate charts.
 	 *
+	 * While the position remains API-set, recalculating it after price-scale, time-scale, data, or chart-size changes
+	 * does not emit crosshair move events. Pointer interaction resumes ordinary crosshair move events.
+	 *
 	 * @param price - The price (vertical coordinate) of the new crosshair position.
 	 * @param horizontalPosition - The horizontal coordinate (time by default) of the new crosshair position.
 	 */
