@@ -34,6 +34,7 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
 	pointMarkersVisible: false,
+	connectGaps: true,
 };
 const createPaneView = (series: ISeries<'Baseline'>, model: IChartModelBase): IUpdatablePaneView => new SeriesBaselinePaneView(series, model);
 
