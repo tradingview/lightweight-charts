@@ -114,15 +114,22 @@ export interface ITimeScaleApi<HorzScaleItem> {
 	 * Converts time to index.
 	 *
 	 * @param time - Time needs to be converted
-	 * @returns Index of that time or `null` if no time found on time scale
+	 * @param findNearest - If `true` and `time` is not an exact key on the time scale, return the first index whose time is greater than or equal to `time` (or the last index if `time` is after the last point). If omitted or `false`, return `null` unless `time` is an exact time-scale key. Default: `false`.
+	 * @returns Index of that time, or `null` if no matching index is found (or the time scale is empty)
 	 */
 	timeToIndex(time: HorzScaleItem, findNearest?: boolean): TimePointIndex | null;
 
 	/**
 	 * Converts a time to local x coordinate.
 	 *
+	 * This uses the same matching rule as {@link timeToIndex} without `findNearest`: `time` must be an exact key on the time scale (the discrete set of bar-bucket timestamps, not a continuous axis).
+	 * Values that do not equal a bar's `time` — for example an event timestamp, or a 1-minute stamp on a 5-minute chart — return `null`.
+	 *
+	 * For a time that may not be an exact key, call {@link timeToIndex} with `findNearest` set to `true`, then {@link logicalToCoordinate} on the resulting index.
+	 * To place a point between bars, interpolate neighbouring logical coordinates.
+	 *
 	 * @param time - Time needs to be converted
-	 * @returns X coordinate of that time or `null` if no time found on time scale
+	 * @returns X coordinate of that time or `null` if `time` is not an exact time-scale key or the chart has no data
 	 */
 	timeToCoordinate(time: HorzScaleItem): Coordinate | null;
 
