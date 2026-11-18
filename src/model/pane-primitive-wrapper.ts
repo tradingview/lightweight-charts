@@ -86,7 +86,7 @@ export abstract class PrimitiveWrapper<T extends ISeriesPrimitiveBase<TAttachedP
 		this._primitive.updateAllViews?.();
 	}
 
-	public paneViews(): readonly ISeriesPrimitivePaneViewWrapper[] | readonly PrimitivePaneViewWrapper[] {
+	public allPaneViews(): readonly PrimitivePaneViewWrapper[] {
 		const base = this._primitive.paneViews?.() ?? [];
 		if (this._paneViewsCache?.base === base) {
 			return this._paneViewsCache.wrapper;
@@ -107,5 +107,22 @@ export abstract class PrimitiveWrapper<T extends ISeriesPrimitiveBase<TAttachedP
 export class PanePrimitiveWrapper extends PrimitiveWrapper<IPanePrimitiveBase<unknown>> {
 	public labelPaneViews(): readonly IPaneView[] {
 		return [];
+	}
+
+	public paneViews(): readonly PrimitivePaneViewWrapper[] {
+		return this._paneViewsByZOrder('normal');
+	}
+
+	public topPaneViews(): readonly PrimitivePaneViewWrapper[] {
+		return this._paneViewsByZOrder('top');
+	}
+
+	public bottomPaneViews(): readonly PrimitivePaneViewWrapper[] {
+		return this._paneViewsByZOrder('bottom');
+	}
+
+	private _paneViewsByZOrder(zOrder: PrimitivePaneViewZOrder): readonly PrimitivePaneViewWrapper[] {
+		return this.allPaneViews()
+			.filter((view: PrimitivePaneViewWrapper) => view.zOrder() === zOrder);
 	}
 }

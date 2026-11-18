@@ -72,7 +72,7 @@ function extractPrimitivePaneViews(
 }
 
 function primitivePaneViewsExtractor(wrapper: SeriesPrimitiveWrapper): readonly ISeriesPrimitivePaneViewWrapper[] {
-	return wrapper.paneViews();
+	return wrapper.allPaneViews();
 }
 function primitivePricePaneViewsExtractor(wrapper: SeriesPrimitiveWrapper): readonly ISeriesPrimitivePaneViewWrapper[] {
 	return wrapper.priceAxisPaneViews();
