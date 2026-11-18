@@ -8,6 +8,7 @@
 		{ "path": "../../src/tsconfig.composite.json" }
 	],
 	"include": [
-		"./**/*.ts"
+		"./**/*.ts",
+		"../../plugin-examples/src/plugins/chart-navigator/range.ts"
 	]
 }
