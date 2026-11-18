@@ -22,6 +22,7 @@ import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { Pane } from '../model/pane';
 import { TextWidthCache } from '../model/text-width-cache';
+import { TimeMark } from '../model/time-scale';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { IAxisView } from '../views/pane/iaxis-view';
@@ -32,6 +33,7 @@ import { drawBackground, drawForeground, drawSourceViews } from './draw-function
 import { ITimeAxisViewsGetter } from './iaxis-view-getters';
 import { MouseEventHandler, MouseEventHandlers, MouseEventHandlerTouchEvent, TouchMouseEvent } from './mouse-event-handler';
 import { PriceAxisStub, PriceAxisStubParams } from './price-axis-stub';
+import { filterOverlappingLabels } from './time-axis-labels';
 
 const enum Constants {
 	BorderSize = 1,
@@ -67,7 +69,6 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 	private _mouseDown: boolean = false;
 	private _size: Size = size({ width: 0, height: 0 });
 	private readonly _sizeChanged: Delegate<Size> = new Delegate();
-	private readonly _widthCache: TextWidthCache = new TextWidthCache(5);
 	private _isSettingSize: boolean = false;
 
 	private readonly _horzScaleBehavior: IHorzScaleBehavior<HorzScaleItem>;
@@ -421,28 +422,26 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			ctx.textBaseline = 'middle';
 			ctx.fillStyle = this._textColor();
 
-			// draw base marks
-			ctx.font = this._baseFont();
-			for (const tickMark of tickMarks) {
-				if (tickMark.weight < maxWeight) {
-					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
-					ctx.fillText(tickMark.label, coordinate, yText);
-				}
-			}
-			if (this._chart.options().timeScale.allowBoldLabels) {
-				ctx.font = this._baseBoldFont();
-			}
-			for (const tickMark of tickMarks) {
-				if (tickMark.weight >= maxWeight) {
-					const coordinate = tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(ctx, tickMark.coord, tickMark.label) : tickMark.coord;
-					ctx.fillText(tickMark.label, coordinate, yText);
-				}
+			const baseFont = this._baseFont();
+			const boldFont = this._chart.options().timeScale.allowBoldLabels ? this._baseBoldFont() : baseFont;
+			const labels = tickMarks.map((tickMark: TimeMark) => {
+				ctx.font = tickMark.weight < maxWeight ? baseFont : boldFont;
+				const width = ctx.measureText(tickMark.label).width;
+				return {
+					tickMark,
+					width,
+					weight: tickMark.weight,
+					coordinate: tickMark.needAlignCoordinate ? this._alignTickMarkLabelCoordinate(tickMark.coord, width) : tickMark.coord,
+				};
+			});
+			for (const label of filterOverlappingLabels(labels)) {
+				ctx.font = label.weight < maxWeight ? baseFont : boldFont;
+				ctx.fillText(label.tickMark.label, label.coordinate, yText);
 			}
 		});
 	}
 
-	private _alignTickMarkLabelCoordinate(ctx: CanvasRenderingContext2D, coordinate: number, labelText: string): number {
-		const labelWidth = this._widthCache.measureText(ctx, labelText);
+	private _alignTickMarkLabelCoordinate(coordinate: number, labelWidth: number): number {
 		const labelWidthHalf = labelWidth / 2;
 		const leftTextCoordinate = Math.floor(coordinate - labelWidthHalf) + 0.5;
 
