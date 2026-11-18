@@ -1,0 +1,52 @@
+#overview {
+	position: relative;
+	height: 120px;
+	max-width: 600px;
+	margin: 16px auto;
+}
+.chart-navigator {
+	position: absolute;
+	top: 0;
+	z-index: 3;
+	overflow: hidden;
+	touch-action: none;
+	user-select: none;
+	cursor: crosshair;
+}
+.chart-navigator[hidden] { display: none; }
+.chart-navigator-move {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	box-sizing: border-box;
+	border: 2px solid #2962ff;
+	background: #2962ff22;
+	box-shadow: 0 0 0 10000px #13172222;
+	cursor: grab;
+}
+.chart-navigator-from,
+.chart-navigator-to {
+	position: absolute;
+	top: 20%;
+	height: 60%;
+	width: 16px;
+	transform: translateX(-50%);
+	box-sizing: border-box;
+	border: 2px solid #2962ff;
+	border-radius: 4px;
+	background: #fff;
+	cursor: ew-resize;
+}
+.chart-navigator-from:focus-visible,
+.chart-navigator-to:focus-visible,
+.chart-navigator-move:focus-visible {
+	outline: 2px solid #131722;
+	outline-offset: -4px;
+}
+
+/* Stagger handles so both remain reachable when the selected span is tiny. */
+.chart-navigator-compact .chart-navigator-from { top: 5%; height: 40%; }
+.chart-navigator-compact .chart-navigator-to { top: 55%; height: 40%; }
+
+/* Keep the chart's own attribution link above the interactive overlay. */
+#overview a[href^='https://www.tradingview.com/'] { z-index: 4; }
