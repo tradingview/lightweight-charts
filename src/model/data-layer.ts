@@ -108,11 +108,12 @@ function seriesUpdateInfo<TSeriesType extends SeriesType, HorzScaleItem>(seriesR
 
 function timeScalePointTime<TSeriesType extends SeriesType, HorzScaleItem>(mergedPointData: Map<Series<TSeriesType>, SeriesPlotRow<TSeriesType> | WhitespacePlotRow>): HorzScaleItem {
 	let result: HorzScaleItem | undefined;
-	mergedPointData.forEach((v: SeriesPlotRow<TSeriesType> | WhitespacePlotRow) => {
-		if (result === undefined) {
-			result = v.originalTime as HorzScaleItem;
+	for (const row of mergedPointData.values()) {
+		result = row.originalTime as HorzScaleItem;
+		if (result !== undefined) {
+			break;
 		}
-	});
+	}
 
 	return ensureDefined(result);
 }
@@ -573,6 +574,10 @@ export class DataLayer<HorzScaleItem> {
 }
 
 function assignIndexToPointData<HorzScaleItem>(pointData: TimePointData, index: TimePointIndex): void {
+	if (pointData.index === index) {
+		return;
+	}
+
 	// first, nevertheless update index of point data ("make it valid")
 	pointData.index = index;
 

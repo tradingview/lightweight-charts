@@ -13,8 +13,9 @@ import { BusinessDay, Time, TimePoint, UTCTimestamp } from '../../src/model/horz
 import { PlotRowValueIndex } from '../../src/model/plot-data';
 import { PlotList } from '../../src/model/plot-list';
 import { Series } from '../../src/model/series';
+import { SeriesPlotRow } from '../../src/model/series-data';
 import { SeriesType } from '../../src/model/series-options';
-import { TimePointIndex } from '../../src/model/time-data';
+import { TimePointIndex, TimeScalePoint } from '../../src/model/time-data';
 
 chai.use(chaiExclude);
 
@@ -62,6 +63,48 @@ function lineDataAt(time: Time, value: number): LineData<Time> {
 }
 
 describe('DataLayer', () => {
+	it('does not rewrite unchanged indexes when removing a series with shared time points', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const first = createSeriesMock();
+		const removed = createSeriesMock();
+		const last = createSeriesMock();
+		const data = [dataItemAt(1000 as UTCTimestamp), dataItemAt(2000 as UTCTimestamp)];
+		const firstRows = ensureDefined(dataLayer.setSeriesData(first, data).series.get(first)).data;
+		dataLayer.setSeriesData(removed, data);
+		const lastRows = ensureDefined(dataLayer.setSeriesData(last, data).series.get(last)).data;
+		const writes = { count: 0 };
+		for (const row of [...firstRows, ...lastRows]) {
+			let index = row.index;
+			Object.defineProperty(row, 'index', {
+				get: () => index,
+				set: (value: TimePointIndex) => { index = value; writes.count++; },
+				configurable: true,
+			});
+		}
+
+		const result = dataLayer.removeSeries(removed);
+		expect(writes.count).to.equal(0);
+		expect(result.timeScale.points).to.equal(undefined);
+		expect(result.timeScale.baseIndex).to.equal(1);
+		expect(firstRows.map((row: SeriesPlotRow<SeriesType>) => row.index)).to.deep.equal([0, 1]);
+		expect(lastRows.map((row: SeriesPlotRow<SeriesType>) => row.index)).to.deep.equal([0, 1]);
+	});
+
+	it('still updates survivor indexes when removing exclusive time points', () => {
+		const dataLayer = new DataLayer<Time>(behavior);
+		const removed = createSeriesMock();
+		const survivor = createSeriesMock();
+		dataLayer.setSeriesData(removed, [whitespaceItemAt(1000 as UTCTimestamp), whitespaceItemAt(3000 as UTCTimestamp)]);
+		const rows = ensureDefined(dataLayer.setSeriesData(survivor, [dataItemAt(2000 as UTCTimestamp), dataItemAt(4000 as UTCTimestamp)]).series.get(survivor)).data;
+		expect(rows.map((row: SeriesPlotRow<SeriesType>) => row.index)).to.deep.equal([1, 3]);
+
+		const result = dataLayer.removeSeries(removed);
+		expect(rows.map((row: SeriesPlotRow<SeriesType>) => row.index)).to.deep.equal([0, 1]);
+		expect(result.timeScale.firstChangedPointIndex).to.equal(0);
+		expect(result.timeScale.baseIndex).to.equal(1);
+		expect(result.timeScale.points?.map((point: TimeScalePoint) => point.originalTime)).to.deep.equal([2000, 4000]);
+	});
+
 	it('should be able to append new series with updating time scale', () => {
 		const dataLayer = new DataLayer<Time>(behavior);
 
