@@ -3,6 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "test:navigator": "node tests/chart-navigator.mjs",
         "build:deps": "pnpm --filter @tradingview/lwc-toolkit --filter @tradingview/lwc-plugin-preview-kit --filter @tradingview/lwc-plugin-brushable-area-series build",
         "build": "pnpm build:deps && tsc",
         "compile": "pnpm build:deps && tsc && node compile.mjs",
