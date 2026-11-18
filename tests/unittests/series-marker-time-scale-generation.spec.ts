@@ -94,6 +94,45 @@ describe('Marker indexes after shared time scale updates', () => {
 		expect(index(marker)).to.equal(1);
 	});
 
+	it('keeps timeScale identity across data changes and series removal', () => {
+		const { api, handles } = setup();
+		const timeScale = api.timeScale();
+		handles[0].setData(data([10, 30]));
+		handles[1].setData(data([5, 20, 40]));
+		expect(api.timeScale()).to.equal(timeScale);
+		api.removeSeries(handles[1]);
+		expect(api.timeScale()).to.equal(timeScale);
+	});
+
+	it('keeps markers on their bars while dropping the oldest bar with two sibling line series', () => {
+		const { model, handles, marker } = setup();
+		let times = Array.from({ length: 100 }, (unused: unknown, i: number) => i + 1);
+		handles.forEach((handle: SeriesApi<'Line', Time>) => handle.setData(data(times)));
+		marker.setMarkers([{ time: 90 as UTCTimestamp, position: 'aboveBar', color: 'red', shape: 'arrowDown' }]);
+		for (let step = 1; step <= 5; step++) {
+			times = [...times.slice(1), 100 + step];
+			for (const handle of handles) {
+				handle.setData(data(times));
+			}
+			expect(index(marker)).to.equal(times.indexOf(90));
+			model.recalculateAllPanes();
+			expect(index(marker)).to.equal(times.indexOf(90));
+		}
+	});
+
+	it('selects the first fulfilled row when the marked series starts at shared index 50', () => {
+		const { model, handles, marker } = setup();
+		handles[1].setData(data(Array.from({ length: 100 }, (unused: unknown, i: number) => i + 1)));
+		handles[0].setData(data([51, 61, 71]));
+		expect(handles[0].dataByIndex(0, MismatchDirection.NearestRight)).to.deep.equal(handles[0].data()[0]);
+		marker.setMarkers([10, 51, 60, 61, 80].map((time: number) => ({ time: time as UTCTimestamp, position: 'inBar', color: 'red', shape: 'circle' })));
+		model.recalculateAllPanes();
+		/* eslint-disable @typescript-eslint/naming-convention */
+		const indexes = (marker as unknown as { _indexedMarkers: { time: number }[] })._indexedMarkers.map((item: { time: number }) => item.time);
+		/* eslint-enable @typescript-eslint/naming-convention */
+		expect(indexes).to.deep.equal([50, 50, 50, 60, 70]);
+	});
+
 	it('keeps the cached indexes on value-only updates and repeated view updates', () => {
 		const { api, model, handles, marker } = setup();
 		handles.forEach((handle: SeriesApi<'Line', Time>) => handle.setData(data([10, 20, 30])));
@@ -136,7 +175,7 @@ describe('Marker indexes after shared time scale updates', () => {
 	});
 
 	it('selects the same first custom-series row while excluding custom whitespace', () => {
-		const { api } = setup();
+		const { api, handles } = setup();
 		const custom = api.addCustomSeries({
 			renderer: () => ({ draw: () => {} }),
 			update: () => {},
@@ -148,6 +187,10 @@ describe('Marker indexes after shared time scale updates', () => {
 			custom.setData(rows);
 			expect(custom.dataByIndex(0, MismatchDirection.NearestRight)).to.deep.equal(custom.data()[0] ?? null);
 		}
+		handles[1].setData(data(Array.from({ length: 50 }, (unused: unknown, i: number) => i + 1)));
+		custom.setData([{ time: 50 as UTCTimestamp }, ...data([51, 61])]);
+		expect(api.timeScale().timeToIndex(51 as UTCTimestamp)).to.equal(50);
+		expect(custom.dataByIndex(0, MismatchDirection.NearestRight)).to.deep.equal(custom.data()[0]);
 	});
 
 	it('reindexes after detach and reattach', () => {
