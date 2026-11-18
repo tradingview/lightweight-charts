@@ -9,6 +9,7 @@ import { HorzScaleBehaviorTime } from '../../src/model/horz-scale-behavior-time/
 import { Time, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
 import { InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { KineticAnimation } from '../../src/model/kinetic-animation';
+import { RangeImpl } from '../../src/model/range-impl';
 import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from '../../src/model/time-data';
 
 function createModel(timeScaleOptions: Partial<ChartOptionsInternal<Time>['timeScale']> = {}): ChartModel<Time> {
@@ -308,5 +309,125 @@ describe('ChartModel time scale scrolling', () => {
 
 		model.updateTimeScale(549 as TimePointIndex, points(550), 500);
 		expect(animation.getPosition(100)).to.be.equal(positionBefore);
+	});
+
+	it('does not emit an intermediate fixed-left range before append compensation', () => {
+		const model = createModel({ fixLeftEdge: true, shiftVisibleRangeOnNewBar: false });
+		const scale = model.timeScale();
+		scale.setWidth(500);
+		model.updateTimeScale(499 as TimePointIndex, points(500), 0);
+		scale.setVisibleRange(new RangeImpl(280 as TimePointIndex, 499 as TimePointIndex));
+		const before = scale.visibleLogicalRange();
+		const events: unknown[] = [];
+		scale.logicalRangeChanged().subscribe(() => events.push(scale.visibleLogicalRange()));
+		model.updateTimeScale(699 as TimePointIndex, points(700), 500);
+		expect(scale.visibleLogicalRange()).to.deep.equal(before);
+		expect(events).to.deep.equal([]);
+	});
+
+	for (const fixLeftEdge of [false, true]) {
+		for (const fixRightEdge of [false, true]) {
+			it(`keeps range events stable during compensated appends with edges ${fixLeftEdge}/${fixRightEdge}`, () => {
+				const model = createModel({ fixLeftEdge, fixRightEdge, shiftVisibleRangeOnNewBar: false });
+				const scale = model.timeScale();
+				scale.setWidth(500);
+				model.updateTimeScale(499 as TimePointIndex, points(500), 0);
+				scale.setVisibleRange(new RangeImpl(0 as TimePointIndex, 219 as TimePointIndex));
+				const before = scale.visibleLogicalRange();
+				const kineticBefore = scale.kineticScrollPosition();
+				const events: unknown[] = [];
+				scale.logicalRangeChanged().subscribe(() => events.push(scale.visibleLogicalRange()));
+				model.updateTimeScale(699 as TimePointIndex, points(700), 500);
+				expect(scale.visibleLogicalRange()).to.deep.equal(before);
+				expect(scale.kineticScrollPosition()).to.equal(kineticBefore);
+				expect(events).to.deep.equal([]);
+			});
+		}
+	}
+
+	it('keeps the legitimate fixed-left notification when new bars shift the view', () => {
+		const model = createModel({ fixLeftEdge: true, shiftVisibleRangeOnNewBar: true });
+		const scale = model.timeScale();
+		scale.setWidth(500);
+		model.updateTimeScale(499 as TimePointIndex, points(500), 0);
+		scale.setVisibleRange(new RangeImpl(280 as TimePointIndex, 499 as TimePointIndex));
+		scale.visibleLogicalRange();
+		const events: unknown[] = [];
+		scale.logicalRangeChanged().subscribe(() => events.push(scale.visibleLogicalRange()));
+		model.updateTimeScale(699 as TimePointIndex, points(700), 500);
+		expect(events).to.have.length(1);
+		expect(events[0]).to.deep.equal(new RangeImpl(480, 699));
+	});
+
+	it('keeps fractional-spacing fixed-left drag samples stable during append', () => {
+		const model = createModel({ fixLeftEdge: true, barSpacing: 2.5 });
+		const scale = model.timeScale();
+		scale.setWidth(503);
+		model.updateTimeScale(999 as TimePointIndex, points(1000), 0);
+		model.startScrollTime(0 as Coordinate);
+		model.scrollTimeTo(4000 as Coordinate);
+		const before = scale.visibleLogicalRange();
+		const kineticBefore = scale.kineticScrollPosition();
+		const events: unknown[] = [];
+		scale.logicalRangeChanged().subscribe(() => events.push(scale.visibleLogicalRange()));
+		model.updateTimeScale(1049 as TimePointIndex, points(1050), 1000);
+		model.scrollTimeTo(4000 as Coordinate);
+		expect(scale.visibleLogicalRange()).to.deep.equal(before);
+		expect(scale.kineticScrollPosition()).to.equal(kineticBefore);
+		expect(events).to.deep.equal([]);
+	});
+
+	it('preserves a subscriber range change during a legitimate shifted notification', () => {
+		const model = createModel({ fixLeftEdge: true, shiftVisibleRangeOnNewBar: true });
+		const scale = model.timeScale();
+		scale.setWidth(500);
+		model.updateTimeScale(499 as TimePointIndex, points(500), 0);
+		scale.setVisibleRange(new RangeImpl(280 as TimePointIndex, 499 as TimePointIndex));
+		scale.visibleLogicalRange();
+		let handled = false;
+		scale.logicalRangeChanged().subscribe(() => {
+			if (!handled) {
+				handled = true;
+				scale.setVisibleRange(new RangeImpl(300 as TimePointIndex, 599 as TimePointIndex));
+			}
+		});
+		model.updateTimeScale(699 as TimePointIndex, points(700), 500);
+		expect(handled).to.equal(true);
+		expect(scale.visibleLogicalRange()).to.deep.equal(new RangeImpl(300, 599));
+	});
+
+	it('keeps a dataset-filling viewport stable with both fixed edges', () => {
+		const model = createModel({ fixLeftEdge: true, fixRightEdge: true, barSpacing: 1, shiftVisibleRangeOnNewBar: false });
+		const scale = model.timeScale();
+		scale.setWidth(1000);
+		model.updateTimeScale(29 as TimePointIndex, points(30), 0);
+		const before = scale.visibleLogicalRange();
+		const spacing = scale.barSpacing();
+		const events: unknown[] = [];
+		scale.logicalRangeChanged().subscribe(() => events.push(scale.visibleLogicalRange()));
+		model.updateTimeScale(49 as TimePointIndex, points(50), 30);
+		expect(scale.visibleLogicalRange()).to.deep.equal(before);
+		expect(scale.barSpacing()).to.equal(spacing);
+		expect(events).to.deep.equal([]);
+	});
+
+	it('preserves a subscriber spacing change during a legitimate shifted notification', () => {
+		const model = createModel({ fixLeftEdge: true, shiftVisibleRangeOnNewBar: true });
+		const scale = model.timeScale();
+		scale.setWidth(500);
+		model.updateTimeScale(499 as TimePointIndex, points(500), 0);
+		scale.setVisibleRange(new RangeImpl(280 as TimePointIndex, 499 as TimePointIndex));
+		scale.visibleLogicalRange();
+		let handled = false;
+		scale.logicalRangeChanged().subscribe(() => {
+			if (!handled) {
+				handled = true;
+				scale.setBarSpacing(4);
+			}
+		});
+		model.updateTimeScale(699 as TimePointIndex, points(700), 500);
+		expect(handled).to.equal(true);
+		expect(scale.barSpacing()).to.equal(4);
+		expect(scale.visibleLogicalRange()).to.deep.equal(new RangeImpl(575, 699));
 	});
 });

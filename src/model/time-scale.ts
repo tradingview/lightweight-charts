@@ -740,10 +740,14 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 		this.setRightOffset(newOffset);
 	}
 
-	public setBaseIndex(baseIndex: TimePointIndex | null): void {
+	public setBaseIndex(baseIndex: TimePointIndex | null, rightOffsetDelta: number = 0): void {
 		this._visibleRangeInvalidated = true;
 		this._baseIndexOrNull = baseIndex;
-		this._correctOffset();
+		if (rightOffsetDelta !== 0) {
+			this.shiftRightOffset(rightOffsetDelta);
+		} else {
+			this._correctOffset();
+		}
 
 		this._doFixLeftEdge();
 	}
