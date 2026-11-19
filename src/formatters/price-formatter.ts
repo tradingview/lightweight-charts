@@ -61,10 +61,11 @@ export class PriceFormatter extends FormatterBase implements IPriceFormatter {
 	public format(price: number): string {
 		// \u2212 is unicode's minus sign https://www.fileformat.info/info/unicode/char/2212/index.htm
 		// we should use it because it has the same width as plus sign +
-		const sign = price < 0 ? '\u2212' : '';
-		price = Math.abs(price);
+		const formatted = this._formatAsDecimal(Math.abs(price));
+		// a negative value that rounds to zero (e.g. -0.001, or a tick mark that came out as -3e-18) is shown as zero
+		const sign = price < 0 && /[1-9]/.test(formatted) ? '\u2212' : '';
 
-		return sign + this._formatAsDecimal(price);
+		return sign + formatted;
 	}
 
 	private _calculateDecimal(): void {
