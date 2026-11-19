@@ -80,6 +80,31 @@ describe('Formatters', () => {
 			expect(formatter.format(13.1)).to.be.equal('14.0');
 		}
 	});
+	it('price-formatter should not put a minus sign on a value that rounds to zero', () => {
+		{
+			const formatter = new PriceFormatter();
+			// what the price axis gets for its zero tick after `logical -= span`
+			expect(formatter.format(-3.469446951953614e-18)).to.be.equal('0.00');
+			expect(formatter.format(-0.004)).to.be.equal('0.00');
+			expect(formatter.format(-0.005)).to.be.equal('\u22120.01');
+		}
+		{
+			// precision = 2, minMove = 0.05
+			const formatter = new PriceFormatter(100, 5);
+			expect(formatter.format(-0.02)).to.be.equal('0.00');
+			expect(formatter.format(-0.03)).to.be.equal('\u22120.05');
+		}
+		{
+			// precision = 0, minMove = 5
+			const formatter = new PriceFormatter(1, 5);
+			expect(formatter.format(-2)).to.be.equal('0');
+			expect(formatter.format(-3)).to.be.equal('\u22125');
+		}
+		{
+			const formatter = new PercentageFormatter();
+			expect(formatter.format(-0.001)).to.be.equal('0.00%');
+		}
+	});
 	it('time-formatter', () => {
 		{
 			const formatter = new TimeFormatter();
