@@ -12,6 +12,7 @@ import { Time } from '../../src/model/horz-scale-behavior-time/types';
 import { LocalizationOptions } from '../../src/model/localization-options';
 import { PriceRangeImpl } from '../../src/model/price-range-impl';
 import { PriceScale, PriceScaleMode } from '../../src/model/price-scale';
+import { fromIndexedTo100, toIndexedTo100 } from '../../src/model/price-scale-conversions';
 
 describe('PriceScale', () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -125,5 +126,11 @@ describe('PriceScale', () => {
 		expect(priceRange).to.not.equal(null);
 		expect(priceRange?.from).to.be.equal(fromPrice);
 		expect(priceRange?.to).to.be.equal(toPrice);
+	});
+
+	it('indexed to 100 with a negative base value', () => {
+		expect(toIndexedTo100(-10, -10)).to.be.equal(100);
+		expect(toIndexedTo100(-5, -10)).to.be.equal(150);
+		expect(fromIndexedTo100(toIndexedTo100(-5, -10), -10)).to.be.equal(-5);
 	});
 });

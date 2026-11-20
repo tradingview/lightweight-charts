@@ -39,8 +39,8 @@ export function fromIndexedTo100(value: number, baseValue: number): number {
 }
 
 export function toIndexedTo100(value: number, baseValue: number): number {
-	const result = 100 * (value - baseValue) / baseValue + 100;
-	return (baseValue < 0 ? -result : result);
+	const result = 100 * (value - baseValue) / baseValue;
+	return (baseValue < 0 ? -result : result) + 100;
 }
 
 export function toIndexedTo100Range(priceRange: PriceRangeImpl, baseValue: number): PriceRangeImpl {
