@@ -28,7 +28,7 @@ import { Point } from './point';
 import { PriceScale, PriceScaleOptions } from './price-scale';
 import { Series } from './series';
 import { SeriesType } from './series-options';
-import { LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
+import { Logical, LogicalRange, TimePointIndex, TimeScalePoint } from './time-data';
 import { HorzScaleOptions, ITimeScale, TimeScale } from './time-scale';
 import { TouchMouseEventData } from './touch-mouse-event-data';
 
@@ -507,6 +507,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 	private readonly _timeScale: TimeScale<HorzScaleItem>;
 	private _timeScaleAnimation: ITimeScaleAnimation | null = null;
+	private _pendingLogicalRange: LogicalRange | null = null;
 	private readonly _panes: Pane[] = [];
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
@@ -968,6 +969,7 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 
 		if (newPoints !== undefined && firstChangedPointIndex !== undefined) {
 			this._timeScale.update(newPoints, firstChangedPointIndex);
+			this._shiftPendingLogicalRange(oldFirstTime);
 		}
 
 		const newFirstTime = this._timeScale.indexToTime(0 as TimePointIndex);
@@ -1084,18 +1086,29 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	}
 
 	public fitContent(): void {
+		this._pendingLogicalRange = null;
 		const mask = InvalidateMask.light();
 		mask.setFitContent();
 		this._invalidate(mask);
 	}
 
 	public setTargetLogicalRange(range: LogicalRange): void {
+		// the range is applied on the next frame, so keep a copy whose indices
+		// updateTimeScale() can shift if bars are added to the left before that frame
+		this._pendingLogicalRange = { from: range.from, to: range.to };
 		const mask = InvalidateMask.light();
-		mask.applyRange(range);
+		mask.applyRange(this._pendingLogicalRange);
 		this._invalidate(mask);
 	}
 
+	public clearPendingLogicalRange(range: LogicalRange): void {
+		if (this._pendingLogicalRange === range) {
+			this._pendingLogicalRange = null;
+		}
+	}
+
 	public resetTimeScale(): void {
+		this._pendingLogicalRange = null;
 		const mask = InvalidateMask.light();
 		mask.resetTimeScale();
 		this._invalidate(mask);
@@ -1301,6 +1314,21 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 		}
 
 		return false;
+	}
+
+	private _shiftPendingLogicalRange(oldFirstTime: InternalHorzScaleItem | null): void {
+		if (this._pendingLogicalRange === null || oldFirstTime === null) {
+			return;
+		}
+		// bars added in front of the previous first bar move every existing bar's
+		// logical index by the number of added bars; a range that was requested
+		// before the update (and is only applied on the next frame) must move along
+		const newFirstIndex = this._timeScale.timeToIndex(oldFirstTime, false);
+		if (newFirstIndex === null || newFirstIndex === 0) {
+			return;
+		}
+		this._pendingLogicalRange.from = this._pendingLogicalRange.from + newFirstIndex as Logical;
+		this._pendingLogicalRange.to = this._pendingLogicalRange.to + newFirstIndex as Logical;
 	}
 
 	private _shiftTimeScaleAnimation(delta: number): void {

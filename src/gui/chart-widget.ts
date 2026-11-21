@@ -695,6 +695,7 @@ export class ChartWidget<HorzScaleItem> implements IDestroyable, IChartWidgetBas
 				break;
 			case TimeScaleInvalidationType.ApplyRange:
 				timeScale.setLogicalRange(invalidation.value);
+				this._model.clearPendingLogicalRange(invalidation.value);
 				break;
 			case TimeScaleInvalidationType.ApplyBarSpacing:
 				timeScale.setBarSpacing(invalidation.value);
