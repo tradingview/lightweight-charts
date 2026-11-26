@@ -1,6 +1,7 @@
 import { LineSeries, createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { HeatmapCellShader, createColorScale, createHeatmapSeries } from '../heatmap-series';
 import { orderBookData } from './sample-data';
 
@@ -28,7 +29,11 @@ const scales: Record<string, HeatmapCellShader> = {
 const { mid, book } = orderBookData(150, 3, 20, 1);
 const heatmap = createHeatmapSeries(chart, { cellShader: scales.heat, cellGap: 0 });
 heatmap.setData(book);
-chart.addSeries(LineSeries, { color: '#131722', lineWidth: 2, priceLineVisible: false }).setData(mid);
+const midLine = chart.addSeries(LineSeries, { lineWidth: 2, priceLineVisible: false });
+midLine.setData(mid);
+// The mid price line has to stand out from the cells on either background;
+// white rather than the usual light gray, which fades on the orange cells.
+themeChart(chart, theme => midLine.applyOptions({ color: theme === 'dark' ? '#FFFFFF' : '#131722' }));
 chart.timeScale().fitContent();
 
 mountControls([

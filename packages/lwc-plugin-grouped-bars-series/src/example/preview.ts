@@ -1,6 +1,7 @@
 import { createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { createGroupedBarsSeries } from '../grouped-bars-series';
 import { groupedBarsData } from './sample-data';
 
@@ -14,9 +15,10 @@ const chart = createChart('chart', {
 	timeScale: { barSpacing: 48 },
 });
 
-const series = createGroupedBarsSeries(chart, {
-	color: 'black', // for the price line
-});
+const series = createGroupedBarsSeries(chart);
+// The series color is only the price line's, which has to read on either
+// background.
+themeChart(chart, theme => series.applyOptions({ color: theme === 'dark' ? '#D1D4DC' : '#131722' }));
 series.setData(groupedBarsData(3, POINTS));
 chart.timeScale().fitContent();
 

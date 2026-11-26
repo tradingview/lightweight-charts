@@ -12,6 +12,14 @@ preview (`src/example/preview.html`), `tests/{unit,graphics,interactions}`, a
 README in the catalog's shape and a CHANGELOG. Read the whole `src/` of the
 nearest one before designing; they are small.
 
+Every preview calls `themeChart` from
+`@tradingview/lwc-plugin-preview-kit/preview-theme` and has been checked in
+both the light and the dark theme. A new package needs the same: open the
+built preview with `?theme=dark` and make sure nothing is left white or
+unreadable on black. For colors that have to change with the theme, see the
+previews of `session-highlighting`, `image-watermark`,
+`rounded-candles-series` and `box-whisker-series`.
+
 Every custom series below ships a `create<Name>Series(chart, options?,
 paneIndex?)` factory as the supported entry point and keeps the
 `<Name>Series` class exported for `chart.addCustomSeries` and composition.
