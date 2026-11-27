@@ -936,9 +936,14 @@ export class ChartModel<HorzScaleItem> implements IDestroyable, IChartModelBase 
 	public setAndSaveSyntheticPosition(price: number, horizontalPosition: HorzScaleItem, pane: Pane): void {
 		const priceScale = pane.defaultPriceScale();
 		const firstValue = priceScale.firstValue();
-		const y = priceScale.priceToCoordinate(price, ensureNotNull(firstValue));
 		const index = this._timeScale.timeToIndex(horizontalPosition as InternalHorzScaleItem, true);
-		const x = this._timeScale.indexToCoordinate(ensureNotNull(index));
+		if (firstValue === null || index === null) {
+			// nothing to place the crosshair against (e.g. the pane has no data yet)
+			this.clearCurrentPosition(true);
+			return;
+		}
+		const y = priceScale.priceToCoordinate(price, firstValue);
+		const x = this._timeScale.indexToCoordinate(index);
 		this.setAndSaveCurrentPosition(x, y, null, pane, true);
 	}
 
