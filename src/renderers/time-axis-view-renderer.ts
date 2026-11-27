@@ -2,6 +2,8 @@ import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D, MediaCoordina
 
 import { ensureNotNull } from '../helpers/assertions';
 
+import { IRange } from '../model/time-data';
+
 import { ITimeAxisViewRenderer, TimeAxisViewRendererOptions } from './itime-axis-view-renderer';
 
 export interface TimeAxisViewRendererData {
@@ -29,7 +31,11 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		this._data = data;
 	}
 
-	public draw(target: CanvasRenderingTarget2D, rendererOptions: TimeAxisViewRendererOptions): void {
+	public draw(
+		target: CanvasRenderingTarget2D,
+		rendererOptions: TimeAxisViewRendererOptions,
+		occupiedRanges?: IRange<number>[]
+	): void {
 		if (this._data === null || this._data.visible === false || this._data.text.length === 0) {
 			return;
 		}
@@ -58,6 +64,13 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		}
 
 		const x2 = x1 + labelWidth;
+
+		if (occupiedRanges !== undefined) {
+			if (occupiedRanges.some(({ from, to }: IRange<number>) => x1 < to && x2 > from)) {
+				return;
+			}
+			occupiedRanges.push({ from: x1, to: x2 });
+		}
 
 		const y1 = 0;
 		const y2 = Math.ceil(

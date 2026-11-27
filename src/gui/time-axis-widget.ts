@@ -22,6 +22,7 @@ import { PrimitivePaneViewZOrder } from '../model/ipane-primitive';
 import { LayoutOptions } from '../model/layout-options';
 import { Pane } from '../model/pane';
 import { TextWidthCache } from '../model/text-width-cache';
+import { IRange } from '../model/time-data';
 import { IPaneRenderer } from '../renderers/ipane-renderer';
 import { TimeAxisViewRendererOptions } from '../renderers/itime-axis-view-renderer';
 import { IAxisView } from '../views/pane/iaxis-view';
@@ -336,7 +337,7 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 			topTarget.useBitmapCoordinateSpace(({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope) => {
 				ctx.clearRect(0, 0, bitmapSize.width, bitmapSize.height);
 			});
-			this._drawLabels([...this._chart.model().serieses(), this._chart.model().crosshairSource()], topTarget);
+			this._drawLabels(topTarget);
 			this._drawAdditionalSources(topTarget, sourceTopPaneViews);
 		}
 	}
@@ -455,12 +456,22 @@ export class TimeAxisWidget<HorzScaleItem> implements MouseEventHandlers, IDestr
 		return coordinate;
 	}
 
-	private _drawLabels(sources: readonly IDataSource[], target: CanvasRenderingTarget2D): void {
+	private _drawLabels(target: CanvasRenderingTarget2D): void {
 		const rendererOptions = this._getRendererOptions();
-		for (const source of sources) {
-			for (const view of source.timeAxisViews()) {
-				view.renderer().draw(target, rendererOptions);
+		const model = this._chart.model();
+		const sources = model.serieses();
+		const occupiedRanges: IRange<number>[] = [];
+
+		// Give priority to labels that would otherwise be painted on top.
+		for (let sourceIndex = sources.length - 1; sourceIndex >= 0; sourceIndex--) {
+			const views = sources[sourceIndex].timeAxisViews();
+			for (let viewIndex = views.length - 1; viewIndex >= 0; viewIndex--) {
+				views[viewIndex].renderer().draw(target, rendererOptions, occupiedRanges);
 			}
+		}
+
+		for (const view of model.crosshairSource().timeAxisViews()) {
+			view.renderer().draw(target, rendererOptions);
 		}
 	}
 
