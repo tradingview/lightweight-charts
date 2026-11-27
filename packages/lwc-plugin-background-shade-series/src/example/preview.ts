@@ -1,12 +1,14 @@
 import { CandlestickSeries, createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { createBackgroundShadeSeries } from '../background-shade-series';
 import { candleData, upShare } from './sample-data';
 
 // The catalog preview: candles over a shading from the share of up-closing
 // bars. The dev demo next door adds a whitespace gap and a per-bar color.
 const chart = createChart('chart', { autoSize: true });
+themeChart(chart);
 
 const candles = candleData(120);
 const candleSeries = chart.addSeries(CandlestickSeries);

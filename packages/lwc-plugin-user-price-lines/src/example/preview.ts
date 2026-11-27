@@ -1,6 +1,7 @@
 import { LineSeries, createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { UserPriceLines } from '../user-price-lines';
 import { lineData } from './sample-data';
 
@@ -8,6 +9,8 @@ import { lineData } from './sample-data';
 // result is visible before the button is found at the right edge. The dev
 // demo next door lists the lines and switches the crosshair mode option.
 const chart = createChart('chart', { autoSize: true });
+// The add button takes the crosshair label's background, which the theme sets.
+themeChart(chart);
 
 const series = chart.addSeries(LineSeries, { color: '#2962FF' });
 const data = lineData(120);

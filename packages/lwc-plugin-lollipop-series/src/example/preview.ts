@@ -1,6 +1,7 @@
 import { createChart } from 'lightweight-charts';
 import { mountControls } from '@tradingview/lwc-plugin-preview-kit/preview-controls';
 import '@tradingview/lwc-plugin-preview-kit/preview.css';
+import { themeChart } from '@tradingview/lwc-plugin-preview-kit/preview-theme';
 import { createLollipopSeries } from '../lollipop-series';
 import { lollipopData } from './sample-data';
 
@@ -10,6 +11,7 @@ const chart = createChart('chart', {
 	autoSize: true,
 	timeScale: { barSpacing: 12 },
 });
+themeChart(chart);
 
 const series = createLollipopSeries(chart, {
 	color: '#2962FF',

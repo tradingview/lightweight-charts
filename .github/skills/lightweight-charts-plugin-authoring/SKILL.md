@@ -108,6 +108,8 @@ step's mistakes.
 6. **Interaction**: `hitTest`, hover, drag. Keep it separate from drawing.
 7. **Tests**, then the README, then the demo and preview pages. The package
    contract (`references/package-contract.md`) says what each must contain.
+   The preview must use `themeChart` from the preview kit's `preview-theme`
+   and be checked in both the light and the dark theme.
 
 ## Scaffold, don't start blank
 

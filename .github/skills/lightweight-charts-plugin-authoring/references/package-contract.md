@@ -59,6 +59,20 @@ unknown keys are errors.
   `@tradingview/lwc-plugin-preview-kit` (layout + `mountControls` /
   `addRefreshButton`); a standalone project has no preview by default.
 
+  The preview follows the docs site's light or dark theme and switches live
+  when the site theme is toggled. Call `themeChart(chart, onTheme?)` from
+  `@tradingview/lwc-plugin-preview-kit/preview-theme` in the same script run
+  as `createChart`, before anything awaits; it themes the chart's
+  background, text, grid, scales and crosshair labels. Anything the preview
+  colors itself — series and plugin options, a price line color, an image —
+  is your job: recolor it in `onTheme`, which runs right away and again on
+  every switch. Keep a control's current choice in a variable so a theme
+  switch reapplies it, and read `previewTheme()` in the control's handler
+  (see `rounded-candles-series` or `box-whisker-series`). Before you
+  finish, check the built preview in both themes (`?theme=light` and
+  `?theme=dark` on its URL): nothing white or light-only left over, and
+  every line, dot and label readable on black.
+
 Neither page is the plugin's tests. Keep them free of assertions.
 
 ## README shape
