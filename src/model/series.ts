@@ -285,7 +285,7 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 			this._precomputeConflationLevels(tsOptions.precomputeConflationPriority);
 		}
 
-		this.invalidatePaneViewData();
+		this._paneView.update('data');
 
 		if (this._lastPriceAnimationPaneView !== null) {
 			if (updateInfo && updateInfo.lastBarUpdatedOrNewBarsAddedToTheRight) {
@@ -303,6 +303,8 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 	}
 
 	public invalidatePaneViewData(): void {
+		// conflated rows are copies, so they keep the logical indexes they were built with
+		this._conflationByFactorCache.clear();
 		this._paneView.update('data');
 	}
 
