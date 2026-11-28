@@ -37,21 +37,21 @@ export class PriceAxisStub implements IDestroyable {
 	private readonly _isLeft: boolean;
 	private _size: Size = size({ width: 0, height: 0 });
 	private readonly _borderVisible: BorderVisibleGetter;
-	private readonly _bottomColor: ColorGetter;
+	private readonly _backgroundColorGetter: ColorGetter;
 
 	public constructor(
 		side: PriceAxisWidgetSide,
 		options: ChartOptionsBase,
 		params: PriceAxisStubParams,
 		borderVisible: BorderVisibleGetter,
-		bottomColor: ColorGetter
+		backgroundColorGetter: ColorGetter
 	) {
 		this._isLeft = side === 'left';
 		this._rendererOptionsProvider = params.rendererOptionsProvider;
 
 		this._options = options;
 		this._borderVisible = borderVisible;
-		this._bottomColor = bottomColor;
+		this._backgroundColorGetter = backgroundColorGetter;
 
 		this._cell = document.createElement('div');
 		this._cell.style.width = '25px';
@@ -133,12 +133,13 @@ export class PriceAxisStub implements IDestroyable {
 		const horzBorderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * horizontalPixelRatio);
 		const vertBorderSize = Math.floor(this._rendererOptionsProvider.options().borderSize * verticalPixelRatio);
 		const left = (this._isLeft) ? bitmapSize.width - horzBorderSize : 0;
+		const top = (this._options.timeScale.position === 'top') ? bitmapSize.height - vertBorderSize : 0;
 
-		ctx.fillRect(left, 0, horzBorderSize, vertBorderSize);
+		ctx.fillRect(left, top, horzBorderSize, vertBorderSize);
 	}
 
 	private _drawBackground({ context: ctx, bitmapSize }: BitmapCoordinatesRenderingScope): void {
-		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, this._bottomColor());
+		clearRect(ctx, 0, 0, bitmapSize.width, bitmapSize.height, this._backgroundColorGetter());
 	}
 
 	private readonly _canvasSuggestedBitmapSizeChangedHandler = () => this.paint(InvalidationLevel.Full);
