@@ -1,2 +1,4 @@
-TradingView Lightweight Charts™
-Copyright (с) 2025 TradingView, Inc. https://www.tradingview.com/
+Combined project notice:
+- TradingView Lightweight Charts: Apache License 2.0; TradingView attribution requirements apply. See https://www.tradingview.com/
+- lightweight-charts-drawing: MIT License, Copyright (c) 2026 deepentropy.
+The complete drawing package license is in LICENSE.DRAWING.
