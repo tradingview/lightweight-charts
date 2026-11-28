@@ -44,6 +44,7 @@ import { PaneApi } from './pane-api';
 import { PriceScaleApi } from './price-scale-api';
 import { SeriesApi } from './series-api';
 import { TimeScaleApi } from './time-scale-api';
+import { advanceTimeScalePointsGeneration } from './time-scale-points-generation';
 
 function patchPriceFormat(priceFormat?: DeepPartial<PriceFormat>): void {
 	if (priceFormat === undefined || priceFormat.type === 'custom') {
@@ -418,6 +419,9 @@ export class ChartApi<HorzScaleItem> implements IChartApiBase<HorzScaleItem>, Da
 		}
 		model.updateTimeScale(update.timeScale.baseIndex, update.timeScale.points, update.timeScale.firstChangedPointIndex);
 		update.series.forEach((value: SeriesChanges, series: Series<SeriesType>) => series.setData(value.data, value.info));
+		if (update.timeScale.points !== undefined && update.timeScale.firstChangedPointIndex !== undefined) {
+			advanceTimeScalePointsGeneration(this._timeScaleApi);
+		}
 
 		model.timeScale().recalculateIndicesWithData();
 		model.recalculateAllPanes();
