@@ -125,5 +125,13 @@ describe('PriceScale', () => {
 		expect(priceRange).to.not.equal(null);
 		expect(priceRange?.from).to.be.equal(fromPrice);
 		expect(priceRange?.to).to.be.equal(toPrice);
+
+		priceScaleApi.setVisibleRange({ from: 100, to: 50000 });
+
+		priceRange = priceScaleApi.getVisibleRange();
+
+		expect(priceRange).to.not.equal(null);
+		expect(priceRange?.from).to.be.equal(100);
+		expect(priceRange?.to).to.be.equal(50000);
 	});
 });
